@@ -1,0 +1,10 @@
+/* 브랜드 컬러 변수 */
+:root {
+  --color-primary: #0066ff;
+  --color-primary-dark: #0047b3;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+  --color-gray-50: #f9fafb;
+  --color-gray-900: #111827;
+}
