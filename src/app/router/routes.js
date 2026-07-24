@@ -8,6 +8,7 @@ import { productsRoutes } from '@/features/products'
 import { coachRoutes } from '@/features/coach'
 import { collectionRoutes } from '@/features/collection'
 import { mypageRoutes } from '@/features/mypage'
+import { pacemakerRoutes } from '@/features/pacemaker'
 
 export const routes = [
   {
@@ -28,6 +29,7 @@ export const routes = [
     component: () => import('@/app/layouts/DashboardLayout.vue'),
     children: [
       ...roadmapRoutes,
+      ...pacemakerRoutes,
       ...collectionRoutes,
       ...spendingRoutes,
       ...productsRoutes,
