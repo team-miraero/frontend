@@ -3,7 +3,7 @@
   <div class="flex h-screen w-full overflow-hidden bg-[#f8fbff]">
     <DashboardSidebar />
     <div class="flex min-w-0 flex-1 flex-col">
-      <DashboardHeader />
+      <DashboardHeader v-if="!route.meta.hideHeader" />
       <main class="flex-1 overflow-y-auto">
         <RouterView />
       </main>
@@ -12,7 +12,10 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
 import { RouterView } from 'vue-router'
 import DashboardHeader from '@/app/layouts/components/DashboardHeader.vue'
 import DashboardSidebar from './components/DashboardSidebar.vue'
+
+const route = useRoute()
 </script>
