@@ -11,15 +11,15 @@
 export const GOAL_TYPES = [
   {
     id: 'house',
-    label: '내 집 마련',
+    label: '독립자금',
     description: '전세/매매 자금을 위한 목표',
     icon: 'home',
   },
   {
-    id: 'travel',
-    label: '여행자금',
-    description: '국내외 여행을 위한 목표',
-    icon: 'plane',
+    id: 'emergency',
+    label: '비상금/목돈',
+    description: '예기치 못한 지출 대비 목표',
+    icon: 'umbrella',
   },
   {
     id: 'wedding',
@@ -28,9 +28,9 @@ export const GOAL_TYPES = [
     icon: 'ring',
   },
   {
-    id: 'emergency',
-    label: '비상금',
-    description: '예기치 못한 지출 대비 목표',
+    id: 'loan',
+    label: '학자금 대출',
+    description: '학자금 상환을 위한 목표',
     icon: 'umbrella',
   },
 ]

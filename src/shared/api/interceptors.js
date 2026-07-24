@@ -36,7 +36,8 @@ export function attachResponseInterceptor(instance) {
       /** @type {NormalizedError} */
       const normalized = {
         status: error.response?.status ?? 0,
-        message: error.response?.data?.message ?? error.message ?? '알 수 없는 오류가 발생했습니다.',
+        message:
+          error.response?.data?.message ?? error.message ?? '알 수 없는 오류가 발생했습니다.',
         cause: error,
       }
 
