@@ -1,10 +1,10 @@
 <!-- 좌측 사이드바 + 헤더 + 컨텐츠 영역 레이아웃 -->
 <template>
-  <div class="flex min-h-screen w-full bg-[#f8fbff]">
+  <div class="flex h-screen w-full overflow-hidden bg-[#f8fbff]">
     <DashboardSidebar />
-    <div class="flex flex-1 flex-col">
+    <div class="flex min-w-0 flex-1 flex-col">
       <DashboardHeader />
-      <main class="flex-1">
+      <main class="flex-1 overflow-y-auto">
         <RouterView />
       </main>
     </div>
