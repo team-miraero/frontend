@@ -1,16 +1,4 @@
-// goal feature public API
-
-// Components
-export { default as GoalCard } from './components/GoalCard.vue'
-
-// Store
-export { useGoalStore } from './store/goal.store'
-
-// Constants
-export * from './constants/goal.constants'
-
-// API
-export * from './api/goal.api'
-
-// Routes
-export { goalRoutes } from './routes'
+// goal feature 공개 API barrel
+export { goalRoutes } from '@/features/goal/routes'
+export { useGoalStore } from '@/features/goal/store/goal.store'
+export * as goalApi from '@/features/goal/api/goal.api'
