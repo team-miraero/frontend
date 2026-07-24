@@ -30,7 +30,7 @@ export const GOAL_TYPES = [
   {
     id: 'loan',
     label: '학자금 대출',
-    description: '예기치 못한 지출 대비 목표',
+    description: '학자금 상환을 위한 목표',
     icon: 'umbrella',
   },
 ]
