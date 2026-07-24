@@ -3,7 +3,7 @@
     <div>
       <p class="text-xs text-slate-500">안녕하세요, {{ userName }}님 👋</p>
       <h1 class="pt-0.5 text-[22px] font-black tracking-[-0.44px] text-[#0a192f]">
-        내 로드맵 대시보드
+        {{ pageTitle }}
       </h1>
     </div>
 
@@ -12,8 +12,8 @@
         type="button"
         class="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.08] px-4 py-2.5 text-xs font-bold text-primary"
       >
-        <img src="@/assets/icons/pacemaker.svg" alt-="" class="size-[13px]" />
-        페이스메이커
+        <img src="@/assets/icons/pacemaker.svg" alt="" class="size-[13px]" />
+        {{ goalTitle }}
       </button>
 
       <div
@@ -26,10 +26,22 @@
 </template>
 <script setup>
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
+import { useGoalStore } from '@/features/goal'
+import { NAV_ITEMS } from '@/shared/constants/navigation'
 
+const route = useRoute()
 const authStore = useAuthStore()
+const goalStore = useGoalStore()
 
 const userName = computed(() => authStore.user?.name ?? '')
 const userInitial = computed(() => userName.value.charAt(0))
+
+const pageTitle = computed(
+  () => NAV_ITEMS.find((item) => item.routeName === route.name)?.pageTitle ?? ''
+)
+
+// TODO: goal.sotre에 목표 title 전용 필드가 생기면 selectedGoalType 대신 그 필드로 교체
+const goalTitle = computed(() => goalStore.selectedGoalType ?? '')
 </script>
