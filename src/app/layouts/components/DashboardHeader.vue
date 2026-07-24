@@ -12,7 +12,7 @@
         type="button"
         class="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.08] px-4 py-2.5 text-xs font-bold text-primary"
       >
-        <img src="@/assets/icons/pacemaker.svg" alt="" class="size-[13px]" />
+        <img src="@/assets/icons/roadmap.svg" alt="" class="size-[13px]" />
         {{ goalTitle }}
       </button>
 
