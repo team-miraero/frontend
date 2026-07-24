@@ -30,6 +30,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useGoalStore } from '@/features/goal'
 import { NAV_ITEMS } from '@/shared/constants/navigation'
+import { GOAL_TYPES } from '@/shared/constants/goals'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -43,5 +44,8 @@ const pageTitle = computed(
 )
 
 // TODO: goal.sotre에 목표 title 전용 필드가 생기면 selectedGoalType 대신 그 필드로 교체
-const goalTitle = computed(() => goalStore.selectedGoalType ?? '')
+const goalTitle = computed(() => {
+  const matched = GOAL_TYPES.find((type) => type.id === goalStore.selectedGoalType)
+  return matched?.label ?? ''
+})
 </script>
