@@ -1,10 +1,33 @@
 <template>
-  <header class="flex items-center justify-between border-b border-slate-200 bg-white px-10 py-5">
-    <div>
-      <p class="text-xs text-slate-500">안녕하세요, {{ userName }}님 👋</p>
-      <h1 class="pt-0.5 text-[22px] font-black tracking-[-0.44px] text-[#0a192f]">
-        {{ pageTitle }}
-      </h1>
+  <header
+    class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-5 lg:px-10"
+  >
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
+        aria-label="사이드바 메뉴 열기"
+        @click="uiStore.toggleSidebar()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          class="size-5"
+        >
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <div>
+        <p class="text-xs text-slate-500">안녕하세요, {{ userName }}님 👋</p>
+        <h1 class="pt-0.5 text-[22px] font-black tracking-[-0.44px] text-[#0a192f]">
+          {{ pageTitle }}
+        </h1>
+      </div>
     </div>
 
     <div class="flex items-center gap-3">
@@ -28,12 +51,14 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
+import { useUiStore } from '@/stores/ui.store'
 import { useGoalStore } from '@/features/goal'
 import { NAV_ITEMS } from '@/shared/constants/navigation'
 import { GOAL_TYPES } from '@/shared/constants/goals'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const goalStore = useGoalStore()
 
 const userName = computed(() => authStore.user?.name ?? '')

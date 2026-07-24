@@ -1,6 +1,16 @@
 <!-- 대시보드 좌측 사이드바: 로고 + 네비게이션 + 프로필 -->
 <template>
-  <aside class="flex h-full w-[248px] shrink-0 flex-col border-r border-slate-200 bg-white">
+  <!-- 모바일 오버레이 배경: 사이드바 펼침 상태에서만 표시, 클릭 시 닫힘 -->
+  <div
+    v-if="uiStore.sidebarOpen"
+    class="fixed inset-0 z-30 bg-black/40 lg:hidden"
+    @click="uiStore.toggleSidebar()"
+  />
+
+  <aside
+    class="fixed inset-y-0 left-0 z-40 flex h-screen w-[248px] shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-200 ease-in-out lg:sticky lg:top-0 lg:translate-x-0"
+    :class="uiStore.sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+  >
     <!-- 로고 + 마이데이터 연동 배지 -->
     <div class="border-b border-[#f0f4fb] px-6 pt-7 pb-5">
       <div class="flex items-center gap-2.5 pb-3">
@@ -24,6 +34,7 @@
           :to="{ name: roadmapNav.routeName }"
           class="flex w-full items-center gap-3 rounded-[14px] px-4 py-2.5"
           :class="isActive(roadmapNav.routeName) ? 'bg-[#eaf2ff]' : ''"
+          @click="closeMobileSidebar"
         >
           <img :src="roadmapNav.icon" alt="" class="size-4" />
           <span
@@ -52,6 +63,7 @@
         :to="{ name: collectionNav.routeName }"
         class="mt-2 flex h-11 items-center gap-3 rounded-[14px] px-4 py-3"
         :class="isActive(collectionNav.routeName) ? 'bg-[#eaf2ff]' : ''"
+        @click="closeMobileSidebar"
       >
         <img :src="collectionNav.icon" alt="" class="size-[18px]" />
         <span
@@ -68,6 +80,7 @@
         :to="{ name: pacemakerNav.routeName }"
         class="flex items-center gap-3 rounded-[14px] px-4 py-2.5"
         :class="isActive(pacemakerNav.routeName) ? 'bg-[#eaf2ff]' : ''"
+        @click="closeMobileSidebar"
       >
         <img :src="pacemakerNav.icon" alt="" class="size-4" />
         <span
@@ -86,6 +99,7 @@
           :to="{ name: item.routeName }"
           class="flex items-center gap-3 rounded-[14px] px-4 py-2.5"
           :class="isActive(item.routeName) ? 'bg-[#eaf2ff]' : ''"
+          @click="closeMobileSidebar"
         >
           <img :src="item.icon" alt="" class="size-4" />
           <span
@@ -115,6 +129,7 @@
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
+import { useUiStore } from '@/stores/ui.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { NAV_ITEMS } from '@/shared/constants/navigation'
 
@@ -127,11 +142,16 @@ defineProps({
 
 const route = useRoute()
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 
 const userName = computed(() => authStore.user?.name ?? '')
 const userInitial = computed(() => userName.value.charAt(0))
 
 const isActive = (routeName) => route.name === routeName
+
+const closeMobileSidebar = () => {
+  if (uiStore.sidebarOpen) uiStore.toggleSidebar()
+}
 
 const roadmapNav = NAV_ITEMS.find((item) => item.routeName === ROUTE_NAMES.DASHBOARD)
 const pacemakerNav = NAV_ITEMS.find((item) => item.routeName === ROUTE_NAMES.PACEMAKER)
