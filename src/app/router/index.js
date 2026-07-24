@@ -4,11 +4,7 @@ import { routes } from '@/app/router/routes'
 import { useAuthStore } from '@/stores/auth.store'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
-const PUBLIC_ROUTE_NAMES = new Set([
-  ROUTE_NAMES.ONBOARDING,
-  ROUTE_NAMES.LOGIN,
-  ROUTE_NAMES.SIGNUP,
-])
+const PUBLIC_ROUTE_NAMES = new Set([ROUTE_NAMES.ONBOARDING, ROUTE_NAMES.LOGIN, ROUTE_NAMES.SIGNUP])
 
 export const router = createRouter({
   history: createWebHistory(),

@@ -9,11 +9,41 @@ import coachIcon from '@/assets/icons/coach.svg'
 import mypageIcon from '@/assets/icons/mypage.svg'
 
 export const NAV_ITEMS = [
-    { routeName: ROUTE_NAMES.DASHBOARD, label: '로드맵', pageTitle: '나의 로드맵 대시보드', icon: roadmapIcon },
-  { routeName: ROUTE_NAMES.PACEMAKER, label: '페이스메이커', pageTitle: '페이스메이커', icon: pacemakerIcon },
-  { routeName: ROUTE_NAMES.COLLECTION, label: '목표 컬렉션', pageTitle: '나의 목표컬렉션', icon: collectionIcon },
-  { routeName: ROUTE_NAMES.SPENDING, label: '지출 관리', pageTitle: '나의 지출관리', icon: spendingIcon },
-  { routeName: ROUTE_NAMES.PRODUCTS, label: 'KB 상품', pageTitle: 'KB 상품 추천', icon: productsIcon },
-  { routeName: ROUTE_NAMES.COACH, label: 'AI 목표 코치', pageTitle: 'AI 목표 코치', icon: coachIcon },
+  {
+    routeName: ROUTE_NAMES.DASHBOARD,
+    label: '로드맵',
+    pageTitle: '나의 로드맵 대시보드',
+    icon: roadmapIcon,
+  },
+  {
+    routeName: ROUTE_NAMES.PACEMAKER,
+    label: '페이스메이커',
+    pageTitle: '페이스메이커',
+    icon: pacemakerIcon,
+  },
+  {
+    routeName: ROUTE_NAMES.COLLECTION,
+    label: '목표 컬렉션',
+    pageTitle: '나의 목표컬렉션',
+    icon: collectionIcon,
+  },
+  {
+    routeName: ROUTE_NAMES.SPENDING,
+    label: '지출 관리',
+    pageTitle: '나의 지출관리',
+    icon: spendingIcon,
+  },
+  {
+    routeName: ROUTE_NAMES.PRODUCTS,
+    label: 'KB 상품',
+    pageTitle: 'KB 상품 추천',
+    icon: productsIcon,
+  },
+  {
+    routeName: ROUTE_NAMES.COACH,
+    label: 'AI 목표 코치',
+    pageTitle: 'AI 목표 코치',
+    icon: coachIcon,
+  },
   { routeName: ROUTE_NAMES.MYPAGE, label: '마이페이지', pageTitle: '마이페이지', icon: mypageIcon },
 ]

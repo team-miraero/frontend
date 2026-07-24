@@ -20,7 +20,5 @@ export function formatDate(date) {
 export function diffInMonths(targetDate) {
   const target = targetDate instanceof Date ? targetDate : new Date(targetDate)
   const now = new Date()
-  return (
-    (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth())
-  )
+  return (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth())
 }
