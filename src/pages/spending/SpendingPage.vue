@@ -1,8 +1,13 @@
-<!-- 소비 분석 페이지 플레이스홀더 -->
 <template>
-  <div class="p-6">
-    <h1 class="text-xl font-bold">소비 분석 · EXP-01~04</h1>
-  </div>
+  <main>
+    <!-- 페이지 상단 영역 -->
+
+    <SpendingSummarySection />
+
+    <!-- 절감 시뮬레이터 -->
+  </main>
 </template>
 
-<script setup></script>
+<script setup>
+import SpendingSummarySection from '@/features/spending/components/SpendingSummarySection.vue'
+</script>
