@@ -1,12 +1,27 @@
-// roadmap 도메인 상태 store
+// roadmap 도메인 상태 store: 마일스톤 목록
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import * as roadmapApi from '@/features/roadmap/api/roadmap.api'
 
 export const useRoadmapStore = defineStore('feature-roadmap', () => {
-  // 담을 상태: roadmap(Roadmap), milestones, currentStage(시작/탄력/가속/결승)
-  const roadmap = ref(null)
   const milestones = ref([])
-  const currentStage = ref(null)
 
-  return { roadmap, milestones, currentStage }
+  const nextMilestone = computed(
+    () => milestones.value.find((milestone) => milestone.status === 'IN_PROGRESS') ?? null
+  )
+
+  const previousMilestone = computed(() => {
+    if (!nextMilestone.value) return null
+    const index = milestones.value.findIndex((m) => m.milestoneId === nextMilesone.value.milestoneId)
+    return index > 0 ? milestones.value[index - 1] : null
+  })
+
+  /**
+   * @param {number} goalId
+   */
+  async function fetchMilestones(goalId) {
+    milestones.value = await roadmapApi.getMilestones(goalId)
+  }
+
+  return { milestones, nextMilestone, previousMilestone, fetchMilestones }
 })
