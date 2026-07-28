@@ -2,8 +2,8 @@
   <div class="p-6">
     <h1 class="text-xl font-bold mb-4">로그인 · AUTH-01</h1>
     <button 
-      @click="handleMockLogin"
       class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      @click="handleMockLogin"
     >
       임시 로그인 (테스트용)
     </button>

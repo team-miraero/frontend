@@ -25,25 +25,25 @@ export const GOAL_PRESETS = Object.freeze([
   {
     id: GOAL_PRESET_IDS.INDEPENDENCE,
     title: '독립자금',
-    description: '보증금부터 월세, 이사 비용까지 나만의 공간을 만들기 위한 첫걸음',
+    description: '전세·월세 보증금 마련',
     icon: '🏠',
   },
   {
     id: GOAL_PRESET_IDS.EMERGENCY,
-    title: '비상금·첫 목돈',
-    description: '갑작스러운 지출에 대비하고 든든한 시드머니를 모으기 위한 기본 자금',
+    title: '비상금',
+    description: '생활비 3~6개월치 안전망',
     icon: '💰',
   },
   {
     id: GOAL_PRESET_IDS.MARRIAGE,
     title: '결혼자금',
-    description: '일생의 가장 특별한 시작인 결혼식과 신혼 보금자리를 위한 자비로운 준비',
+    description: '결혼을 위한 목돈',
     icon: '💍',
   },
   {
     id: GOAL_PRESET_IDS.STUDENT_LOAN,
-    title: '학자금 대출 상환',
-    description: '미래를 향해 더 가볍게 날아오르기 위한 학자금 대출 완전 상환 계획',
+    title: '학자금',
+    description: '빚 없는 출발',
     icon: '🎓',
   },
 ])
