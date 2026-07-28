@@ -1,5 +1,5 @@
 // pacemaker 도메인 API 함수 골격: 자동저축(페이스메이커) 조회/토글
-
+import { client } from '@/shared/api/client'
 /**
  * @typedef {Object} PacemakerStatus
  * @property {number | null} autoSavingId

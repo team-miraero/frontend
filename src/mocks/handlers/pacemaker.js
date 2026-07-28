@@ -10,6 +10,7 @@ export const pacemakerHandlers = [
       registered: true,
       status: mockPacemakerStatus,
       enabled: mockPacemakerStatus === 'ACTIVE',
+      monthlySecuredAmount: 42000,
     })
   }),
 

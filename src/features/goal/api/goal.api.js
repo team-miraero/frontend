@@ -1,4 +1,4 @@
-// goal 도메인 API 함수 골격 
+// goal 도메인 API 함수 골격
 import { client } from '@/shared/api/client'
 /**
  * @typedef {Object} GoalParams
@@ -48,7 +48,6 @@ export async function linkAccount(payload) {
   // TODO: 실제 API 연동 시 client.post(`/goals/${payload.goalId}/accounts`, payload)로 교체
 }
 
-
 // 목표 목록 조회 API
 /**
  * @typedef {Object} GoalListItem
@@ -66,7 +65,6 @@ export async function getGoals() {
   const { data } = await client.get('/goals')
   return data.goals
 }
-
 
 // 목표 상세 조회 API
 /**
@@ -109,7 +107,7 @@ export async function getGoalDetail(goalId) {
  * @param {number} goalId
  * @returns {Promise<GoalAsset[]>}
  */
-export async function getGoalAssets(goalID) {
+export async function getGoalAssets(goalId) {
   const { data } = await client.get(`/goals/${goalId}/assets`)
   return data.assets
 }

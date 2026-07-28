@@ -1,5 +1,5 @@
 // roadmap 도메인 API 함수 골격: 목표 마일스톤 (/api/goals/{goalId}/milestones)
-
+import { client } from '@/shared/api/client'
 /**
  * @typedef {Object} MileStone
  * @property {number} milestoneId
