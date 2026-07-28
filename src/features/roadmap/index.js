@@ -6,5 +6,7 @@ export { default as PaceBanner } from '@/features/roadmap/components/PaceBanner.
 export { default as GoalSummaryCard } from '@/features/roadmap/components/GoalSummaryCard.vue'
 export { default as ConnectedAssetsCard } from '@/features/roadmap/components/ConnectedAssetsCard.vue'
 export { default as PacemakerToggleCard } from '@/features/roadmap/components/PacemakerToggleCard.vue'
-export { default as MilestoneRoadmap } from '@/features/roadmap/components/MilestoneRoadmap.vue'
+export { default as MilestoneProgressBar } from '@/features/roadmap/components/MilestoneProgressBar.vue'
+export { default as NextMilestoneCard } from '@/features/roadmap/components/NextMilestoneCard.vue'
+export { default as MilestoneList } from '@/features/roadmap/components/MilestoneList.vue'
 export { default as AvailableMoneyPanel } from '@/features/roadmap/components/AvailableMoneyPanel.vue'

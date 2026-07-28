@@ -1,8 +1,11 @@
 <!-- 로드맵 메인 대시보드 -->
 <template>
   <div v-if="goalStore.currentGoal" class="flex justify-center bg-[#f8fbff] pb-16">
-    <div class="w-full max-w-[1080px] px-10 py-7">
-      <PaceBanner :pace="goalStore.currentGoal.pace" :progress-rate="goalStore.currentGoal.progressRate" />
+    <div class="w-full max-w-[1440px] px-10 py-7">
+      <PaceBanner
+        :pace="goalStore.currentGoal.pace"
+        :progress-rate="goalStore.currentGoal.progressRate"
+      />
 
       <div class="grid grid-cols-3 gap-4 pt-6">
         <GoalSummaryCard :goal="goalStore.currentGoal" />
@@ -14,14 +17,19 @@
       </div>
 
       <div class="flex gap-5 pt-6">
-        <div class="flex-1">
-          <MilestoneRoadmap
+        <div class="flex flex-1 min-w-0 flex-col gap-4">
+          <MilestoneProgressBar
             :goal="goalStore.currentGoal"
             :milestones="roadmapStore.milestones"
             @pause="goalStore.updateCurrentGoalStatus('PAUSE')"
           />
+          <NextMilestoneCard :goal="goalStore.currentGoal" :milestones="roadmapStore.milestones" />
+          <MilestoneList :milestones="roadmapStore.milestones" />
         </div>
-        <AvailableMoneyPanel v-if="goalStore.availableMoney" :available-money="goalStore.availableMoney" />
+        <AvailableMoneyPanel
+          v-if="goalStore.availableMoney"
+          :available-money="goalStore.availableMoney"
+        />
       </div>
     </div>
   </div>
@@ -37,8 +45,10 @@ import {
   GoalSummaryCard,
   ConnectedAssetsCard,
   PacemakerToggleCard,
-  MilestoneRoadmap, 
-  AvailableMoneyPanel 
+  MilestoneProgressBar,
+  NextMilestoneCard,
+  MilestoneList,
+  AvailableMoneyPanel,
 } from '@/features/roadmap'
 import { usePacemakerStore } from '@/features/pacemaker'
 import * as goalApi from '@/features/goal/api/goal.api'

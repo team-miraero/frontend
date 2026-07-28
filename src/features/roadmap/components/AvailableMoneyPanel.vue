@@ -1,6 +1,6 @@
 <!-- 사이드 "여유자금" 패널 -->
 <template>
-  <div class="w-[220px] shrink-0">
+  <div class="w-[300px] shrink-0">
     <p class="text-sm font-bold text-[#0a192f]">여유자금</p>
 
     <div class="mt-2 rounded-2xl border border-slate-200 bg-white p-5">
