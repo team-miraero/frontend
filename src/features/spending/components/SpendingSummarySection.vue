@@ -29,7 +29,7 @@
           <p class="text-xs text-[#64748B]">이번 달 저축 여력</p>
 
           <p class="mt-1.5">
-            <strong class="text-xl font-bold text-[#10B981]">
+            <strong class="text-xl font-bold text-[#0A192F]">
               {{ formattedSavingCapacity }}
             </strong>
 
@@ -41,7 +41,7 @@
           <p class="text-xs text-[#64748B]">목표 달성까지</p>
 
           <p class="mt-1.5">
-            <strong class="text-xl font-bold text-[#0066FF]">
+            <strong class="text-xl font-bold text-[#0A192F]">
               {{ formattedRemainingMonths }}
             </strong>
 
@@ -61,7 +61,7 @@
           </p>
 
           <span class="text-xs font-medium text-[#64748B]">
-            잔여 {{ formattedRemainingMonths }}개월
+            진행률 {{ normalizedGoalProgress }}%
           </span>
         </div>
 
@@ -90,24 +90,24 @@
         :description="desktopMonthlyDifferenceDescription"
         :description-highlight="monthlyDifferenceText"
         :tone="monthlyDifferenceTone"
+        value-tone="default"
       />
 
       <SpendingSummaryCard
         title="이번 달 저축 여력"
         :value="savingCapacity"
         unit="만원"
-        description="목표를 위해 저축 가능한 금액이에요"
-        tone="positive"
+        description="목표를 위해 저축 가능해요"
       />
 
       <SpendingSummaryCard
         title="목표 달성 현황"
-        :value="`잔여 ${formattedRemainingMonths}`"
+        :value="remainingMonths"
+        value-prefix="잔여"
         unit="개월"
         :progress="goalProgress"
         progress-label="목표 달성 진행률"
         :progress-text="`${normalizedGoalProgress}%`"
-        tone="default"
       />
     </div>
   </section>
@@ -115,7 +115,8 @@
 
 <script setup>
 import { computed } from 'vue'
-import SpendingSummaryCard from './SpendingSummaryCard.vue'
+import SpendingSummaryCard from '@/features/spending/components/SpendingSummaryCard.vue'
+import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 
 const props = defineProps({
   totalSpending: {
@@ -140,7 +141,7 @@ const props = defineProps({
   },
   selectedGoal: {
     type: String,
-    default: '유럽 여행자금',
+    default: DEFAULT_SELECTED_GOAL,
   },
 })
 

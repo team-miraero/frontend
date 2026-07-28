@@ -1,15 +1,17 @@
 <template>
-  <article
-    class="flex min-h-[116px] flex-col justify-between rounded-2xl border border-[#E2E8F0] bg-white px-5 py-4 lg:min-h-[124px] lg:px-6"
-  >
+  <article class="flex h-[140px] flex-col rounded-2xl border border-[#E2E8F0] bg-white px-6 py-5">
     <div>
       <p class="text-sm font-medium text-[#64748B]">
         {{ title }}
       </p>
 
       <div class="mt-2 flex items-end gap-1">
+        <span v-if="valuePrefix" class="pb-0.5 text-sm font-medium text-[#64748B]">
+          {{ valuePrefix }}
+        </span>
+
         <strong
-          class="text-[26px] font-bold leading-none tracking-[-0.03em]"
+          class="text-[30px] font-bold leading-none tracking-[-0.03em]"
           :class="valueColorClass"
         >
           {{ formattedValue }}
@@ -21,8 +23,8 @@
       </div>
     </div>
 
-    <div v-if="hasProgress" class="mt-4">
-      <div class="mb-2 flex items-center justify-between gap-3">
+    <div v-if="hasProgress" class="mt-auto">
+      <div class="mb-1.5 flex items-center justify-between gap-3">
         <span class="text-xs text-[#64748B]">
           {{ progressLabel }}
         </span>
@@ -47,7 +49,7 @@
       </div>
     </div>
 
-    <p v-else-if="description" class="mt-3 text-xs leading-5 text-[#64748B]">
+    <p v-else-if="description" class="mt-auto text-xs leading-5 text-[#64748B]">
       {{ descriptionPrefix }}
 
       <strong v-if="descriptionHighlight" class="font-semibold" :class="descriptionColorClass">
@@ -60,6 +62,13 @@
 <script setup>
 import { computed } from 'vue'
 
+const TONE_CLASSES = {
+  default: 'text-[#0A192F]',
+  primary: 'text-[#0066FF]',
+  positive: 'text-[#10B981]',
+  warning: 'text-[#F59E0B]',
+}
+
 const props = defineProps({
   title: {
     type: String,
@@ -68,6 +77,10 @@ const props = defineProps({
   value: {
     type: [Number, String],
     required: true,
+  },
+  valuePrefix: {
+    type: String,
+    default: '',
   },
   unit: {
     type: String,
@@ -85,6 +98,12 @@ const props = defineProps({
     type: String,
     default: 'default',
     validator: (value) => ['default', 'primary', 'positive', 'warning'].includes(value),
+  },
+  valueTone: {
+    type: String,
+    default: null,
+    validator: (value) =>
+      value === null || ['default', 'primary', 'positive', 'warning'].includes(value),
   },
   progress: {
     type: Number,
@@ -126,25 +145,7 @@ const descriptionPrefix = computed(() => {
   return props.description.replace(props.descriptionHighlight, '').trim()
 })
 
-const valueColorClass = computed(() => {
-  const toneClasses = {
-    default: 'text-[#0A192F]',
-    primary: 'text-[#0066FF]',
-    positive: 'text-[#10B981]',
-    warning: 'text-[#F59E0B]',
-  }
+const valueColorClass = computed(() => TONE_CLASSES[props.valueTone ?? props.tone])
 
-  return toneClasses[props.tone]
-})
-
-const descriptionColorClass = computed(() => {
-  const toneClasses = {
-    default: 'text-[#0A192F]',
-    primary: 'text-[#0066FF]',
-    positive: 'text-[#10B981]',
-    warning: 'text-[#F59E0B]',
-  }
-
-  return toneClasses[props.tone]
-})
+const descriptionColorClass = computed(() => TONE_CLASSES[props.tone])
 </script>
