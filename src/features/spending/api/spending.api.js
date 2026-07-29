@@ -6,6 +6,8 @@ const MOCK_SPENDING_SUMMARY = {
   remainingMonths: 53,
   monthlyDifference: 4,
   goalProgress: 62,
+  myDataLinked: true,
+  referenceMonth: '2026-07',
 }
 
 /**
@@ -15,6 +17,8 @@ const MOCK_SPENDING_SUMMARY = {
  * @property {number} remainingMonths
  * @property {number} monthlyDifference 만원 단위
  * @property {number} goalProgress
+ * @property {boolean} myDataLinked 마이데이터 연동 여부
+ * @property {string | null} referenceMonth 데이터 기준 월 (YYYY-MM)
  */
 
 /**

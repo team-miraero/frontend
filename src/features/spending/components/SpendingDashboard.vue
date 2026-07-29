@@ -1,47 +1,91 @@
 <template>
-  <div class="mx-auto w-full max-w-[1660px] px-4 pb-24 pt-5 sm:px-6 md:px-8 md:pb-12 lg:px-10">
-    <div class="mb-5 md:mb-7">
-      <p class="text-xs font-medium text-[#64748B]">마이데이터 연동 · 7월 기준</p>
-    </div>
+  <div>
+    <RoadmapSelector
+      :goals="goals"
+      :selected-goal-id="selectedGoalId"
+      :disabled="areGoalsLoading"
+      :helper-text="roadmapHelperText"
+      :trailing-text="myDataStatusText"
+      @update:selected-goal-id="$emit('select-goal', $event)"
+    />
 
-    <p
-      v-if="error"
-      class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700"
-      role="alert"
+    <div
+      class="mx-auto w-full max-w-[1660px] px-4 pb-24 pt-3 sm:px-6 md:px-8 md:pb-12 md:pt-4 lg:px-10"
     >
-      지출 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
-    </p>
+      <p
+        v-if="error"
+        class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700"
+        role="alert"
+      >
+        지출 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
+      </p>
 
-    <template v-else-if="spendingSummary">
-      <SpendingSummarySection
-        :total-spending="spendingSummary.totalSpending"
-        :saving-capacity="spendingSummary.savingCapacity"
-        :remaining-months="spendingSummary.remainingMonths"
-        :monthly-difference="spendingSummary.monthlyDifference"
-        :goal-progress="spendingSummary.goalProgress"
-        :selected-goal="selectedGoal"
-      />
+      <template v-else-if="spendingSummary">
+        <SpendingSummarySection
+          :total-spending="spendingSummary.totalSpending"
+          :saving-capacity="spendingSummary.savingCapacity"
+          :remaining-months="spendingSummary.remainingMonths"
+          :monthly-difference="spendingSummary.monthlyDifference"
+          :goal-progress="spendingSummary.goalProgress"
+          :selected-goal="selectedGoal"
+        />
 
-      <SpendingContentTabs
-        class="mt-5 md:mt-7"
-        :summary="spendingSummary"
-        :selected-goal="selectedGoal"
-      />
-    </template>
+        <SpendingContentTabs
+          class="mt-5 md:mt-7"
+          :summary="spendingSummary"
+          :selected-goal="selectedGoal"
+        />
+      </template>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import SpendingContentTabs from '@/features/spending/components/SpendingContentTabs.vue'
 import SpendingSummarySection from '@/features/spending/components/SpendingSummarySection.vue'
-import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 import { useSpendingStore } from '@/features/spending/store/spending.store'
+import RoadmapSelector from '@/shared/ui/RoadmapSelector.vue'
 
 const spendingStore = useSpendingStore()
 const { spendingSummary, error } = storeToRefs(spendingStore)
-const selectedGoal = DEFAULT_SELECTED_GOAL
+
+const props = defineProps({
+  goals: {
+    type: Array,
+    default: () => [],
+  },
+  selectedGoalId: {
+    type: [Number, String],
+    default: null,
+  },
+  selectedGoal: {
+    type: String,
+    default: '',
+  },
+  areGoalsLoading: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+defineEmits(['select-goal'])
+
+const roadmapHelperText = computed(() =>
+  props.selectedGoal
+    ? `이 페이지의 모든 단축 효과는 ${props.selectedGoal} 로드맵 기준으로 계산돼요`
+    : ''
+)
+
+const myDataStatusText = computed(() => {
+  if (!spendingSummary.value?.myDataLinked) return ''
+
+  const month = Number(spendingSummary.value.referenceMonth?.split('-')[1])
+  return Number.isInteger(month) && month > 0
+    ? `마이데이터 연동 · ${month}월 기준`
+    : '마이데이터 연동'
+})
 
 onMounted(() => {
   spendingStore.loadSpendingData({
