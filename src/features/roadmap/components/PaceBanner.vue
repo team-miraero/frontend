@@ -33,6 +33,7 @@
       type="button"
       class="flex min-w-[150px] flex-col items-center justify-center gap-1.5 rounded-[18px] px-5 py-4"
       :style="{ backgroundImage: theme.ctaGradient, boxShadow: `0 4px 10px ${theme.ctaShadow}` }"
+      @click="$emit('cta-click')"
     >
       <img :src="theme.ctaIcon" alt="" class="size-[18px]" />
       <span class="text-center text-xs font-black leading-[15px] text-white">
@@ -58,6 +59,7 @@ const props = defineProps({
     required: true,
   },
 })
+defineEmits(['cta-click'])
 
 const theme = computed(() => PACE_THEME[props.pace.paceStatus] ?? PACE_THEME.ON_TRACK)
 </script>

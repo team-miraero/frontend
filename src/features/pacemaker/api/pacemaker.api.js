@@ -6,6 +6,11 @@ import { client } from '@/shared/api/client'
  * @property {boolean} registered
  * @property {'ACTIVE' | 'PAUSED' | null} status
  * @property {boolean} enabled
+ * @property {number} monthlySecuredAmount 이번 달 자동 확보 금액
+ * @property {number} balance 페이스메이커 저금통 잔액
+ * @property {number} todayEarned 오늘 적립된 금액
+ * @property {number} streakDays 연속 적립일
+ * @property {number} dailyLimit 하루 자동저축 상한선
  */
 
 /**
@@ -23,6 +28,35 @@ export async function getPacemakerStatus() {
  */
 export async function updatePacemakerStatus(autoSavingId, status) {
   const { data } = await client.patch(`/pace-maker/${autoSavingId}/status`, { status })
+  return data
+}
+
+/**
+ * 페이스메이커 저금통 잔액을 특정 목표의 연결 계좌로 입금
+ * @param {number} goalId
+ * @param {number} amount
+ * @returns {Promise<{ goalId: number, depositedAmount: number, remainingBalance: number }>}
+ */
+export async function depositToGoalAccount(goalId, amount) {
+  const { data } = await client.post('/pace-maker/deposit', { goalId, amount })
+  return data
+}
+
+/**
+ * @typedef {Object} PacemakerHistoryItem
+ * @property {string} date 'yyyy-MM-dd'
+ * @property {'SAVED' | 'SKIPPED'} status
+ * @property {number | null} amount 저축된 금액 (SKIPPED면 null)
+ * @property {string | null} reason 저축을 건너뛴 사유 (SAVED면 null)
+ */
+
+/**
+ * 자동 저축 내역 조회
+ * @param {{ page?: number, size?: number }} [params]
+ * @returns {Promise<{ histories: PacemakerHistoryItem[], hasNext: boolean }>}
+ */
+export async function getPacemakerHistories({ page = 0, size = 20 } = {}) {
+  const { data } = await client.get('/pace-maker/histories', { params: { page, size } })
   return data
 }
 
