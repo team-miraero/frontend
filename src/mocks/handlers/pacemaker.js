@@ -2,8 +2,8 @@
 import { http, HttpResponse } from 'msw'
 
 // 테스트 시 registered/mockPacemakerStatus 조합만 바꿔가며 미개설·OFF·ON 상태를 확인하면 됩니다.
-let mockRegistered = true
-let mockPacemakerStatus = 'ACTIVE' // 'ACTIVE' | 'PAUSED' | null
+let mockRegistered = false
+let mockPacemakerStatus = null // 'ACTIVE' | 'PAUSED' | null
 let mockBalance = 270000
 
 export const pacemakerHandlers = [
