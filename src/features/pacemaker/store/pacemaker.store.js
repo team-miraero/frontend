@@ -9,6 +9,8 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   /** @type {import('vue').Ref<import('@/features/pacemaker/api/pacemaker.api').PacemakerStatus | null>} */
   const pacemakerStatus = ref(null)
   const depositTargets = ref([])
+  const histories = ref([])
+  const hasMoreHistories = ref(false)
 
   async function fetchPacemakerStatus() {
     pacemakerStatus.value = await pacemakerApi.getPacemakerStatus()
@@ -57,12 +59,21 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     return result
   }
 
+  async function fetchHistories() {
+    const result = await pacemakerApi.getPacemakerHistories()
+    histories.value = result.histories
+    hasMoreHistories.value = result.hasNext
+  }
+
   return {
     pacemakerStatus,
     depositTargets,
+    histories,
+    hasMoreHistories,
     fetchPacemakerStatus,
     fetchDepositTargets,
     togglePacemaker,
     depositToGoal,
+    fetchHistories,
   }
 })

@@ -40,4 +40,17 @@ export const pacemakerHandlers = [
       remainingBalance: mockBalance,
     })
   }),
+
+  http.get('*/api/pace-maker/histories', async () => {
+    return HttpResponse.json({
+      histories: [
+        { date: '2026-07-18', status: 'SAVED', amount: 3200, reason: null },
+        { date: '2026-07-17', status: 'SAVED', amount: 5800, reason: null },
+        { date: '2026-07-16', status: 'SKIPPED', amount: null, reason: '지출 초과' },
+        { date: '2026-07-15', status: 'SAVED', amount: 4100, reason: null },
+        { date: '2026-07-14', status: 'SAVED', amount: 2700, reason: null },
+      ],
+      hasNext: false,
+    })
+  }),
 ]

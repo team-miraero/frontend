@@ -42,4 +42,22 @@ export async function depositToGoalAccount(goalId, amount) {
   return data
 }
 
+/**
+ * @typedef {Object} PacemakerHistoryItem
+ * @property {string} date 'yyyy-MM-dd'
+ * @property {'SAVED' | 'SKIPPED'} status
+ * @property {number | null} amount 저축된 금액 (SKIPPED면 null)
+ * @property {string | null} reason 저축을 건너뛴 사유 (SAVED면 null)
+ */
+
+/**
+ * 자동 저축 내역 조회
+ * @param {{ page?: number, size?: number }} [params]
+ * @returns {Promise<{ histories: PacemakerHistoryItem[], hasNext: boolean }>}
+ */
+export async function getPacemakerHistories({ page = 0, size = 20 } = {}) {
+  const { data } = await client.get('/pace-maker/histories', { params: { page, size } })
+  return data
+}
+
 // TODO: 최초 개설 POST API 명세 확정되면 registerPacemaker() 추가
