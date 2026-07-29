@@ -2,13 +2,34 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import * as pacemakerApi from '@/features/pacemaker/api/pacemaker.api'
+import { goalApi } from '@/features/goal'
+import { GOAL_TYPE_ICON } from '@/features/pacemaker/constants/pacemaker.constants'
 
 export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   /** @type {import('vue').Ref<import('@/features/pacemaker/api/pacemaker.api').PacemakerStatus | null>} */
   const pacemakerStatus = ref(null)
+  const depositTargets = ref([])
 
   async function fetchPacemakerStatus() {
     pacemakerStatus.value = await pacemakerApi.getPacemakerStatus()
+  }
+
+  // 입금 가능 계좌 = 각 목표의 연결 자산(/api/goals/{goalId}/assets) 중 LOAN이 아닌 것들
+  async function fetchDepositTargets() {
+    const goals = await goalApi.getGoals()
+    const assetsByGoal = await Promise.all(goals.map((goal) => goalApi.getGoalAssets(goal.goalId)))
+
+    depositTargets.value = goals.flatMap((goal, index) =>
+      assetsByGoal[index]
+        .filter((asset) => asset.assetType !== 'LOAN')
+        .map((asset) => ({
+          goalId: goal.goalId,
+          goalName: goal.goalName,
+          icon: GOAL_TYPE_ICON[goal.goalType] ?? '🎯',
+          bankName: asset.bankName,
+          accountNumberMasked: asset.accountNumberMasked,
+        }))
+    )
   }
 
   async function togglePacemaker() {
@@ -22,5 +43,11 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     pacemakerStatus.value.enabled = result.status === 'ACTIVE'
   }
 
-  return { pacemakerStatus, fetchPacemakerStatus, togglePacemaker }
+  return { 
+    pacemakerStatus, 
+    depositTargets,
+    fetchPacemakerStatus, 
+    fetchDepositTargets,
+    togglePacemaker,
+   }
 })
