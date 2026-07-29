@@ -1,0 +1,133 @@
+export const DEFAULT_SELECTED_GOAL = '유럽 여행자금'
+
+export const MONTHS_SHORTENED_PER_SAVING_UNIT = 0.04
+
+export const SPENDING_AGE_GROUPS = [
+  { id: 'early-20s', label: '20대 초' },
+  { id: 'late-20s', label: '20대 후' },
+  { id: 'early-30s', label: '30대 초' },
+  { id: 'late-30s', label: '30대 후' },
+]
+
+export const DEFAULT_SPENDING_AGE_GROUP_ID = 'late-20s'
+
+export const PEER_SPENDING_BY_AGE_GROUP = {
+  'early-20s': {
+    food: 28,
+    cafe: 13,
+    shopping: 18,
+    subscription: 7,
+    transportation: 8,
+    exercise: 4,
+  },
+  'late-20s': {
+    food: 30,
+    cafe: 12,
+    shopping: 20,
+    subscription: 8,
+    transportation: 10,
+    exercise: 6,
+  },
+  'early-30s': {
+    food: 35,
+    cafe: 10,
+    shopping: 17,
+    subscription: 9,
+    transportation: 11,
+    exercise: 7,
+  },
+  'late-30s': {
+    food: 38,
+    cafe: 9,
+    shopping: 15,
+    subscription: 10,
+    transportation: 12,
+    exercise: 8,
+  },
+}
+
+export const PREVIOUS_MONTH_SPENDING_BY_CATEGORY = {
+  food: 29,
+  cafe: 16,
+  shopping: 20,
+  subscription: 7,
+  transportation: 10,
+  exercise: 4,
+}
+
+export const SPENDING_CATEGORIES = [
+  {
+    id: 'food',
+    name: '식비',
+    icon: '🍴',
+    mode: 'adjustable',
+    current: 32,
+    target: null,
+    min: 0,
+    step: 1,
+    accent: '#FF6B6B',
+    softColor: '#FFF1F2',
+    borderColor: '#FFCDD2',
+  },
+  {
+    id: 'cafe',
+    name: '카페',
+    icon: '☕',
+    mode: 'adjustable',
+    current: 14,
+    target: null,
+    min: 0,
+    step: 1,
+    accent: '#F59E0B',
+    softColor: '#FFF7E8',
+    borderColor: '#FDD99A',
+  },
+  {
+    id: 'shopping',
+    name: '쇼핑',
+    icon: '🛍️',
+    mode: 'adjustable',
+    current: 22,
+    target: null,
+    min: 0,
+    step: 1,
+    accent: '#A855F7',
+    softColor: '#F8F0FF',
+    borderColor: '#DDB9FF',
+  },
+  {
+    id: 'subscription',
+    name: '구독',
+    icon: '📺',
+    mode: 'adjustable',
+    current: 8,
+    target: null,
+    min: 0,
+    step: 1,
+    accent: '#3D8BFF',
+    softColor: '#EEF5FF',
+    borderColor: '#B9D4FF',
+  },
+  {
+    id: 'transportation',
+    name: '교통',
+    icon: '🚌',
+    mode: 'maintain',
+    current: 9,
+    accent: '#10B981',
+    softColor: '#ECFDF5',
+    maintainTitle: '생활 필수 지출로 유지가 적절해요.',
+    maintainDescription: '현재 수준을 유지해도 목표 달성 계획에 무리가 없어요.',
+  },
+  {
+    id: 'exercise',
+    name: '운동',
+    icon: '🏋️',
+    mode: 'maintain',
+    current: 5,
+    accent: '#64748B',
+    softColor: '#F1F5F9',
+    maintainTitle: '현재 루틴을 유지해도 괜찮아요.',
+    maintainDescription: '줄이기보다 지속 가능성을 우선하는 지출로 판단했어요.',
+  },
+]
