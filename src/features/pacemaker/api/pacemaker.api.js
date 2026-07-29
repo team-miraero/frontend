@@ -1,49 +1,29 @@
-// pacemaker 도메인 API 함수 골격 (PACE-01~06)
-
+// pacemaker 도메인 API 함수 골격: 자동저축(페이스메이커) 조회/토글
+import { client } from '@/shared/api/client'
 /**
- * @typedef {Object} CashflowAnalysis
- * @property {number} monthlyIncome
- * @property {number} monthlyExpense
- * @property {number} netCashflow
+ * @typedef {Object} PacemakerStatus
+ * @property {number | null} autoSavingId
+ * @property {boolean} registered
+ * @property {'ACTIVE' | 'PAUSED' | null} status
+ * @property {boolean} enabled
  */
 
 /**
- * @typedef {Object} SpareMoney
- * @property {number} today 오늘 남은 여유자금
- * @property {number} thisWeek 이번 주 여유자금
- * @property {number} thisMonth 이번 달 여유자금
+ * @returns {Promise<PacemakerStatus>}
  */
-
-/**
- * @typedef {Object} NextMonthReserve
- * @property {number} reserveRate 준비금 확보율
- * @property {number} reservedAmount
- * @property {number} targetAmount
- */
-
-/**
- * @param {string} goalId
- * @returns {Promise<CashflowAnalysis>}
- */
-export async function getCashflowAnalysis(goalId) {
-  // TODO: 실제 API 연동 시 client.get(`/goals/${goalId}/cashflow`)로 교체
-  return { monthlyIncome: 0, monthlyExpense: 0, netCashflow: 0 }
+export async function getPacemakerStatus() {
+  const { data } = await client.get('/pace-maker')
+  return data
 }
 
 /**
- * @param {string} goalId
- * @returns {Promise<SpareMoney>}
+ * @param {number} autoSavingId
+ * @param {'ACTIVE' | 'PAUSED'} status
+ * @returns {Promise<{ autoSavingId: number, status: string, changedAt: string }>}
  */
-export async function getSpareMoney(goalId) {
-  // TODO: 실제 API 연동 시 client.get(`/goals/${goalId}/spare-money`)로 교체
-  return { today: 0, thisWeek: 0, thisMonth: 0 }
+export async function updatePacemakerStatus(autoSavingId, status) {
+  const { data } = await client.patch(`/pace-maker/${autoSavingId}/status`, { status })
+  return data
 }
 
-/**
- * @param {string} goalId
- * @returns {Promise<NextMonthReserve>}
- */
-export async function getNextMonthReserve(goalId) {
-  // TODO: 실제 API 연동 시 client.get(`/goals/${goalId}/next-month-reserve`)로 교체
-  return { reserveRate: 0, reservedAmount: 0, targetAmount: 0 }
-}
+// TODO: 최초 개설 POST API 명세 확정되면 registerPacemaker() 추가
