@@ -1,11 +1,10 @@
 // spending 도메인 상태 store
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getSpendingSummary, getTransactions } from '@/features/spending/api/spending.api'
+import { getSpendingSummary } from '@/features/spending/api/spending.api'
 
 export const useSpendingStore = defineStore('spending', () => {
   const spendingSummary = ref(null)
-  const transactions = ref([])
   const isLoading = ref(false)
   const error = ref(null)
 
@@ -14,13 +13,7 @@ export const useSpendingStore = defineStore('spending', () => {
     error.value = null
 
     try {
-      const [summary, loadedTransactions] = await Promise.all([
-        getSpendingSummary(params),
-        getTransactions(params),
-      ])
-
-      spendingSummary.value = summary
-      transactions.value = loadedTransactions
+      spendingSummary.value = await getSpendingSummary(params)
     } catch (caughtError) {
       error.value = caughtError
     } finally {
@@ -30,7 +23,6 @@ export const useSpendingStore = defineStore('spending', () => {
 
   return {
     spendingSummary,
-    transactions,
     isLoading,
     error,
     loadSpendingData,

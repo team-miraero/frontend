@@ -210,6 +210,7 @@ import {
   calculateShortenedMonths,
   formatShortenedMonths,
 } from '@/features/spending/composables/useSpendingSimulator'
+import { formatKoreanNumber } from '@/shared/lib/money'
 
 const props = defineProps({
   category: {
@@ -228,8 +229,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update-target'])
 
-const amountFormatter = new Intl.NumberFormat('ko-KR')
-const formatAmount = (value) => amountFormatter.format(value)
+const formatAmount = formatKoreanNumber
 
 const sliderValue = computed(() => props.category.target ?? props.category.current)
 const hasTarget = computed(() => props.category.target !== null)
