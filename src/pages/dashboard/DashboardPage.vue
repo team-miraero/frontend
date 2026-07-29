@@ -5,6 +5,7 @@
       <PaceBanner
         :pace="goalStore.currentGoal.pace"
         :progress-rate="goalStore.currentGoal.progressRate"
+        @cta-click="handlePacemakerCta"
       />
       <!-- ============ 데스크톱 (lg 이상): 기존 3열 + 사이드 패널 구조 유지 ============ -->
       <div class="hidden lg:block">
@@ -53,7 +54,7 @@
           />
           <PacemakerToggleCard
             :pacemaker="pacemakerStore.pacemakerStatus"
-            @toggle="pacemakerStore.togglePacemaker"
+            @toggle="handlePacemakerCta"
           />
         </div>
 
@@ -68,6 +69,10 @@
         </div>
       </div>
     </div>
+    <PacemakerSetupModal
+      v-model="isPacemakerModalOpen"
+      @closed="closePacemakerModal"
+    />
   </div>
 </template>
 
@@ -86,13 +91,28 @@ import {
   MilestoneList,
   AvailableMoneyPanel,
 } from '@/features/roadmap'
-import { usePacemakerStore } from '@/features/pacemaker'
+import { usePacemakerStore, PacemakerSetupModal } from '@/features/pacemaker'
+import { useModal } from '@/shared/composables/useModal'
 import * as goalApi from '@/features/goal/api/goal.api'
+
 const route = useRoute()
 const goalStore = useGoalStore()
 const roadmapStore = useRoadmapStore()
 const pacemakerStore = usePacemakerStore()
+const {
+  isOpen: isPacemakerModalOpen,
+  open: openPacemakerModal,
+  close: closePacemakerModal,
+} = useModal()
 
+// 페이스메이커 CTA, 아직 전용 저금통이 있으면 개설 안내 모달, 있으면 토글 동작
+function handlePacemakerCta() {
+  if (pacemakerStore.pacemakerStatus?.registered) {
+    pacemakeStore.togglePacemaker()
+  } else {
+    openPacemakerModal()
+  }
+}
 onMounted(async () => {
   const goalId = route.params.goalId ?? (await resolveDefaultGoalId())
   if (!goalId) return

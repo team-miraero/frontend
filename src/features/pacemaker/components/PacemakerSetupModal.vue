@@ -1,6 +1,10 @@
 <!-- 페이스메이커 전용 저금통 최초 개설 안내 모달 -->
 <template>
-  <BaseModal :model-value="modelValue" :show-default-close="false" @update:model-value="$emit('update:modelValue', $event)">
+  <BaseModal
+    :model-value="modelValue"
+    :show-default-close="false"
+    @update:model-value="$emit('update:modelValue', $event)"
+  >
     <div class="-m-6 overflow-hidden rounded-xl">
       <!-- 헤더 -->
       <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
@@ -21,7 +25,9 @@
       <!-- 본문 -->
       <div class="flex flex-col items-center gap-5 px-7 py-6">
         <div class="flex flex-col items-center gap-3 py-4">
-          <div class="flex size-14 items-center justify-center rounded-2xl border border-slate-200 bg-[#f8fbff]">
+          <div
+            class="flex size-14 items-center justify-center rounded-2xl border border-slate-200 bg-[#f8fbff]"
+          >
             <span class="text-[28px] leading-none">🪣</span>
           </div>
           <div class="flex flex-col items-center gap-1 text-center">
@@ -36,8 +42,10 @@
         <button
           type="button"
           class="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)]"
-          style="background-image: linear-gradient(173deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%)"
-          @click="$emit('create')"
+          style="
+            background-image: linear-gradient(173deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%);
+          "
+          @click="goToPacemakerSetup"
         >
           <img src="@/assets/icons/pacemaker-setup-cta.svg" alt="" class="size-[15px]" />
           여유자금 저금통 개설하기
@@ -64,5 +72,12 @@ defineProps({
     default: false,
   },
 })
-defineEmits(['update:modelValue', 'create'])
+const emit = defineEmits(['update:modelValue'])
+
+const router = useRouter()
+
+function goToPacemakerSetup() {
+  emit('update:modelValue', false)
+  router.push({ name: ROUTE_NAME.PACEMAKER })
+}
 </script>
