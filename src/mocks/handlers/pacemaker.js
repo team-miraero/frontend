@@ -29,4 +29,14 @@ export const pacemakerHandlers = [
       changedAt: new Date().toISOString().slice(0, 19),
     })
   }),
+
+  http.post('*/api/pace-maker/deposit', async ({ request }) => {
+    const { goalId, amount } = await request.json()
+    mockBalance = Math.max(0, mockBalance - amount)
+    return HttpResponse.json({
+      goalId,
+      depositedAmount: amount,
+      remainingBalance: mockBalance,
+    })
+  }),
 ]

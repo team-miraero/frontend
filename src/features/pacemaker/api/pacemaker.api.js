@@ -31,5 +31,15 @@ export async function updatePacemakerStatus(autoSavingId, status) {
   return data
 }
 
+/**
+ * 페이스메이커 저금통 잔액을 특정 목표의 연결 계좌로 입금
+ * @param {number} goalId
+ * @param {number} amount
+ * @returns {Promise<{ goalId: number, depositedAmount: number, remainingBalance: number }>}
+ */
+export async function depositToGoalAccount(goalId, amount) {
+  const { data } = await client.post('/pace-maker/deposit', { goalId, amount })
+  return data
+}
 
 // TODO: 최초 개설 POST API 명세 확정되면 registerPacemaker() 추가

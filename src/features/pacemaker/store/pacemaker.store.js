@@ -43,11 +43,24 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     pacemakerStatus.value.enabled = result.status === 'ACTIVE'
   }
 
-  return { 
-    pacemakerStatus, 
+  /**
+   * @param {number} goalId
+   * @param {number} amount
+   */
+  async function depositToGoal(goalId, amount) {
+    const result = await pacemakerApi.depositToGoalAccount(goalId, amount)
+    if (pacemakerStatus.value) {
+      pacemakerStatus.value.balance = result.remainingBalance
+    }
+    return result
+  }
+
+  return {
+    pacemakerStatus,
     depositTargets,
-    fetchPacemakerStatus, 
+    fetchPacemakerStatus,
     fetchDepositTargets,
     togglePacemaker,
-   }
+    depositToGoal,
+  }
 })
