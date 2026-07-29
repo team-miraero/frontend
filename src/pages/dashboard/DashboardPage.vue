@@ -5,7 +5,7 @@
       <PaceBanner
         :pace="goalStore.currentGoal.pace"
         :progress-rate="goalStore.currentGoal.progressRate"
-        @cta-click="handlePacemakerCta"
+        @cta-click="handlePacemakerCtaClick"
       />
       <!-- ============ 데스크톱 (lg 이상): 기존 3열 + 사이드 패널 구조 유지 ============ -->
       <div class="hidden lg:block">
@@ -14,7 +14,7 @@
           <ConnectedAssetsCard :assets="goalStore.assets" />
           <PacemakerToggleCard
             :pacemaker="pacemakerStore.pacemakerStatus"
-            @toggle="handlePacemakerCta"
+            @toggle="handlePacemakerToggle"
           />
         </div>
 
@@ -54,7 +54,7 @@
           />
           <PacemakerToggleCard
             :pacemaker="pacemakerStore.pacemakerStatus"
-            @toggle="handlePacemakerCta"
+            @toggle="handlePacemakerToggle"
           />
         </div>
 
@@ -72,6 +72,12 @@
     <PacemakerSetupModal
       v-model="isPacemakerModalOpen"
       @closed="closePacemakerModal"
+    />
+    <PacemakerBalanceModal
+      v-model="isPacemakerBalanceModalOpen"
+      :pacemaker="pacemakerStore.pacemakerStatus ?? {}"
+      :deposit-targets="pacemakerStore.depositTargets"
+      @toggle-auto-saving="pacemakerStore.togglePacemaker"
     />
   </div>
 </template>
@@ -91,7 +97,7 @@ import {
   MilestoneList,
   AvailableMoneyPanel,
 } from '@/features/roadmap'
-import { usePacemakerStore, PacemakerSetupModal } from '@/features/pacemaker'
+import { usePacemakerStore, PacemakerSetupModal, PacemakerBalanceModal } from '@/features/pacemaker'
 import { useModal } from '@/shared/composables/useModal'
 import * as goalApi from '@/features/goal/api/goal.api'
 
@@ -102,17 +108,30 @@ const pacemakerStore = usePacemakerStore()
 const {
   isOpen: isPacemakerModalOpen,
   open: openPacemakerModal,
-  close: closePacemakerModal,
 } = useModal()
+const {
+   isOpen: isPacemakerBalanceModalOpen, 
+   open: openPacemakerBalanceModal 
+  } = useModal()
 
-// 페이스메이커 CTA, 아직 전용 저금통이 있으면 개설 안내 모달, 있으면 토글 동작
-function handlePacemakerCta() {
+// 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
+function handlePacemakerToggle() {
   if (pacemakerStore.pacemakerStatus?.registered) {
     pacemakerStore.togglePacemaker()
   } else {
     openPacemakerModal()
   }
 }
+
+// 페이스메이커 CTA, 아직 전용 저금통이 있으면 개설 안내 모달, 있으면 토글 동작
+function handlePacemakerCtaClick() {
+  if (pacemakerStore.pacemakerStatus?.registered) {
+    openPacemakerBalanceModal()
+  } else {
+    openPacemakerModal()
+  }
+}
+
 onMounted(async () => {
   const goalId = route.params.goalId ?? (await resolveDefaultGoalId())
   if (!goalId) return
@@ -120,6 +139,7 @@ onMounted(async () => {
   await goalStore.fetchDashboardData(goalId)
   await roadmapStore.fetchMilestones(goalId)
   await pacemakerStore.fetchPacemakerStatus()
+  await pacemakerStore.fetchDepositTargets()
 })
 
 // 라우트에 goalId가 없는 '/dashboard' 진입 시, 첫 번째 목표를 기본으로 보여줌

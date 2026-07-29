@@ -68,7 +68,7 @@ export const goalHandlers = [
     })
   }),
 
-  http.get('*/api/goals/:goalId/assets', async () => {
+  http.get('*/api/goals/:goalId/assets', async ({ params }) => {
     if (params.goalId === '3') {
       return HttpResponse.json({
         assets: [
