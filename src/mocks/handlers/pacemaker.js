@@ -7,7 +7,7 @@ export const pacemakerHandlers = [
   http.get('*/api/pace-maker', async () => {
     return HttpResponse.json({
       autoSavingId: 21,
-      registered: true,
+      registered: false,
       status: mockPacemakerStatus,
       enabled: mockPacemakerStatus === 'ACTIVE',
       monthlySecuredAmount: 42000,

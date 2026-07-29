@@ -166,7 +166,7 @@ function formatManwon(amount) {
 function pacePositions() {
   const target = toTrackPercent(props.goal.pace.expectedAmount / props.goal.goalAmount)
   const current = toTrackPercent(props.goal.progressRate / 100)
-  const MIN_GAP = 2
+  const MIN_GAP = 2.5
 
   if (Math.abs(current - target) >= MIN_GAP) {
     return { target, current }

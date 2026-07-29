@@ -43,15 +43,27 @@
       </div>
     </template>
 
-    <!-- OFF 상태(개설됨/미개설 공통): 같은 구조, 무채색 톤 -->
+    <!-- OFF 상태(개설됨/미개설) -->
     <template v-else>
-      <p class="text-[12px] font-bold leading-[18px] text-slate-600">
+      <p class="pt-3 text-[12px] font-bold leading-[18px] text-slate-600">
         {{ offDescription }}
       </p>
-      <div class="rounded-[10px] bg-slate-100 px-3 py-2">
-        <p class="text-[11px] font-bold text-slate-400">
-          {{ isRegistered ? '지금은 OFF 상태예요' : '개설 후 이용할 수 있어요' }}
-        </p>
+
+      <!-- 하단 상태 안내 박스 (인디케이터 + 액션 링크 추가) -->
+      <div class="mt-3 flex items-center justify-between rounded-[10px] bg-slate-100 px-3 py-2">
+        <div class="flex items-center gap-2">
+          <!-- 상태별 미니 닷(Dot) 아이콘 -->
+          <span
+            class="size-1.5 rounded-full"
+            :class="isRegistered ? 'bg-slate-400' : 'bg-slate-300'"
+          />
+          <p class="text-[11px] font-semibold text-slate-500">
+            {{ isRegistered ? '지금은 OFF 상태예요' : '개설 후 이용할 수 있어요' }}
+          </p>
+        </div>
+
+        <!-- 미개설 상태일 때 우측 유도 텍스트 -->
+        <span v-if="!isRegistered" class="text-[11px] font-bold text-primary"> 개설하기 &gt; </span>
       </div>
     </template>
   </div>
