@@ -12,7 +12,9 @@ export const useRoadmapStore = defineStore('feature-roadmap', () => {
 
   const previousMilestone = computed(() => {
     if (!nextMilestone.value) return null
-    const index = milestones.value.findIndex((m) => m.milestoneId === nextMilesone.value.milestoneId)
+    const index = milestones.value.findIndex(
+      (m) => m.milestoneId === nextMilestone.value.milestoneId
+    )
     return index > 0 ? milestones.value[index - 1] : null
   })
 

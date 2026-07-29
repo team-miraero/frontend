@@ -14,7 +14,11 @@
 
     <div>
       <div class="flex items-center justify-between text-[10px] text-white/70">
-        <span>{{ previousMilestone?.order ?? 0 }}단계 ({{ formatManwon(previousMilestone?.targetAmount ?? 0) }})</span>
+        <span
+          >{{ previousMilestone?.order ?? 0 }}단계 ({{
+            formatManwon(previousMilestone?.targetAmount ?? 0)
+          }})</span
+        >
         <span>{{ nextMilestone.order }}단계 ({{ formatManwon(nextMilestone.targetAmount) }})</span>
       </div>
       <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-white/20">
@@ -31,7 +35,9 @@
     <div class="grid grid-cols-3 gap-3">
       <div class="rounded-xl bg-white/15 px-3 py-2.5">
         <p class="text-[9px] text-white/65">현재 잔액</p>
-        <p class="pt-0.5 text-sm font-black tracking-[-0.28px] text-white">{{ formatManwon(goal.currentAmount) }}</p>
+        <p class="pt-0.5 text-sm font-black tracking-[-0.28px] text-white">
+          {{ formatManwon(goal.currentAmount) }}
+        </p>
       </div>
       <div class="rounded-xl bg-white/15 px-3 py-2.5">
         <p class="text-[9px] text-white/65">다음 목표</p>
@@ -41,7 +47,9 @@
       </div>
       <div class="rounded-xl bg-white/15 px-3 py-2.5">
         <p class="text-[9px] text-white/65">남은 금액</p>
-        <p class="pt-0.5 text-sm font-black tracking-[-0.28px] text-white">{{ formatManwon(remainingToNext) }}</p>
+        <p class="pt-0.5 text-sm font-black tracking-[-0.28px] text-white">
+          {{ formatManwon(remainingToNext) }}
+        </p>
       </div>
     </div>
   </div>
@@ -61,7 +69,9 @@ const props = defineProps({
   },
 })
 
-const nextMilestone = computed(() => props.milestones.find((m) => m.status === 'IN_PROGRESS') ?? null)
+const nextMilestone = computed(
+  () => props.milestones.find((m) => m.status === 'IN_PROGRESS') ?? null
+)
 const previousMilestone = computed(() => {
   if (!nextMilestone.value) return null
   const index = props.milestones.indexOf(nextMilestone.value)

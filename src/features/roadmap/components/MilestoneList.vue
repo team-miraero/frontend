@@ -1,6 +1,8 @@
 <!-- 전체 마일스톤 리스트 -->
 <template>
-  <div class="rounded-3xl border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)]">
+  <div
+    class="rounded-3xl border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)]"
+  >
     <p class="pb-5 text-xs font-bold uppercase tracking-[1.2px] text-slate-400">전체 마일스톤</p>
 
     <ul class="flex flex-col">

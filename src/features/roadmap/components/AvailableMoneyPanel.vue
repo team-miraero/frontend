@@ -15,7 +15,9 @@
       <div class="flex items-center justify-between">
         <span class="flex items-center gap-1.5 text-sm text-slate-500">📅 이번 달</span>
       </div>
-      <p class="pt-3 text-2xl font-black text-[#0a192f]">{{ formatWon(availableMoney.availableMoney) }}</p>
+      <p class="pt-3 text-2xl font-black text-[#0a192f]">
+        {{ formatWon(availableMoney.availableMoney) }}
+      </p>
       <p class="pt-1 text-xs text-slate-400">고정지출 뺀 이번 달 순수 여유금 🍀</p>
     </div>
   </div>

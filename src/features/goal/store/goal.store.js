@@ -41,7 +41,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
   async function updateCurrentGoalStatus(status) {
     if (!currentGoal.value) return
     const result = await goalApi.updateGoalStatus(currentGoal.value.goalId, status)
-    currentGoal.vaslue.status = result.status
+    currentGoal.value.vaslue.status = result.status
   }
 
   return {

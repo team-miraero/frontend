@@ -2,7 +2,13 @@
 <template>
   <div
     class="rounded-[20px] border border-primary/20 p-[25px]"
-    style="background-image: linear-gradient(149deg, rgba(0,102,255,0.03) 0%, rgb(244,248,255) 100%)"
+    style="
+      background-image: linear-gradient(
+        149deg,
+        rgba(0, 102, 255, 0.03) 0%,
+        rgb(244, 248, 255) 100%
+      );
+    "
   >
     <div class="flex items-center justify-between">
       <p class="text-xs font-bold text-slate-400">다음달 자금마련</p>

@@ -37,7 +37,7 @@ export const goalHandlers = [
     })
   }),
 
-  http.get('*/api/goals/:goalId', async({ params }) => {
+  http.get('*/api/goals/:goalId', async ({ params }) => {
     return HttpResponse.json({
       goalId: Number(params.goalId),
       goalType: 'INDEPENDENCE',
@@ -56,7 +56,7 @@ export const goalHandlers = [
       pace: {
         expectedAmount: 10810000,
         differenceAmount: 690000,
-        paceStatus: 'AHEAD', // 'AHEAD' | 'ON_TRACK' | 'BEHIND'로 바꿔가며 배너 색상 확인 가능
+        paceStatus: 'BEHIND', // 'AHEAD' | 'ON_TRACK' | 'BEHIND'로 바꿔가며 배너 색상 확인 가능
       },
     })
   }),

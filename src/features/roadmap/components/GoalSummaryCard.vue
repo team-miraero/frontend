@@ -1,6 +1,8 @@
 <!-- "모인 금액 / 목표" 카드 -->
 <template>
-  <div class="rounded-[20px] border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)]">
+  <div
+    class="rounded-[20px] border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)]"
+  >
     <p class="text-xs font-bold text-slate-400">모인 금액 / 목표</p>
 
     <div class="flex items-end gap-2 pt-2">

@@ -22,5 +22,5 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     pacemakerStatus.value.enabled = result.status === 'ACTIVE'
   }
 
-  return { pacemakerStatus, fetchPacemakerStatus, togglePacemaker}
+  return { pacemakerStatus, fetchPacemakerStatus, togglePacemaker }
 })

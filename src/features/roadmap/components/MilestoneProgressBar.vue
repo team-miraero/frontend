@@ -150,10 +150,6 @@ function milestonePosition(milestone) {
   return toTrackPercent(milestone.targetAmount / props.goal.goalAmount)
 }
 
-function pacePosition(amount) {
-  return toTrackPercent(amount / props.goal.goalAmount)
-}
-
 function progressFillWidth() {
   return toTrackPercent(props.goal.progressRate / 100) - TRACK_START
 }
@@ -181,5 +177,4 @@ function pacePositions() {
     ? { target: mid - MIN_GAP / 2, current: mid + MIN_GAP / 2 }
     : { target: mid + MIN_GAP / 2, current: mid - MIN_GAP / 2 }
 }
-
 </script>
