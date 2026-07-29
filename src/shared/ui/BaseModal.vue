@@ -5,6 +5,7 @@
       <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
         <slot />
         <button
+          v-if="showDefaultClose"
           type="button"
           class="mt-4 text-sm text-gray-500"
           @click="$emit('update:modelValue', false)"
@@ -22,6 +23,10 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  showDefaultClose: {
+    type: Boolean,
+    default: true,
+  }
 })
 defineEmits(['update:modelValue'])
 </script>
