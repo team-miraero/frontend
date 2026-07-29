@@ -8,7 +8,9 @@
     <div class="flex flex-col items-center gap-5 px-7 py-10">
       <div
         class="flex size-20 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(0,102,255,0.3)]"
-        style="background-image: linear-gradient(135deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%)"
+        style="
+          background-image: linear-gradient(135deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%);
+        "
       >
         <img src="@/assets/icons/deposit-success-check.svg" alt="" class="size-9" />
       </div>
@@ -26,7 +28,9 @@
         class="flex w-full items-center justify-between rounded-2xl border border-primary/20 bg-[#eaf2ff] px-5 py-4"
       >
         <div>
-          <p class="text-xs text-slate-500">{{ target?.bankName }} {{ target?.accountNumberMasked }}</p>
+          <p class="text-xs text-slate-500">
+            {{ target?.bankName }} {{ target?.accountNumberMasked }}
+          </p>
           <p class="pt-0.5 text-sm font-bold text-[#0a192f]">
             {{ target?.icon }} {{ target?.goalName }}
           </p>
@@ -37,7 +41,9 @@
       <button
         type="button"
         class="w-full rounded-2xl py-3.5 text-sm font-black text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)]"
-        style="background-image: linear-gradient(173deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%)"
+        style="
+          background-image: linear-gradient(173deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%);
+        "
         @click="$emit('update:modelValue', false)"
       >
         확인
