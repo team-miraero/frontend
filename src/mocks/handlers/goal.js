@@ -33,6 +33,13 @@ export const goalHandlers = [
           progressRate: 45.0,
           status: 'ACTIVE',
         },
+        {
+          goalId: 3,
+          goalName: '결혼 자금',
+          goalType: 'WEDDING',
+          progressRate: 20.0,
+          status: 'ACTIVE',
+        },
       ],
     })
   }),
@@ -62,6 +69,48 @@ export const goalHandlers = [
   }),
 
   http.get('*/api/goals/:goalId/assets', async () => {
+    if (params.goalId === '3') {
+      return HttpResponse.json({
+        assets: [
+          {
+            assetType: 'ACCOUNT',
+            assetId: 4,
+            assetName: '카카오뱅크 결혼자금통',
+            bankName: '카카오뱅크',
+            accountNumberMasked: '***7890',
+            balance: 5000000,
+            assetDetail: { interestRate: 3.5, maturityDate: '2027-12-31' },
+            autoTransfer: {
+              amount: 150000,
+              transferDay: 15,
+              withdrawalAccount: { bankName: 'KB국민', accountNumberMasked: '***789' },
+            },
+          },
+        ],
+      })
+    }
+
+    if (params.goalId === '2') {
+      return HttpResponse.json({
+        assets: [
+          {
+            assetType: 'LOAN',
+            assetId: 3,
+            assetName: '학자금 대출',
+            bankName: 'KB국민',
+            accountNumberMasked: '***321',
+            balance: null,
+            assetDetail: { interestRate: 3.0, maturityDate: '2026-08-25' },
+            autoTransfer: {
+              amount: 1000000,
+              transferDay: 10,
+              withdrawalAccount: { bankName: 'KB국민', accountNumberMasked: '***789' },
+            },
+          },
+        ],
+      })
+    }
+
     return HttpResponse.json({
       assets: [
         {
@@ -81,27 +130,13 @@ export const goalHandlers = [
         {
           assetType: 'ACCOUNT',
           assetId: 2,
-          assetName: 'KB 독립적금',
-          bankName: 'KB국민',
-          accountNumberMasked: '***456',
+          assetName: 'IBK기업은행 독립자금계좌',
+          bankName: 'IBK기업은행',
+          accountNumberMasked: '***9012',
           balance: 3500000,
           assetDetail: { interestRate: 4.5, maturityDate: '2028-03-15' },
           autoTransfer: {
             amount: 100000,
-            transferDay: 10,
-            withdrawalAccount: { bankName: 'KB국민', accountNumberMasked: '***789' },
-          },
-        },
-        {
-          assetType: 'LOAN',
-          assetId: 3,
-          assetName: '학자금 대출',
-          bankName: 'KB국민',
-          accountNumberMasked: '***321',
-          balance: null,
-          assetDetail: { interestRate: 3.0, maturityDate: '2026-08-25' },
-          autoTransfer: {
-            amount: 1000000,
             transferDay: 10,
             withdrawalAccount: { bankName: 'KB국민', accountNumberMasked: '***789' },
           },
