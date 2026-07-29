@@ -10,7 +10,6 @@
  * @typedef {Object} SignupPayload
  * @property {string} email
  * @property {string} password
- * @property {string} name
  */
 
 /**
@@ -26,7 +25,19 @@
  */
 export async function login(credentials) {
   // TODO: 실제 API 연동 시 client.post('/auth/login', credentials)로 교체
-  return { accessToken: '', user: { id: '', name: '', email: '' } }
+  // return { accessToken: '', user: { id: '', name: '', email: '' } }
+  if (credentials.email === 'test@miraero.com' && credentials.password === '12345678') {
+    return {
+      accessToken: 'mock-token',
+      user: {
+        id: '1',
+        name: '홍길동',
+        email: credentials.email,
+      },
+    }
+  }
+
+  throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.')
 }
 
 /**
@@ -35,7 +46,7 @@ export async function login(credentials) {
  */
 export async function signup(payload) {
   // TODO: 실제 API 연동 시 client.post('/auth/signup', payload)로 교체
-  return { id: '', name: '', email: '' }
+  return { id: 'mock-user-id', name: '', email: payload.email }
 }
 
 /**
