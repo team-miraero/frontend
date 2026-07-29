@@ -76,12 +76,17 @@
       :deposit-targets="pacemakerStore.depositTargets"
       @toggle-auto-saving="pacemakerStore.togglePacemaker"
       @deposit="handleOpenDeposit"
+      @view-history="handleOpenHistory"
     />
     <PacemakerDepositModal
       v-model="isPacemakerDepositModalOpen"
       :target="selectedDepositTarget"
       :available-balance="pacemakerStore.pacemakerStatus?.balance ?? 0"
       @deposit="handleDeposit"
+    />
+    <PacemakerHistoryModal
+      v-model="isPacemakerHistoryModalOpen"
+      :histories="pacemakerStore.histories"
     />
   </div>
 </template>
@@ -106,6 +111,7 @@ import {
   PacemakerSetupModal,
   PacemakerBalanceModal,
   PacemakerDepositModal,
+  PacemakerHistoryModal,
 } from '@/features/pacemaker'
 import { useModal } from '@/shared/composables/useModal'
 import * as goalApi from '@/features/goal/api/goal.api'
@@ -117,6 +123,7 @@ const pacemakerStore = usePacemakerStore()
 const { isOpen: isPacemakerModalOpen, open: openPacemakerModal } = useModal()
 const { isOpen: isPacemakerBalanceModalOpen, open: openPacemakerBalanceModal } = useModal()
 const { isOpen: isPacemakerDepositModalOpen, open: openPacemakerDepositModal } = useModal()
+const { isOpen: isPacemakerHistoryModalOpen, open: openPacemakerHistoryModal } = useModal()
 
 const selectedDepositTarget = ref(null)
 
@@ -150,6 +157,12 @@ function handleOpenDeposit(goalId) {
 async function handleDeposit({ goalId, amount }) {
   await pacemakerStore.depositToGoal(goalId, amount)
   isPacemakerDepositModalOpen.value = false
+}
+
+// 잔액 모달의 "전체 자동 저축 내역 보기" 클릭: 필요할 때만 조회
+async function handleOpenHistory() {
+  openPacemakerHistoryModal()
+  await pacemakerStore.fetchHistories()
 }
 
 onMounted(async () => {
