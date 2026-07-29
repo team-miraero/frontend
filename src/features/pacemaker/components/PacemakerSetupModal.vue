@@ -64,7 +64,9 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 defineProps({
   modelValue: {
@@ -78,6 +80,6 @@ const router = useRouter()
 
 function goToPacemakerSetup() {
   emit('update:modelValue', false)
-  router.push({ name: ROUTE_NAME.PACEMAKER })
+  router.push({ name: ROUTE_NAMES.PACEMAKER })
 }
 </script>

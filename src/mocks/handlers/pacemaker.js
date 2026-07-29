@@ -1,7 +1,7 @@
 // 페이스메이커(자동저축) 관련 MSW 핸들러
 import { http, HttpResponse } from 'msw'
 
-let mockPacemakerStatus = 'ACTIVE' // 토글 테스트를 위해 모듈 스코프에서 상태 유지
+let mockPacemakerStatus = 'null' // 여유자금 통장 미개설 상태
 
 export const pacemakerHandlers = [
   http.get('*/api/pace-maker', async () => {

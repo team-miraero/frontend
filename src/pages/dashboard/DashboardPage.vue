@@ -14,7 +14,7 @@
           <ConnectedAssetsCard :assets="goalStore.assets" />
           <PacemakerToggleCard
             :pacemaker="pacemakerStore.pacemakerStatus"
-            @toggle="pacemakerStore.togglePacemaker"
+            @toggle="handlePacemakerCta"
           />
         </div>
 
@@ -108,7 +108,7 @@ const {
 // 페이스메이커 CTA, 아직 전용 저금통이 있으면 개설 안내 모달, 있으면 토글 동작
 function handlePacemakerCta() {
   if (pacemakerStore.pacemakerStatus?.registered) {
-    pacemakeStore.togglePacemaker()
+    pacemakerStore.togglePacemaker()
   } else {
     openPacemakerModal()
   }
