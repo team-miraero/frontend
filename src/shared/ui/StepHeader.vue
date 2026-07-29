@@ -2,7 +2,10 @@
 <template>
   <header>
     <div class="flex items-center justify-between">
-      <BrandHeader />
+      <div class="flex items-center gap-2">
+        <img :src="logo" alt="" class="h-8 w-8 shrink-0" />
+        <span class="text-lg font-bold text-gray-900">미래로</span>
+      </div>
       <button
         v-if="showBack"
         type="button"
@@ -40,7 +43,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import BrandHeader from '@/features/auth/components/BrandHeader.vue'
+import logo from '@/assets/images/logo.png'
 
 const props = defineProps({
   currentStep: { type: Number, required: true },
