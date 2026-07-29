@@ -2,6 +2,59 @@ export const DEFAULT_SELECTED_GOAL = '유럽 여행자금'
 
 export const MONTHS_SHORTENED_PER_SAVING_UNIT = 0.04
 
+export const SPENDING_AGE_GROUPS = [
+  { id: 'early-20s', label: '20대 초' },
+  { id: 'late-20s', label: '20대 후' },
+  { id: 'early-30s', label: '30대 초' },
+  { id: 'late-30s', label: '30대 후' },
+]
+
+export const DEFAULT_SPENDING_AGE_GROUP_ID = 'late-20s'
+
+export const PEER_SPENDING_BY_AGE_GROUP = {
+  'early-20s': {
+    food: 28,
+    cafe: 13,
+    shopping: 18,
+    subscription: 7,
+    transportation: 8,
+    exercise: 4,
+  },
+  'late-20s': {
+    food: 30,
+    cafe: 12,
+    shopping: 20,
+    subscription: 8,
+    transportation: 10,
+    exercise: 6,
+  },
+  'early-30s': {
+    food: 35,
+    cafe: 10,
+    shopping: 17,
+    subscription: 9,
+    transportation: 11,
+    exercise: 7,
+  },
+  'late-30s': {
+    food: 38,
+    cafe: 9,
+    shopping: 15,
+    subscription: 10,
+    transportation: 12,
+    exercise: 8,
+  },
+}
+
+export const PREVIOUS_MONTH_SPENDING_BY_CATEGORY = {
+  food: 29,
+  cafe: 16,
+  shopping: 20,
+  subscription: 7,
+  transportation: 10,
+  exercise: 4,
+}
+
 export const SPENDING_CATEGORIES = [
   {
     id: 'food',

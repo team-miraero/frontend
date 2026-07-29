@@ -12,24 +12,29 @@
       지출 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
     </p>
 
-    <SpendingSummarySection
-      v-else-if="spendingSummary"
-      :total-spending="spendingSummary.totalSpending"
-      :saving-capacity="spendingSummary.savingCapacity"
-      :remaining-months="spendingSummary.remainingMonths"
-      :monthly-difference="spendingSummary.monthlyDifference"
-      :goal-progress="spendingSummary.goalProgress"
-      :selected-goal="selectedGoal"
-    />
+    <template v-else-if="spendingSummary">
+      <SpendingSummarySection
+        :total-spending="spendingSummary.totalSpending"
+        :saving-capacity="spendingSummary.savingCapacity"
+        :remaining-months="spendingSummary.remainingMonths"
+        :monthly-difference="spendingSummary.monthlyDifference"
+        :goal-progress="spendingSummary.goalProgress"
+        :selected-goal="selectedGoal"
+      />
 
-    <SpendingSimulatorSection class="mt-7 md:mt-9" :selected-goal="selectedGoal" />
+      <SpendingContentTabs
+        class="mt-5 md:mt-7"
+        :summary="spendingSummary"
+        :selected-goal="selectedGoal"
+      />
+    </template>
   </div>
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import SpendingSimulatorSection from '@/features/spending/components/SpendingSimulatorSection.vue'
+import SpendingContentTabs from '@/features/spending/components/SpendingContentTabs.vue'
 import SpendingSummarySection from '@/features/spending/components/SpendingSummarySection.vue'
 import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 import { useSpendingStore } from '@/features/spending/store/spending.store'

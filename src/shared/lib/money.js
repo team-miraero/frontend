@@ -1,11 +1,22 @@
 // 원화 포맷 유틸
+const koreanNumberFormatter = new Intl.NumberFormat('ko-KR')
+
+/**
+ * 숫자를 한국어 로케일 천 단위 구분 문자열로 변환한다.
+ * @param {number} value
+ * @returns {string}
+ */
+export function formatKoreanNumber(value) {
+  return koreanNumberFormatter.format(value)
+}
+
 /**
  * 숫자를 "1,234,000원" 형태의 원화 문자열로 변환한다.
  * @param {number} amount
  * @returns {string}
  */
 export function formatKRW(amount) {
-  return `${new Intl.NumberFormat('ko-KR').format(amount)}원`
+  return `${formatKoreanNumber(amount)}원`
 }
 
 /**
@@ -15,5 +26,5 @@ export function formatKRW(amount) {
  */
 export function formatKRWCompact(amount) {
   const man = Math.round(amount / 10000)
-  return `${new Intl.NumberFormat('ko-KR').format(man)}만원`
+  return `${formatKoreanNumber(man)}만원`
 }
