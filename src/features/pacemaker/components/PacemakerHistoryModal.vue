@@ -43,6 +43,8 @@
 </template>
 
 <script setup>
+import BaseModal from '@/shared/ui/BaseModal.vue'
+
 defineProps({
   modelValue: {
     type: Boolean,

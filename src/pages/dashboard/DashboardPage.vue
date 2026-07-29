@@ -88,6 +88,11 @@
       v-model="isPacemakerHistoryModalOpen"
       :histories="pacemakerStore.histories"
     />
+    <PacemakerDepositSuccessModal
+      v-model="isPacemakerDepositSuccessModalOpen"
+      :target="selectedDepositTarget"
+      :amount="depositedAmount"
+    />
   </div>
 </template>
 
@@ -112,6 +117,7 @@ import {
   PacemakerBalanceModal,
   PacemakerDepositModal,
   PacemakerHistoryModal,
+  PacemakerDepositSuccessModal,
 } from '@/features/pacemaker'
 import { useModal } from '@/shared/composables/useModal'
 import * as goalApi from '@/features/goal/api/goal.api'
@@ -124,8 +130,11 @@ const { isOpen: isPacemakerModalOpen, open: openPacemakerModal } = useModal()
 const { isOpen: isPacemakerBalanceModalOpen, open: openPacemakerBalanceModal } = useModal()
 const { isOpen: isPacemakerDepositModalOpen, open: openPacemakerDepositModal } = useModal()
 const { isOpen: isPacemakerHistoryModalOpen, open: openPacemakerHistoryModal } = useModal()
+const { isOpen: isPacemakerDepositSuccessModalOpen, open: openPacemakerDepositSuccessModal } =
+  useModal()
 
 const selectedDepositTarget = ref(null)
+const depositedAmount = ref(0)
 
 // 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
 function handlePacemakerToggle() {
@@ -152,11 +161,12 @@ function handleOpenDeposit(goalId) {
   openPacemakerDepositModal()
 }
 
-// 입금 모달의 "입금하기" 클릭: 실제 입금 처리
-// TODO: 입금 완료 후 안내 모달(다음 작업)을 여기서 열도록 교체
+// 입금 모달의 "입금하기" 클릭: 실제 입금 처리 후 완료 모달로 전환
 async function handleDeposit({ goalId, amount }) {
   await pacemakerStore.depositToGoal(goalId, amount)
+  depositedAmount.value = amount
   isPacemakerDepositModalOpen.value = false
+  openPacemakerDepositSuccessModal()
 }
 
 // 잔액 모달의 "전체 자동 저축 내역 보기" 클릭: 필요할 때만 조회
