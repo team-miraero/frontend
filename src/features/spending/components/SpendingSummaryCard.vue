@@ -6,7 +6,7 @@
       </p>
 
       <div class="mt-2 flex items-end gap-1">
-        <span v-if="valuePrefix" class="pb-0.5 text-sm font-medium text-[#64748B]">
+        <span v-if="valuePrefix" class="pb-0.5 text-[13px] font-medium text-[#64748B]">
           {{ valuePrefix }}
         </span>
 
@@ -17,7 +17,7 @@
           {{ formattedValue }}
         </strong>
 
-        <span class="pb-0.5 text-sm font-medium text-[#64748B]">
+        <span class="pb-0.5 text-[13px] font-medium text-[#64748B]">
           {{ unit }}
         </span>
       </div>
@@ -49,24 +49,26 @@
       </div>
     </div>
 
-    <p v-else-if="description" class="mt-auto text-xs leading-5 text-[#64748B]">
-      {{ descriptionPrefix }}
-
+    <p v-else-if="description" class="mt-auto whitespace-nowrap text-xs leading-5 text-[#64748B]">
+      <span>{{ descriptionBeforeHighlight }}</span>
       <strong v-if="descriptionHighlight" class="font-semibold" :class="descriptionColorClass">
         {{ descriptionHighlight }}
       </strong>
+      <span>{{ descriptionAfterHighlight }}</span>
     </p>
   </article>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { formatKoreanNumber } from '@/shared/lib/money'
 
 const TONE_CLASSES = {
   default: 'text-[#0A192F]',
   primary: 'text-[#0066FF]',
   positive: 'text-[#10B981]',
   warning: 'text-[#F59E0B]',
+  coral: 'text-[#E76F6F]',
 }
 
 const props = defineProps({
@@ -97,13 +99,13 @@ const props = defineProps({
   tone: {
     type: String,
     default: 'default',
-    validator: (value) => ['default', 'primary', 'positive', 'warning'].includes(value),
+    validator: (value) => ['default', 'primary', 'positive', 'warning', 'coral'].includes(value),
   },
   valueTone: {
     type: String,
     default: null,
     validator: (value) =>
-      value === null || ['default', 'primary', 'positive', 'warning'].includes(value),
+      value === null || ['default', 'primary', 'positive', 'warning', 'coral'].includes(value),
   },
   progress: {
     type: Number,
@@ -124,7 +126,7 @@ const formattedValue = computed(() => {
     return props.value
   }
 
-  return new Intl.NumberFormat('ko-KR').format(props.value)
+  return formatKoreanNumber(props.value)
 })
 
 const hasProgress = computed(() => props.progress !== null)
@@ -137,12 +139,30 @@ const normalizedProgress = computed(() => {
   return Math.min(Math.max(props.progress, 0), 100)
 })
 
-const descriptionPrefix = computed(() => {
+const descriptionHighlightIndex = computed(() => {
   if (!props.descriptionHighlight) {
+    return -1
+  }
+
+  return props.description.indexOf(props.descriptionHighlight)
+})
+
+const descriptionBeforeHighlight = computed(() => {
+  if (descriptionHighlightIndex.value < 0) {
     return props.description
   }
 
-  return props.description.replace(props.descriptionHighlight, '').trim()
+  return props.description.slice(0, descriptionHighlightIndex.value)
+})
+
+const descriptionAfterHighlight = computed(() => {
+  if (descriptionHighlightIndex.value < 0) {
+    return ''
+  }
+
+  return props.description.slice(
+    descriptionHighlightIndex.value + props.descriptionHighlight.length
+  )
 })
 
 const valueColorClass = computed(() => TONE_CLASSES[props.valueTone ?? props.tone])

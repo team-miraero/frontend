@@ -5,21 +5,31 @@
     <!-- 모바일 통합 요약 카드 -->
     <article class="rounded-2xl border border-[#D6E4FF] bg-white p-5 md:hidden">
       <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-medium text-[#64748B]">이번 달 총지출</p>
-
-          <div class="mt-2 flex items-end gap-1">
-            <strong class="text-[32px] font-bold leading-none tracking-[-0.04em] text-[#0A192F]">
-              {{ formattedTotalSpending }}
-            </strong>
-
-            <span class="pb-0.5 text-sm font-medium text-[#64748B]"> 만원 </span>
-          </div>
-        </div>
+        <p class="text-sm font-medium text-[#64748B]">이번 달 총지출</p>
 
         <span class="rounded-full bg-[#EAF2FF] px-3 py-1.5 text-xs font-semibold text-[#0066FF]">
           {{ selectedGoal }}
         </span>
+      </div>
+
+      <div class="mt-2 flex items-end gap-1 whitespace-nowrap">
+        <strong class="text-[32px] font-bold leading-none tracking-[-0.04em] text-[#0A192F]">
+          {{ formattedTotalSpending }}
+        </strong>
+
+        <div class="flex items-center gap-2 pb-0.5">
+          <span class="text-sm font-medium text-[#64748B]">만원</span>
+
+          <p class="text-[11px] text-[#64748B]">
+            <span>전월 대비 </span>
+
+            <strong class="font-semibold" :class="monthlyDifferenceColorClass">
+              {{ desktopMonthlyDifferenceHighlightText }}
+            </strong>
+
+            <span v-if="monthlyDifference !== 0"> · {{ monthlyDifferenceRate }}% </span>
+          </p>
+        </div>
       </div>
 
       <div
@@ -51,18 +61,9 @@
       </div>
 
       <div class="mt-4">
-        <div class="flex items-center justify-between gap-4">
-          <p class="text-xs text-[#64748B]">
-            전월 대비
-
-            <strong class="ml-1 font-semibold" :class="monthlyDifferenceColorClass">
-              {{ monthlyDifferenceText }}
-            </strong>
-          </p>
-
-          <span class="text-xs font-medium text-[#64748B]">
-            진행률 {{ normalizedGoalProgress }}%
-          </span>
+        <div class="flex items-center justify-between gap-4 text-xs text-[#64748B]">
+          <span>목표 달성 진행률</span>
+          <span class="font-medium">{{ normalizedGoalProgress }}%</span>
         </div>
 
         <div
@@ -88,22 +89,16 @@
         :value="totalSpending"
         unit="만원"
         :description="desktopMonthlyDifferenceDescription"
-        :description-highlight="monthlyDifferenceText"
-        :tone="monthlyDifferenceTone"
+        :description-highlight="desktopMonthlyDifferenceHighlightText"
+        :tone="desktopMonthlyDifferenceTone"
         value-tone="default"
       />
 
-      <SpendingSummaryCard
-        title="이번 달 저축 여력"
-        :value="savingCapacity"
-        unit="만원"
-        description="목표를 위해 저축 가능해요"
-      />
+      <SpendingSummaryCard title="이번 달 저축 여력" :value="savingCapacity" unit="만원" />
 
       <SpendingSummaryCard
         title="목표 달성 현황"
         :value="remainingMonths"
-        value-prefix="잔여"
         unit="개월"
         :progress="goalProgress"
         progress-label="목표 달성 진행률"
@@ -116,6 +111,7 @@
 <script setup>
 import { computed } from 'vue'
 import SpendingSummaryCard from '@/features/spending/components/SpendingSummaryCard.vue'
+import { useSpendingSummaryComparison } from '@/features/spending/composables/useSpendingComparisons'
 import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 
 const props = defineProps({
@@ -145,52 +141,24 @@ const props = defineProps({
   },
 })
 
-const formatNumber = (value) => new Intl.NumberFormat('ko-KR').format(value)
-
-const formattedTotalSpending = computed(() => formatNumber(props.totalSpending))
-
-const formattedSavingCapacity = computed(() => formatNumber(props.savingCapacity))
-
-const formattedRemainingMonths = computed(() => formatNumber(props.remainingMonths))
-
-const normalizedGoalProgress = computed(() => Math.min(Math.max(props.goalProgress, 0), 100))
-
-const monthlyDifferenceText = computed(() => {
-  const absoluteDifference = formatNumber(Math.abs(props.monthlyDifference))
-
-  if (props.monthlyDifference > 0) {
-    return `+${absoluteDifference}만원`
-  }
-
-  if (props.monthlyDifference < 0) {
-    return `-${absoluteDifference}만원`
-  }
-
-  return '변동 없음'
-})
-
-const desktopMonthlyDifferenceDescription = computed(
-  () => `전월 대비 ${monthlyDifferenceText.value}`
-)
-
-const monthlyDifferenceTone = computed(() => {
-  if (props.monthlyDifference > 0) {
-    return 'warning'
-  }
-
-  if (props.monthlyDifference < 0) {
-    return 'positive'
-  }
-
-  return 'default'
-})
+const {
+  formattedTotalSpending,
+  formattedSavingCapacity,
+  formattedRemainingMonths,
+  normalizedGoalProgress,
+  monthlyDifferenceRate,
+  monthlyDifferenceDirection,
+  monthlyDifferenceHighlightText: desktopMonthlyDifferenceHighlightText,
+  monthlyDifferenceDescription: desktopMonthlyDifferenceDescription,
+  monthlyDifferenceTone: desktopMonthlyDifferenceTone,
+} = useSpendingSummaryComparison(props)
 
 const monthlyDifferenceColorClass = computed(() => {
-  if (props.monthlyDifference > 0) {
-    return 'text-[#F59E0B]'
+  if (monthlyDifferenceDirection.value === 'increase') {
+    return 'text-[#E76F6F]'
   }
 
-  if (props.monthlyDifference < 0) {
+  if (monthlyDifferenceDirection.value === 'decrease') {
     return 'text-[#10B981]'
   }
 

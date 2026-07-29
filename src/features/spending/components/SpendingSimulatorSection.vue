@@ -1,37 +1,44 @@
 <template>
   <section class="w-full" aria-labelledby="spending-simulator-title">
     <!-- 섹션 헤더 -->
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h2 id="spending-simulator-title" class="text-lg font-bold text-[#0A192F] md:text-xl">
+    <div>
+      <div class="flex items-start justify-between gap-3">
+        <h2
+          id="spending-simulator-title"
+          class="shrink-0 text-lg font-bold text-[#0A192F] md:text-xl"
+        >
           절감 시뮬레이터
         </h2>
 
-        <p class="mt-1 text-sm text-[#64748B]">슬라이더를 조절해 목표 지출을 설정해보세요.</p>
-      </div>
-
-      <div
-        class="inline-flex w-fit items-center gap-2 rounded-xl bg-[#0066FF] px-3 py-2 text-xs font-semibold text-white md:px-4"
-      >
-        <svg
-          class="h-4 w-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          aria-hidden="true"
+        <div
+          class="inline-flex min-w-0 items-center gap-1.5 rounded-xl bg-[#0066FF] px-2.5 py-2 text-xs font-semibold text-white sm:gap-2 sm:px-4"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z" />
-        </svg>
+          <svg
+            class="h-4 w-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"
+            />
+          </svg>
 
-        <span aria-live="polite">
-          {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }}개월 단축
-        </span>
+          <span class="text-right leading-4 sm:whitespace-nowrap" aria-live="polite">
+            {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }}개월 단축
+          </span>
+        </div>
       </div>
+
+      <p class="mt-1 text-sm text-[#64748B]">슬라이더를 조절해 목표 지출을 설정해보세요.</p>
     </div>
 
     <!-- 모바일 카테고리 선택 -->
-    <div class="mt-5 md:hidden">
+    <div class="mt-5 min-[1400px]:hidden">
       <p class="mb-3 text-center text-xs text-[#64748B]">
         카테고리를 선택하고 지출을 조절해보세요.
       </p>
@@ -106,8 +113,8 @@
       </div>
     </div>
 
-    <!-- 태블릿 및 데스크톱 -->
-    <div class="mt-5 hidden grid-cols-2 gap-4 md:grid lg:grid-cols-3">
+    <!-- 넓은 데스크톱 -->
+    <div class="mt-5 hidden grid-cols-3 gap-4 min-[1400px]:grid">
       <SpendingCategoryCard
         v-for="category in categories"
         :key="category.id"
