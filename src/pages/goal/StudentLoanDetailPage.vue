@@ -3,15 +3,18 @@
     <!-- <div class="space-y-6 pb-32"> -->
     <!-- 상단 텍스트 -->
     <header class="space-y-2">
-      <div
-        class="inline-flex items-center space-x-1 rounded-full bg-blue-50 px-3 py-1 text-sm font-bold text-blue-600"
-      >
-        <span>🎓</span>
-        <span>학자금 대출 상환</span>
-      </div>
-      <p class="text-sm font-bold text-blue-600">STEP 2 — 목표 구체화</p>
-      <h1 class="text-2xl font-bold text-gray-900 whitespace-pre-line">
-        빚 없는 출발, 언제까지 완납할까요
+      <!-- 🌟 공통 StepHeader 적용 -->
+      <StepHeader
+        :current-step="2"
+        :total-steps="3"
+        goal-label="🎓 학자금 대출 상환"
+        step-label="STEP 2 — 목표 구체화"
+        @back="router.back()"
+      />
+
+      <!-- 메인 타이틀 (헤더 바로 아래 배치) -->
+      <h1 class="text-2xl font-bold text-gray-900 whitespace-pre-line mt-2 mb-6">
+        빚 없는 출발, 언제까지 완납할까요?
       </h1>
     </header>
 
@@ -31,7 +34,6 @@
       </div>
     </BaseCard>
 
-    <!-- 2. 완납 기간 -->
     <!-- 2. 완납 기간 -->
     <BaseCard>
       <!-- 타이틀 및 우측 상단 개월 수 표시 -->
@@ -122,12 +124,16 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import BaseCard from '@/shared/ui/BaseCard.vue'
 import AmountInput from '@/shared/ui/AmountInput.vue'
 import RangeSliderSync from '@/shared/ui/RangeSliderSync.vue'
 import BottomFixedButton from '@/shared/ui/BottomFixedButton.vue'
 import { useGoalStore } from '@/features/goal/store/goal.store'
 
+import StepHeader from '@/shared/ui/StepHeader.vue'
+
+const router = useRouter()
 const goalStore = useGoalStore()
 
 const loanBalance = ref(10000000)
@@ -179,5 +185,7 @@ async function handleCheckFeasibility() {
 
   // TODO: 향후 'POST /api/goals/possible' API를 호출할 예정
   console.log('API 호출 준비:', goalStore.goalParams)
+
+  router.push('/goal/feasibility')
 }
 </script>

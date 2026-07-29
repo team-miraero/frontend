@@ -1,13 +1,21 @@
 <template>
-  <div class="mx-auto max-w-4xl px-6 py-12">
-    <!-- 헤더 섹션 -->
-    <header class="mb-12 text-center">
-      <span class="mb-2 block text-sm font-bold text-blue-600">STEP 1 — 목표 선택</span>
-      <h1 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+  <div class="mx-auto max-w-4xl px-6 py-8 pb-32">
+    <!-- 🌟 1. 공통 StepHeader 적용 -->
+    <!-- 목표 '선택' 단계이므로 goal-label은 생략하고 진행률(1/3)과 라벨만 전달합니다 -->
+    <StepHeader
+      :current-step="1"
+      :total-steps="3"
+      step-label="STEP 1 — 목표 선택"
+      @back="router.back()"
+    />
+
+    <!-- 🌟 2. 메인 타이틀 영역 (헤더 바로 아래 배치) -->
+    <div class="text-center mt-8 mb-12">
+      <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
         어떤 목표를 향해 달릴까요?
       </h1>
-      <p class="text-lg text-gray-600">준비하고 계신 소중한 미래를 선택해 주세요.</p>
-    </header>
+      <p class="text-lg text-gray-600 mt-4">준비하고 계신 소중한 미래를 선택해 주세요.</p>
+    </div>
 
     <!-- 목표 카드 그리드 -->
     <div class="grid grid-cols-2 gap-4 sm:gap-6">
@@ -20,17 +28,13 @@
       />
     </div>
 
-    <!-- 하단 액션 버튼 -->
-    <div class="mt-16 flex flex-col items-center space-y-4">
-      <BaseButton
-        class="min-w-[280px] py-4 text-lg font-bold shadow-lg"
-        :disabled="!selectedGoal"
-        @click="handleNext"
-      >
-        {{ buttonText }}
-      </BaseButton>
-      <p class="text-sm text-gray-500">나중에 목표를 추가하거나 변경할 수 있어요</p>
-    </div>
+    <!-- 🌟 3. 공통 BottomCTA 적용 (하단 고정 액션 버튼) -->
+    <BottomCTA
+      :label="buttonText"
+      :disabled="!selectedGoal"
+      caption="나중에 목표를 추가하거나 변경할 수 있어요"
+      @click="handleNext"
+    />
   </div>
 </template>
 
@@ -38,7 +42,8 @@
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import GoalCard from '@/features/goal/components/GoalCard.vue'
-import BaseButton from '@/shared/ui/BaseButton.vue'
+import BottomCTA from '@/shared/ui/BottomCTA.vue'
+import StepHeader from '@/shared/ui/StepHeader.vue'
 import { useGoalStore } from '@/features/goal/store/goal.store'
 import { getGoalPresets } from '@/features/goal/api/goal.api'
 
@@ -50,9 +55,10 @@ const selectedGoal = computed(() => {
   return presets.value.find((p) => p.id === goalStore.selectedGoalId)
 })
 
+// 💡 수정됨: BottomCTA 내부에 화살표(›)가 이미 존재하므로 텍스트에서 ' >' 기호를 제거했습니다.
 const buttonText = computed(() => {
   if (!selectedGoal.value) return '선택 완료'
-  return `'${selectedGoal.value.title}' 목표로 시작하기 >`
+  return `'${selectedGoal.value.title}' 목표로 시작하기`
 })
 
 onMounted(async () => {
