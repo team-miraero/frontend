@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw'
 // 테스트 시 registered/mockPacemakerStatus 조합만 바꿔가며 미개설·OFF·ON 상태를 확인하면 됩니다.
 let mockRegistered = true
 let mockPacemakerStatus = 'ACTIVE' // 'ACTIVE' | 'PAUSED' | null
+let mockBalance = 270000
 
 export const pacemakerHandlers = [
   http.get('*/api/pace-maker', async () => {
@@ -13,7 +14,7 @@ export const pacemakerHandlers = [
       status: mockPacemakerStatus,
       enabled: mockPacemakerStatus === 'ACTIVE',
       monthlySecuredAmount: 42000,
-      balance: 270000,
+      balance: mockBalance,
       todayEarned: 12700,
       streakDays: 52,
       dailyLimit: 10000,

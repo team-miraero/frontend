@@ -26,6 +26,8 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
           goalId: goal.goalId,
           goalName: goal.goalName,
           icon: GOAL_TYPE_ICON[goal.goalType] ?? '🎯',
+          accountNickname: asset.assetName,
+          accountBalance: asset.balance,
           bankName: asset.bankName,
           accountNumberMasked: asset.accountNumberMasked,
         }))

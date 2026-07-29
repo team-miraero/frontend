@@ -69,21 +69,25 @@
         </div>
       </div>
     </div>
-    <PacemakerSetupModal
-      v-model="isPacemakerModalOpen"
-      @closed="closePacemakerModal"
-    />
+    <PacemakerSetupModal v-model="isPacemakerModalOpen" />
     <PacemakerBalanceModal
       v-model="isPacemakerBalanceModalOpen"
       :pacemaker="pacemakerStore.pacemakerStatus ?? {}"
       :deposit-targets="pacemakerStore.depositTargets"
       @toggle-auto-saving="pacemakerStore.togglePacemaker"
+      @deposit="handleOpenDeposit"
+    />
+    <PacemakerDepositModal
+      v-model="isPacemakerDepositModalOpen"
+      :target="selectedDepositTarget"
+      :available-balance="pacemakerStore.pacemakerStatus?.balance ?? 0"
+      @deposit="handleDeposit"
     />
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
 import {
@@ -97,7 +101,12 @@ import {
   MilestoneList,
   AvailableMoneyPanel,
 } from '@/features/roadmap'
-import { usePacemakerStore, PacemakerSetupModal, PacemakerBalanceModal } from '@/features/pacemaker'
+import {
+  usePacemakerStore,
+  PacemakerSetupModal,
+  PacemakerBalanceModal,
+  PacemakerDepositModal,
+} from '@/features/pacemaker'
 import { useModal } from '@/shared/composables/useModal'
 import * as goalApi from '@/features/goal/api/goal.api'
 
@@ -105,14 +114,11 @@ const route = useRoute()
 const goalStore = useGoalStore()
 const roadmapStore = useRoadmapStore()
 const pacemakerStore = usePacemakerStore()
-const {
-  isOpen: isPacemakerModalOpen,
-  open: openPacemakerModal,
-} = useModal()
-const {
-   isOpen: isPacemakerBalanceModalOpen, 
-   open: openPacemakerBalanceModal 
-  } = useModal()
+const { isOpen: isPacemakerModalOpen, open: openPacemakerModal } = useModal()
+const { isOpen: isPacemakerBalanceModalOpen, open: openPacemakerBalanceModal } = useModal()
+const { isOpen: isPacemakerDepositModalOpen, open: openPacemakerDepositModal } = useModal()
+
+const selectedDepositTarget = ref(null)
 
 // 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
 function handlePacemakerToggle() {
@@ -130,6 +136,20 @@ function handlePacemakerCtaClick() {
   } else {
     openPacemakerModal()
   }
+}
+
+// 잔액 모달의 "입금" 클릭: 어떤 목표 계좌로 입금할지 선택하고 입금 모달을 염
+function handleOpenDeposit(goalId) {
+  selectedDepositTarget.value =
+    pacemakerStore.depositTargets.find((target) => target.goalId === goalId) ?? null
+  openPacemakerDepositModal()
+}
+
+// 입금 모달의 "입금하기" 클릭: 실제 입금 처리
+// TODO: 입금 완료 후 안내 모달(다음 작업)을 여기서 열도록 교체
+async function handleDeposit({ goalId, amount }) {
+  await pacemakerStore.depositToGoal(goalId, amount)
+  isPacemakerDepositModalOpen.value = false
 }
 
 onMounted(async () => {
