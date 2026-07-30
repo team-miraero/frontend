@@ -1,36 +1,35 @@
+<!-- src/features/goal/components/GoalCard.vue -->
 <template>
   <div
-    class="relative cursor-pointer rounded-2xl border-2 p-6 transition-all duration-200 hover:shadow-md"
-    :class="[
+    class="relative flex flex-col p-6 rounded-2xl transition-all duration-300 cursor-pointer border-2"
+    :class="
       isSelected
-        ? 'border-blue-600 bg-blue-50 shadow-sm'
-        : 'border-gray-200 bg-white hover:border-blue-200'
-    ]"
+        ? 'border-blue-600 bg-blue-50/50 shadow-md'
+        : 'border-transparent bg-white shadow-sm hover:border-blue-300 hover:-translate-y-1 hover:shadow-md'
+    "
     @click="$emit('select')"
   >
-    <!-- 체크 아이콘 (선택 시 노출) -->
+    <!-- 우측 상단 체크마크 -->
     <div
       v-if="isSelected"
-      class="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white"
+      class="absolute top-4 right-4 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm animate-in zoom-in duration-200"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        class="h-4 w-4"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-          clip-rule="evenodd"
-        />
-      </svg>
+      ✓
     </div>
 
-    <!-- 카드 내용 -->
-    <div class="mb-4 text-4xl">{{ icon }}</div>
-    <h3 class="mb-2 text-lg font-bold text-gray-900">{{ title }}</h3>
-    <p class="text-sm leading-relaxed text-gray-600">{{ description }}</p>
+    <!-- 아이콘 (이모지) -->
+    <div class="text-3xl mb-4">{{ icon }}</div>
+
+    <!-- 타이틀 (선택 시 파란색으로 변경) -->
+    <h3
+      class="text-lg font-bold mb-1 transition-colors"
+      :class="isSelected ? 'text-blue-600' : 'text-gray-900'"
+    >
+      {{ title }}
+    </h3>
+
+    <!-- 서브타이틀 -->
+    <p class="text-sm text-gray-500">{{ description }}</p>
   </div>
 </template>
 

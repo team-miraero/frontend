@@ -47,8 +47,8 @@
 
       <!-- 심플한 네이티브 슬라이더 적용 (인풋 박스 제거) -->
       <input
-        type="range"
         v-model="repaymentPeriod"
+        type="range"
         min="6"
         max="60"
         class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
