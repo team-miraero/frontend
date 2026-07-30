@@ -1,16 +1,39 @@
 <!-- 목표설정 퍼널(GOAL-02) 공용 기간 슬라이더 카드: 개월 수 슬라이더 + 계산 결과 박스 -->
 <template>
-  <div class="rounded-3xl border border-accent/50 bg-accent-light/70 p-6 shadow-sm">
+  <div class="w-full rounded-3xl border border-accent/50 bg-accent-light/70 p-8 shadow-sm">
     <div class="flex items-start justify-between">
       <div>
         <p class="text-base font-bold text-gray-900">{{ label }}</p>
         <p v-if="caption" class="mt-0.5 text-xs text-gray-400">{{ caption }}</p>
       </div>
-      <span class="shrink-0 text-base font-bold text-primary">{{ modelValue }}개월</span>
+      <span v-if="!presets.length" class="shrink-0 text-base font-bold text-primary">
+        {{ modelValue }}개월
+      </span>
     </div>
 
-    <div class="mt-4">
-      <div class="relative h-2 w-full">
+    <div v-if="presets.length" class="mt-4 grid grid-cols-4 gap-2 w-full">
+      <button
+        v-for="preset in presets"
+        :key="preset.value"
+        type="button"
+        class="w-full whitespace-nowrap rounded-full border px-4 py-2.5 text-center text-xs font-semibold transition-all shadow-sm"
+        :class="
+          modelValue === preset.value
+            ? 'border-primary bg-primary text-white'
+            : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+        "
+        @click="emit('update:modelValue', preset.value)"
+      >
+        {{ preset.label }}
+      </button>
+    </div>
+
+    <div class="mt-5">
+      <div v-if="presets.length" class="flex items-center justify-between">
+        <p class="text-xs font-medium text-gray-500">세부 조정</p>
+        <span class="text-xs font-bold text-primary">{{ modelValue }}개월</span>
+      </div>
+      <div class="relative mt-2 h-2 w-full">
         <div class="absolute inset-0 rounded-full bg-gray-200" />
         <div
           class="absolute inset-y-0 left-0 rounded-full bg-primary"
@@ -95,6 +118,12 @@
 <script setup>
 import { computed } from 'vue'
 
+/**
+ * @typedef {Object} PeriodPreset
+ * @property {string} label 칩에 표시할 문구 (예: '1년')
+ * @property {number} value 클릭 시 설정될 개월 수
+ */
+
 const props = defineProps({
   label: { type: String, required: true },
   modelValue: { type: Number, required: true },
@@ -104,6 +133,8 @@ const props = defineProps({
   resultLabel: { type: String, required: true },
   resultValue: { type: String, required: true },
   resultCaption: { type: String, default: '' },
+  /** @type {import('vue').PropType<PeriodPreset[]>} */
+  presets: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['update:modelValue'])
 
