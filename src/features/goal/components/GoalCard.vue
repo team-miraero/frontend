@@ -17,10 +17,14 @@
       ✓
     </div>
 
-    <!-- 아이콘 (이모지) -->
-    <div class="text-3xl mb-4">{{ icon }}</div>
+    <!-- 옅은 파란색 원형 배경 안에 기존 이모지를 크게 배치 -->
+    <div
+      class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-2xl mb-4 shadow-sm"
+    >
+      {{ icon }}
+    </div>
 
-    <!-- 타이틀 (선택 시 파란색으로 변경) -->
+    <!-- 타이틀 -->
     <h3
       class="text-lg font-bold mb-1 transition-colors"
       :class="isSelected ? 'text-blue-600' : 'text-gray-900'"
@@ -35,22 +39,11 @@
 
 <script setup>
 defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  icon: {
-    type: String,
-    required: true,
-  },
-  isSelected: {
-    type: Boolean,
-    default: false,
-  },
+  id: { type: String, required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  icon: { type: String, required: true },
+  isSelected: { type: Boolean, default: false },
 })
 
 defineEmits(['select'])

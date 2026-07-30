@@ -9,12 +9,13 @@
       <StepHeader :current-step="1" :total-steps="3" @back="router.back()" />
 
       <!-- 메인 타이틀 영역 -->
-      <div class="text-center mt-10 mb-12">
+      <div class="text-center mt-8 mb-12">
         <p class="text-sm font-bold text-blue-600 mb-3">STEP 1 — 목표 선택</p>
+        <!-- 폰트 크기와 굵기 조정 -->
         <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
           어떤 목표를 향해 달릴까요?
         </h1>
-        <p class="text-lg text-gray-500 mt-3">지금 가장 집중하고 싶은 목표를 하나 선택해 주세요.</p>
+        <p class="text-sm text-gray-500 mt-2">지금 가장 집중하고 싶은 목표를 하나 선택해 주세요.</p>
       </div>
 
       <!-- 목표 카드 그리드 (2열) -->

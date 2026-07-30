@@ -3,7 +3,7 @@
     <!-- <div class="space-y-6 pb-32"> -->
     <!-- 상단 텍스트 -->
     <header class="space-y-2">
-      <!-- 🌟 공통 StepHeader 적용 -->
+      <!-- 공통 StepHeader 적용 -->
       <StepHeader
         :current-step="2"
         :total-steps="3"

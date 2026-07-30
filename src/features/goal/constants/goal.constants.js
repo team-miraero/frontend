@@ -31,7 +31,7 @@ export const GOAL_PRESETS = Object.freeze([
   {
     id: GOAL_PRESET_IDS.EMERGENCY,
     title: '비상금',
-    description: '생활비 3~6개월치 안전망',
+    description: '생활비 목돈마련',
     icon: '💰',
   },
   {
