@@ -18,11 +18,6 @@ export const goalRoutes = [
         component: () => import('@/pages/goal/GoalDetailPage.vue'),
       },
       {
-        path: 'student-loan',
-        name: 'STUDENT_LOAN_DETAIL',
-        component: () => import('@/pages/goal/StudentLoanDetailPage.vue'),
-      },
-      {
         path: 'feasibility',
         name: ROUTE_NAMES.GOAL_FEASIBILITY,
         component: () => import('@/pages/goal/FeasibilityPage.vue'),

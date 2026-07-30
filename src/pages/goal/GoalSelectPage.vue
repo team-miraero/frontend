@@ -81,10 +81,6 @@ onMounted(async () => {
 })
 
 function handleNext() {
-  if (goalStore.selectedGoalId === 'STUDENT_LOAN') {
-    router.push('/goal/student-loan')
-  } else {
-    goalStore.moveToNextStep()
-  }
+  goalStore.moveToNextStep()
 }
 </script>

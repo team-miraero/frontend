@@ -127,7 +127,6 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/shared/ui/BaseCard.vue'
 import AmountInput from '@/shared/ui/AmountInput.vue'
-import RangeSliderSync from '@/shared/ui/RangeSliderSync.vue'
 import BottomFixedButton from '@/shared/ui/BottomFixedButton.vue'
 import { useGoalStore } from '@/features/goal/store/goal.store'
 
