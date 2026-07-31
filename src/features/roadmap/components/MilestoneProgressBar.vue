@@ -20,7 +20,7 @@
       <div
         v-for="milestone in milestones"
         :key="milestone.milestoneId"
-        class="absolute top-0 flex -translate-x-1/2 flex-col items-center"
+        class="absolute top-0 flex w-max -translate-x-[58%] flex-col items-center lg:-translate-x-1/2"
         :style="{ left: `${milestonePosition(milestone)}%` }"
       >
         <span
@@ -117,7 +117,10 @@
       >
         {{ goal.pace.paceStatus === 'BEHIND' ? '▼' : '▲' }}
         {{ formatManwon(Math.abs(goal.pace.differenceAmount)) }}
-        {{ goal.pace.paceStatus === 'BEHIND' ? '뒤처짐' : '앞섬' }}
+        <!-- 모바일: 문장 첫 단어(금액)까지만 노출, "앞섬/뒤처짐"은 데스크톱에서만 -->
+        <span class="hidden lg:inline">{{
+          goal.pace.paceStatus === 'BEHIND' ? '뒤처짐' : '앞섬'
+        }}</span>
       </span>
     </div>
   </div>
