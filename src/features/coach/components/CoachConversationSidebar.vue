@@ -1,6 +1,7 @@
 <!-- AI 코치 대화방 목록 사이드바 -->
 <template>
   <aside class="flex h-full w-[260px] shrink-0 flex-col border-r border-slate-200 bg-white">
+    <!-- 새 대화 버튼 -->
     <div class="border-b border-slate-100 p-4">
       <button
         type="button"
@@ -12,6 +13,7 @@
       </button>
     </div>
 
+    <!-- 대화방 리스트 -->
     <ul class="flex-1 overflow-y-auto p-2">
       <li v-for="conversation in conversations" :key="conversation.conversationId">
         <div
