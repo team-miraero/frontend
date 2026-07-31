@@ -81,4 +81,9 @@ function assetIcon(assetType) {
 function formatManwon(amount) {
   return `${Math.round(amount / 10000).toLocaleString()}만원`
 }
+
+// 모바일 축약형: 자산명이 길어 글씨가 깨지는 것을 막기 위해 첫 단어 그룹만 노출
+function firstWord(name) {
+  return name.split(' ')[0]
+}
 </script>
