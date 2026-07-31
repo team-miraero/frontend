@@ -1,25 +1,65 @@
 <template>
-  <!-- 1. 배경 래퍼: 너비 제한 없이 화면 전체를 덮습니다 -->
-  <HeroBackground>
-    <!-- 2. 콘텐츠 래퍼: 이 녀석이 내용물들을 모아서 중앙 정렬(mx-auto) 시키고 너비를 제한(max-w-3xl)합니다 -->
-    <div
-      class="mx-auto w-full max-w-3xl px-6 pt-10 pb-32 animate-in fade-in slide-in-from-bottom-8 duration-700"
-    >
-      <!-- 공통 StepHeader -->
-      <StepHeader :current-step="1" :total-steps="3" @back="router.back()" />
+  <!-- 배경 래퍼: 소프트 블루 은은한 배경 -->
+  <div class="min-h-screen bg-[#F7FAFC] flex flex-col justify-between font-sans">
+    <!-- 1. 상단 네비게이션 헤더 & 진행바 영역 -->
+    <header class="w-full max-w-5xl mx-auto px-6 pt-6 pb-2">
+      <!-- 로고 및 이전 버튼 -->
+      <div class="flex items-center justify-between mb-8">
+        <!-- 로고 -->
+        <div
+          class="flex items-center gap-2 cursor-pointer"
+          @click="router.push({ name: 'onboarding' })"
+        >
+          <img :src="logo" alt="미래로" class="w-8 h-8 object-contain" />
+          <span class="font-extrabold text-lg tracking-tight text-gray-900">미래로</span>
+        </div>
 
+        <!-- 이전 버튼 -->
+        <button
+          @click="router.back()"
+          class="flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+        >
+          <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          이전
+        </button>
+      </div>
+
+      <!-- 진행바 (Progress Bar with Animation) -->
+      <div class="flex items-center gap-4 max-w-2xl mx-auto">
+        <div class="relative flex-1 h-2 bg-gray-200/70 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-[#0066FF] rounded-full ease-out"
+            :style="{
+              width: progressWidth,
+              transition: 'width 1000ms cubic-bezier(0.4, 0, 0.2, 1)',
+            }"
+          ></div>
+        </div>
+        <span class="text-xs font-bold text-gray-400 whitespace-nowrap">1 / 3</span>
+      </div>
+    </header>
+
+    <!-- 2. 중앙 컨텐츠 영역 -->
+    <main
+      class="w-full max-w-2xl mx-auto px-6 py-6 flex-1 flex flex-col justify-center animate-in fade-in slide-in-from-bottom-6 duration-700"
+    >
       <!-- 메인 타이틀 영역 -->
-      <div class="text-center mt-8 mb-12">
-        <p class="text-sm font-bold text-blue-600 mb-3">STEP 1 — 목표 선택</p>
-        <!-- 폰트 크기와 굵기 조정 -->
-        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+      <div class="text-center mb-8">
+        <p class="text-xs sm:text-sm font-bold text-[#0066FF] tracking-wider mb-2">
+          STEP 1 — 목표 선택
+        </p>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
           어떤 목표를 향해 달릴까요?
         </h1>
-        <p class="text-sm text-gray-500 mt-2">지금 가장 집중하고 싶은 목표를 하나 선택해 주세요.</p>
+        <p class="text-xs sm:text-sm text-gray-500 mt-2 font-medium">
+          지금 가장 집중하고 싶은 목표를 하나 선택해 주세요.
+        </p>
       </div>
 
       <!-- 목표 카드 그리드 (2열) -->
-      <div class="grid grid-cols-2 gap-4 sm:gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <GoalCard
           v-for="preset in presets"
           :key="preset.id"
@@ -28,37 +68,49 @@
           @select="toggleGoal(preset.id)"
         />
       </div>
-    </div>
 
-    <!-- 하단 고정 버튼 (컴포넌트 내부에 fixed가 있으므로 배경 래퍼 바로 안쪽에 배치) -->
-    <BottomCTA
-      :label="buttonText"
-      :disabled="!selectedGoal"
-      caption="나중에 목표를 추가하거나 변경할 수 있어요"
-      @click="handleNext"
-    />
-  </HeroBackground>
+      <!-- 하단 CTA 버튼 -->
+      <div class="mt-8 flex flex-col items-center">
+        <button
+          :disabled="!selectedGoal"
+          @click="handleNext"
+          class="w-full max-w-md bg-[#0066FF] hover:bg-blue-600 active:scale-[0.99] disabled:bg-gray-300 disabled:cursor-not-allowed disabled:active:scale-100 text-white font-bold text-base py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+        >
+          <span>{{ buttonText }}</span>
+          <svg class="w-4 h-4 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+        <p class="text-xs text-gray-400 font-medium mt-3">
+          나중에 목표를 추가하거나 변경할 수 있어요
+        </p>
+      </div>
+    </main>
+
+    <!-- 하단 여백 바닥 받침 -->
+    <footer class="py-4"></footer>
+  </div>
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import GoalCard from '@/features/goal/components/GoalCard.vue'
-import BottomCTA from '@/shared/ui/BottomCTA.vue'
-import StepHeader from '@/shared/ui/StepHeader.vue'
-import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import { useGoalStore } from '@/features/goal/store/goal.store'
 import { getGoalPresets } from '@/features/goal/api/goal.api'
+import logo from '@/assets/images/logo.png'
 
 const router = useRouter()
 const goalStore = useGoalStore()
 const presets = ref([])
 
+// 진행바 애니메이션을 위한 반응형 수치
+const progressWidth = ref('0%')
+
 const selectedGoal = computed(() => {
   return presets.value.find((p) => p.id === goalStore.selectedGoalId)
 })
 
-// 💡 수정됨: BottomCTA 내부에 화살표(›)가 이미 존재하므로 텍스트에서 ' >' 기호를 제거했습니다.
 const buttonText = computed(() => {
   if (!selectedGoal.value) return '목표를 선택해 주세요'
   return `'${selectedGoal.value.title}' 목표로 시작하기`
@@ -73,6 +125,13 @@ function toggleGoal(id) {
 }
 
 onMounted(async () => {
+  // 진행바 0% -> 33.3% 부드러운 애니메이션 트리거
+  nextTick(() => {
+    setTimeout(() => {
+      progressWidth.value = '33.333%'
+    }, 100)
+  })
+
   try {
     presets.value = await getGoalPresets()
   } catch (error) {

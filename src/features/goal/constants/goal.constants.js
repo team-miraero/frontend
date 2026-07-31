@@ -30,8 +30,8 @@ export const GOAL_PRESETS = Object.freeze([
   },
   {
     id: GOAL_PRESET_IDS.EMERGENCY,
-    title: '비상금',
-    description: '생활비 목돈마련',
+    title: '비상금·첫 목돈',
+    description: '생활비 목돈 마련',
     icon: '💰',
   },
   {
@@ -42,7 +42,7 @@ export const GOAL_PRESETS = Object.freeze([
   },
   {
     id: GOAL_PRESET_IDS.STUDENT_LOAN,
-    title: '학자금',
+    title: '학자금 대출 상환',
     description: '빚 없는 출발',
     icon: '🎓',
   },
