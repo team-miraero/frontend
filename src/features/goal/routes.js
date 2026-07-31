@@ -1,6 +1,5 @@
 // goal 도메인 라우트 (GOAL-01~05)
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import GoalLayout from '@/app/layouts/GoalLayout.vue'
 
 export const goalRoutes = [
   {
