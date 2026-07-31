@@ -24,7 +24,7 @@
       rgba(219, 233, 255, 0.1) 20%,
       rgba(255, 255, 255, 0) 48%
     ),
-    linear-gradient(180deg, #f8fbff 0%, #ffffff 78%);
+    linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
 }
 
 /*
