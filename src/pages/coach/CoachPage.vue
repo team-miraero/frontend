@@ -3,8 +3,30 @@
   <div class="flex h-full">
     <div class="flex h-full flex-1 flex-col bg-[#f8fbff]">
       <!-- 인트로: 모바일에선 타이틀 + 짧은 설명만, 데스크톱에선 전체 문구 -->
-      <div class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 lg:px-10 lg:py-6">
+      <div
+        class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 lg:px-10 lg:py-6"
+      >
         <div class="flex items-center gap-3 lg:items-start">
+          <!-- 모바일: 메인 사이드바(메뉴) 열기 버튼 — 다른 탭 헤더와 동일한 위치/동작 -->
+          <button
+            type="button"
+            class="-ml-1 shrink-0 rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
+            aria-label="사이드바 메뉴 열기"
+            @click="uiStore.toggleSidebar()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              class="size-5"
+            >
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
           <div
             class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#66b2ff] lg:size-10 lg:rounded-2xl lg:drop-shadow-[0_4px_7px_rgba(0,102,255,0.22)]"
           >
@@ -84,6 +106,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
+import { useUiStore } from '@/stores/ui.store'
 import { useGoalStore } from '@/features/goal'
 import { GOAL_TYPES } from '@/shared/constants/goals'
 import { useMediaQuery } from '@/shared/composables/useMediaQuery'
@@ -95,6 +118,7 @@ import {
 } from '@/features/coach'
 
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const goalStore = useGoalStore()
 const coachStore = useCoachStore()
 

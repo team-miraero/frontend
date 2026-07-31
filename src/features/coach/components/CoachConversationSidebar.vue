@@ -12,7 +12,14 @@
   <div
     ref="containerRef"
     class="h-full shrink-0"
-    :class="isDesktop ? 'relative' : 'fixed inset-y-0 right-0 z-40 w-[85%] max-w-[320px]'"
+    :class="
+      isDesktop
+        ? 'relative'
+        : [
+            'fixed inset-y-0 right-0 z-40 w-[85%] max-w-[320px] transition-transform duration-200 ease-out',
+            isOpen ? 'translate-x-0' : 'translate-x-full',
+          ]
+    "
     :style="isDesktop ? { width: isDesktopCollapsed ? '0px' : `${width}px` } : undefined"
   >
     <!-- 데스크톱: 접힌 상태에서 화면 오른쪽 끝에 붙는 펼치기 탭 -->
@@ -28,8 +35,7 @@
 
     <aside
       v-show="isDesktop ? !isDesktopCollapsed : true"
-      class="flex h-full w-full flex-col overflow-hidden border-l border-slate-200 bg-white transition-transform duration-200 ease-out"
-      :class="!isDesktop && (isOpen ? 'translate-x-0' : 'translate-x-full')"
+      class="flex h-full w-full flex-col overflow-hidden border-l border-slate-200 bg-white"
     >
       <!-- 새 대화 버튼 + 접기 버튼(데스크톱) / 닫기 버튼(모바일) -->
       <div class="flex items-center gap-2 border-b border-slate-100 p-4">
