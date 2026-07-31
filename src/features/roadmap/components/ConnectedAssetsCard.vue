@@ -1,7 +1,8 @@
 <!-- "연동된 저금통 · 계좌" 카드 -->
 <template>
+  <!-- 데스크톱(lg 이상): 기존 배치 그대로 유지 -->
   <div
-    class="rounded-[20px] border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)]"
+    class="hidden rounded-[20px] border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:block"
   >
     <div class="flex items-center justify-between">
       <p class="text-xs font-bold text-slate-400">연동된 저금통 · 계좌</p>
@@ -25,6 +26,29 @@
     <div class="mt-2 flex items-center justify-between border-t border-slate-100 pt-2.5">
       <span class="text-xs text-slate-500">합계 잔액</span>
       <span class="text-xs font-black text-[#0a192f]">{{ formatManwon(totalBalance) }}</span>
+    </div>
+  </div>
+
+  <!-- 모바일(lg 미만): 타이틀을 "연동된 자산"으로 줄이고 합계 잔액을 줄바꿈한 축약형 -->
+  <div
+    class="rounded-[20px] border border-slate-200 bg-white p-4 shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:hidden"
+  >
+    <p class="text-xs font-bold text-slate-400">연동된 자산</p>
+
+    <div class="flex flex-col gap-2 pt-3">
+      <div v-for="asset in savingsAssets" :key="asset.assetId" class="flex items-center gap-2">
+        <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[#eaf2ff]">
+          <img :src="assetIcon(asset.assetType)" alt="" class="size-3" />
+        </div>
+        <p class="min-w-0 truncate text-xs font-bold text-[#0a192f]">
+          {{ firstWord(asset.assetName) }}
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-2 flex flex-col gap-0.5 border-t border-slate-100 pt-2">
+      <span class="text-[11px] text-slate-500">합계 잔액</span>
+      <span class="text-lg font-black text-[#0a192f]">{{ formatManwon(totalBalance) }}</span>
     </div>
   </div>
 </template>
