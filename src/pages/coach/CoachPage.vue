@@ -1,14 +1,6 @@
 <!-- AI 목표 코치 채팅 페이지 -->
 <template>
   <div class="flex h-full">
-    <CoachConversationSidebar
-      :conversations="coachStore.conversations"
-      :active-conversation-id="coachStore.currentConversationId"
-      @create="handleCreateConversation"
-      @select="handleSelectConversation"
-      @delete="handleDeleteConversation"
-    />
-
     <div class="flex h-full flex-1 flex-col bg-[#f8fbff]">
       <!-- 인트로 -->
       <div class="border-b border-slate-200 bg-white px-10 py-6">
@@ -49,6 +41,14 @@
       <!-- 입력 영역 -->
       <CoachChatInput />
     </div>
+
+    <CoachConversationSidebar
+      :conversations="coachStore.conversations"
+      :active-conversation-id="coachStore.currentConversationId"
+      @create="handleCreateConversation"
+      @select="handleSelectConversation"
+      @delete="handleDeleteConversation"
+    />
   </div>
 </template>
 
