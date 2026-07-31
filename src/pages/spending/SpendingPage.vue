@@ -1,8 +1,24 @@
-<!-- 소비 분석 페이지 플레이스홀더 -->
 <template>
-  <div class="p-6">
-    <h1 class="text-xl font-bold">소비 분석 · EXP-01~04</h1>
-  </div>
+  <SpendingDashboard
+    :goals="goals"
+    :selected-goal-id="selectedGoalId"
+    :selected-goal="selectedGoalName"
+    :are-goals-loading="areGoalsLoading"
+    @select-goal="goalStore.selectGoal"
+  />
 </template>
 
-<script setup></script>
+<script setup>
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { SpendingDashboard } from '@/features/spending'
+import { useGoalStore } from '@/features/goal'
+
+const goalStore = useGoalStore()
+const { goals, selectedGoalId, selectedGoal, areGoalsLoading } = storeToRefs(goalStore)
+const selectedGoalName = computed(() => selectedGoal.value?.goalName ?? '')
+
+onMounted(() => {
+  goalStore.fetchGoals()
+})
+</script>
