@@ -22,8 +22,8 @@ import { client } from '@/shared/api/client'
  * @returns {Promise<{ goalId: number }>}
  */
 export async function createGoal(payload) {
-  // TODO: 실제 API 연동 시 client.post('/goals', payload)로 교체
-  return { goalId: Math.floor(Math.random() * 100000) }
+  const { data } = await client.post('/goals', payload)
+  return data
 }
 
 /**
@@ -40,18 +40,13 @@ export async function createGoal(payload) {
  * @property {boolean} possible 실현 가능 여부
  */
 
-// TODO: 실제 마이데이터 연동 전까지 사용하는 mock 월 저축 가능 금액
-const MOCK_MONTHLY_SAVING_CAPACITY = 620000
-
 /**
  * @param {FeasibilityParams} params
  * @returns {Promise<FeasibilityResponse>}
  */
-export async function getFeasibility({ goalAmount, goalMonths, startAmount }) {
-  // TODO: 실제 API 연동 시 client.get('/goals/feasibility', { params })로 교체
-  const requiredMonthly = Math.max(0, Math.round((goalAmount - startAmount) / goalMonths))
-  const availableMonthly = MOCK_MONTHLY_SAVING_CAPACITY
-  return { requiredMonthly, availableMonthly, possible: requiredMonthly <= availableMonthly }
+export async function getFeasibility(params) {
+  const { data } = await client.get('/goals/feasibility', { params })
+  return data
 }
 
 // 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)
@@ -66,68 +61,13 @@ export async function getFeasibility({ goalAmount, goalMonths, startAmount }) {
  * @property {number | null} interestRate
  */
 
-// TODO: 실제 마이데이터 연동 전까지 사용하는 mock 계좌 목록
-const MOCK_ACCOUNTS = [
-  {
-    accountId: 1,
-    institutionName: 'KB국민은행',
-    accountType: 'CHECKING',
-    accountName: 'KB 국민은행 입출금',
-    maskedAccountNumber: '···2291',
-    balance: 1250000,
-    interestRate: null,
-  },
-  {
-    accountId: 2,
-    institutionName: 'NH농협은행',
-    accountType: 'CHECKING',
-    accountName: 'NH 농협은행 입출금',
-    maskedAccountNumber: '···5548',
-    balance: 320000,
-    interestRate: null,
-  },
-  {
-    accountId: 3,
-    institutionName: 'KB국민은행',
-    accountType: 'SAVING',
-    accountName: 'KB 스타적금',
-    maskedAccountNumber: '···3821',
-    balance: 640000,
-    interestRate: 4.5,
-  },
-  {
-    accountId: 4,
-    institutionName: '카카오뱅크',
-    accountType: 'SAVING',
-    accountName: '카카오뱅크 적금',
-    maskedAccountNumber: '···0047',
-    balance: 1200000,
-    interestRate: 3.8,
-  },
-  {
-    accountId: 5,
-    institutionName: '토스뱅크',
-    accountType: 'SAVING',
-    accountName: '토스뱅크 저금통',
-    maskedAccountNumber: '···7193',
-    balance: 320000,
-    interestRate: 2.3,
-  },
-]
-
 /**
  * @param {{ accountType?: 'CHECKING' | 'SAVING' | 'DEPOSIT' }} [params]
  * @returns {Promise<{ totalBalance: number, accounts: AccountItem[] }>}
  */
-export async function getAccounts(params = {}) {
-  // TODO: 실제 API 연동 시 client.get('/accounts', { params })로 교체
-  const accounts = params.accountType
-    ? MOCK_ACCOUNTS.filter((account) => account.accountType === params.accountType)
-    : MOCK_ACCOUNTS
-  return {
-    totalBalance: accounts.reduce((sum, account) => sum + account.balance, 0),
-    accounts,
-  }
+export async function getAccounts(params) {
+  const { data } = await client.get('/accounts', { params })
+  return data
 }
 
 // 저금통 개설 API (GOAL-04)
@@ -154,16 +94,8 @@ export async function getAccounts(params = {}) {
  * @returns {Promise<MoneyBoxResponse>}
  */
 export async function createMoneyBox(payload) {
-  // TODO: 실제 API 연동 시 client.post('/money-boxes', payload)로 교체
-  return {
-    moneyBoxId: Math.floor(Math.random() * 100000),
-    userId: 0,
-    type: payload.type,
-    balance: 0,
-    maskedAccountNumber: '123-****-7890',
-    createdAt: new Date().toISOString(),
-    assetType: 'MONEY_BOX',
-  }
+  const { data } = await client.post('/money-boxes', payload)
+  return data
 }
 
 // 목표 목록 조회 API

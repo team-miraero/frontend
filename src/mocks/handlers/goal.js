@@ -2,13 +2,112 @@
 import { http, HttpResponse } from 'msw'
 import mydata from '@/mocks/fixtures/mydata.json'
 
+// TODO: 실제 마이데이터 연동 전까지 사용하는 mock 월 저축 가능 금액
+const MOCK_MONTHLY_SAVING_CAPACITY = 620000
+
+// TODO: 실제 마이데이터 연동 전까지 사용하는 mock 계좌 목록
+const MOCK_ACCOUNTS = [
+  {
+    accountId: 1,
+    institutionName: 'KB국민은행',
+    accountType: 'CHECKING',
+    accountName: 'KB 국민은행 입출금',
+    maskedAccountNumber: '···2291',
+    balance: 1250000,
+    interestRate: null,
+  },
+  {
+    accountId: 2,
+    institutionName: 'NH농협은행',
+    accountType: 'CHECKING',
+    accountName: 'NH 농협은행 입출금',
+    maskedAccountNumber: '···5548',
+    balance: 320000,
+    interestRate: null,
+  },
+  {
+    accountId: 3,
+    institutionName: 'KB국민은행',
+    accountType: 'SAVING',
+    accountName: 'KB 스타적금',
+    maskedAccountNumber: '···3821',
+    balance: 640000,
+    interestRate: 4.5,
+  },
+  {
+    accountId: 4,
+    institutionName: '카카오뱅크',
+    accountType: 'SAVING',
+    accountName: '카카오뱅크 적금',
+    maskedAccountNumber: '···0047',
+    balance: 1200000,
+    interestRate: 3.8,
+  },
+  {
+    accountId: 5,
+    institutionName: '토스뱅크',
+    accountType: 'SAVING',
+    accountName: '토스뱅크 저금통',
+    maskedAccountNumber: '···7193',
+    balance: 320000,
+    interestRate: 2.3,
+  },
+]
+
 export const goalHandlers = [
+  // 목표생성 API (GOAL-04 완료 시점) — assets에 저금통이 포함되면 백엔드가 저금통도 함께 생성
   http.post('*/api/goals', async () => {
-    return HttpResponse.json({ id: 'g1' }, { status: 201 })
+    return HttpResponse.json({ goalId: Math.floor(Math.random() * 100000) }, { status: 201 })
   }),
 
-  http.get('*/api/goals/:goalId/feasibility', async () => {
-    return HttpResponse.json({ result: '현실적' })
+  // 실현가능성 조회 API (GOAL-03) — goalAmount/goalMonths/startAmount 쿼리로 계산
+  http.get('*/api/goals/feasibility', async ({ request }) => {
+    const url = new URL(request.url)
+    const goalAmount = Number(url.searchParams.get('goalAmount'))
+    const goalMonths = Number(url.searchParams.get('goalMonths'))
+    const startAmount = Number(url.searchParams.get('startAmount'))
+
+    const requiredMonthly = Math.max(0, Math.round((goalAmount - startAmount) / goalMonths))
+    const availableMonthly = MOCK_MONTHLY_SAVING_CAPACITY
+
+    return HttpResponse.json({
+      requiredMonthly,
+      availableMonthly,
+      possible: requiredMonthly <= availableMonthly,
+    })
+  }),
+
+  // 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)
+  http.get('*/api/accounts', async ({ request }) => {
+    const url = new URL(request.url)
+    const accountType = url.searchParams.get('accountType')
+
+    const accounts = accountType
+      ? MOCK_ACCOUNTS.filter((account) => account.accountType === accountType)
+      : MOCK_ACCOUNTS
+
+    return HttpResponse.json({
+      totalBalance: accounts.reduce((sum, account) => sum + account.balance, 0),
+      accounts,
+    })
+  }),
+
+  // 저금통 개설 API (GOAL-04)
+  http.post('*/api/money-boxes', async ({ request }) => {
+    const payload = await request.json()
+
+    return HttpResponse.json(
+      {
+        moneyBoxId: Math.floor(Math.random() * 100000),
+        userId: 0,
+        type: payload.type,
+        balance: 0,
+        maskedAccountNumber: '123-****-7890',
+        createdAt: new Date().toISOString(),
+        assetType: 'MONEY_BOX',
+      },
+      { status: 201 }
+    )
   }),
 
   http.get('*/api/mydata', async () => {
