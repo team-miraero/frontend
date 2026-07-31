@@ -96,7 +96,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
-import { BrandHeader } from '@/features/auth'
+import BrandHeader from '@/shared/ui/BrandHeader.vue'
 import { MYDATA_SYNC_ITEMS } from '@/features/auth/constants/auth.constants'
 
 const STEP_INTERVAL_MS = 1000
