@@ -47,15 +47,23 @@
           <ConnectedAssetsCard :assets="goalStore.assets" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4 pt-4">
+        <div class="grid grid-cols-2 items-start gap-4 pt-4">
           <AvailableMoneyPanel
             v-if="goalStore.availableMoney"
             :available-money="goalStore.availableMoney"
           />
-          <PacemakerToggleCard
-            :pacemaker="pacemakerStore.pacemakerStatus"
-            @toggle="handlePacemakerToggle"
-          />
+          <div>
+            <!-- AvailableMoneyPanel의 "여유자금" 타이틀과 같은 높이의 투명 스페이서:
+                 두 컬럼의 카드 상단(top)을 맞추기 위함. PacemakerToggleCard는 루트가
+                 2개(lg 분기)라 class를 직접 전달해도 fallthrough되지 않으므로 래퍼에 여백을 줌 -->
+            <p class="invisible text-sm font-bold">여유자금</p>
+            <div class="mt-2">
+              <PacemakerToggleCard
+                :pacemaker="pacemakerStore.pacemakerStatus"
+                @toggle="handlePacemakerToggle"
+              />
+            </div>
+          </div>
         </div>
 
         <div class="flex flex-col gap-4 pt-4">

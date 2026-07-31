@@ -16,8 +16,8 @@
 
         <!-- 이전 버튼 -->
         <button
-          @click="router.back()"
           class="flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+          @click="router.back()"
         >
           <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -73,8 +73,8 @@
       <div class="mt-8 flex flex-col items-center">
         <button
           :disabled="!selectedGoal"
-          @click="handleNext"
           class="w-full max-w-md bg-[#0066FF] hover:bg-blue-600 active:scale-[0.99] disabled:bg-gray-300 disabled:cursor-not-allowed disabled:active:scale-100 text-white font-bold text-base py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+          @click="handleNext"
         >
           <span>{{ buttonText }}</span>
           <svg class="w-4 h-4 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">

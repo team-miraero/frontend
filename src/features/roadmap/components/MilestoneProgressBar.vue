@@ -20,7 +20,7 @@
       <div
         v-for="milestone in milestones"
         :key="milestone.milestoneId"
-        class="absolute top-0 flex -translate-x-1/2 flex-col items-center"
+        class="absolute top-0 flex w-max -translate-x-[58%] flex-col items-center lg:-translate-x-1/2"
         :style="{ left: `${milestonePosition(milestone)}%` }"
       >
         <span
@@ -88,36 +88,46 @@
     </div>
 
     <!-- 현재, 목표페이스 설명 컨테이너 하단, 왼쪽 정렬 -->
-    <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+    <div class="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-1.5">
           <span
-            class="flex size-[18px] items-center justify-center rounded-full border-2 border-dashed border-primary bg-primary/60 shadow-[0_4px_14px_rgba(0,102,255,0.31)]"
+            class="flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-primary bg-primary/60 shadow-[0_4px_14px_rgba(0,102,255,0.31)]"
           >
             <img src="@/assets/icons/pace-current-runner-sm.svg" alt="" class="size-2.5" />
           </span>
-          <span class="text-[10px] text-slate-500"
-            >현재 · {{ formatManwon(goal.currentAmount) }}원</span
-          >
+          <!-- 모바일: 라벨/금액 줄바꿈, 데스크톱: 기존 "현재 · 금액" 한 줄 그대로 -->
+          <span class="flex flex-col text-[10px] leading-tight text-slate-500 lg:block">
+            <span class="lg:hidden">현재</span>
+            <span class="lg:hidden">{{ formatManwon(goal.currentAmount) }}원</span>
+            <span class="hidden lg:inline">현재 · {{ formatManwon(goal.currentAmount) }}원</span>
+          </span>
         </div>
         <div class="flex items-center gap-1.5">
           <span
-            class="flex size-[18px] items-center justify-center rounded-full border-2 border-dashed border-[#639bde] bg-slate-200"
+            class="flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-[#639bde] bg-slate-200"
           >
             <img src="@/assets/icons/pace-target-runner-sm.svg" alt="" class="size-2.5" />
           </span>
-          <span class="text-[10px] text-slate-400"
-            >목표 페이스 · {{ formatManwon(goal.pace.expectedAmount) }}원</span
-          >
+          <span class="flex flex-col text-[10px] leading-tight text-slate-400 lg:block">
+            <span class="lg:hidden">목표 페이스</span>
+            <span class="lg:hidden">{{ formatManwon(goal.pace.expectedAmount) }}원</span>
+            <span class="hidden lg:inline"
+              >목표 페이스 · {{ formatManwon(goal.pace.expectedAmount) }}원</span
+            >
+          </span>
         </div>
       </div>
 
       <span
-        class="rounded-full border border-primary/20 bg-primary/[0.06] px-2.5 py-0.5 text-[10px] font-bold text-primary"
+        class="shrink-0 whitespace-nowrap rounded-full border border-primary/20 bg-primary/[0.06] px-2 py-0.5 text-[9px] font-bold text-primary lg:px-2.5 lg:text-[10px]"
       >
         {{ goal.pace.paceStatus === 'BEHIND' ? '▼' : '▲' }}
         {{ formatManwon(Math.abs(goal.pace.differenceAmount)) }}
-        {{ goal.pace.paceStatus === 'BEHIND' ? '뒤처짐' : '앞섬' }}
+        <!-- 모바일: 문장 첫 단어(금액)까지만 노출, "앞섬/뒤처짐"은 데스크톱에서만 -->
+        <span class="hidden lg:inline">{{
+          goal.pace.paceStatus === 'BEHIND' ? '뒤처짐' : '앞섬'
+        }}</span>
       </span>
     </div>
   </div>
