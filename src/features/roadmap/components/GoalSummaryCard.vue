@@ -37,8 +37,11 @@
 
     <div class="flex flex-col gap-0.5 pt-2">
       <p class="text-xs text-slate-400">목표 {{ formatWon(goal.goalAmount) }}</p>
-      <p class="text-lg font-black tracking-[-0.36px] text-[#0a192f]">
-        모인 {{ formatManwon(goal.currentAmount) }}
+      <p class="flex items-baseline gap-1">
+        <span class="text-xs text-slate-400">현재</span>
+        <span class="text-lg font-black tracking-[-0.36px] text-[#0a192f]">
+          {{ formatManwon(goal.currentAmount) }}
+        </span>
       </p>
     </div>
 
