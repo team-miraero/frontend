@@ -1,13 +1,20 @@
-// goal 도메인 상태 store
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { router } from '@/app/router'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 import * as goalApi from '@/features/goal/api/goal.api'
 import { resolveFeasibilityStatus } from '@/features/goal/composables/useFeasibility'
 
+/**
+ * 목표 설정 플로우 및 로드맵 상태를 관리하는 스토어
+ */
 export const useGoalStore = defineStore('feature-goal', () => {
-  // 기존 온보딩 관련 상태
+  // 온보딩 및 기본 선택 상태
   const selectedGoalType = ref(null)
+  const selectedGoalId = ref(null)
   const goalParams = ref(null)
+  const feasibilityResult = ref(null)
+  const linkedAccountIds = ref([])
 
   // 실현가능성(GOAL-03) 상태
   const feasibility = ref(null)
@@ -18,10 +25,8 @@ export const useGoalStore = defineStore('feature-goal', () => {
   // 계좌·저금통 연결(GOAL-04) 상태
   const accounts = ref([])
   const areAccountsLoading = ref(false)
-
-  // 여러 대시보드 페이지에서 공통으로 사용하는 로드맵 선택 상태
+  // 대시보드 및 로드맵 공통 선택 상태
   const goals = ref([])
-  const selectedGoalId = ref(null)
   const goalsError = ref(null)
   const areGoalsLoading = ref(false)
   const selectedGoal = computed(
@@ -33,6 +38,33 @@ export const useGoalStore = defineStore('feature-goal', () => {
   const assets = ref([])
   const availableMoney = ref(null)
   const isLoading = ref(false)
+
+  /**
+   * 사용자가 선택한 목표 ID를 설정합니다.
+   * @param {string | number | null} id - 목표 ID 또는 프리셋 ID
+   */
+  function selectGoal(id) {
+    selectedGoalId.value = id
+  }
+
+  /**
+   * 다음 단계(목표 상세 입력 페이지)로 이동합니다.
+   */
+  function moveToNextStep() {
+    if (!selectedGoalId.value) return
+    router.push({ name: ROUTE_NAMES.GOAL_DETAIL })
+  }
+
+  /**
+   * 플로우를 초기 상태로 리셋합니다.
+   */
+  function resetGoalStore() {
+    selectedGoalType.value = null
+    selectedGoalId.value = null
+    goalParams.value = { amount: 0, period: 0, seedMoney: 0 }
+    feasibilityResult.value = null
+    linkedAccountIds.value = []
+  }
 
   async function fetchGoals() {
     if (goals.value.length > 0 || areGoalsLoading.value) return
@@ -131,11 +163,11 @@ export const useGoalStore = defineStore('feature-goal', () => {
     return goalApi.createGoal({ goalName, goalType, goalAmount, goalMonths, startAmount, assets })
   }
 
-  function selectGoal(goalId) {
-    if (goals.value.some((goal) => goal.goalId === goalId)) {
-      selectedGoalId.value = goalId
-    }
-  }
+  // function selectGoal(goalId) {
+  //   if (goals.value.some((goal) => goal.goalId === goalId)) {
+  //     selectedGoalId.value = goalId
+  //   }
+  // }
 
   /**
    * @param {number} goalId
@@ -162,11 +194,14 @@ export const useGoalStore = defineStore('feature-goal', () => {
   async function updateCurrentGoalStatus(status) {
     if (!currentGoal.value) return
     const result = await goalApi.updateGoalStatus(currentGoal.value.goalId, status)
-    currentGoal.value.vaslue.status = result.status
+    if (currentGoal.value) {
+      currentGoal.value.status = result.status
+    }
   }
 
   return {
     selectedGoalType,
+    selectedGoalId,
     goalParams,
     feasibility,
     isFeasibilityLoading,
@@ -175,7 +210,6 @@ export const useGoalStore = defineStore('feature-goal', () => {
     accounts,
     areAccountsLoading,
     goals,
-    selectedGoalId,
     selectedGoal,
     goalsError,
     areGoalsLoading,
@@ -183,8 +217,10 @@ export const useGoalStore = defineStore('feature-goal', () => {
     assets,
     availableMoney,
     isLoading,
-    fetchGoals,
     selectGoal,
+    moveToNextStep,
+    resetGoalStore,
+    fetchGoals,
     fetchDashboardData,
     updateCurrentGoalStatus,
     fetchFeasibility,

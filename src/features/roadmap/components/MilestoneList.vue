@@ -9,10 +9,10 @@
       <li v-for="(milestone, index) in milestones" :key="milestone.milestoneId" class="flex gap-4">
         <div class="flex w-8 flex-col items-center">
           <span
-            class="flex size-7 shrink-0 items-center justify-center rounded-full border-2"
+            class="flex size-6 shrink-0 items-center justify-center rounded-full border-2"
             :class="
               milestone.status === 'COMPLETED'
-                ? 'border-primary bg-primary shadow-[0_4px_7px_rgba(0,102,255,0.25)]'
+                ? 'border-primary bg-primary/10'
                 : 'border-slate-200 bg-slate-100'
             "
           >
@@ -42,27 +42,27 @@
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-2">
               <span
-                class="text-[15px] font-black tracking-[-0.3px]"
+                class="whitespace-nowrap text-xs font-black tracking-[-0.3px] lg:text-[15px]"
                 :class="milestone.status === 'COMPLETED' ? 'text-primary' : 'text-slate-400'"
               >
                 {{ formatManwon(milestone.targetAmount) }}원
               </span>
               <span
                 v-if="milestone.status === 'IN_PROGRESS'"
-                class="rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold text-white"
+                class="hidden rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold text-white lg:inline-block"
               >
                 진행 중
               </span>
               <span
                 v-if="milestone.status === 'COMPLETED'"
-                class="rounded-full bg-primary/[0.09] px-2 py-0.5 text-[9px] font-bold text-primary"
+                class="hidden rounded-full bg-primary/[0.09] px-2 py-0.5 text-[9px] font-bold text-primary lg:inline-block"
               >
                 완료 ✓
               </span>
             </div>
             <div class="flex items-center gap-1.5">
               <span
-                class="text-[10px]"
+                class="whitespace-nowrap text-[10px]"
                 :class="milestone.status === 'COMPLETED' ? 'text-primary/60' : 'text-slate-400'"
               >
                 {{ milestone.targetDate }}

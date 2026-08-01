@@ -2,11 +2,11 @@
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 export const goalRoutes = [
-  // {
-  //   path: '/goal/select',
-  //   name: ROUTE_NAMES.GOAL_SELECT,
-  //   component: () => import('@/pages/goal/GoalSelectPage.vue'),
-  // },
+  {
+    path: '/goal/select',
+    name: ROUTE_NAMES.GOAL_SELECT,
+    component: () => import('@/pages/goal/GoalSelectPage.vue'),
+  },
   {
     path: '/goal/detail',
     name: ROUTE_NAMES.GOAL_DETAIL,

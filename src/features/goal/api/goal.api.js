@@ -1,6 +1,5 @@
-// goal 도메인 API 함수 골격
-import { client } from '@/shared/api/client'
 import { GOAL_PRESETS } from '@/features/goal/constants/goal.constants.js'
+import { client } from '@/shared/api/client'
 
 /**
  * @typedef {import('@/features/goal/constants/goal.constants.js').GoalPreset} GoalPreset

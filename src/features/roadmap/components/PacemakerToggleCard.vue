@@ -1,7 +1,8 @@
 <!-- "다음달 자금마련" 페이스메이커 토글 카드 -->
 <template>
+  <!-- 데스크톱(lg 이상): 기존 배치 그대로 유지 -->
   <div
-    class="flex flex-col gap-3 rounded-[20px] border p-[25px]"
+    class="hidden flex-col gap-3 rounded-[20px] border p-[25px] lg:flex"
     :class="cardClass"
     :style="cardStyle"
   >
@@ -67,6 +68,41 @@
       </div>
     </template>
   </div>
+
+  <!-- 모바일(lg 미만): 설명 문단 없이 타이틀 → 토글 → 상태 안내만 세로로 배치한 정사각형 카드
+       (옆 칸인 여유자금 패널이 더 길어도 그리드 stretch로 늘어지지 않도록 items-start와 함께 사용) -->
+  <div
+    class="flex aspect-square flex-col items-center justify-between gap-2 rounded-[20px] border p-4 text-center lg:hidden"
+    :class="cardClass"
+    :style="cardStyle"
+  >
+    <div class="flex items-center gap-1.5">
+      <p class="text-xs font-bold text-slate-400">다음달 자금마련</p>
+      <span
+        v-if="!isRegistered"
+        class="rounded-full bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-500"
+      >
+        미개설
+      </span>
+    </div>
+
+    <button
+      type="button"
+      class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+      :class="pacemaker?.enabled ? 'bg-primary' : 'bg-slate-300'"
+      @click="$emit('toggle')"
+    >
+      <span
+        class="absolute top-0.5 size-[18px] rounded-full bg-white transition-all"
+        :class="pacemaker?.enabled ? 'left-[23px]' : 'left-0.5'"
+      />
+    </button>
+
+    <div>
+      <p class="text-[11px] font-semibold text-slate-500">{{ mobileStatusText }}</p>
+      <p v-if="!isRegistered" class="pt-0.5 text-[11px] font-bold text-primary">개설하기 &gt;</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -100,6 +136,12 @@ const cardStyle = computed(() => {
     return 'background-image: linear-gradient(149deg, rgba(0, 102, 255, 0.03) 0%, rgb(244, 248, 255) 100%);'
   }
   return 'background-color: #f8fafc;'
+})
+
+// 모바일 축약형: 설명 문단 대신 상태별 한 줄 요약만 노출
+const mobileStatusText = computed(() => {
+  if (isOn.value) return `이번달 +${formatWon(props.pacemaker.monthlySecuredAmount)} 확보`
+  return isRegistered.value ? '지금은 OFF 상태예요' : '개설 후 이용할 수 있어요'
 })
 
 function formatWon(amount) {
