@@ -26,7 +26,7 @@
       </span>
     </div>
 
-    <p v-if="caption" class="mt-2 text-xs text-gray-400">{{ caption }}</p>
+    <p v-if="caption" class="mt-2 text-xs font-semibold text-primary">{{ caption }}</p>
 
     <div v-if="presets.length" class="mt-4 grid grid-cols-4 gap-2 w-full">
       <button

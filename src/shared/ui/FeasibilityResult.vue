@@ -131,7 +131,8 @@
     >
       <div class="flex items-center gap-2">
         <span
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+          :class="adjustIconClass"
         >
           <svg
             viewBox="0 0 24 24"
@@ -218,11 +219,14 @@
 
       <div
         v-if="recalculated"
-        class="mt-4 flex items-center justify-between rounded-xl bg-accent-light p-4"
+        class="mt-4 flex items-center justify-between rounded-xl p-4"
+        :class="recalculatedBoxClass.bg"
       >
         <div>
           <p class="text-xs text-gray-500">{{ recalculated.label }}</p>
-          <p class="mt-0.5 text-lg font-bold text-primary">{{ recalculated.value }}</p>
+          <p class="mt-0.5 text-lg font-bold" :class="recalculatedBoxClass.value">
+            {{ recalculated.value }}
+          </p>
         </div>
         <div class="text-right">
           <p class="text-xs text-gray-500">{{ recalculated.sublabel }}</p>
@@ -302,6 +306,20 @@ const statusTextClass = computed(() => statusClass.value.text)
 const statusBarClass = computed(() => statusClass.value.bar)
 const statusBadgeBgClass = computed(() => statusClass.value.badgeBg)
 const statusIconBgClass = computed(() => statusClass.value.iconBg)
+
+const ADJUST_ICON_CLASS = {
+  warning: 'bg-amber-50 text-amber-500',
+  danger: 'bg-red-50 text-red-500',
+}
+const adjustIconClass = computed(() => ADJUST_ICON_CLASS[props.status] ?? ADJUST_ICON_CLASS.danger)
+
+const RECALCULATED_BOX_CLASS = {
+  warning: { bg: 'bg-amber-50', value: 'text-amber-600' },
+  danger: { bg: 'bg-red-50', value: 'text-red-600' },
+}
+const recalculatedBoxClass = computed(
+  () => RECALCULATED_BOX_CLASS[props.status] ?? RECALCULATED_BOX_CLASS.danger
+)
 
 const availableValueLabel = computed(() => formatKRWCompact(props.availableAmount))
 const requiredValueLabel = computed(() => formatKRWCompact(props.requiredAmount))

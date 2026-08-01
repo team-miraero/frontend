@@ -28,6 +28,8 @@
         {{ selectedGoal.label }}
       </span>
 
+      <p class="mt-4 text-xs font-bold text-primary">STEP 3 — 실현가능성 확인</p>
+
       <h1 class="mt-4 text-[30px] font-bold leading-tight text-gray-900">
         내 여력으로 가능한<br />목표일까요?
       </h1>

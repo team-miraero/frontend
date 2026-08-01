@@ -25,6 +25,8 @@
         {{ selectedGoal.label }}
       </span>
 
+      <p class="mt-4 text-xs font-bold text-primary">STEP 2 — 목표 구체화</p>
+
       <h1 class="mt-4 text-[30px] font-bold leading-tight text-gray-900">
         얼마를, 언제까지<br />모을까요?
       </h1>
@@ -47,6 +49,7 @@
           :result-value="monthlyAmountLabel"
           :min="6"
           :max="60"
+          :presets="PERIOD_PRESETS"
           class="animate-fade-in-up"
           style="animation-delay: 175ms"
         />
@@ -105,6 +108,13 @@ const AMOUNT_PRESETS = [
   { label: '2,000만원', value: 20000000 },
   { label: '3,000만원', value: 30000000 },
   { label: '5,000만원', value: 50000000 },
+]
+
+const PERIOD_PRESETS = [
+  { label: '6개월', value: 6 },
+  { label: '1년', value: 12 },
+  { label: '2년', value: 24 },
+  { label: '3년', value: 36 },
 ]
 
 const router = useRouter()
