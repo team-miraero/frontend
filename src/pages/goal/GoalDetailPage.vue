@@ -22,34 +22,35 @@
         v-if="selectedGoal"
         class="mt-4 inline-flex items-center gap-1 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
       >
-        {{ selectedGoal.label }}
+        {{ selectedGoal.icon }} {{ selectedGoal.title }}
       </span>
 
       <p class="mt-4 text-xs font-bold text-primary">STEP 2 — 목표 구체화</p>
 
-      <h1 class="mt-4 text-[30px] font-bold leading-tight text-gray-900">
-        얼마를, 언제까지<br />모을까요?
+      <h1 class="mt-4 whitespace-pre-line text-[30px] font-bold leading-tight text-gray-900">
+        {{ config.title }}
       </h1>
 
       <div class="mt-6 space-y-4">
         <AmountInputCard
           v-model="amount"
-          label="보증금 목표금액"
+          :label="config.amountLabel"
           :caption="amountCaption"
-          :presets="AMOUNT_PRESETS"
+          :presets="config.amountPresets"
           class="animate-fade-in-up"
           style="animation-delay: 100ms"
         />
 
         <PeriodSliderCard
           v-model="months"
-          label="목표 기간"
-          :caption="targetDateLabel"
+          :label="config.periodLabel"
+          :caption="config.showTargetDate ? targetDateLabel : ''"
           result-label="월 예상 저축액"
           :result-value="monthlyAmountLabel"
-          :min="6"
-          :max="60"
-          :presets="PERIOD_PRESETS"
+          :result-caption="config.showPeriodFormula ? periodFormulaLabel : ''"
+          :min="config.periodMin"
+          :max="config.periodMax"
+          :presets="config.periodPresets"
           class="animate-fade-in-up"
           style="animation-delay: 175ms"
         />
@@ -99,32 +100,25 @@ import BottomCTA from '@/shared/ui/BottomCTA.vue'
 import AmountInputCard from '@/shared/ui/AmountInputCard.vue'
 import PeriodSliderCard from '@/shared/ui/PeriodSliderCard.vue'
 import { useGoalStore } from '@/features/goal'
-import { GOAL_TYPES } from '@/shared/constants/goals'
+import { GOAL_PRESETS } from '@/features/goal/constants/goal.constants.js'
+import {
+  GOAL_DETAIL_CONFIG,
+  DEFAULT_GOAL_DETAIL_CONFIG,
+} from '@/features/goal/constants/goalDetailConfig.js'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRWCompact } from '@/shared/lib/money'
 
-const AMOUNT_PRESETS = [
-  { label: '1,000만원', value: 10000000 },
-  { label: '2,000만원', value: 20000000 },
-  { label: '3,000만원', value: 30000000 },
-  { label: '5,000만원', value: 50000000 },
-]
-
-const PERIOD_PRESETS = [
-  { label: '6개월', value: 6 },
-  { label: '1년', value: 12 },
-  { label: '2년', value: 24 },
-  { label: '3년', value: 36 },
-]
-
 const router = useRouter()
 const goalStore = useGoalStore()
-const { selectedGoalType } = storeToRefs(goalStore)
+const { selectedGoalId } = storeToRefs(goalStore)
 
-const selectedGoal = computed(() => GOAL_TYPES.find((goal) => goal.id === selectedGoalType.value))
+const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === selectedGoalId.value))
+const config = computed(
+  () => GOAL_DETAIL_CONFIG[selectedGoalId.value] ?? DEFAULT_GOAL_DETAIL_CONFIG
+)
 
-const amount = ref(30000000)
-const months = ref(24)
+const amount = ref(config.value.defaultAmount)
+const months = ref(config.value.periodDefault)
 const startAmount = ref(0)
 
 const amountCaption = computed(() =>
@@ -136,6 +130,9 @@ const targetDateLabel = computed(() => {
   target.setMonth(target.getMonth() + months.value)
   return `목표 달성 예정일: ${target.getFullYear()}년 ${target.getMonth() + 1}월`
 })
+const periodFormulaLabel = computed(
+  () => `${formatKRWCompact(amount.value)} ÷ ${months.value}개월`
+)
 
 function handleBack() {
   router.push({ name: ROUTE_NAMES.GOAL_SELECT })
