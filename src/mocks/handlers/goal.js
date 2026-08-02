@@ -147,6 +147,120 @@ export const goalHandlers = [
     })
   }),
 
+  http.get('*/api/goals/:goalId/linked-assets', async ({ params }) => {
+    if (params.goalId === '3') {
+      return HttpResponse.json({
+        success: true,
+        data: {
+          goalId: 3,
+          totalLinkedBalance: 5000000,
+          linkedAssets: [
+            {
+              assetType: 'ACCOUNT',
+              assetId: 3,
+              assetName: 'KB Star 정기예금',
+              institutionName: 'KB국민은행',
+              maskedAccountNumber: '***7890',
+              balance: 5000000,
+              interestRate: 3.5,
+            },
+          ],
+        },
+        error: null,
+      })
+    }
+
+    if (params.goalId === '2') {
+      return HttpResponse.json({
+        success: true,
+        data: {
+          goalId: 2,
+          totalLinkedBalance: 2500000,
+          linkedAssets: [
+            {
+              assetType: 'MONEY_BOX',
+              assetId: 5,
+              assetName: '미래로 저금통',
+              institutionName: null,
+              maskedAccountNumber: null,
+              balance: 2500000,
+              interestRate: null,
+            },
+          ],
+        },
+        error: null,
+      })
+    }
+
+    return HttpResponse.json({
+      success: true,
+      data: {
+        goalId: Number(params.goalId),
+        totalLinkedBalance: 11500000,
+        linkedAssets: [
+          {
+            assetType: 'MONEY_BOX',
+            assetId: 5,
+            assetName: '미래로 저금통',
+            institutionName: null,
+            maskedAccountNumber: null,
+            balance: 8500000,
+            interestRate: null,
+          },
+          {
+            assetType: 'ACCOUNT',
+            assetId: 2,
+            assetName: 'KB 독립적금',
+            institutionName: 'KB국민은행',
+            maskedAccountNumber: '***456',
+            balance: 3000000,
+            interestRate: 3.5,
+          },
+        ],
+      },
+      error: null,
+    })
+  }),
+
+  http.get('*/api/accounts', async () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        totalBalance: 11500000,
+        accounts: [
+          {
+            accountId: 1,
+            institutionName: 'KB국민은행',
+            accountType: 'CHECKING',
+            accountName: 'KB국민ONE통장',
+            maskedAccountNumber: '***7890',
+            balance: 3500000,
+            interestRate: null,
+          },
+          {
+            accountId: 2,
+            institutionName: 'KB국민은행',
+            accountType: 'SAVING',
+            accountName: 'KB 독립적금',
+            maskedAccountNumber: '***456',
+            balance: 3000000,
+            interestRate: 3.5,
+          },
+          {
+            accountId: 3,
+            institutionName: 'KB국민은행',
+            accountType: 'DEPOSIT',
+            accountName: 'KB Star 정기예금',
+            maskedAccountNumber: '***7890',
+            balance: 5000000,
+            interestRate: 3.5,
+          },
+        ],
+      },
+      error: null,
+    })
+  }),
+
   http.get('*/api/goals/:goalId', async ({ params }) => {
     return HttpResponse.json({
       goalId: Number(params.goalId),
@@ -178,8 +292,8 @@ export const goalHandlers = [
           {
             assetType: 'ACCOUNT',
             assetId: 4,
-            assetName: '카카오뱅크 결혼자금통',
-            bankName: '카카오뱅크',
+            assetName: 'KB Star 정기예금',
+            bankName: 'KB국민은행',
             accountNumberMasked: '***7890',
             balance: 5000000,
             assetDetail: { interestRate: 3.5, maturityDate: '2027-12-31' },
@@ -206,6 +320,20 @@ export const goalHandlers = [
             assetDetail: { interestRate: 3.0, maturityDate: '2026-08-25' },
             autoTransfer: {
               amount: 1000000,
+              transferDay: 10,
+              withdrawalAccount: { bankName: 'KB국민', accountNumberMasked: '***789' },
+            },
+          },
+          {
+            assetType: 'MONEY_BOX',
+            assetId: 5,
+            assetName: '미래로 저금통',
+            bankName: 'KB국민',
+            accountNumberMasked: '***456',
+            balance: 2500000,
+            assetDetail: null,
+            autoTransfer: {
+              amount: 300000,
               transferDay: 10,
               withdrawalAccount: { bankName: 'KB국민', accountNumberMasked: '***789' },
             },

@@ -175,6 +175,90 @@ export async function getGoalAssets(goalId) {
   return data.assets
 }
 
+/**
+ * @typedef {Object} LinkedGoalAsset
+ * @property {'MONEY_BOX' | 'ACCOUNT'} assetType
+ * @property {number} assetId
+ * @property {string} assetName
+ * @property {string | null} institutionName
+ * @property {string | null} maskedAccountNumber
+ * @property {number} balance
+ * @property {number | null} interestRate
+ */
+
+/**
+ * @typedef {Object} LinkedGoalAssets
+ * @property {number} goalId
+ * @property {number} totalLinkedBalance
+ * @property {LinkedGoalAsset[]} linkedAssets
+ */
+
+/**
+ * @typedef {Object} AccountListItem
+ * @property {number} accountId
+ * @property {string} institutionName
+ * @property {'CHECKING' | 'DEPOSIT' | 'SAVING'} accountType
+ * @property {string} accountName
+ * @property {string} maskedAccountNumber
+ * @property {number} balance
+ * @property {number | null} interestRate
+ */
+
+/**
+ * @typedef {Object} AccountList
+ * @property {number} totalBalance
+ * @property {AccountListItem[]} accounts
+ */
+
+function unwrapApiData(responseBody) {
+  if (
+    responseBody &&
+    typeof responseBody === 'object' &&
+    Object.hasOwn(responseBody, 'success') &&
+    Object.hasOwn(responseBody, 'data')
+  ) {
+    if (!responseBody.success) {
+      throw new Error(responseBody.error?.message ?? 'API 요청에 실패했습니다.')
+    }
+    return responseBody.data
+  }
+
+  return responseBody
+}
+
+/**
+ * 상품 추천 화면용 목표 연결 자산 조회
+ *
+ * @param {number} goalId
+ * @returns {Promise<LinkedGoalAssets>}
+ */
+export async function getGoalLinkedAssets(goalId) {
+  const { data: responseBody } = await client.get(`/goals/${goalId}/linked-assets`)
+  const data = unwrapApiData(responseBody)
+
+  if (!data || !Array.isArray(data.linkedAssets)) {
+    throw new TypeError('연결 자산 API 응답 형식이 올바르지 않습니다.')
+  }
+
+  return data
+}
+
+/**
+ * 연결 자산의 ACCOUNT 유형과 상품명을 확인하기 위한 전체 계좌 조회
+ *
+ * @returns {Promise<AccountList>}
+ */
+export async function getAccounts() {
+  const { data: responseBody } = await client.get('/accounts')
+  const data = unwrapApiData(responseBody)
+
+  if (!data || !Array.isArray(data.accounts)) {
+    throw new TypeError('계좌 목록 API 응답 형식이 올바르지 않습니다.')
+  }
+
+  return data
+}
+
 // 여유자금 조회 API
 /**
  * @param {number} goalId
