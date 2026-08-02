@@ -25,7 +25,7 @@
         v-if="selectedGoal"
         class="mt-4 inline-flex items-center gap-1 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
       >
-        {{ selectedGoal.label }}
+        {{ selectedGoal.icon }} {{ selectedGoal.title }}
       </span>
 
       <p class="mt-4 text-xs font-bold text-primary">STEP 3 — 실현가능성 확인</p>
@@ -48,15 +48,21 @@
           :forecast-message="forecastMessage"
           :monthly-label="formatKRWCompact(feasibility.requiredMonthly)"
           :period-label="formatPeriodLabel(goalParams.months)"
-          :goal-label="selectedGoal?.label"
+          :goal-label="selectedGoal?.title"
           :stats="stats"
           :adjust-title="statusContent.adjustTitle"
           :adjust-message="statusContent.adjustMessage"
           :alternatives="ALTERNATIVES"
           :recalculated="recalculated"
+          :is-recalculating="isRecalculating"
         />
       </div>
     </div>
+
+    <LoadingSpinner
+      v-else-if="goalParams && isFeasibilityLoading"
+      message="실현가능성을 계산하고 있어요"
+    />
 
     <BottomCTA
       v-if="goalParams && feasibility"
@@ -75,9 +81,10 @@ import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import BrandHeader from '@/shared/ui/BrandHeader.vue'
 import ProgressBar from '@/shared/ui/ProgressBar.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import FeasibilityResult from '@/shared/ui/FeasibilityResult.vue'
 import { useGoalStore } from '@/features/goal'
-import { GOAL_TYPES } from '@/shared/constants/goals'
+import { GOAL_PRESETS } from '@/features/goal/constants/goal.constants.js'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRWCompact } from '@/shared/lib/money'
 
@@ -108,12 +115,13 @@ const STATUS_CONTENT = {
 
 const router = useRouter()
 const goalStore = useGoalStore()
-const { selectedGoalType, goalParams, feasibility, recalculatedFeasibility } =
+const { selectedGoalId, goalParams, feasibility, isFeasibilityLoading, recalculatedFeasibility } =
   storeToRefs(goalStore)
 
-const selectedGoal = computed(() => GOAL_TYPES.find((goal) => goal.id === selectedGoalType.value))
+const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === selectedGoalId.value))
 
 const selectedAlternative = ref('')
+const isRecalculating = ref(false)
 
 onMounted(async () => {
   if (!goalParams.value) {
@@ -167,21 +175,26 @@ watch(selectedAlternative, async (key) => {
     return
   }
 
-  if (key === 'period') {
+  isRecalculating.value = true
+  try {
+    if (key === 'period') {
+      await goalStore.fetchRecalculatedFeasibility({
+        goalAmount: goalParams.value.amount,
+        goalMonths: goalParams.value.months + 12,
+        startAmount: goalParams.value.startAmount,
+      })
+      return
+    }
+
+    const adjustedAmount = Math.round((goalParams.value.amount * 0.8) / 10000) * 10000
     await goalStore.fetchRecalculatedFeasibility({
-      goalAmount: goalParams.value.amount,
-      goalMonths: goalParams.value.months + 12,
+      goalAmount: adjustedAmount,
+      goalMonths: goalParams.value.months,
       startAmount: goalParams.value.startAmount,
     })
-    return
+  } finally {
+    isRecalculating.value = false
   }
-
-  const adjustedAmount = Math.round((goalParams.value.amount * 0.8) / 10000) * 10000
-  await goalStore.fetchRecalculatedFeasibility({
-    goalAmount: adjustedAmount,
-    goalMonths: goalParams.value.months,
-    startAmount: goalParams.value.startAmount,
-  })
 })
 
 const ctaLabel = computed(() =>

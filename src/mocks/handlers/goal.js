@@ -1,5 +1,5 @@
 // goal 관련 MSW 핸들러 샘플 (마이데이터 mock 포함)
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse, delay } from 'msw'
 import mydata from '@/mocks/fixtures/mydata.json'
 
 // TODO: 실제 마이데이터 연동 전까지 사용하는 mock 월 저축 가능 금액
@@ -57,11 +57,13 @@ const MOCK_ACCOUNTS = [
 export const goalHandlers = [
   // 목표생성 API (GOAL-04 완료 시점) — assets에 저금통이 포함되면 백엔드가 저금통도 함께 생성
   http.post('*/api/goals', async () => {
+    await delay(500)
     return HttpResponse.json({ goalId: Math.floor(Math.random() * 100000) }, { status: 201 })
   }),
 
   // 실현가능성 조회 API (GOAL-03) — goalAmount/goalMonths/startAmount 쿼리로 계산
   http.get('*/api/goals/feasibility', async ({ request }) => {
+    await delay(500)
     const url = new URL(request.url)
     const goalAmount = Number(url.searchParams.get('goalAmount'))
     const goalMonths = Number(url.searchParams.get('goalMonths'))
@@ -79,6 +81,7 @@ export const goalHandlers = [
 
   // 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)
   http.get('*/api/accounts', async ({ request }) => {
+    await delay(500)
     const url = new URL(request.url)
     const accountType = url.searchParams.get('accountType')
 
@@ -94,6 +97,7 @@ export const goalHandlers = [
 
   // 저금통 개설 API (GOAL-04)
   http.post('*/api/money-boxes', async ({ request }) => {
+    await delay(500)
     const payload = await request.json()
 
     return HttpResponse.json(
