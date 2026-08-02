@@ -79,7 +79,13 @@ export async function getFeasibility(params) {
  * @returns {Promise<{ totalBalance: number, accounts: AccountItem[] }>}
  */
 export async function getAccounts(params) {
-  const { data } = await client.get('/accounts', { params })
+  const { data: responseBody } = await client.get('/accounts', { params })
+  const data = unwrapApiData(responseBody)
+
+  if (!data || !Array.isArray(data.accounts)) {
+    throw new TypeError('계좌 목록 API 응답 형식이 올바르지 않습니다.')
+  }
+
   return data
 }
 
@@ -193,23 +199,6 @@ export async function getGoalAssets(goalId) {
  * @property {LinkedGoalAsset[]} linkedAssets
  */
 
-/**
- * @typedef {Object} AccountListItem
- * @property {number} accountId
- * @property {string} institutionName
- * @property {'CHECKING' | 'DEPOSIT' | 'SAVING'} accountType
- * @property {string} accountName
- * @property {string} maskedAccountNumber
- * @property {number} balance
- * @property {number | null} interestRate
- */
-
-/**
- * @typedef {Object} AccountList
- * @property {number} totalBalance
- * @property {AccountListItem[]} accounts
- */
-
 function unwrapApiData(responseBody) {
   if (
     responseBody &&
@@ -238,22 +227,6 @@ export async function getGoalLinkedAssets(goalId) {
 
   if (!data || !Array.isArray(data.linkedAssets)) {
     throw new TypeError('연결 자산 API 응답 형식이 올바르지 않습니다.')
-  }
-
-  return data
-}
-
-/**
- * 연결 자산의 ACCOUNT 유형과 상품명을 확인하기 위한 전체 계좌 조회
- *
- * @returns {Promise<AccountList>}
- */
-export async function getAccounts() {
-  const { data: responseBody } = await client.get('/accounts')
-  const data = unwrapApiData(responseBody)
-
-  if (!data || !Array.isArray(data.accounts)) {
-    throw new TypeError('계좌 목록 API 응답 형식이 올바르지 않습니다.')
   }
 
   return data

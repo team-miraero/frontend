@@ -52,6 +52,24 @@ const MOCK_ACCOUNTS = [
     balance: 320000,
     interestRate: 2.3,
   },
+  {
+    accountId: 6,
+    institutionName: 'KB국민은행',
+    accountType: 'SAVING',
+    accountName: 'KB 독립적금',
+    maskedAccountNumber: '***456',
+    balance: 3000000,
+    interestRate: 3.5,
+  },
+  {
+    accountId: 7,
+    institutionName: 'KB국민은행',
+    accountType: 'DEPOSIT',
+    accountName: 'KB Star 정기예금',
+    maskedAccountNumber: '***7890',
+    balance: 5000000,
+    interestRate: 3.5,
+  },
 ]
 
 export const goalHandlers = [
@@ -157,7 +175,7 @@ export const goalHandlers = [
           linkedAssets: [
             {
               assetType: 'ACCOUNT',
-              assetId: 3,
+              assetId: 7,
               assetName: 'KB Star 정기예금',
               institutionName: 'KB국민은행',
               maskedAccountNumber: '***7890',
@@ -209,50 +227,11 @@ export const goalHandlers = [
           },
           {
             assetType: 'ACCOUNT',
-            assetId: 2,
+            assetId: 6,
             assetName: 'KB 독립적금',
             institutionName: 'KB국민은행',
             maskedAccountNumber: '***456',
             balance: 3000000,
-            interestRate: 3.5,
-          },
-        ],
-      },
-      error: null,
-    })
-  }),
-
-  http.get('*/api/accounts', async () => {
-    return HttpResponse.json({
-      success: true,
-      data: {
-        totalBalance: 11500000,
-        accounts: [
-          {
-            accountId: 1,
-            institutionName: 'KB국민은행',
-            accountType: 'CHECKING',
-            accountName: 'KB국민ONE통장',
-            maskedAccountNumber: '***7890',
-            balance: 3500000,
-            interestRate: null,
-          },
-          {
-            accountId: 2,
-            institutionName: 'KB국민은행',
-            accountType: 'SAVING',
-            accountName: 'KB 독립적금',
-            maskedAccountNumber: '***456',
-            balance: 3000000,
-            interestRate: 3.5,
-          },
-          {
-            accountId: 3,
-            institutionName: 'KB국민은행',
-            accountType: 'DEPOSIT',
-            accountName: 'KB Star 정기예금',
-            maskedAccountNumber: '***7890',
-            balance: 5000000,
             interestRate: 3.5,
           },
         ],
