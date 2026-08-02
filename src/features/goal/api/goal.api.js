@@ -14,6 +14,103 @@ export async function getGoalPresets() {
   return Promise.resolve([...GOAL_PRESETS])
 }
 
+/**
+ * @typedef {Object} GoalAssetInput
+ * @property {number} [assetId] 연결할 자산 ID (새로 만드는 저금통처럼 아직 없는 자산은 생략)
+ * @property {'MONEYBOX' | 'ACCOUNT' | 'LOAN'} assetType
+ */
+
+/**
+ * @typedef {Object} CreateGoalPayload
+ * @property {string} [goalName] 목표명
+ * @property {'INDEPENDENCE' | 'EMERGENCY' | 'WEDDING' | 'LOAN'} goalType
+ * @property {number} goalAmount 목표 금액
+ * @property {number} goalMonths 목표 기간(개월)
+ * @property {number} startAmount 목표 시작 금액
+ * @property {GoalAssetInput[]} assets 연결할 자산 목록 (저금통 타입이면 서버가 저금통도 함께 생성)
+ */
+
+/**
+ * @param {CreateGoalPayload} payload
+ * @returns {Promise<{ goalId: number }>}
+ */
+export async function createGoal(payload) {
+  const { data } = await client.post('/goals', payload)
+  return data
+}
+
+/**
+ * @typedef {Object} FeasibilityParams
+ * @property {number} goalAmount 목표금액
+ * @property {number} goalMonths 목표 개월수
+ * @property {number} startAmount 이미 모아둔 금액
+ */
+
+/**
+ * @typedef {Object} FeasibilityResponse
+ * @property {number} requiredMonthly 월 저축·상환 여력에 필요한 금액
+ * @property {number} availableMonthly 월 저축·상환 가능 금액
+ * @property {boolean} possible 실현 가능 여부
+ */
+
+/**
+ * @param {FeasibilityParams} params
+ * @returns {Promise<FeasibilityResponse>}
+ */
+export async function getFeasibility(params) {
+  const { data } = await client.get('/goals/feasibility', { params })
+  return data
+}
+
+// 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)
+/**
+ * @typedef {Object} AccountItem
+ * @property {number} accountId
+ * @property {string} institutionName
+ * @property {'CHECKING' | 'SAVING' | 'DEPOSIT'} accountType
+ * @property {string} accountName
+ * @property {string} maskedAccountNumber
+ * @property {number} balance
+ * @property {number | null} interestRate
+ */
+
+/**
+ * @param {{ accountType?: 'CHECKING' | 'SAVING' | 'DEPOSIT' }} [params]
+ * @returns {Promise<{ totalBalance: number, accounts: AccountItem[] }>}
+ */
+export async function getAccounts(params) {
+  const { data } = await client.get('/accounts', { params })
+  return data
+}
+
+// 저금통 개설 API (GOAL-04)
+/**
+ * @typedef {Object} MoneyBoxPayload
+ * @property {'GOAL' | 'AUTO_SAVING'} type
+ * @property {string} name
+ * @property {{ amount: number, transferDay: number, withdrawalAccountId: number }} autoTransfer
+ */
+
+/**
+ * @typedef {Object} MoneyBoxResponse
+ * @property {number} moneyBoxId
+ * @property {number} userId
+ * @property {string} type
+ * @property {number} balance
+ * @property {string} maskedAccountNumber
+ * @property {string} createdAt
+ * @property {'MONEY_BOX'} assetType
+ */
+
+/**
+ * @param {MoneyBoxPayload} payload
+ * @returns {Promise<MoneyBoxResponse>}
+ */
+export async function createMoneyBox(payload) {
+  const { data } = await client.post('/money-boxes', payload)
+  return data
+}
+
 // 목표 목록 조회 API
 /**
  * @typedef {Object} GoalListItem

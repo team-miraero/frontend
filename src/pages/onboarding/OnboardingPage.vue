@@ -47,7 +47,7 @@
 
 <script setup>
 import { RouterLink } from 'vue-router'
-import BrandHeader from '@/features/auth/components/BrandHeader.vue'
+import BrandHeader from '@/shared/ui/BrandHeader.vue'
 import BaseButton from '@/shared/ui/BaseButton.vue'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
