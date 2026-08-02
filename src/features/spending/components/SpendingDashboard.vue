@@ -27,7 +27,7 @@
           :remaining-months="spendingSummary.remainingMonths"
           :monthly-difference="spendingSummary.monthlyDifference"
           :goal-progress="spendingSummary.goalProgress"
-          :selected-goal="selectedGoal"
+          @open-transactions="openTransactionHistory"
         />
 
         <SpendingContentTabs
@@ -37,19 +37,38 @@
         />
       </template>
     </div>
+
+    <SpendingHistoryModal
+      v-model="isTransactionHistoryOpen"
+      :transactions="transactionHistory?.transactions ?? []"
+      :total-count="transactionHistory?.totalCount ?? 0"
+      :total-expense="transactionSummary?.totalExpense ?? 0"
+      :loading="areTransactionsLoading"
+      :error="transactionsError"
+      @retry="loadTransactionHistory"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import SpendingContentTabs from '@/features/spending/components/SpendingContentTabs.vue'
+import SpendingHistoryModal from '@/features/spending/components/SpendingHistoryModal.vue'
 import SpendingSummarySection from '@/features/spending/components/SpendingSummarySection.vue'
 import { useSpendingStore } from '@/features/spending/store/spending.store'
 import RoadmapSelector from '@/shared/ui/RoadmapSelector.vue'
 
 const spendingStore = useSpendingStore()
-const { spendingSummary, error } = storeToRefs(spendingStore)
+const {
+  spendingSummary,
+  error,
+  transactionHistory,
+  transactionSummary,
+  areTransactionsLoading,
+  transactionsError,
+} = storeToRefs(spendingStore)
+const isTransactionHistoryOpen = ref(false)
 
 const props = defineProps({
   goals: {
@@ -86,6 +105,17 @@ const myDataStatusText = computed(() => {
     ? `마이데이터 연동 · ${month}월 기준`
     : '마이데이터 연동'
 })
+
+const referenceMonth = computed(() => spendingSummary.value?.referenceMonth ?? '2026-07')
+
+function loadTransactionHistory() {
+  return spendingStore.loadTransactions({ yearMonth: referenceMonth.value })
+}
+
+function openTransactionHistory() {
+  isTransactionHistoryOpen.value = true
+  loadTransactionHistory()
+}
 
 onMounted(() => {
   spendingStore.loadSpendingData({

@@ -7,9 +7,15 @@
       <div class="flex items-start justify-between gap-4">
         <p class="text-sm font-medium text-[#64748B]">이번 달 총지출</p>
 
-        <span class="rounded-full bg-[#EAF2FF] px-3 py-1.5 text-xs font-semibold text-[#0066FF]">
-          {{ selectedGoal }}
-        </span>
+        <button
+          type="button"
+          class="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#0066FF] focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0066FF]/30"
+          aria-haspopup="dialog"
+          @click="$emit('open-transactions')"
+        >
+          내역 보기
+          <span aria-hidden="true">›</span>
+        </button>
       </div>
 
       <div class="mt-2 flex items-end gap-1 whitespace-nowrap">
@@ -92,6 +98,8 @@
         :description-highlight="desktopMonthlyDifferenceHighlightText"
         :tone="desktopMonthlyDifferenceTone"
         value-tone="default"
+        action-label="내역 보기"
+        @action="$emit('open-transactions')"
       />
 
       <SpendingSummaryCard title="이번 달 저축 여력" :value="savingCapacity" unit="만원" />
@@ -112,7 +120,6 @@
 import { computed } from 'vue'
 import SpendingSummaryCard from '@/features/spending/components/SpendingSummaryCard.vue'
 import { useSpendingSummaryComparison } from '@/features/spending/composables/useSpendingComparisons'
-import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 
 const props = defineProps({
   totalSpending: {
@@ -135,11 +142,9 @@ const props = defineProps({
     type: Number,
     default: 62,
   },
-  selectedGoal: {
-    type: String,
-    default: DEFAULT_SELECTED_GOAL,
-  },
 })
+
+defineEmits(['open-transactions'])
 
 const {
   formattedTotalSpending,
