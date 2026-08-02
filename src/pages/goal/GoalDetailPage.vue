@@ -32,7 +32,16 @@
       </h1>
 
       <div class="mt-6 space-y-4">
+        <AmountPresetCard
+          v-if="config.amountFieldType === 'presetCard'"
+          v-model="amount"
+          :label="config.amountLabel"
+          :presets="config.amountPresets"
+          class="animate-fade-in-up"
+          style="animation-delay: 100ms"
+        />
         <AmountInputCard
+          v-else
           v-model="amount"
           :label="config.amountLabel"
           :caption="amountCaption"
@@ -79,8 +88,11 @@
           <path d="M12 8h.01" />
         </svg>
         <span>
-          소득·지출은 마이데이터에서 자동으로 계산해요. 입력한 금액과 실제 저축 여력을 함께 고려해
-          로드맵을 만들어 드려요.
+          {{ config.infoText.prefix
+          }}<span v-if="config.infoText.highlight" class="font-semibold text-primary">{{
+            config.infoText.highlight
+          }}</span
+          >{{ config.infoText.suffix }}
         </span>
       </p>
     </div>
@@ -98,6 +110,7 @@ import BrandHeader from '@/shared/ui/BrandHeader.vue'
 import ProgressBar from '@/shared/ui/ProgressBar.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
 import AmountInputCard from '@/shared/ui/AmountInputCard.vue'
+import AmountPresetCard from '@/features/goal/components/AmountPresetCard.vue'
 import PeriodSliderCard from '@/shared/ui/PeriodSliderCard.vue'
 import { useGoalStore } from '@/features/goal'
 import { GOAL_PRESETS } from '@/features/goal/constants/goal.constants.js'
