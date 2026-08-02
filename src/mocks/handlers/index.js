@@ -4,6 +4,7 @@ import { goalHandlers } from '@/mocks/handlers/goal'
 import { pacemakerHandlers } from '@/mocks/handlers/pacemaker'
 import { coachHandlers } from '@/mocks/handlers/coach'
 import { productsHandlers } from '@/mocks/handlers/products'
+import { spendingHandlers } from '@/mocks/handlers/spending'
 
 export const handlers = [
   ...authHandlers,
@@ -11,4 +12,5 @@ export const handlers = [
   ...pacemakerHandlers,
   ...coachHandlers,
   ...productsHandlers,
+  ...spendingHandlers,
 ]
