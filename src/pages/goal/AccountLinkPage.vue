@@ -19,7 +19,7 @@
       <span
         class="inline-flex items-center gap-1 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
       >
-        {{ selectedGoal?.label }}·첫 목돈
+        {{ selectedGoal?.title }}
       </span>
 
       <h1 class="mt-4 text-[30px] font-bold leading-tight text-gray-900">
@@ -29,6 +29,9 @@
         목표 전용 공간을 정해야 진행률을 정확하게 추적할 수 있어요.
       </p>
 
+      <LoadingSpinner v-if="areAccountsLoading" message="연결 가능한 계좌를 불러오고 있어요" />
+
+      <template v-else>
       <div class="mt-6 space-y-3">
         <AccountOptionCard
           title="저금통 만들기"
@@ -233,9 +236,15 @@
           </p>
         </div>
       </div>
+      </template>
     </div>
 
-    <BottomCTA :label="ctaLabel" :disabled="ctaDisabled" @click="handleSubmit" />
+    <BottomCTA
+      v-if="!areAccountsLoading"
+      :label="ctaLabel"
+      :disabled="ctaDisabled"
+      @click="handleSubmit"
+    />
   </HeroBackground>
 </template>
 
@@ -246,10 +255,12 @@ import { useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import BrandHeader from '@/shared/ui/BrandHeader.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import AccountOptionCard from '@/shared/ui/AccountOptionCard.vue'
 import AccountListItem from '@/shared/ui/AccountListItem.vue'
 import { useGoalStore } from '@/features/goal'
-import { GOAL_TYPES } from '@/shared/constants/goals'
+import { GOAL_PRESETS } from '@/features/goal/constants/goal.constants.js'
+import { GOAL_API_TYPE_BY_PRESET_ID } from '@/features/goal/constants/goalApiType.js'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRWCompact } from '@/shared/lib/money'
 
@@ -260,9 +271,10 @@ const OTHER_ACTIVE_GOAL = { label: '비상금 목돈', monthlyAmount: 200000 }
 
 const router = useRouter()
 const goalStore = useGoalStore()
-const { selectedGoalType, goalParams, feasibility, accounts } = storeToRefs(goalStore)
+const { selectedGoalId, goalParams, feasibility, accounts, areAccountsLoading } =
+  storeToRefs(goalStore)
 
-const selectedGoal = computed(() => GOAL_TYPES.find((goal) => goal.id === selectedGoalType.value))
+const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === selectedGoalId.value))
 
 const mode = ref('moneybox')
 const transferAmount = ref(0)
@@ -303,41 +315,50 @@ onMounted(async () => {
   selectedExistingAccountIds.value = firstSavingAccountId ? [firstSavingAccountId] : []
 })
 
-const ctaLabel = computed(() =>
-  mode.value === 'moneybox' ? '저금통 만들고 시작하기' : '연결하고 시작하기'
-)
-const ctaDisabled = computed(() =>
-  mode.value === 'moneybox'
+const isSubmitting = ref(false)
+
+const ctaLabel = computed(() => {
+  if (isSubmitting.value) return '만드는 중...'
+  return mode.value === 'moneybox' ? '저금통 만들고 시작하기' : '연결하고 시작하기'
+})
+const ctaDisabled = computed(() => {
+  if (isSubmitting.value) return true
+  return mode.value === 'moneybox'
     ? !selectedWithdrawalAccountId.value || !transferAmount.value
     : selectedExistingAccountIds.value.length === 0
-)
+})
 
 function handleBack() {
   router.push({ name: ROUTE_NAMES.GOAL_FEASIBILITY })
 }
 
 async function handleSubmit() {
-  await goalStore.submitGoalCreation({
-    goalName: selectedGoal.value?.label,
-    goalType: selectedGoal.value?.apiType,
-    goalAmount: goalParams.value.amount,
-    goalMonths: goalParams.value.months,
-    startAmount: goalParams.value.startAmount,
-    moneyBox:
-      mode.value === 'moneybox'
-        ? {
-            type: 'GOAL',
-            name: `${selectedGoal.value?.label ?? '목표'} 저금통`,
-            autoTransfer: {
-              amount: transferAmount.value,
-              transferDay: transferDay.value,
-              withdrawalAccountId: selectedWithdrawalAccountId.value,
-            },
-          }
-        : null,
-    existingAccountIds: mode.value === 'account' ? selectedExistingAccountIds.value : [],
-  })
+  isSubmitting.value = true
+  try {
+    await goalStore.submitGoalCreation({
+      goalName: selectedGoal.value?.title,
+      goalType: GOAL_API_TYPE_BY_PRESET_ID[selectedGoalId.value],
+      goalAmount: goalParams.value.amount,
+      goalMonths: goalParams.value.months,
+      startAmount: goalParams.value.startAmount,
+      moneyBox:
+        mode.value === 'moneybox'
+          ? {
+              type: 'GOAL',
+              name: `${selectedGoal.value?.title ?? '목표'} 저금통`,
+              autoTransfer: {
+                amount: transferAmount.value,
+                transferDay: transferDay.value,
+                withdrawalAccountId: selectedWithdrawalAccountId.value,
+              },
+            }
+          : null,
+      existingAccountIds: mode.value === 'account' ? selectedExistingAccountIds.value : [],
+    })
 
-  router.push({ name: ROUTE_NAMES.DASHBOARD })
+    router.push({ name: ROUTE_NAMES.DASHBOARD })
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>

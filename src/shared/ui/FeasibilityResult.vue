@@ -157,12 +157,13 @@
           v-for="alt in alternatives"
           :key="alt.key"
           class="flex cursor-pointer items-center justify-between rounded-xl border p-3 transition-colors"
-          :class="
+          :class="[
             selectedAlternative === alt.key
               ? 'border-primary bg-accent-light'
-              : 'border-gray-200 bg-white hover:bg-gray-50'
-          "
-          @click.prevent="emit('update:selectedAlternative', alt.key)"
+              : 'border-gray-200 bg-white hover:bg-gray-50',
+            isRecalculating ? 'pointer-events-none opacity-60' : '',
+          ]"
+          @click.prevent="!isRecalculating && emit('update:selectedAlternative', alt.key)"
         >
           <span class="flex items-center gap-2">
             <span class="flex h-5 w-5 shrink-0 items-center justify-center text-gray-400">
@@ -199,7 +200,11 @@
             </span>
           </span>
           <span
-            v-if="selectedAlternative === alt.key"
+            v-if="selectedAlternative === alt.key && isRecalculating"
+            class="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-300 border-t-primary"
+          />
+          <span
+            v-else-if="selectedAlternative === alt.key"
             class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-white"
           >
             <svg
@@ -218,7 +223,15 @@
       </div>
 
       <div
-        v-if="recalculated"
+        v-if="isRecalculating"
+        class="mt-4 flex items-center gap-2 rounded-xl bg-gray-50 p-4"
+      >
+        <span class="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-300 border-t-primary" />
+        <span class="text-xs text-gray-500">다시 계산하고 있어요...</span>
+      </div>
+
+      <div
+        v-else-if="recalculated"
         class="mt-4 flex items-center justify-between rounded-xl p-4"
         :class="recalculatedBoxClass.bg"
       >
@@ -277,6 +290,7 @@ const props = defineProps({
   alternatives: { type: Array, default: () => [] },
   selectedAlternative: { type: String, default: '' },
   recalculated: { type: Object, default: null },
+  isRecalculating: { type: Boolean, default: false },
 })
 const emit = defineEmits(['update:selectedAlternative'])
 
