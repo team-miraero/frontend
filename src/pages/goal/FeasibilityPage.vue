@@ -147,25 +147,37 @@ const stats = computed(() => [
   { label: '월 저축액', value: formatKRWCompact(feasibility.value.requiredMonthly) },
 ])
 
+/**
+ * 선택한 대안(기간 늘리기/금액 낮추기)을 반영한 목표 파라미터를 계산한다.
+ * @param {'period' | 'amount'} key
+ */
+function getAdjustedGoalParams(key) {
+  if (key === 'period') {
+    return { ...goalParams.value, months: goalParams.value.months + 12 }
+  }
+  const adjustedAmount = Math.round((goalParams.value.amount * 0.8) / 10000) * 10000
+  return { ...goalParams.value, amount: adjustedAmount }
+}
+
 const recalculated = computed(() => {
   if (!selectedAlternative.value || !recalculatedFeasibility.value) return null
 
+  const adjusted = getAdjustedGoalParams(selectedAlternative.value)
+
   if (selectedAlternative.value === 'period') {
-    const adjustedMonths = goalParams.value.months + 12
     return {
       label: '조정 후 월 저축액',
       value: formatKRWCompact(recalculatedFeasibility.value.requiredMonthly),
       sublabel: '조정 기간',
-      subvalue: formatPeriodLabel(adjustedMonths),
+      subvalue: formatPeriodLabel(adjusted.months),
     }
   }
 
-  const adjustedAmount = Math.round((goalParams.value.amount * 0.8) / 10000) * 10000
   return {
     label: '조정 후 월 저축액',
     value: formatKRWCompact(recalculatedFeasibility.value.requiredMonthly),
     sublabel: '조정 금액',
-    subvalue: formatKRWCompact(adjustedAmount),
+    subvalue: formatKRWCompact(adjusted.amount),
   }
 })
 
@@ -177,31 +189,25 @@ watch(selectedAlternative, async (key) => {
 
   isRecalculating.value = true
   try {
-    if (key === 'period') {
-      await goalStore.fetchRecalculatedFeasibility({
-        goalAmount: goalParams.value.amount,
-        goalMonths: goalParams.value.months + 12,
-        startAmount: goalParams.value.startAmount,
-      })
-      return
-    }
-
-    const adjustedAmount = Math.round((goalParams.value.amount * 0.8) / 10000) * 10000
+    const adjusted = getAdjustedGoalParams(key)
     await goalStore.fetchRecalculatedFeasibility({
-      goalAmount: adjustedAmount,
-      goalMonths: goalParams.value.months,
-      startAmount: goalParams.value.startAmount,
+      goalAmount: adjusted.amount,
+      goalMonths: adjusted.months,
+      startAmount: adjusted.startAmount,
     })
   } finally {
     isRecalculating.value = false
   }
 })
 
-const ctaLabel = computed(() =>
-  feasibility.value?.status === 'success' || selectedAlternative.value
+const ctaLabel = computed(() => {
+  if (selectedAlternative.value) {
+    return '조정된 계획으로 시작하기'
+  }
+  return feasibility.value?.status === 'success'
     ? '계좌 연결하기'
     : '대안을 선택해 주세요'
-)
+})
 const ctaDisabled = computed(
   () => feasibility.value?.status !== 'success' && !selectedAlternative.value
 )
@@ -219,6 +225,10 @@ function handleBack() {
 }
 
 function handleNext() {
+  if (selectedAlternative.value && recalculatedFeasibility.value) {
+    goalParams.value = getAdjustedGoalParams(selectedAlternative.value)
+    feasibility.value = recalculatedFeasibility.value
+  }
   router.push({ name: ROUTE_NAMES.GOAL_ACCOUNT })
 }
 </script>
