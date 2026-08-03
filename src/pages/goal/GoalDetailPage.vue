@@ -171,14 +171,53 @@
               class="mt-3 flex items-center rounded-2xl border border-gray-200 bg-white px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
             >
               <input
-                v-model.number="extraPayment"
-                type="number"
-                min="0"
-                step="10000"
+                :value="formattedExtraPayment"
+                type="text"
+                inputmode="numeric"
                 placeholder="0"
                 class="w-full bg-transparent text-lg font-bold text-gray-900 outline-none"
+                @input="handleExtraPaymentInput"
               />
               <span class="shrink-0 text-sm font-semibold text-gray-400">원/월</span>
+            </div>
+            <div v-if="extraPayment > 0" class="mt-1.5 text-xs font-semibold text-primary">
+              = {{ formatKRWReadable(extraPayment) }}
+            </div>
+
+            <!-- 입력 시 노출되는 계산 파란색 카드 (추가상환여력.png 디자인 스펙 일치) -->
+            <div
+              v-if="extraPayment > 0"
+              class="mt-4 rounded-2xl bg-[#F0F6FF] border border-blue-100 p-4 animate-fade-in-up"
+            >
+              <div class="flex items-center gap-1.5 text-xs font-bold text-primary">
+                <span class="text-sm">⚡</span>
+                <span
+                  >완납 {{ extraLoanResult.reducedMonths }}개월 단축! ({{
+                    extraLoanResult.newMonths
+                  }}개월로 줄어요)</span
+                >
+              </div>
+
+              <div class="mt-3 space-y-2 border-t border-blue-100/70 pt-3 text-xs">
+                <div class="flex justify-between items-center text-gray-600">
+                  <span>월 납입액 (추가 포함)</span>
+                  <span class="font-bold text-gray-900"
+                    >{{ extraLoanResult.newMonthlyPayment.toLocaleString() }}원</span
+                  >
+                </div>
+                <div class="flex justify-between items-center text-gray-600">
+                  <span>절약되는 이자</span>
+                  <span class="font-bold text-emerald-600"
+                    >- {{ extraLoanResult.savedInterest.toLocaleString() }}원</span
+                  >
+                </div>
+                <div class="flex justify-between items-center text-gray-600 pt-1">
+                  <span>새 총 상환금액</span>
+                  <span class="font-extrabold text-primary text-sm"
+                    >약 {{ formatKRWCompact(extraLoanResult.newTotalPayment) }}</span
+                  >
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -258,7 +297,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
@@ -276,11 +315,11 @@ import {
 } from '@/features/goal/constants/goalDetailConfig.js'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRWCompact, formatKRWReadable } from '@/shared/lib/money'
-import { calculateStudentLoan } from '@/features/goal/lib/loan.js'
+import { calculateStudentLoan, calculateExtraLoanRepayment } from '@/features/goal/lib/loan.js'
 
 const router = useRouter()
 const goalStore = useGoalStore()
-const { selectedGoalId } = storeToRefs(goalStore)
+const { selectedGoalId, goalParams } = storeToRefs(goalStore)
 
 const isStudentLoan = computed(() => selectedGoalId.value === GOAL_PRESET_IDS.STUDENT_LOAN)
 
@@ -289,15 +328,44 @@ const config = computed(
   () => GOAL_DETAIL_CONFIG[selectedGoalId.value] ?? DEFAULT_GOAL_DETAIL_CONFIG
 )
 
-const amount = ref(config.value.defaultAmount)
-const months = ref(config.value.periodDefault)
-const startAmount = ref(0)
-const extraPayment = ref(0) // 학자금 대출용 추가 상환 여력
+// goalParams에 이전에 입력했던 저장값이 있다면 복원, 없으면 기본값 적용
+const amount = ref(goalParams.value?.amount ?? config.value.defaultAmount)
+const months = ref(goalParams.value?.months ?? config.value.periodDefault)
+const startAmount = ref(goalParams.value?.startAmount ?? 0)
+const extraPayment = ref(goalParams.value?.extraPayment ?? 0) // 학자금 대출용 추가 상환 여력
+
+onMounted(() => {
+  if (goalParams.value) {
+    if (typeof goalParams.value.amount === 'number') amount.value = goalParams.value.amount
+    if (typeof goalParams.value.months === 'number') months.value = goalParams.value.months
+    if (typeof goalParams.value.startAmount === 'number') startAmount.value = goalParams.value.startAmount
+    if (typeof goalParams.value.extraPayment === 'number') extraPayment.value = goalParams.value.extraPayment
+  }
+})
+
+const formattedExtraPayment = computed(() => {
+  if (!extraPayment.value) return ''
+  return extraPayment.value.toLocaleString()
+})
+
+function handleExtraPaymentInput(e) {
+  const rawValue = e.target.value.replace(/[^0-9]/g, '')
+  extraPayment.value = rawValue ? parseInt(rawValue, 10) : 0
+}
 
 const loanResult = computed(() =>
   calculateStudentLoan({
     amount: amount.value,
     months: months.value,
+    annualRate: 0.017,
+  })
+)
+
+const extraLoanResult = computed(() =>
+  calculateExtraLoanRepayment({
+    amount: amount.value,
+    months: months.value,
+    extraPayment: extraPayment.value,
     annualRate: 0.017,
   })
 )
@@ -325,7 +393,16 @@ function handleNext() {
     months: months.value,
     startAmount: startAmount.value,
     extraPayment: extraPayment.value,
-    loanResult: isStudentLoan.value ? loanResult.value : null,
+    loanResult: isStudentLoan.value
+      ? {
+          ...loanResult.value,
+          monthlyPayment: extraLoanResult.value.newMonthlyPayment, // 추가 상환액 포함 월 납입액(725,866원)
+          originalMonthly: loanResult.value.monthlyPayment,
+          savedInterest: extraLoanResult.value.savedInterest,
+          reducedMonths: extraLoanResult.value.reducedMonths,
+          newMonths: extraLoanResult.value.newMonths,
+        }
+      : null,
   }
   router.push({ name: ROUTE_NAMES.GOAL_FEASIBILITY })
 }

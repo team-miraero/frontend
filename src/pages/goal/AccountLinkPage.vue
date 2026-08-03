@@ -342,7 +342,7 @@ function handleBack() {
 async function handleSubmit() {
   isSubmitting.value = true
   try {
-    await goalStore.submitGoalCreation({
+    const result = await goalStore.submitGoalCreation({
       goalName: selectedGoal.value?.title,
       goalType: GOAL_API_TYPE_BY_PRESET_ID[selectedGoalId.value],
       goalAmount: goalParams.value.amount,
@@ -363,6 +363,13 @@ async function handleSubmit() {
       existingAccountIds: mode.value === 'account' ? selectedExistingAccountIds.value : [],
     })
 
+    if (result && result.goalId) {
+      router.push({ name: ROUTE_NAMES.DASHBOARD_GOAL, params: { goalId: result.goalId } })
+    } else {
+      router.push({ name: ROUTE_NAMES.DASHBOARD })
+    }
+  } catch (err) {
+    console.error('Failed to submit goal creation:', err)
     router.push({ name: ROUTE_NAMES.DASHBOARD })
   } finally {
     isSubmitting.value = false

@@ -5,13 +5,15 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import * as goalApi from '@/features/goal/api/goal.api'
 import { resolveFeasibilityStatus } from '@/features/goal/composables/useFeasibility'
 
+import { GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
+
 /**
  * 목표 설정 플로우 및 로드맵 상태를 관리하는 스토어
  */
 export const useGoalStore = defineStore('feature-goal', () => {
   // 온보딩 및 기본 선택 상태
   const selectedGoalType = ref(null)
-  const selectedGoalId = ref(null)
+  const selectedGoalId = ref(GOAL_PRESET_IDS.STUDENT_LOAN)
   const goalParams = ref(null)
   const feasibilityResult = ref(null)
   const linkedAccountIds = ref([])
