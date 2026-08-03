@@ -66,7 +66,7 @@
         <div v-if="isRoadmapListExpanded" class="pt-1 pl-4">
           <div class="flex flex-col gap-1 border-l border-[#e8effe] pl-3">
             <RouterLink
-              v-for="goal in sortedGoals"
+              v-for="goal in goalStore.goals"
               :key="goal.goalId"
               :to="{ name: ROUTE_NAMES.DASHBOARD_GOAL, params: { goalId: goal.goalId } }"
               class="rounded-xl px-3 py-2.5"
@@ -211,16 +211,6 @@ const isRoadmapListExpanded = ref(true)
 const isRoadmapSectionActive = computed(() =>
   [ROUTE_NAMES.DASHBOARD, ROUTE_NAMES.DASHBOARD_GOAL].includes(route.name)
 )
-
-// 선택된(현재 보고 있는) 목표를 목록 맨 위로 올림
-const sortedGoals = computed(() => {
-  const selectedId = goalStore.selectedGoalId
-  return [...goalStore.goals].sort((a, b) => {
-    if (a.goalId === selectedId) return -1
-    if (b.goalId === selectedId) return 1
-    return 0
-  })
-})
 
 function isSelectedGoal(goal) {
   return goal.goalId === goalStore.selectedGoalId
