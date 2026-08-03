@@ -1,48 +1,50 @@
-<!-- 사이드 "여유자금" 패널 -->
+<!-- 사이드 "여유자금" 패널: 카드 클릭 시 각각 오늘/이번 달 여유자금 상세 모달을 염 -->
 <template>
   <div class="w-full">
     <p class="text-sm font-bold text-[#0a192f]">여유자금</p>
 
-    <div class="mt-2 rounded-2xl border border-slate-200 bg-white p-5">
+    <button
+      type="button"
+      class="mt-2 w-full rounded-2xl border border-slate-200 bg-white p-5 text-left"
+      @click="$emit('open-today')"
+    >
       <div class="flex items-center justify-between">
         <span class="flex items-center gap-1.5 text-sm text-slate-500">☀️ 오늘</span>
       </div>
       <p class="pt-3 text-lg font-black text-[#0a192f] lg:text-2xl">
-        {{ formatWon(estimatedDailyMoney) }}
+        {{ formatWon(daily.availableMoney) }}
       </p>
       <p class="pt-1 text-xs text-slate-400">오늘 하루 안심하고 쓸 수 있는 돈 🎯</p>
-    </div>
+    </button>
 
-    <div class="mt-3 rounded-2xl border border-slate-200 bg-white p-5">
+    <button
+      type="button"
+      class="mt-3 w-full rounded-2xl border border-slate-200 bg-white p-5 text-left"
+      @click="$emit('open-month')"
+    >
       <div class="flex items-center justify-between">
         <span class="flex items-center gap-1.5 text-sm text-slate-500">📅 이번 달</span>
       </div>
       <p class="pt-3 text-lg font-black text-[#0a192f] lg:text-2xl">
-        {{ formatWon(availableMoney.availableMoney) }}
+        {{ formatWon(monthly.availableMoney) }}
       </p>
       <p class="pt-1 text-xs text-slate-400">고정지출 뺀 이번 달 순수 여유금 🍀</p>
-    </div>
+    </button>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-
-const props = defineProps({
-  availableMoney: {
+defineProps({
+  monthly: {
     type: Object,
-    required: true,
+    required: true, // { income, fixedExpense, targetGoalAutoTransfer, otherGoalAutoTransfer, variableExpense, availableMoney }
+  },
+  daily: {
+    type: Object,
+    required: true, // 위와 동일한 형태의 일 단위 값 (백엔드가 계산해서 내려줌)
   },
 })
-
-// TODO: 백엔드가 '오늘' 여유자금을 따로 안 주고 있어서, 이번 달 여유자금을 이번 달 남은 일수로 나눈 근사치입니다.
-// 정확한 일 단위 필드가 API에 추가되면 이 계산은 제거하고 바로 바인딩.
-const estimatedDailyMoney = computed(() => {
-  const today = new Date()
-  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
-  const remainingDays = daysInMonth - today.getDate() + 1
-  return Math.round(props.availableMoney.availableMoney / remainingDays)
-})
+defineEmits(['open-today', 'open-month'])
 
 function formatWon(amount) {
   return `${amount.toLocaleString()}원`
