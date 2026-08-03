@@ -6,38 +6,36 @@
     <article
       class="min-w-0 w-full rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 min-[1400px]:order-3 min-[1400px]:flex min-[1400px]:flex-col"
     >
-      <div>
+      <div class="category-header">
         <h2 id="spending-category-monthly-title" class="text-base font-bold text-[#0A192F]">
           카테고리별 지난달 대비 변화
         </h2>
 
-        <p class="mt-1 text-xs text-[#64748B]">각 항목의 지난달과 이번 달 지출을 비교해보세요.</p>
+        <p class="text-xs text-[#64748B]">각 항목의 지난달과 이번 달 지출을 비교해보세요.</p>
       </div>
 
-      <ul
-        class="mt-5 grid gap-2.5 min-[1400px]:min-h-0 min-[1400px]:flex-1 min-[1400px]:grid-rows-6"
-      >
+      <ul class="category-list min-[1400px]:min-h-0 min-[1400px]:flex-1">
         <li
           v-for="category in monthlyComparisonItems"
           :key="category.id"
-          class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-3 rounded-xl border border-[#E2E8F0] px-3 py-3 sm:grid-cols-[minmax(64px,0.8fr)_minmax(112px,1.4fr)_auto]"
+          class="category-item grid min-w-0 grid-cols-[minmax(56px,0.8fr)_minmax(88px,1.3fr)_auto] items-center gap-x-1.5 rounded-xl border border-[#E2E8F0] px-3 py-3"
         >
-          <div class="flex min-w-0 items-center gap-2">
+          <div class="flex min-w-0 items-center gap-1.5 sm:gap-2">
             <span
-              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm"
+              class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs sm:h-8 sm:w-8 sm:text-sm"
               :style="{ backgroundColor: category.softColor }"
               aria-hidden="true"
             >
               {{ category.icon }}
             </span>
 
-            <span class="truncate text-xs font-semibold text-[#0A192F]">
+            <span class="truncate text-[11px] font-semibold text-[#0A192F] sm:text-xs">
               {{ category.name }}
             </span>
           </div>
 
           <div
-            class="col-span-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 text-center sm:col-span-1 sm:col-start-2 sm:row-start-1"
+            class="category-comparison grid min-w-0 -translate-x-2 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 text-center"
           >
             <div>
               <p class="text-[10px] text-[#94A3B8]">지난달</p>
@@ -57,7 +55,7 @@
           </div>
 
           <span
-            class="col-start-2 row-start-1 whitespace-nowrap text-[11px] font-semibold sm:col-start-3"
+            class="change-amount whitespace-nowrap text-[11px] font-semibold"
             :class="getDifferenceClass(category.difference)"
           >
             {{ formatDifference(category.difference) }}
@@ -95,3 +93,44 @@ const formatDifference = (difference) => {
   return `${difference > 0 ? '↑' : '↓'} ${formatAmount(Math.abs(difference))}만원`
 }
 </script>
+
+<style scoped>
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.category-header {
+  margin-bottom: 20px;
+}
+
+.category-header h2 {
+  margin-bottom: 4px;
+}
+
+.change-amount {
+  padding-right: 4px;
+  text-align: right;
+}
+
+@media (min-width: 768px) {
+  .category-item {
+    display: grid;
+    grid-template-columns:
+      minmax(120px, 1fr) minmax(72px, 110px) minmax(24px, 40px) minmax(72px, 110px)
+      minmax(56px, 80px);
+    align-items: center;
+    column-gap: 20px;
+    min-height: 68px;
+    padding: 12px 16px;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+  }
+
+  .category-comparison {
+    display: contents;
+    transform: none;
+  }
+}
+</style>

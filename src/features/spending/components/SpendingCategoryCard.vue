@@ -92,7 +92,7 @@
       </div>
 
       <!-- 슬라이더 -->
-      <div class="mt-5">
+      <div class="relative mt-5">
         <label :for="`spending-range-${category.id}`" class="sr-only">
           {{ category.name }} 목표 지출 조절
         </label>
