@@ -55,6 +55,17 @@ export const PREVIOUS_MONTH_SPENDING_BY_CATEGORY = {
   exercise: 4,
 }
 
+// 절감 시뮬레이터에서 사용하는 최근 3개월 월평균 소비 금액 (만원 단위)
+// 또래·지난달 비교의 이번 달 소비 금액과 분리해 관리한다.
+export const RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY = {
+  food: 32,
+  cafe: 14,
+  shopping: 22,
+  subscription: 8,
+  transportation: 9,
+  exercise: 5,
+}
+
 export const SPENDING_CATEGORIES = [
   {
     id: 'food',
@@ -109,6 +120,19 @@ export const SPENDING_CATEGORIES = [
     borderColor: '#B9D4FF',
   },
   {
+    id: 'exercise',
+    name: '운동',
+    icon: '🏋️',
+    mode: 'adjustable',
+    current: 5,
+    target: null,
+    min: 0,
+    step: 1,
+    accent: '#64748B',
+    softColor: '#F1F5F9',
+    borderColor: '#CBD5E1',
+  },
+  {
     id: 'transportation',
     name: '교통',
     icon: '🚌',
@@ -117,17 +141,6 @@ export const SPENDING_CATEGORIES = [
     accent: '#10B981',
     softColor: '#ECFDF5',
     maintainTitle: '생활 필수 지출로 유지가 적절해요.',
-    maintainDescription: '현재 수준을 유지해도 목표 달성 계획에 무리가 없어요.',
-  },
-  {
-    id: 'exercise',
-    name: '운동',
-    icon: '🏋️',
-    mode: 'maintain',
-    current: 5,
-    accent: '#64748B',
-    softColor: '#F1F5F9',
-    maintainTitle: '현재 루틴을 유지해도 괜찮아요.',
-    maintainDescription: '줄이기보다 지속 가능성을 우선하는 지출로 판단했어요.',
+    maintainDescription: '최근 3개월 평균 수준을 유지해도 목표 달성 계획에 무리가 없어요.',
   },
 ]

@@ -39,31 +39,43 @@
               class="flex items-center justify-between gap-3 py-2.5"
             >
               <span class="flex items-center gap-3">
-                <span
-                  v-if="statusOf(index) === 'done'"
-                  class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-white"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="h-3 w-3"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                </span>
-                <span
-                  v-else-if="statusOf(index) === 'active'"
-                  class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-primary"
+                <Transition
+                  mode="out-in"
+                  enter-active-class="transition duration-150 ease-out"
+                  enter-from-class="scale-75 opacity-0"
+                  enter-to-class="scale-100 opacity-100"
+                  leave-active-class="transition duration-100 ease-in"
+                  leave-from-class="scale-100 opacity-100"
+                  leave-to-class="scale-75 opacity-0"
                 >
                   <span
-                    class="h-2.5 w-2.5 animate-spin rounded-full border-2 border-primary/30 border-t-primary"
-                  />
-                </span>
-                <span v-else class="h-5 w-5 shrink-0 rounded-full border-2 border-gray-200" />
+                    v-if="statusOf(index) === 'done'"
+                    key="done"
+                    class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-white"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-3 w-3"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </span>
+                  <span
+                    v-else-if="statusOf(index) === 'active'"
+                    key="active"
+                    class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-primary"
+                  >
+                    <span
+                      class="h-2.5 w-2.5 animate-spin rounded-full border-2 border-primary/30 border-t-primary"
+                    />
+                  </span>
+                  <span v-else key="pending" class="h-5 w-5 shrink-0 rounded-full border-2 border-gray-200" />
+                </Transition>
 
                 <span
                   class="text-sm"
@@ -73,16 +85,25 @@
                 </span>
               </span>
 
-              <span v-if="statusOf(index) === 'done'" class="shrink-0 text-xs font-semibold text-primary">
-                완료
-              </span>
+              <Transition
+                enter-active-class="transition duration-150 ease-out"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+              >
+                <span
+                  v-if="statusOf(index) === 'done'"
+                  class="shrink-0 text-xs font-semibold text-primary"
+                >
+                  완료
+                </span>
+              </Transition>
             </li>
           </ul>
         </div>
 
         <div class="mt-5 h-1.5 w-full rounded-full bg-gray-100">
           <div
-            class="h-1.5 rounded-full bg-primary transition-all duration-500"
+            class="h-1.5 rounded-full bg-primary transition-all duration-300 ease-out"
             :style="{ width: progressPercent + '%' }"
           />
         </div>
@@ -95,45 +116,74 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import BrandHeader from '@/shared/ui/BrandHeader.vue'
 import { MYDATA_SYNC_ITEMS } from '@/features/auth/constants/auth.constants'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 
-const STEP_INTERVAL_MS = 1000
+// 한 항목당 리듬: ① 연동 중 유지 → ② 완료 체크+진행바 증가(같은 이벤트, 동시) → ③ 유지 → 다음 항목 시작
+const STEP_ACTIVE_MS = 800
+const STEP_DONE_HOLD_MS = 350
 const NAVIGATE_DELAY_MS = 1000
 
-// 완료된 항목 수(이 개수만큼 앞에서부터 'done', 그다음 하나가 'active', 나머지는 'pending')
-const completedCount = ref(0)
-let stepTimer = null
-let navigateTimer = null
+const router = useRouter()
+
+// 완료된 항목 수 — '완료' 표시와 진행바가 이 값 하나를 같이 바라봐서 항상 같은 프레임에 움직임
+const doneCount = ref(0)
+// true인 동안엔 방금 완료된 항목만 보이고 다음 항목은 아직 'active'로 넘어가지 않음
+const isBetweenSteps = ref(false)
+let isCancelled = false
+let currentTimeoutId = null
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    currentTimeoutId = setTimeout(resolve, ms)
+  })
+}
 
 const progressPercent = computed(() =>
-  Math.min((completedCount.value / MYDATA_SYNC_ITEMS.length) * 100, 100),
+  Math.min((doneCount.value / MYDATA_SYNC_ITEMS.length) * 100, 100),
 )
 
 function statusOf(index) {
-  if (index < completedCount.value) return 'done'
-  if (index === completedCount.value) return 'active'
+  if (index < doneCount.value) return 'done'
+  if (index === doneCount.value && !isBetweenSteps.value) return 'active'
   return 'pending'
 }
 
 function goToNextStep() {
-  // TODO: 실제 연동 완료 후 이동할 페이지가 정해지면 router.push({ name: ROUTE_NAMES.GOAL_SELECT }) 등으로 교체
+  router.push({ name: ROUTE_NAMES.GOAL_SELECT })
+}
+
+async function runSyncSteps() {
+  for (let i = 0; i < MYDATA_SYNC_ITEMS.length; i++) {
+    // ① 연동 중 유지
+    await wait(STEP_ACTIVE_MS)
+    if (isCancelled) return
+
+    // ② 완료 체크 + 진행바 증가를 같은 프레임에서 함께 반영, 다음 항목은 아직 시작 안 함
+    doneCount.value += 1
+    isBetweenSteps.value = true
+    await wait(STEP_DONE_HOLD_MS)
+    if (isCancelled) return
+
+    // 다음 항목 시작
+    isBetweenSteps.value = false
+  }
+
+  await wait(NAVIGATE_DELAY_MS)
+  if (isCancelled) return
+
+  goToNextStep()
 }
 
 onMounted(() => {
-  stepTimer = setInterval(() => {
-    if (completedCount.value >= MYDATA_SYNC_ITEMS.length) {
-      clearInterval(stepTimer)
-      navigateTimer = setTimeout(goToNextStep, NAVIGATE_DELAY_MS)
-      return
-    }
-    completedCount.value += 1
-  }, STEP_INTERVAL_MS)
+  runSyncSteps()
 })
 
 onBeforeUnmount(() => {
-  clearInterval(stepTimer)
-  clearTimeout(navigateTimer)
+  isCancelled = true
+  clearTimeout(currentTimeoutId)
 })
 </script>

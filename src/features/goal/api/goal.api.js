@@ -233,14 +233,34 @@ export async function getGoalLinkedAssets(goalId) {
   return data
 }
 
-// 여유자금 조회 API
+/**
+ * @typedef {Object} AvailableMoneyBreakdown
+ * @property {number} income
+ * @property {number} fixedExpense
+ * @property {number} targetGoalAutoTransfer
+ * @property {number} otherGoalAutoTransfer
+ * @property {number} variableExpense
+ * @property {number} availableMoney
+ */
+
+// 월 여유자금 조회 API
 /**
  * @param {number} goalId
- * @returns {Promise<AvailableMoney>}
+ * @returns {Promise<AvailableMoneyBreakdown>}
  */
-export async function getAvailableMoney(goalId) {
-  const { data } = await client.get(`/goals/${goalId}/available-money`)
-  return data
+export async function getMonthlyAvailableMoney(goalId) {
+  const { data } = await client.get(`/goals/${goalId}/monthly-available`)
+  return data.monthly
+}
+
+// 일 여유자금 조회 API
+/**
+ * @param {number} goalId
+ * @returns {Promise<AvailableMoneyBreakdown>}
+ */
+export async function getDailyAvailableMoney(goalId) {
+  const { data } = await client.get(`/goals/${goalId}/daily-available`)
+  return data.daily
 }
 
 /**

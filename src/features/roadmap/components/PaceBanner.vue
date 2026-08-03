@@ -32,6 +32,7 @@
     <button
       type="button"
       class="flex min-w-[150px] flex-col items-center justify-center gap-1.5 rounded-[18px] px-5 py-4"
+      :class="disabled ? 'pointer-events-none opacity-45' : ''"
       :style="{ backgroundImage: theme.ctaGradient, boxShadow: `0 4px 10px ${theme.ctaShadow}` }"
       @click="$emit('cta-click')"
     >
@@ -69,6 +70,7 @@
     <button
       type="button"
       class="flex aspect-square flex-col items-center justify-center gap-1.5 rounded-2xl px-3 py-3"
+      :class="disabled ? 'pointer-events-none opacity-45' : ''"
       :style="{ backgroundImage: theme.ctaGradient, boxShadow: `0 4px 10px ${theme.ctaShadow}` }"
       @click="$emit('cta-click')"
     >
@@ -94,6 +96,10 @@ const props = defineProps({
   progressRate: {
     type: Number,
     required: true,
+  },
+  disabled: {
+    type: Boolean,
+    default: false, // 목표 일시정지 중일 때 CTA 버튼만 비활성화(흐리게 + 클릭 차단)
   },
 })
 defineEmits(['cta-click'])

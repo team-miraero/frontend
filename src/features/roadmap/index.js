@@ -10,3 +10,8 @@ export { default as MilestoneProgressBar } from '@/features/roadmap/components/M
 export { default as NextMilestoneCard } from '@/features/roadmap/components/NextMilestoneCard.vue'
 export { default as MilestoneList } from '@/features/roadmap/components/MilestoneList.vue'
 export { default as AvailableMoneyPanel } from '@/features/roadmap/components/AvailableMoneyPanel.vue'
+export { default as TodayAvailableMoneyModal } from '@/features/roadmap/components/TodayAvailableMoneyModal.vue'
+export { default as MonthlyAvailableMoneyModal } from '@/features/roadmap/components/MonthlyAvailableMoneyModal.vue'
+export { default as LinkedAssetsModal } from '@/features/roadmap/components/LinkedAssetsModal.vue'
+export { default as GoalPausedBanner } from '@/features/roadmap/components/GoalPausedBanner.vue'
+export { default as GoalStatusConfirmModal } from '@/features/roadmap/components/GoalStatusConfirmModal.vue'

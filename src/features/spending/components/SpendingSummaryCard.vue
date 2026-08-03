@@ -1,9 +1,22 @@
 <template>
   <article class="flex h-[140px] flex-col rounded-2xl border border-[#E2E8F0] bg-white px-6 py-5">
     <div>
-      <p class="text-sm font-medium text-[#64748B]">
-        {{ title }}
-      </p>
+      <div class="flex items-center justify-between gap-3">
+        <p class="text-sm font-medium text-[#64748B]">
+          {{ title }}
+        </p>
+
+        <button
+          v-if="actionLabel"
+          type="button"
+          class="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#0066FF] transition-colors hover:text-[#0047B3] focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0066FF]/30"
+          aria-haspopup="dialog"
+          @click="$emit('action')"
+        >
+          {{ actionLabel }}
+          <span aria-hidden="true">›</span>
+        </button>
+      </div>
 
       <div class="mt-2 flex items-end gap-1">
         <span v-if="valuePrefix" class="pb-0.5 text-[13px] font-medium text-[#64748B]">
@@ -49,13 +62,15 @@
       </div>
     </div>
 
-    <p v-else-if="description" class="mt-auto whitespace-nowrap text-xs leading-5 text-[#64748B]">
-      <span>{{ descriptionBeforeHighlight }}</span>
-      <strong v-if="descriptionHighlight" class="font-semibold" :class="descriptionColorClass">
-        {{ descriptionHighlight }}
-      </strong>
-      <span>{{ descriptionAfterHighlight }}</span>
-    </p>
+    <div v-else-if="description" class="mt-auto">
+      <p class="whitespace-nowrap text-xs leading-5 text-[#64748B]">
+        <span>{{ descriptionBeforeHighlight }}</span>
+        <strong v-if="descriptionHighlight" class="font-semibold" :class="descriptionColorClass">
+          {{ descriptionHighlight }}
+        </strong>
+        <span>{{ descriptionAfterHighlight }}</span>
+      </p>
+    </div>
   </article>
 </template>
 
@@ -119,7 +134,13 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  actionLabel: {
+    type: String,
+    default: '',
+  },
 })
+
+defineEmits(['action'])
 
 const formattedValue = computed(() => {
   if (typeof props.value !== 'number') {

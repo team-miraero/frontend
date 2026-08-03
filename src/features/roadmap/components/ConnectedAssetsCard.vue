@@ -1,8 +1,10 @@
-<!-- "연동된 저금통 · 계좌" 카드 -->
+<!-- "연동된 저금통 · 계좌" 카드: 클릭하면 이 목표에 묶인 자금(대출 포함) 상세 모달을 염 -->
 <template>
   <!-- 데스크톱(lg 이상): 기존 배치 그대로 유지 -->
-  <div
-    class="hidden rounded-[20px] border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:block"
+  <button
+    type="button"
+    class="hidden w-full rounded-[20px] border border-slate-200 bg-white p-[25px] text-left shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:block"
+    @click="$emit('open-detail')"
   >
     <div class="flex items-center justify-between">
       <p class="text-xs font-bold text-slate-400">연동된 저금통 · 계좌</p>
@@ -27,11 +29,13 @@
       <span class="text-xs text-slate-500">합계 잔액</span>
       <span class="text-xs font-black text-[#0a192f]">{{ formatManwon(totalBalance) }}</span>
     </div>
-  </div>
+  </button>
 
   <!-- 모바일(lg 미만): 타이틀을 "연동된 자산"으로 줄이고 합계 잔액을 줄바꿈한 축약형 -->
-  <div
-    class="rounded-[20px] border border-slate-200 bg-white p-4 shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:hidden"
+  <button
+    type="button"
+    class="w-full rounded-[20px] border border-slate-200 bg-white p-4 text-left shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:hidden"
+    @click="$emit('open-detail')"
   >
     <p class="text-xs font-bold text-slate-400">연동된 자산</p>
 
@@ -50,7 +54,7 @@
       <span class="text-[11px] text-slate-500">합계 잔액</span>
       <span class="text-lg font-black text-[#0a192f]">{{ formatManwon(totalBalance) }}</span>
     </div>
-  </div>
+  </button>
 </template>
 
 <script setup>
@@ -64,6 +68,7 @@ const props = defineProps({
     required: true,
   },
 })
+defineEmits(['open-detail'])
 
 // LOAN은 저축 목적 자산이 아니라서 이 카드(저금통·계좌)에서는 제외
 const savingsAssets = computed(() =>

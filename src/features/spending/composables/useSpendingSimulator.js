@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import {
   MONTHS_SHORTENED_PER_SAVING_UNIT,
+  RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY,
   SPENDING_CATEGORIES,
 } from '@/features/spending/constants/spending.constants'
 
@@ -11,7 +12,7 @@ export function calculateSavingAmount(category) {
     return 0
   }
 
-  return Math.max(category.current - category.target, 0)
+  return Math.max(category.recentThreeMonthAverage - category.target, 0)
 }
 
 export function calculateShortenedMonths(savingAmount) {
@@ -27,7 +28,13 @@ export function formatShortenedMonths(months) {
 }
 
 export function useSpendingSimulator() {
-  const categories = ref(SPENDING_CATEGORIES.map((category) => ({ ...category })))
+  const categories = ref(
+    SPENDING_CATEGORIES.map((category) => ({
+      ...category,
+      recentThreeMonthAverage:
+        RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY[category.id] ?? category.current,
+    }))
+  )
   const selectedCategoryId = ref(categories.value[0]?.id ?? null)
 
   const selectedCategoryIndex = computed(() =>
@@ -72,7 +79,7 @@ export function useSpendingSimulator() {
       return
     }
 
-    category.target = target < category.current ? target : null
+    category.target = target < category.recentThreeMonthAverage ? target : null
   }
 
   return {

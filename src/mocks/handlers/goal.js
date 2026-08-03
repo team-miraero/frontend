@@ -359,9 +359,9 @@ export const goalHandlers = [
         {
           assetType: 'ACCOUNT',
           assetId: 2,
-          assetName: 'IBK기업은행 독립자금계좌',
-          bankName: 'IBK기업은행',
-          accountNumberMasked: '***9012',
+          assetName: 'KB 독립적금',
+          bankName: 'KB국민',
+          accountNumberMasked: '***456',
           balance: 3500000,
           assetDetail: { interestRate: 4.5, maturityDate: '2028-03-15' },
           autoTransfer: {
@@ -374,14 +374,29 @@ export const goalHandlers = [
     })
   }),
 
-  http.get('*/api/goals/:goalId/available-money', async () => {
+  http.get('*/api/goals/:goalId/monthly-available', async () => {
     return HttpResponse.json({
-      availableMoney: 350000,
-      monthlyIncome: 2800000,
-      targetGoalAutoTransfer: 300000,
-      otherGoalAutoTransfer: 300000,
-      fixedExpense: 900000,
-      variableExpense: 950000,
+      monthly: {
+        income: 2800000,
+        fixedExpense: 900000,
+        targetGoalAutoTransfer: 300000,
+        otherGoalAutoTransfer: 300000,
+        variableExpense: 500000,
+        availableMoney: 800000,
+      },
+    })
+  }),
+
+  http.get('*/api/goals/:goalId/daily-available', async () => {
+    return HttpResponse.json({
+      daily: {
+        income: 93333,
+        fixedExpense: 30000,
+        targetGoalAutoTransfer: 10000,
+        otherGoalAutoTransfer: 10000,
+        variableExpense: 16666,
+        availableMoney: 26666,
+      },
     })
   }),
 
