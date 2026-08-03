@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div
       v-if="modelValue"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-[#0A192F]/35 p-0 backdrop-blur-[1px] sm:items-center sm:p-4 lg:justify-end lg:px-10 xl:px-14"
+      class="fixed inset-0 z-50 flex items-end justify-center bg-[#0A192F]/35 p-0 backdrop-blur-[1px] sm:items-center sm:p-4"
       @click.self="close"
       @keydown.esc.stop="close"
     >
