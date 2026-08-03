@@ -6,6 +6,7 @@
       <PaceBanner
         :pace="goalStore.currentGoal.pace"
         :progress-rate="goalStore.currentGoal.progressRate"
+        :disabled="isGoalPaused"
         @cta-click="handlePacemakerCtaClick"
       />
       <!-- 목표가 일시정지 상태면 아래 액션 영역 전체를 흐리게 하고 클릭이 통하지 않도록 막음 -->
