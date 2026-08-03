@@ -133,7 +133,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
 import {
@@ -161,7 +161,6 @@ import {
   PacemakerDepositSuccessModal,
 } from '@/features/pacemaker'
 import { useModal } from '@/shared/composables/useModal'
-import * as goalApi from '@/features/goal/api/goal.api'
 
 const route = useRoute()
 const goalStore = useGoalStore()
