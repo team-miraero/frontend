@@ -5,6 +5,7 @@ import { attachRequestInterceptor, attachResponseInterceptor } from '@/shared/ap
 export const client = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
+  withCredentials: true, // Refresh Token을 HTTP-only 쿠키로 주고받기 위함
 })
 
 attachRequestInterceptor(client)

@@ -51,9 +51,19 @@
 
           <TermsAgreement v-model="agreedTerms" :terms="SIGNUP_TERMS" />
 
-          <div>
-            <BaseButton type="submit" full-width size="lg" :disabled="!canSubmit">
-              동의하고 회원가입
+          <div class="space-y-3">
+            <p v-if="authFeatureStore.signupError" class="text-center text-sm text-red-500">
+              {{ authFeatureStore.signupError }}
+            </p>
+            <BaseButton
+              type="submit"
+              full-width
+              size="lg"
+              :disabled="!canSubmit || authFeatureStore.isSubmittingSignup"
+            >
+              {{
+                authFeatureStore.isSubmittingSignup ? '회원가입 처리 중...' : '동의하고 회원가입'
+              }}
             </BaseButton>
 
             <p class="mt-4 text-center text-sm text-gray-500">
@@ -66,6 +76,33 @@
         </form>
       </div>
     </main>
+
+    <!-- 회원가입 완료 모달 -->
+    <BaseModal v-model="isSuccessModalOpen" hide-default-close>
+      <div class="p-6 text-center">
+        <div
+          class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-500 mb-4"
+        >
+          <svg
+            class="h-8 w-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900">회원가입이 완료되었어요!</h3>
+        <p class="mt-2 text-sm leading-relaxed text-gray-500">
+          미래로의 회원이 되신 것을 환영합니다 🎉<br />
+          로그인 후 맞춤 자산 관리 서비스를 시작해 보세요.
+        </p>
+        <div class="mt-6">
+          <BaseButton full-width size="lg" @click="handleGoToLogin"> 로그인하러 가기 </BaseButton>
+        </div>
+      </div>
+    </BaseModal>
   </HeroBackground>
 </template>
 
@@ -75,6 +112,7 @@ import { RouterLink, useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import BaseInput from '@/shared/ui/BaseInput.vue'
 import BaseButton from '@/shared/ui/BaseButton.vue'
+import BaseModal from '@/shared/ui/BaseModal.vue'
 import { AuthHeader, PasswordInput, TermsAgreement, useAuthFeatureStore } from '@/features/auth'
 import { SIGNUP_TERMS } from '@/features/auth/constants/auth.constants'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -85,16 +123,20 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const router = useRouter()
 const authFeatureStore = useAuthFeatureStore()
 
+const isSuccessModalOpen = ref(false)
+
 const form = ref({ email: '', password: '', passwordConfirm: '' })
 const errors = ref({ email: '', password: '', passwordConfirm: '' })
 const agreedTerms = ref(SIGNUP_TERMS.reduce((acc, term) => ({ ...acc, [term.id]: false }), {}))
 
 function validateEmail() {
-  errors.value.email = EMAIL_PATTERN.test(form.value.email) ? '' : '올바른 이메일 형식을 입력해 주세요'
+  errors.value.email = EMAIL_PATTERN.test(form.value.email)
+    ? ''
+    : '올바른 이메일 형식을 입력해 주세요'
 }
 
 function validatePassword() {
-  errors.value.password = form.value.password.length >= 8 ? '' : '비밀번호는 8자 이상이어야 해요'
+  errors.value.password = form.value.password.length >= 8 ? '' : '비밀번호는 8자 이상 입력해 주세요'
   if (form.value.passwordConfirm) {
     validatePasswordConfirm()
   }
@@ -127,9 +169,14 @@ async function handleSubmit() {
       email: form.value.email,
       password: form.value.password,
     })
-    router.push({ name: ROUTE_NAMES.MYDATA_LOADING })
+    isSuccessModalOpen.value = true
   } catch {
-    // signupError는 store에서 관리, 필요 시 화면에 노출
+    // signupError는 store에서 관리
   }
+}
+
+function handleGoToLogin() {
+  isSuccessModalOpen.value = false
+  router.push({ name: ROUTE_NAMES.LOGIN })
 }
 </script>
