@@ -13,3 +13,5 @@ export { default as AvailableMoneyPanel } from '@/features/roadmap/components/Av
 export { default as TodayAvailableMoneyModal } from '@/features/roadmap/components/TodayAvailableMoneyModal.vue'
 export { default as MonthlyAvailableMoneyModal } from '@/features/roadmap/components/MonthlyAvailableMoneyModal.vue'
 export { default as LinkedAssetsModal } from '@/features/roadmap/components/LinkedAssetsModal.vue'
+export { default as GoalPausedBanner } from '@/features/roadmap/components/GoalPausedBanner.vue'
+export { default as GoalStatusConfirmModal } from '@/features/roadmap/components/GoalStatusConfirmModal.vue'

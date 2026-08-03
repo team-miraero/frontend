@@ -2,36 +2,59 @@
 <template>
   <div v-if="goalStore.currentGoal" class="flex justify-center bg-[#f8fbff] pb-16">
     <div class="w-full max-w-[1440px] px-10 py-7">
+      <GoalPausedBanner v-if="isGoalPaused" class="mb-4" @resume-click="openResumeConfirm" />
       <PaceBanner
         :pace="goalStore.currentGoal.pace"
         :progress-rate="goalStore.currentGoal.progressRate"
+        :disabled="isGoalPaused"
         @cta-click="handlePacemakerCtaClick"
       />
-      <!-- ============ 데스크톱 (lg 이상): 기존 3열 + 사이드 패널 구조 유지 ============ -->
-      <div class="hidden lg:block">
-        <div class="grid grid-cols-3 gap-4 pt-6">
-          <GoalSummaryCard :goal="goalStore.currentGoal" />
-          <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
-          <PacemakerToggleCard
-            :pacemaker="pacemakerStore.pacemakerStatus"
-            @toggle="handlePacemakerToggle"
-          />
+      <!-- 목표가 일시정지 상태면 아래 액션 영역 전체를 흐리게 하고 클릭이 통하지 않도록 막음 -->
+      <div :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''">
+        <!-- ============ 데스크톱 (lg 이상): 기존 3열 + 사이드 패널 구조 유지 ============ -->
+        <div class="hidden lg:block">
+          <div class="grid grid-cols-3 gap-4 pt-6">
+            <GoalSummaryCard :goal="goalStore.currentGoal" />
+            <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
+            <PacemakerToggleCard
+              :pacemaker="pacemakerStore.pacemakerStatus"
+              @toggle="handlePacemakerToggle"
+            />
+          </div>
+
+          <div class="flex gap-5 pt-6">
+            <div class="flex flex-1 min-w-0 flex-col gap-4">
+              <MilestoneProgressBar
+                :goal="goalStore.currentGoal"
+                :milestones="roadmapStore.milestones"
+                @pause="openPauseConfirm"
+              />
+              <NextMilestoneCard
+                :goal="goalStore.currentGoal"
+                :milestones="roadmapStore.milestones"
+              />
+              <MilestoneList :milestones="roadmapStore.milestones" />
+            </div>
+            <div class="w-[300px] shrink-0">
+              <AvailableMoneyPanel
+                v-if="goalStore.monthlyAvailableMoney && goalStore.dailyAvailableMoney"
+                :monthly="goalStore.monthlyAvailableMoney"
+                :daily="goalStore.dailyAvailableMoney"
+                @open-today="openTodayAvailableMoneyModal"
+                @open-month="openMonthlyAvailableMoneyModal"
+              />
+            </div>
+          </div>
         </div>
 
-        <div class="flex gap-5 pt-6">
-          <div class="flex flex-1 min-w-0 flex-col gap-4">
-            <MilestoneProgressBar
-              :goal="goalStore.currentGoal"
-              :milestones="roadmapStore.milestones"
-              @pause="goalStore.updateCurrentGoalStatus('PAUSE')"
-            />
-            <NextMilestoneCard
-              :goal="goalStore.currentGoal"
-              :milestones="roadmapStore.milestones"
-            />
-            <MilestoneList :milestones="roadmapStore.milestones" />
+        <!-- ============ 모바일 (lg 미만): 2열 페어 그리드로 재배치 ============ -->
+        <div class="lg:hidden">
+          <div class="grid grid-cols-2 gap-4 pt-6">
+            <GoalSummaryCard :goal="goalStore.currentGoal" />
+            <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
           </div>
-          <div class="w-[300px] shrink-0">
+
+          <div class="grid grid-cols-2 items-start gap-4 pt-4">
             <AvailableMoneyPanel
               v-if="goalStore.monthlyAvailableMoney && goalStore.dailyAvailableMoney"
               :monthly="goalStore.monthlyAvailableMoney"
@@ -39,47 +62,30 @@
               @open-today="openTodayAvailableMoneyModal"
               @open-month="openMonthlyAvailableMoneyModal"
             />
-          </div>
-        </div>
-      </div>
-
-      <!-- ============ 모바일 (lg 미만): 2열 페어 그리드로 재배치 ============ -->
-      <div class="lg:hidden">
-        <div class="grid grid-cols-2 gap-4 pt-6">
-          <GoalSummaryCard :goal="goalStore.currentGoal" />
-          <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
-        </div>
-
-        <div class="grid grid-cols-2 items-start gap-4 pt-4">
-          <AvailableMoneyPanel
-            v-if="goalStore.monthlyAvailableMoney && goalStore.dailyAvailableMoney"
-            :monthly="goalStore.monthlyAvailableMoney"
-            :daily="goalStore.dailyAvailableMoney"
-            @open-today="openTodayAvailableMoneyModal"
-            @open-month="openMonthlyAvailableMoneyModal"
-          />
-          <div>
-            <!-- AvailableMoneyPanel의 "여유자금" 타이틀과 같은 높이의 투명 스페이서:
-                 두 컬럼의 카드 상단(top)을 맞추기 위함. PacemakerToggleCard는 루트가
-                 2개(lg 분기)라 class를 직접 전달해도 fallthrough되지 않으므로 래퍼에 여백을 줌 -->
-            <p class="invisible text-sm font-bold">여유자금</p>
-            <div class="mt-2">
-              <PacemakerToggleCard
-                :pacemaker="pacemakerStore.pacemakerStatus"
-                @toggle="handlePacemakerToggle"
-              />
+            <div>
+              <!-- AvailableMoneyPanel의 "여유자금" 타이틀과 같은 높이의 투명 스페이서-->
+              <p class="invisible text-sm font-bold">여유자금</p>
+              <div class="mt-2">
+                <PacemakerToggleCard
+                  :pacemaker="pacemakerStore.pacemakerStatus"
+                  @toggle="handlePacemakerToggle"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="flex flex-col gap-4 pt-4">
-          <MilestoneProgressBar
-            :goal="goalStore.currentGoal"
-            :milestones="roadmapStore.milestones"
-            @pause="goalStore.updateCurrentGoalStatus('PAUSE')"
-          />
-          <NextMilestoneCard :goal="goalStore.currentGoal" :milestones="roadmapStore.milestones" />
-          <MilestoneList :milestones="roadmapStore.milestones" />
+          <div class="flex flex-col gap-4 pt-4">
+            <MilestoneProgressBar
+              :goal="goalStore.currentGoal"
+              :milestones="roadmapStore.milestones"
+              @pause="openPauseConfirm"
+            />
+            <NextMilestoneCard
+              :goal="goalStore.currentGoal"
+              :milestones="roadmapStore.milestones"
+            />
+            <MilestoneList :milestones="roadmapStore.milestones" />
+          </div>
         </div>
       </div>
     </div>
@@ -118,11 +124,16 @@
       :monthly="goalStore.monthlyAvailableMoney"
     />
     <LinkedAssetsModal v-model="isLinkedAssetsModalOpen" :assets="goalStore.assets" />
+    <GoalStatusConfirmModal
+      v-model="isStatusConfirmModalOpen"
+      :mode="statusConfirmMode"
+      @confirm="handleStatusConfirm"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
 import {
@@ -138,6 +149,8 @@ import {
   TodayAvailableMoneyModal,
   MonthlyAvailableMoneyModal,
   LinkedAssetsModal,
+  GoalPausedBanner,
+  GoalStatusConfirmModal,
 } from '@/features/roadmap'
 import {
   usePacemakerStore,
@@ -164,9 +177,13 @@ const { isOpen: isTodayAvailableMoneyModalOpen, open: openTodayAvailableMoneyMod
 const { isOpen: isMonthlyAvailableMoneyModalOpen, open: openMonthlyAvailableMoneyModal } =
   useModal()
 const { isOpen: isLinkedAssetsModalOpen, open: openLinkedAssetsModal } = useModal()
+const { isOpen: isStatusConfirmModalOpen, open: openStatusConfirmModal } = useModal()
 
 const selectedDepositTarget = ref(null)
 const depositedAmount = ref(0)
+const statusConfirmMode = ref('pause')
+
+const isGoalPaused = computed(() => goalStore.currentGoal?.status === 'PAUSE')
 
 // 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
 function handlePacemakerToggle() {
@@ -205,6 +222,24 @@ async function handleDeposit({ goalId, amount }) {
 async function handleOpenHistory() {
   openPacemakerHistoryModal()
   await pacemakerStore.fetchHistories()
+}
+
+// "목표 일시정지" 버튼: 바로 멈추지 않고 확인 모달을 먼저 염
+function openPauseConfirm() {
+  statusConfirmMode.value = 'pause'
+  openStatusConfirmModal()
+}
+
+// 일시정지 배너의 "목표 재개하기" 버튼
+function openResumeConfirm() {
+  statusConfirmMode.value = 'resume'
+  openStatusConfirmModal()
+}
+
+// 확인 모달의 "확인" 클릭: 실제 상태 변경
+async function handleStatusConfirm() {
+  await goalStore.updateCurrentGoalStatus(statusConfirmMode.value === 'pause' ? 'PAUSE' : 'ACTIVE')
+  isStatusConfirmModalOpen.value = false
 }
 
 onMounted(async () => {
