@@ -40,14 +40,14 @@
           available-label="월 가능 저축액"
           :available-amount="feasibility.availableMonthly"
           required-label="월 필요 저축액"
-          :required-amount="feasibility.requiredMonthly"
-          :status="feasibility.status"
+          :required-amount="effectiveRequiredMonthly"
+          :status="effectiveStatus"
           :status-title="statusContent.title"
           :status-message="statusContent.message"
           forecast-label="목표 달성 예측"
           :forecast-message="forecastMessage"
-          :monthly-label="formatKRWCompact(feasibility.requiredMonthly)"
-          :period-label="formatPeriodLabel(goalParams.months)"
+          :monthly-label="formatKRWCompact(effectiveRequiredMonthly)"
+          :period-label="formatPeriodLabel(currentMonths)"
           :goal-label="selectedGoal?.title"
           :stats="stats"
           :adjust-title="statusContent.adjustTitle"
@@ -60,7 +60,7 @@
     </div>
 
     <LoadingSpinner
-      v-else-if="goalParams && isFeasibilityLoading"
+      v-else-if="isFeasibilityLoading"
       message="실현가능성을 계산하고 있어요"
     />
 
@@ -84,9 +84,10 @@ import BottomCTA from '@/shared/ui/BottomCTA.vue'
 import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import FeasibilityResult from '@/shared/ui/FeasibilityResult.vue'
 import { useGoalStore } from '@/features/goal'
-import { GOAL_PRESETS } from '@/features/goal/constants/goal.constants.js'
+import { GOAL_PRESETS, GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRWCompact } from '@/shared/lib/money'
+import { calculateStudentLoan } from '@/features/goal/lib/loan.js'
 
 const ALTERNATIVES = [
   { key: 'period', label: '기간 늘리기', sublabel: '+12개월' },
@@ -119,32 +120,69 @@ const { selectedGoalId, goalParams, feasibility, isFeasibilityLoading, recalcula
   storeToRefs(goalStore)
 
 const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === selectedGoalId.value))
+const isStudentLoan = computed(() => selectedGoalId.value === GOAL_PRESET_IDS.STUDENT_LOAN)
 
 const selectedAlternative = ref('')
 const isRecalculating = ref(false)
 
-onMounted(async () => {
-  if (!goalParams.value) {
-    router.replace({ name: ROUTE_NAMES.GOAL_DETAIL })
-    return
+// 안전한 현재 파라미터 (새로고침 등 기본값 제공)
+const currentAmount = computed(() => Number(goalParams.value?.amount) || (isStudentLoan.value ? 12400000 : 10000000))
+const currentMonths = computed(() => Number(goalParams.value?.months) || 24)
+const currentStartAmount = computed(() => Number(goalParams.value?.startAmount) || 0)
+
+// 학자금 대출인 경우 원리금 균등상환 월 상환액, 일반인 경우 API requiredMonthly 사용
+const effectiveRequiredMonthly = computed(() => {
+  if (isStudentLoan.value) {
+    if (goalParams.value?.loanResult?.monthlyPayment) {
+      return goalParams.value.loanResult.monthlyPayment
+    }
+    const loanCalc = calculateStudentLoan({ amount: currentAmount.value, months: currentMonths.value })
+    return loanCalc.monthlyPayment
   }
-  await goalStore.fetchFeasibility({
-    goalAmount: goalParams.value.amount,
-    goalMonths: goalParams.value.months,
-    startAmount: goalParams.value.startAmount,
-  })
+  return Number(feasibility.value?.requiredMonthly) || 0
 })
 
-const statusContent = computed(() => STATUS_CONTENT[feasibility.value?.status ?? 'danger'])
+const effectiveStatus = computed(() => {
+  const req = effectiveRequiredMonthly.value
+  const avail = Number(feasibility.value?.availableMonthly) || 620000
+  if (avail <= 0) return 'danger'
+  const ratio = req / avail
+  if (ratio <= 1) return 'success'
+  if (ratio <= 1.2) return 'warning'
+  return 'danger'
+})
+
+onMounted(async () => {
+  if (!goalParams.value) {
+    goalParams.value = {
+      amount: currentAmount.value,
+      months: currentMonths.value,
+      startAmount: currentStartAmount.value,
+    }
+  }
+
+  try {
+    await goalStore.fetchFeasibility({
+      goalAmount: currentAmount.value,
+      goalMonths: currentMonths.value,
+      startAmount: currentStartAmount.value,
+      isStudentLoan: isStudentLoan.value,
+    })
+  } catch (err) {
+    console.error('Failed to fetch feasibility:', err)
+  }
+})
+
+const statusContent = computed(() => STATUS_CONTENT[effectiveStatus.value ?? 'danger'])
 
 const forecastMessage = computed(() =>
-  feasibility.value?.status === 'success' ? `충분히 달릴 수 있어요🎉` : ''
+  effectiveStatus.value === 'success' ? `충분히 달릴 수 있어요🎉` : ''
 )
 
 const stats = computed(() => [
-  { label: '목표 금액', value: formatKRWCompact(goalParams.value.amount) },
-  { label: '목표 기간', value: formatPeriodLabel(goalParams.value.months) },
-  { label: '월 저축액', value: formatKRWCompact(feasibility.value.requiredMonthly) },
+  { label: isStudentLoan.value ? '대출 원금' : '목표 금액', value: formatKRWCompact(currentAmount.value) },
+  { label: '목표 기간', value: formatPeriodLabel(currentMonths.value) },
+  { label: isStudentLoan.value ? '월 상환액' : '월 저축액', value: formatKRWCompact(effectiveRequiredMonthly.value) },
 ])
 
 /**
@@ -152,11 +190,15 @@ const stats = computed(() => [
  * @param {'period' | 'amount'} key
  */
 function getAdjustedGoalParams(key) {
+  const baseAmount = currentAmount.value
+  const baseMonths = currentMonths.value
+  const baseStart = currentStartAmount.value
+
   if (key === 'period') {
-    return { ...goalParams.value, months: goalParams.value.months + 12 }
+    return { amount: baseAmount, months: baseMonths + 12, startAmount: baseStart }
   }
-  const adjustedAmount = Math.round((goalParams.value.amount * 0.8) / 10000) * 10000
-  return { ...goalParams.value, amount: adjustedAmount }
+  const adjustedAmount = Math.round((baseAmount * 0.8) / 10000) * 10000
+  return { amount: adjustedAmount, months: baseMonths, startAmount: baseStart }
 }
 
 const recalculated = computed(() => {
@@ -164,19 +206,27 @@ const recalculated = computed(() => {
 
   const adjusted = getAdjustedGoalParams(selectedAlternative.value)
 
+  let reqMonthly = 0
+  if (isStudentLoan.value) {
+    const loanCalc = calculateStudentLoan({ amount: adjusted.amount, months: adjusted.months })
+    reqMonthly = loanCalc.monthlyPayment
+  } else {
+    reqMonthly = Number(recalculatedFeasibility.value.requiredMonthly) || 0
+  }
+
   if (selectedAlternative.value === 'period') {
     return {
-      label: '조정 후 월 저축액',
-      value: formatKRWCompact(recalculatedFeasibility.value.requiredMonthly),
+      label: isStudentLoan.value ? '조정 후 월 상환액' : '조정 후 월 저축액',
+      value: formatKRWCompact(reqMonthly),
       sublabel: '조정 기간',
       subvalue: formatPeriodLabel(adjusted.months),
     }
   }
 
   return {
-    label: '조정 후 월 저축액',
-    value: formatKRWCompact(recalculatedFeasibility.value.requiredMonthly),
-    sublabel: '조정 금액',
+    label: isStudentLoan.value ? '조정 후 월 상환액' : '조정 후 월 저축액',
+    value: formatKRWCompact(reqMonthly),
+    sublabel: '조정 원금',
     subvalue: formatKRWCompact(adjusted.amount),
   }
 })
@@ -194,6 +244,7 @@ watch(selectedAlternative, async (key) => {
       goalAmount: adjusted.amount,
       goalMonths: adjusted.months,
       startAmount: adjusted.startAmount,
+      isStudentLoan: isStudentLoan.value,
     })
   } finally {
     isRecalculating.value = false
@@ -204,18 +255,19 @@ const ctaLabel = computed(() => {
   if (selectedAlternative.value) {
     return '조정된 계획으로 시작하기'
   }
-  return feasibility.value?.status === 'success'
+  return effectiveStatus.value === 'success'
     ? '계좌 연결하기'
     : '대안을 선택해 주세요'
 })
 const ctaDisabled = computed(
-  () => feasibility.value?.status !== 'success' && !selectedAlternative.value
+  () => effectiveStatus.value !== 'success' && !selectedAlternative.value
 )
 
 function formatPeriodLabel(months) {
-  const years = Math.floor(months / 12)
-  const remainMonths = months % 12
-  if (years === 0) return `${months}개월`
+  const m = Number(months) || 0
+  const years = Math.floor(m / 12)
+  const remainMonths = m % 12
+  if (years === 0) return `${m}개월`
   if (remainMonths === 0) return `${years}년`
   return `${years}년 ${remainMonths}개월`
 }
@@ -226,8 +278,13 @@ function handleBack() {
 
 function handleNext() {
   if (selectedAlternative.value && recalculatedFeasibility.value) {
-    goalParams.value = getAdjustedGoalParams(selectedAlternative.value)
-    feasibility.value = recalculatedFeasibility.value
+    const adjusted = getAdjustedGoalParams(selectedAlternative.value)
+    goalParams.value = {
+      ...goalParams.value,
+      amount: adjusted.amount,
+      months: adjusted.months,
+      startAmount: adjusted.startAmount,
+    }
   }
   router.push({ name: ROUTE_NAMES.GOAL_ACCOUNT })
 }

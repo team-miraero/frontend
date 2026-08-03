@@ -44,6 +44,7 @@ export async function createGoal(payload) {
  * @property {number} goalAmount 목표금액
  * @property {number} goalMonths 목표 개월수
  * @property {number} startAmount 이미 모아둔 금액
+ * @property {boolean} [isStudentLoan] 학자금 대출 여부
  */
 
 /**
@@ -58,8 +59,8 @@ export async function createGoal(payload) {
  * @returns {Promise<FeasibilityResponse>}
  */
 export async function getFeasibility(params) {
-  const { data } = await client.get('/goals/feasibility', { params })
-  return data
+  const { data: responseBody } = await client.get('/goals/feasibility', { params })
+  return unwrapApiData(responseBody)
 }
 
 // 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)

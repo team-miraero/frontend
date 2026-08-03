@@ -20,12 +20,15 @@ export function formatKRW(amount) {
 }
 
 /**
- * "만원" 단위 축약 표기로 변환한다. (예: 12,340,000 -> "1,234만원")
+ "만원" 단위 축약 표기로 변환한다. (예: 12,340,000 -> "1,234만원")
  * @param {number} amount
  * @returns {string}
  */
 export function formatKRWCompact(amount) {
-  const man = Math.round(amount / 10000)
+  if (amount === undefined || amount === null || Number.isNaN(Number(amount))) {
+    return '0원'
+  }
+  const man = Math.round(Number(amount) / 10000)
   return `${formatKoreanNumber(man)}만원`
 }
 
@@ -36,11 +39,14 @@ export function formatKRWCompact(amount) {
  * @returns {string}
  */
 export function formatKRWReadable(amount) {
-  if (!amount || amount <= 0) return '0원'
+  if (amount === undefined || amount === null || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
+    return '0원'
+  }
 
-  const uk = Math.floor(amount / 100000000)
-  const man = Math.floor((amount % 100000000) / 10000)
-  const remain = amount % 10000
+  const numAmount = Number(amount)
+  const uk = Math.floor(numAmount / 100000000)
+  const man = Math.floor((numAmount % 100000000) / 10000)
+  const remain = numAmount % 10000
 
   let result = ''
   if (uk > 0) {

@@ -300,19 +300,26 @@ function toggleExistingAccount(accountId) {
 
 onMounted(async () => {
   if (!goalParams.value) {
-    router.replace({ name: ROUTE_NAMES.GOAL_DETAIL })
-    return
+    goalParams.value = { amount: 12400000, months: 24, startAmount: 0 }
   }
 
-  transferAmount.value = feasibility.value?.requiredMonthly ?? 0
+  const defaultTransfer =
+    feasibility.value?.requiredMonthly ||
+    goalParams.value?.loanResult?.monthlyPayment ||
+    525866
+  transferAmount.value = defaultTransfer
 
-  const { accounts: fetchedAccounts } = await goalStore.fetchAccounts()
-  selectedWithdrawalAccountId.value =
-    fetchedAccounts.find((account) => account.accountType === 'CHECKING')?.accountId ?? null
-  const firstSavingAccountId = fetchedAccounts.find(
-    (account) => account.accountType !== 'CHECKING'
-  )?.accountId
-  selectedExistingAccountIds.value = firstSavingAccountId ? [firstSavingAccountId] : []
+  try {
+    const { accounts: fetchedAccounts } = await goalStore.fetchAccounts()
+    selectedWithdrawalAccountId.value =
+      fetchedAccounts.find((account) => account.accountType === 'CHECKING')?.accountId ?? null
+    const firstSavingAccountId = fetchedAccounts.find(
+      (account) => account.accountType !== 'CHECKING'
+    )?.accountId
+    selectedExistingAccountIds.value = firstSavingAccountId ? [firstSavingAccountId] : []
+  } catch (err) {
+    console.error('Failed to fetch accounts:', err)
+  }
 })
 
 const isSubmitting = ref(false)

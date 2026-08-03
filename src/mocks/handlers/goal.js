@@ -82,24 +82,39 @@ export const goalHandlers = [
   // 실현가능성 조회 API (GOAL-03) — goalAmount/goalMonths/startAmount 쿼리로 계산
   http.get('*/api/goals/feasibility', async ({ request }) => {
     await delay(500)
+    await delay(300)
     const url = new URL(request.url)
-    const goalAmount = Number(url.searchParams.get('goalAmount'))
-    const goalMonths = Number(url.searchParams.get('goalMonths'))
-    const startAmount = Number(url.searchParams.get('startAmount'))
+    const goalAmount = Number(url.searchParams.get('goalAmount')) || 0
+    const goalMonths = Number(url.searchParams.get('goalMonths')) || 1
+    const startAmount = Number(url.searchParams.get('startAmount')) || 0
+    const isStudentLoan = url.searchParams.get('isStudentLoan') === 'true'
 
-    const requiredMonthly = Math.max(0, Math.round((goalAmount - startAmount) / goalMonths))
-    const availableMonthly = MOCK_MONTHLY_SAVING_CAPACITY
+    let requiredMonthly = 0
+    if (isStudentLoan) {
+      // 학자금 대출 원리금균등상환 (연 1.7%)
+      const monthlyRate = 0.017 / 12
+      const compound = Math.pow(1 + monthlyRate, goalMonths)
+      requiredMonthly = Math.round((goalAmount * monthlyRate * compound) / (compound - 1)) || 0
+    } else {
+      requiredMonthly = Math.max(0, Math.round((goalAmount - startAmount) / goalMonths)) || 0
+    }
+
+    const availableMonthly = MOCK_MONTHLY_SAVING_CAPACITY || 620000
 
     return HttpResponse.json({
-      requiredMonthly,
-      availableMonthly,
-      possible: requiredMonthly <= availableMonthly,
+      success: true,
+      data: {
+        requiredMonthly,
+        availableMonthly,
+        possible: requiredMonthly <= availableMonthly,
+      },
+      error: null,
     })
   }),
 
   // 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)
   http.get('*/api/accounts', async ({ request }) => {
-    await delay(500)
+    await delay(300)
     const url = new URL(request.url)
     const accountType = url.searchParams.get('accountType')
 
@@ -108,8 +123,12 @@ export const goalHandlers = [
       : MOCK_ACCOUNTS
 
     return HttpResponse.json({
-      totalBalance: accounts.reduce((sum, account) => sum + account.balance, 0),
-      accounts,
+      success: true,
+      data: {
+        totalBalance: accounts.reduce((sum, account) => sum + account.balance, 0),
+        accounts,
+      },
+      error: null,
     })
   }),
 
