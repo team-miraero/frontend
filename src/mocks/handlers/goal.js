@@ -351,20 +351,6 @@ export const goalHandlers = [
             withdrawalAccount: { bankName: 'KB국민', accountNumberMasked: '***789' },
           },
         },
-        {
-          assetType: 'LOAN',
-          assetId: 3,
-          assetName: '학자금 대출',
-          bankName: 'KB국민',
-          accountNumberMasked: '***321',
-          balance: null,
-          assetDetail: { interestRate: 3.0, maturityDate: '2026-08-25' },
-          autoTransfer: {
-            amount: 1000000,
-            transferDay: 10,
-            withdrawalAccount: { bankName: 'KB국민', accountNumberMasked: '***789' },
-          },
-        },
       ],
     })
   }),

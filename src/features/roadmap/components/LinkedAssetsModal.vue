@@ -55,13 +55,13 @@
         <p class="text-xs text-slate-500">{{ row.caption }}</p>
 
         <div v-if="row.assetDetail" class="flex flex-col gap-1.5 border-t border-[#dbeafe] pt-2">
-          <p class="text-xs text-slate-400">만료일 {{ formatDate(row.assetDetail.maturityDate) }}</p>
+          <p class="text-xs text-slate-400">
+            만료일 {{ formatDate(row.assetDetail.maturityDate) }}
+          </p>
           <div class="flex items-center justify-between pt-0.5">
             <span
               class="rounded-full px-2 py-0.5 text-xs font-bold"
-              :class="
-                row.isLoan ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'
-              "
+              :class="row.isLoan ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'"
             >
               연 {{ row.assetDetail.interestRate }}%
             </span>
