@@ -57,10 +57,10 @@
     <template v-if="category.mode === 'adjustable'">
       <div class="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <div class="rounded-xl bg-[#F4F8FF] px-3 py-3 text-center">
-          <p class="text-xs text-[#94A3B8]">현재 지출</p>
+          <p class="text-xs text-[#94A3B8]">기준 지출</p>
 
           <p class="mt-1 text-base font-bold text-[#0A192F]">
-            {{ formatAmount(category.current) }}만원
+            {{ formatAmount(category.recentThreeMonthAverage) }}만원
           </p>
         </div>
 
@@ -102,7 +102,7 @@
           class="spending-range block w-full cursor-pointer"
           type="range"
           :min="category.min"
-          :max="category.current"
+          :max="category.recentThreeMonthAverage"
           :step="category.step ?? 1"
           :value="sliderValue"
           :style="rangeStyle"
@@ -111,7 +111,7 @@
 
         <div class="mt-2 flex items-center justify-between text-xs text-[#94A3B8]">
           <span>{{ formatAmount(category.min) }}</span>
-          <span>{{ formatAmount(category.current) }}만원</span>
+          <span>{{ formatAmount(category.recentThreeMonthAverage) }}만원</span>
         </div>
       </div>
 
@@ -148,10 +148,10 @@
     <div v-else class="flex flex-1 flex-col">
       <div class="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <div class="rounded-xl bg-[#F4F8FF] px-3 py-3 text-center">
-          <p class="text-xs text-[#94A3B8]">현재 지출</p>
+          <p class="text-xs text-[#94A3B8]">기준 지출</p>
 
           <p class="mt-1 text-base font-bold text-[#0A192F]">
-            {{ formatAmount(category.current) }}만원
+            {{ formatAmount(category.recentThreeMonthAverage) }}만원
           </p>
         </div>
 
@@ -169,7 +169,7 @@
         <div class="rounded-xl bg-[#F4F8FF] px-3 py-3 text-center">
           <p class="text-xs text-[#94A3B8]">상태</p>
 
-          <p class="mt-1 text-base font-bold" :style="{ color: category.accent }">현재 수준 유지</p>
+          <p class="mt-1 text-base font-bold" :style="{ color: category.accent }">평균 수준 유지</p>
         </div>
       </div>
 
@@ -231,7 +231,7 @@ const emit = defineEmits(['update-target'])
 
 const formatAmount = formatKoreanNumber
 
-const sliderValue = computed(() => props.category.target ?? props.category.current)
+const sliderValue = computed(() => props.category.target ?? props.category.recentThreeMonthAverage)
 const hasTarget = computed(() => props.category.target !== null)
 const isAdjustable = computed(() => props.category.mode === 'adjustable')
 
@@ -250,7 +250,7 @@ const savingBadge = computed(() => {
 })
 
 const rangeProgress = computed(() => {
-  const range = props.category.current - props.category.min
+  const range = props.category.recentThreeMonthAverage - props.category.min
 
   if (range <= 0) {
     return 100
