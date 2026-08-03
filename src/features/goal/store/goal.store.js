@@ -67,8 +67,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
     linkedAccountIds.value = []
   }
 
-  // 사이드바(로드맵 목록)와 대시보드 페이지가 마운트 시점에 동시에 fetchGoals를 호출하는데,
-  // areGoalsLoading 플래그만으로 막으면 나중 호출자가 goals가 채워지기도 전에 즉시 반환돼버린다.
+  // 사이드바(로드맵 목록)와 대시보드 페이지가 마운트 시점에 동시에 fetchGoals를 호출하는데
   // 진행 중인 요청의 Promise를 공유해서 동시 호출자가 모두 같은 완료 시점을 기다리게 한다.
   let fetchGoalsPromise = null
 
