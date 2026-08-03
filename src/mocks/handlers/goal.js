@@ -355,14 +355,29 @@ export const goalHandlers = [
     })
   }),
 
-  http.get('*/api/goals/:goalId/available-money', async () => {
+  http.get('*/api/goals/:goalId/monthly-available', async () => {
     return HttpResponse.json({
-      availableMoney: 350000,
-      monthlyIncome: 2800000,
-      targetGoalAutoTransfer: 300000,
-      otherGoalAutoTransfer: 300000,
-      fixedExpense: 900000,
-      variableExpense: 950000,
+      monthly: {
+        income: 2800000,
+        fixedExpense: 900000,
+        targetGoalAutoTransfer: 300000,
+        otherGoalAutoTransfer: 300000,
+        variableExpense: 500000,
+        availableMoney: 800000,
+      },
+    })
+  }),
+
+  http.get('*/api/goals/:goalId/daily-available', async () => {
+    return HttpResponse.json({
+      daily: {
+        income: 93333,
+        fixedExpense: 30000,
+        targetGoalAutoTransfer: 10000,
+        otherGoalAutoTransfer: 10000,
+        variableExpense: 16666,
+        availableMoney: 26666,
+      },
     })
   }),
 

@@ -36,7 +36,8 @@ export const useGoalStore = defineStore('feature-goal', () => {
   // 메인 대시보드 관련 목표 상태
   const currentGoal = ref(null)
   const assets = ref([])
-  const availableMoney = ref(null)
+  const monthlyAvailableMoney = ref(null)
+  const dailyAvailableMoney = ref(null)
   const isLoading = ref(false)
 
   /**
@@ -175,14 +176,16 @@ export const useGoalStore = defineStore('feature-goal', () => {
   async function fetchDashboardData(goalId) {
     isLoading.value = true
     try {
-      const [goal, goalAssets, money] = await Promise.all([
+      const [goal, goalAssets, monthlyMoney, dailyMoney] = await Promise.all([
         goalApi.getGoalDetail(goalId),
         goalApi.getGoalAssets(goalId),
-        goalApi.getAvailableMoney(goalId),
+        goalApi.getMonthlyAvailableMoney(goalId),
+        goalApi.getDailyAvailableMoney(goalId),
       ])
       currentGoal.value = goal
       assets.value = goalAssets
-      availableMoney.value = money
+      monthlyAvailableMoney.value = monthlyMoney
+      dailyAvailableMoney.value = dailyMoney
     } finally {
       isLoading.value = false
     }
@@ -215,7 +218,8 @@ export const useGoalStore = defineStore('feature-goal', () => {
     areGoalsLoading,
     currentGoal,
     assets,
-    availableMoney,
+    monthlyAvailableMoney,
+    dailyAvailableMoney,
     isLoading,
     selectGoal,
     moveToNextStep,
