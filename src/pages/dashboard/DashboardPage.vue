@@ -11,7 +11,7 @@
       <div class="hidden lg:block">
         <div class="grid grid-cols-3 gap-4 pt-6">
           <GoalSummaryCard :goal="goalStore.currentGoal" />
-          <ConnectedAssetsCard :assets="goalStore.assets" />
+          <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
           <PacemakerToggleCard
             :pacemaker="pacemakerStore.pacemakerStatus"
             @toggle="handlePacemakerToggle"
@@ -47,7 +47,7 @@
       <div class="lg:hidden">
         <div class="grid grid-cols-2 gap-4 pt-6">
           <GoalSummaryCard :goal="goalStore.currentGoal" />
-          <ConnectedAssetsCard :assets="goalStore.assets" />
+          <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
         </div>
 
         <div class="grid grid-cols-2 items-start gap-4 pt-4">
@@ -117,6 +117,7 @@
       v-model="isMonthlyAvailableMoneyModalOpen"
       :monthly="goalStore.monthlyAvailableMoney"
     />
+    <LinkedAssetsModal v-model="isLinkedAssetsModalOpen" :assets="goalStore.assets" />
   </div>
 </template>
 
@@ -136,6 +137,7 @@ import {
   AvailableMoneyPanel,
   TodayAvailableMoneyModal,
   MonthlyAvailableMoneyModal,
+  LinkedAssetsModal,
 } from '@/features/roadmap'
 import {
   usePacemakerStore,
@@ -161,6 +163,7 @@ const { isOpen: isPacemakerDepositSuccessModalOpen, open: openPacemakerDepositSu
 const { isOpen: isTodayAvailableMoneyModalOpen, open: openTodayAvailableMoneyModal } = useModal()
 const { isOpen: isMonthlyAvailableMoneyModalOpen, open: openMonthlyAvailableMoneyModal } =
   useModal()
+const { isOpen: isLinkedAssetsModalOpen, open: openLinkedAssetsModal } = useModal()
 
 const selectedDepositTarget = ref(null)
 const depositedAmount = ref(0)

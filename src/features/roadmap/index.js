@@ -12,3 +12,4 @@ export { default as MilestoneList } from '@/features/roadmap/components/Mileston
 export { default as AvailableMoneyPanel } from '@/features/roadmap/components/AvailableMoneyPanel.vue'
 export { default as TodayAvailableMoneyModal } from '@/features/roadmap/components/TodayAvailableMoneyModal.vue'
 export { default as MonthlyAvailableMoneyModal } from '@/features/roadmap/components/MonthlyAvailableMoneyModal.vue'
+export { default as LinkedAssetsModal } from '@/features/roadmap/components/LinkedAssetsModal.vue'
