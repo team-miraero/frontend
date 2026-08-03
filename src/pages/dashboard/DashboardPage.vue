@@ -11,7 +11,7 @@
       <div class="hidden lg:block">
         <div class="grid grid-cols-3 gap-4 pt-6">
           <GoalSummaryCard :goal="goalStore.currentGoal" />
-          <ConnectedAssetsCard :assets="goalStore.assets" />
+          <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
           <PacemakerToggleCard
             :pacemaker="pacemakerStore.pacemakerStatus"
             @toggle="handlePacemakerToggle"
@@ -33,8 +33,11 @@
           </div>
           <div class="w-[300px] shrink-0">
             <AvailableMoneyPanel
-              v-if="goalStore.availableMoney"
-              :available-money="goalStore.availableMoney"
+              v-if="goalStore.monthlyAvailableMoney && goalStore.dailyAvailableMoney"
+              :monthly="goalStore.monthlyAvailableMoney"
+              :daily="goalStore.dailyAvailableMoney"
+              @open-today="openTodayAvailableMoneyModal"
+              @open-month="openMonthlyAvailableMoneyModal"
             />
           </div>
         </div>
@@ -44,13 +47,16 @@
       <div class="lg:hidden">
         <div class="grid grid-cols-2 gap-4 pt-6">
           <GoalSummaryCard :goal="goalStore.currentGoal" />
-          <ConnectedAssetsCard :assets="goalStore.assets" />
+          <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
         </div>
 
         <div class="grid grid-cols-2 items-start gap-4 pt-4">
           <AvailableMoneyPanel
-            v-if="goalStore.availableMoney"
-            :available-money="goalStore.availableMoney"
+            v-if="goalStore.monthlyAvailableMoney && goalStore.dailyAvailableMoney"
+            :monthly="goalStore.monthlyAvailableMoney"
+            :daily="goalStore.dailyAvailableMoney"
+            @open-today="openTodayAvailableMoneyModal"
+            @open-month="openMonthlyAvailableMoneyModal"
           />
           <div>
             <!-- AvailableMoneyPanel의 "여유자금" 타이틀과 같은 높이의 투명 스페이서:
@@ -101,6 +107,17 @@
       :target="selectedDepositTarget"
       :amount="depositedAmount"
     />
+    <TodayAvailableMoneyModal
+      v-if="goalStore.dailyAvailableMoney"
+      v-model="isTodayAvailableMoneyModalOpen"
+      :daily="goalStore.dailyAvailableMoney"
+    />
+    <MonthlyAvailableMoneyModal
+      v-if="goalStore.monthlyAvailableMoney"
+      v-model="isMonthlyAvailableMoneyModalOpen"
+      :monthly="goalStore.monthlyAvailableMoney"
+    />
+    <LinkedAssetsModal v-model="isLinkedAssetsModalOpen" :assets="goalStore.assets" />
   </div>
 </template>
 
@@ -118,6 +135,9 @@ import {
   NextMilestoneCard,
   MilestoneList,
   AvailableMoneyPanel,
+  TodayAvailableMoneyModal,
+  MonthlyAvailableMoneyModal,
+  LinkedAssetsModal,
 } from '@/features/roadmap'
 import {
   usePacemakerStore,
@@ -140,6 +160,10 @@ const { isOpen: isPacemakerDepositModalOpen, open: openPacemakerDepositModal } =
 const { isOpen: isPacemakerHistoryModalOpen, open: openPacemakerHistoryModal } = useModal()
 const { isOpen: isPacemakerDepositSuccessModalOpen, open: openPacemakerDepositSuccessModal } =
   useModal()
+const { isOpen: isTodayAvailableMoneyModalOpen, open: openTodayAvailableMoneyModal } = useModal()
+const { isOpen: isMonthlyAvailableMoneyModalOpen, open: openMonthlyAvailableMoneyModal } =
+  useModal()
+const { isOpen: isLinkedAssetsModalOpen, open: openLinkedAssetsModal } = useModal()
 
 const selectedDepositTarget = ref(null)
 const depositedAmount = ref(0)
