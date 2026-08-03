@@ -10,3 +10,5 @@ export { default as MilestoneProgressBar } from '@/features/roadmap/components/M
 export { default as NextMilestoneCard } from '@/features/roadmap/components/NextMilestoneCard.vue'
 export { default as MilestoneList } from '@/features/roadmap/components/MilestoneList.vue'
 export { default as AvailableMoneyPanel } from '@/features/roadmap/components/AvailableMoneyPanel.vue'
+export { default as TodayAvailableMoneyModal } from '@/features/roadmap/components/TodayAvailableMoneyModal.vue'
+export { default as MonthlyAvailableMoneyModal } from '@/features/roadmap/components/MonthlyAvailableMoneyModal.vue'
