@@ -113,6 +113,30 @@ export const GOAL_DETAIL_CONFIG = {
       suffix: '을 기본으로 추천해드려요.',
     },
   },
+  [GOAL_PRESET_IDS.STUDENT_LOAN]: {
+    title: '빚 없는 출발,\n언제까지 완납할까요?',
+    amountFieldType: 'input',
+    amountLabel: '남은 대출 잔액 (원금)',
+    defaultAmount: 0,
+    periodLabel: '완납 기간',
+    periodMin: 6,
+    periodMax: 60,
+    periodDefault: 24,
+    periodPresets: [
+      { label: '6개월', value: 6 },
+      { label: '1년', value: 12 },
+      { label: '2년', value: 24 },
+      { label: '3년', value: 36 },
+    ],
+    showTargetDate: false,
+    showPeriodFormula: false,
+    infoText: {
+      prefix:
+        '이자는 원리금균등상환(등록금대출상환) 방식으로 계산됩니다. 실제 상환액은 상환 방식·중도상환 여부에 따라 달라질 수 있어요.',
+      highlight: '',
+      suffix: '',
+    },
+  },
 }
 
 export const DEFAULT_GOAL_DETAIL_CONFIG = GOAL_DETAIL_CONFIG[GOAL_PRESET_IDS.INDEPENDENCE]
