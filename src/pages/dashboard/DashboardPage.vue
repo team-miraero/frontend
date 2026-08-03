@@ -133,7 +133,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
 import {
@@ -161,7 +161,6 @@ import {
   PacemakerDepositSuccessModal,
 } from '@/features/pacemaker'
 import { useModal } from '@/shared/composables/useModal'
-import * as goalApi from '@/features/goal/api/goal.api'
 
 const route = useRoute()
 const goalStore = useGoalStore()
@@ -242,19 +241,31 @@ async function handleStatusConfirm() {
   isStatusConfirmModalOpen.value = false
 }
 
-onMounted(async () => {
-  const goalId = route.params.goalId ?? (await resolveDefaultGoalId())
-  if (!goalId) return
-
+// 목표 상세(대시보드 데이터+마일스톤)를 불러오고 사이드바 로드맵 목록과 선택 상태를 맞춤
+async function loadGoalDashboard(goalId) {
+  goalStore.selectGoal(goalId)
   await goalStore.fetchDashboardData(goalId)
   await roadmapStore.fetchMilestones(goalId)
+}
+
+onMounted(async () => {
+  await goalStore.fetchGoals()
+
+  const goalId = route.params.goalId ? Number(route.params.goalId) : goalStore.selectedGoalId
+  if (!goalId) return
+
+  await loadGoalDashboard(goalId)
   await pacemakerStore.fetchPacemakerStatus()
   await pacemakerStore.fetchDepositTargets()
 })
 
-// 라우트에 goalId가 없는 '/dashboard' 진입 시, 첫 번째 목표를 기본으로 보여줌
-async function resolveDefaultGoalId() {
-  const goals = await goalApi.getGoals()
-  return goals[0]?.goalId ?? null
-}
+// 사이드바 로드맵 목록에서 다른 목표를 클릭하면 라우트 파라미터만 바뀌고
+// 같은 페이지 컴포넌트가 재사용되므로(onMounted가 다시 안 불림) 별도로 감시
+watch(
+  () => route.params.goalId,
+  (newGoalId, oldGoalId) => {
+    if (!newGoalId || newGoalId === oldGoalId) return
+    loadGoalDashboard(Number(newGoalId))
+  }
+)
 </script>

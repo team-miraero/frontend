@@ -67,22 +67,32 @@ export const useGoalStore = defineStore('feature-goal', () => {
     linkedAccountIds.value = []
   }
 
+  // 사이드바(로드맵 목록)와 대시보드 페이지가 마운트 시점에 동시에 fetchGoals를 호출하는데
+  // 진행 중인 요청의 Promise를 공유해서 동시 호출자가 모두 같은 완료 시점을 기다리게 한다.
+  let fetchGoalsPromise = null
+
   async function fetchGoals() {
-    if (goals.value.length > 0 || areGoalsLoading.value) return
+    if (goals.value.length > 0) return
+    if (fetchGoalsPromise) return fetchGoalsPromise
 
     areGoalsLoading.value = true
     goalsError.value = null
 
-    try {
-      goals.value = await goalApi.getGoals()
-      if (selectedGoalId.value === null) {
-        selectedGoalId.value = goals.value[0]?.goalId ?? null
+    fetchGoalsPromise = (async () => {
+      try {
+        goals.value = await goalApi.getGoals()
+        if (selectedGoalId.value === null) {
+          selectedGoalId.value = goals.value[0]?.goalId ?? null
+        }
+      } catch (caughtError) {
+        goalsError.value = caughtError
+      } finally {
+        areGoalsLoading.value = false
+        fetchGoalsPromise = null
       }
-    } catch (caughtError) {
-      goalsError.value = caughtError
-    } finally {
-      areGoalsLoading.value = false
-    }
+    })()
+
+    return fetchGoalsPromise
   }
 
   /**
