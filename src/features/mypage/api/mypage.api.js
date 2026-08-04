@@ -1,26 +1,96 @@
-// mypage 도메인 API 함수 골격 (MY-01)
+import { client } from '@/shared/api/client'
 
 /**
  * @typedef {Object} Profile
- * @property {string} id
- * @property {string} name
+ * @property {number} memberId
+ * @property {string} nickname
  * @property {string} email
- * @property {string[]} linkedAccountIds
+ * @property {string} birthDate
+ * @property {string | null} profileImageUrl
+ * @property {string | null} company
+ * @property {number | null} monthlyIncome
+ * @property {boolean} kbpayLinked
  */
 
 /**
  * @returns {Promise<Profile>}
  */
 export async function getProfile() {
-  // TODO: 실제 API 연동 시 client.get('/mypage/profile')로 교체
-  return { id: '', name: '', email: '', linkedAccountIds: [] }
+  const { data } = await client.get('/users/profile')
+  return data
 }
 
 /**
- * @param {{ name?: string }} payload
- * @returns {Promise<Profile>}
+ * @typedef {Object} ProfileImageResponse
+ * @property {string} profileImageUrl
+ * @property {string} updatedAt
  */
-export async function updateProfile(payload) {
-  // TODO: 실제 API 연동 시 client.patch('/mypage/profile', payload)로 교체
-  return { id: '', name: '', email: '', linkedAccountIds: [] }
+
+/**
+ * @param {File} file
+ * @returns {Promise<ProfileImageResponse>}
+ */
+export async function updateProfileImage(file) {
+  const formData = new FormData()
+  formData.append('profileImage', file)
+
+  const { data } = await client.patch('/users/profileImage', formData)
+  return data
+}
+
+/**
+ * @param {{ currentPassword: string, newPassword: string }} payload
+ * @returns {Promise<void>}
+ */
+export async function changePassword(payload) {
+  await client.patch('/users/me/password', payload)
+}
+
+/**
+ * @typedef {Object} MydataConnection
+ * @property {number} connectionId
+ * @property {string} institutionName
+ * @property {string} institutionTypeName
+ * @property {string} agreedAt
+ * @property {string} expiresAt
+ * @property {string | null} lastSyncedAt
+ */
+
+/**
+ * @returns {Promise<MydataConnection[]>}
+ */
+export async function getMydataConnections() {
+  const { data: responseBody } = await client.get('/mydata/connections', {
+    baseURL: getApiOrigin(),
+  })
+  const connections = responseBody?.data?.connections ?? responseBody?.connections
+
+  if (!Array.isArray(connections)) {
+    throw new TypeError('마이데이터 연결 기관 응답 형식이 올바르지 않습니다.')
+  }
+
+  return connections
+}
+
+function getApiOrigin() {
+  const baseURL = client.defaults.baseURL
+  if (!baseURL) return undefined
+
+  const fallbackOrigin = typeof window === 'undefined' ? 'http://localhost' : window.location.origin
+  return new URL(baseURL, fallbackOrigin).origin
+}
+
+/**
+ * @typedef {Object} AccountSyncResponse
+ * @property {number} syncedCount
+ * @property {string} syncedAt
+ * @property {string} message
+ */
+
+/**
+ * @returns {Promise<AccountSyncResponse>}
+ */
+export async function syncAccounts() {
+  const { data } = await client.post('/accounts/sync')
+  return data
 }
