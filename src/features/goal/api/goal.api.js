@@ -258,7 +258,7 @@ export async function getGoals() {
  * @property {number} startAmount
  * @property {number} progressRate
  * @property {{ goalMonths: number, startDate: string, endDate: string, remainMonths: number }} period
- * @property {'ACTIVE' | 'PAUSE' | 'COMPLETED'} status
+ * @property {'ACTIVE' | 'PAUSE' | 'PAUSED' | 'COMPLETED'} status
  * @property {{ expectedAmount: number, differenceAmount: number, paceStatus: 'AHEAD' | 'ON_TRACK' | 'BEHIND' }} pace
  */
 
@@ -341,6 +341,23 @@ export async function getGoalDetail(goalId) {
   return { ...DEFAULT_GOAL_DETAIL, goalId: Number(goalId) || 1 }
 }
 
+/**
+ * @typedef {Object} UpdateGoalPayload
+ * @property {string} goalDate 목표일(YYYY-MM-DD)
+ * @property {number} goalAmount 목표 금액
+ * @property {'ACTIVE' | 'PAUSED'} status 목표 상태
+ */
+
+/**
+ * 목표 금액·목표일·상태를 간단 수정한다.
+ * @param {number} goalId
+ * @param {UpdateGoalPayload} payload
+ * @returns {Promise<{ goalId: number }>}
+ */
+export async function updateGoal(goalId, payload) {
+  const { data } = await client.patch(`/goals/${goalId}`, payload)
+  return data
+}
 /**
  * 자산 연결 API (POST /goals/{goalId}/assets)
  * @param {number} goalId

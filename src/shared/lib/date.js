@@ -13,6 +13,23 @@ export function formatDate(date) {
 }
 
 /**
+ * Date를 "YYYY.MM.DD HH:mm" 형태로 변환한다.
+ * @param {Date | string} date
+ * @returns {string}
+ */
+export function formatDateTime(date) {
+  const d = date instanceof Date ? date : new Date(date)
+  if (Number.isNaN(d.getTime())) return '-'
+
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const hours = String(d.getHours()).padStart(2, '0')
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+  return `${yyyy}.${mm}.${dd} ${hours}:${minutes}`
+}
+
+/**
  * 오늘 기준 목표일까지 남은 개월 수를 계산한다.
  * @param {Date | string} targetDate
  * @returns {number}
