@@ -4,6 +4,17 @@ import mydata from '@/mocks/fixtures/mydata.json'
 
 // TODO: 실제 마이데이터 연동 전까지 사용하는 mock 월 저축 가능 금액
 const MOCK_MONTHLY_SAVING_CAPACITY = 620000
+const MOCK_GOAL_UPDATES = new Map()
+
+function getGoalMonths(goalDate) {
+  if (!goalDate) return 10
+  const target = new Date(goalDate)
+  const today = new Date()
+  return Math.max(
+    1,
+    (target.getFullYear() - today.getFullYear()) * 12 + target.getMonth() - today.getMonth()
+  )
+}
 
 // TODO: 실제 마이데이터 연동 전까지 사용하는 mock 계좌 목록
 const MOCK_ACCOUNTS = [
@@ -142,7 +153,7 @@ export const goalHandlers = [
           goalName: '독립 자금',
           goalType: 'INDEPENDENCE',
           progressRate: 42.0,
-          status: 'ACTIVE',
+          status: MOCK_GOAL_UPDATES.get(1)?.status ?? 'ACTIVE',
         },
         {
           goalId: 2,
@@ -160,6 +171,24 @@ export const goalHandlers = [
         },
       ],
     })
+  }),
+
+  http.patch('*/api/goals/:goalId', async ({ params, request }) => {
+    await delay(350)
+    const goalId = Number(params.goalId)
+    const payload = await request.json()
+
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(payload.goalDate) ||
+      !Number.isFinite(payload.goalAmount) ||
+      payload.goalAmount < 10000 ||
+      !['ACTIVE', 'PAUSED'].includes(payload.status)
+    ) {
+      return HttpResponse.json({ message: '목표 수정 입력값을 확인해주세요.' }, { status: 400 })
+    }
+
+    MOCK_GOAL_UPDATES.set(goalId, payload)
+    return HttpResponse.json({ goalId })
   }),
 
   http.get('*/api/goals/:goalId/linked-assets', async ({ params }) => {
@@ -286,21 +315,22 @@ export const goalHandlers = [
       })
     }
 
+    const override = MOCK_GOAL_UPDATES.get(Number(params.goalId))
     return HttpResponse.json({
       goalId: Number(params.goalId),
       goalType: 'INDEPENDENCE',
       goalName: '독립 자금',
-      goalAmount: 30000000,
+      goalAmount: override?.goalAmount ?? 30000000,
       startAmount: 0,
       currentAmount: 11500000,
       progressRate: 38.0,
       period: {
-        goalMonths: 10,
+        goalMonths: getGoalMonths(override?.goalDate),
         startDate: '2026-06',
-        endDate: '2028-03',
-        remainMonths: 9,
+        endDate: override?.goalDate ?? '2028-03',
+        remainMonths: getGoalMonths(override?.goalDate),
       },
-      status: 'ACTIVE',
+      status: override?.status ?? 'ACTIVE',
       pace: {
         expectedAmount: 10810000,
         differenceAmount: 690000,
@@ -557,8 +587,15 @@ export const goalHandlers = [
 
   http.patch('*/api/goals/:goalId/status', async ({ params, request }) => {
     const { status } = await request.json()
+    if (!['ACTIVE', 'PAUSE'].includes(status)) {
+      return HttpResponse.json({ message: '목표 상태 입력값을 확인해주세요.' }, { status: 400 })
+    }
+
+    const goalId = Number(params.goalId)
+    const currentGoal = MOCK_GOAL_UPDATES.get(goalId) ?? {}
+    MOCK_GOAL_UPDATES.set(goalId, { ...currentGoal, status })
     return HttpResponse.json({
-      goalId: Number(params.goalId),
+      goalId,
       status,
       changedAt: new Date().toISOString().slice(0, 19),
     })
