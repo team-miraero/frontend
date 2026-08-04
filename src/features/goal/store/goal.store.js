@@ -25,6 +25,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
   // 계좌·저금통 연결(GOAL-04) 상태
   const accounts = ref([])
   const areAccountsLoading = ref(false)
+  const accountsError = ref(null)
   // 대시보드 및 로드맵 공통 선택 상태
   const goals = ref([])
   const goalsError = ref(null)
@@ -91,6 +92,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
   async function fetchFeasibility(params) {
     isFeasibilityLoading.value = true
     feasibilityError.value = null
+    feasibility.value = null
     try {
       const response = await goalApi.getFeasibility(params)
       feasibility.value = { ...response, ...resolveFeasibilityStatus(response) }
@@ -117,10 +119,14 @@ export const useGoalStore = defineStore('feature-goal', () => {
    */
   async function fetchAccounts(accountType) {
     areAccountsLoading.value = true
+    accountsError.value = null
     try {
       const response = await goalApi.getAccounts(accountType ? { accountType } : undefined)
       accounts.value = response.accounts
       return response
+    } catch (caughtError) {
+      accountsError.value = caughtError
+      throw caughtError
     } finally {
       areAccountsLoading.value = false
     }
@@ -212,6 +218,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
     recalculatedFeasibility,
     accounts,
     areAccountsLoading,
+    accountsError,
     goals,
     selectedGoal,
     goalsError,

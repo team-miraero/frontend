@@ -79,13 +79,10 @@ export const goalHandlers = [
     return HttpResponse.json({ goalId: Math.floor(Math.random() * 100000) }, { status: 201 })
   }),
 
-  // 실현가능성 조회 API (GOAL-03) — goalAmount/goalMonths/startAmount 쿼리로 계산
-  http.get('*/api/goals/feasibility', async ({ request }) => {
+  // 실현가능성(가능성) 조회 API (GOAL-03) — goalAmount/goalMonths/startAmount 바디로 계산
+  http.post('*/api/goals/possibility', async ({ request }) => {
     await delay(500)
-    const url = new URL(request.url)
-    const goalAmount = Number(url.searchParams.get('goalAmount'))
-    const goalMonths = Number(url.searchParams.get('goalMonths'))
-    const startAmount = Number(url.searchParams.get('startAmount'))
+    const { goalAmount, goalMonths, startAmount } = await request.json()
 
     const requiredMonthly = Math.max(0, Math.round((goalAmount - startAmount) / goalMonths))
     const availableMonthly = MOCK_MONTHLY_SAVING_CAPACITY
@@ -114,7 +111,7 @@ export const goalHandlers = [
   }),
 
   // 저금통 개설 API (GOAL-04)
-  http.post('*/api/money-boxes', async ({ request }) => {
+  http.post('*/api/moneyBoxes', async ({ request }) => {
     await delay(500)
     const payload = await request.json()
 

@@ -58,7 +58,7 @@ export async function createGoal(payload) {
  * @returns {Promise<FeasibilityResponse>}
  */
 export async function getFeasibility(params) {
-  const { data } = await client.get('/goals/feasibility', { params })
+  const { data } = await client.post('/goals/possibility', params)
   return data
 }
 
@@ -92,9 +92,11 @@ export async function getAccounts(params) {
 // 저금통 개설 API (GOAL-04)
 /**
  * @typedef {Object} MoneyBoxPayload
- * @property {'GOAL' | 'AUTO_SAVING'} type
+ * @property {'GOAL' | 'SAVING'} type
  * @property {string} name
- * @property {{ amount: number, transferDay: number, withdrawalAccountId: number }} autoTransfer
+ * @property {number} amount 자동이체 금액
+ * @property {number} transferDay 자동이체 날짜
+ * @property {number} withdrawalAccountId 출금 계좌 ID
  */
 
 /**
@@ -113,7 +115,7 @@ export async function getAccounts(params) {
  * @returns {Promise<MoneyBoxResponse>}
  */
 export async function createMoneyBox(payload) {
-  const { data } = await client.post('/money-boxes', payload)
+  const { data } = await client.post('/moneyBoxes', payload)
   return data
 }
 
