@@ -260,6 +260,54 @@ export const goalHandlers = [
   }),
 
   http.get('*/api/goals/:goalId', async ({ params }) => {
+    if (params.goalId === '2') {
+      return HttpResponse.json({
+        goalId: 2,
+        goalType: 'LOAN',
+        goalName: '학자금 대출 상환',
+        goalAmount: 10000000,
+        startAmount: 0,
+        currentAmount: 4500000,
+        progressRate: 45.0,
+        period: {
+          goalMonths: 8,
+          startDate: '2026-01',
+          endDate: '2026-08',
+          remainMonths: 1,
+        },
+        status: 'ACTIVE',
+        pace: {
+          expectedAmount: 5000000,
+          differenceAmount: 500000,
+          paceStatus: 'BEHIND',
+        },
+      })
+    }
+
+    if (params.goalId === '3') {
+      return HttpResponse.json({
+        goalId: 3,
+        goalType: 'WEDDING',
+        goalName: '결혼 자금',
+        goalAmount: 25000000,
+        startAmount: 0,
+        currentAmount: 5000000,
+        progressRate: 20.0,
+        period: {
+          goalMonths: 18,
+          startDate: '2026-07',
+          endDate: '2027-12',
+          remainMonths: 17,
+        },
+        status: 'ACTIVE',
+        pace: {
+          expectedAmount: 5000000,
+          differenceAmount: 0,
+          paceStatus: 'ON_TRACK',
+        },
+      })
+    }
+
     return HttpResponse.json({
       goalId: Number(params.goalId),
       goalType: 'INDEPENDENCE',
@@ -400,7 +448,93 @@ export const goalHandlers = [
     })
   }),
 
-  http.get('*/api/goals/:goalId/milestones', async () => {
+  http.get('*/api/goals/:goalId/milestones', async ({ params }) => {
+    if (params.goalId === '2') {
+      return HttpResponse.json({
+        milestones: [
+          {
+            milestoneId: 5,
+            order: 1,
+            targetAmount: 2500000,
+            targetDate: '2026-03',
+            title: '대출 1/4 상환 완료',
+            tags: ['원금 감축 시작'],
+            status: 'COMPLETED',
+          },
+          {
+            milestoneId: 6,
+            order: 2,
+            targetAmount: 5000000,
+            targetDate: '2026-05',
+            title: '대출 절반 상환 달성',
+            tags: ['상환 속도 유지'],
+            status: 'IN_PROGRESS',
+          },
+          {
+            milestoneId: 7,
+            order: 3,
+            targetAmount: 7500000,
+            targetDate: '2026-07',
+            title: '대출 3/4 상환 달성',
+            tags: ['완제 임박'],
+            status: 'UPCOMING',
+          },
+          {
+            milestoneId: 8,
+            order: 4,
+            targetAmount: 10000000,
+            targetDate: '2026-08',
+            title: '학자금 대출 완제 🎓',
+            tags: ['부채 청산', '완제'],
+            status: 'UPCOMING',
+          },
+        ],
+      })
+    }
+
+    if (params.goalId === '3') {
+      return HttpResponse.json({
+        milestones: [
+          {
+            milestoneId: 9,
+            order: 1,
+            targetAmount: 6250000,
+            targetDate: '2026-11',
+            title: '예식장 계약금 마련',
+            tags: ['예식장 예약'],
+            status: 'IN_PROGRESS',
+          },
+          {
+            milestoneId: 10,
+            order: 2,
+            targetAmount: 12500000,
+            targetDate: '2027-04',
+            title: '혼수 준비금 확보',
+            tags: ['혼수 준비'],
+            status: 'UPCOMING',
+          },
+          {
+            milestoneId: 11,
+            order: 3,
+            targetAmount: 18750000,
+            targetDate: '2027-09',
+            title: '예단·예물 준비금 마련',
+            tags: ['예단', '예물'],
+            status: 'UPCOMING',
+          },
+          {
+            milestoneId: 12,
+            order: 4,
+            targetAmount: 25000000,
+            targetDate: '2027-12',
+            title: '결혼 자금 2,500만원 완성 💍',
+            tags: ['결혼 준비 완료'],
+            status: 'UPCOMING',
+          },
+        ],
+      })
+    }
+
     return HttpResponse.json({
       milestones: [
         {
