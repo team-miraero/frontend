@@ -53,7 +53,7 @@
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="2.5"
             stroke-linecap="round"
             stroke-linejoin="round"
             class="h-4 w-4"
@@ -69,13 +69,13 @@
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="3.2"
+            stroke-width="2.8"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="h-6 w-6 text-red-500"
+            class="h-5 w-5"
           >
-            <path d="M12 6.5v6" />
-            <path d="M12 16.8h.01" stroke-width="4" />
+            <line x1="12" y1="6" x2="12" y2="12.5" />
+            <circle cx="12" cy="17.5" r="1.5" fill="currentColor" stroke="none" />
           </svg>
         </span>
         <div>
@@ -305,13 +305,13 @@ const STATUS_CLASS = {
     text: 'text-amber-500',
     bar: 'bg-amber-400',
     badgeBg: 'bg-amber-50',
-    iconBg: 'bg-amber-400 text-white',
+    iconBg: 'bg-amber-500 text-white',
   },
   danger: {
     text: 'text-red-500',
     bar: 'bg-red-400',
     badgeBg: 'bg-red-50',
-    iconBg: 'bg-red-100 text-red-500 border-[3.5px] border-red-500 shadow-sm',
+    iconBg: 'bg-red-500 text-white',
   },
 }
 

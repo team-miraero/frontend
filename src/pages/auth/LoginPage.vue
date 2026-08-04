@@ -1,7 +1,7 @@
 <!-- 로그인 페이지 (AUTH-02) -->
 <template>
   <HeroBackground>
-    <AuthHeader />
+    <StepHeader back-label="처음으로" @back="router.push({ name: ROUTE_NAMES.ONBOARDING })" />
 
     <main class="flex justify-center px-4 pb-16 pt-8">
       <div class="w-full max-w-[380px] rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
@@ -78,7 +78,8 @@ import { RouterLink, useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import BaseInput from '@/shared/ui/BaseInput.vue'
 import BaseButton from '@/shared/ui/BaseButton.vue'
-import { AuthHeader, PasswordInput, useAuthFeatureStore } from '@/features/auth'
+import StepHeader from '@/shared/ui/StepHeader.vue'
+import { PasswordInput, useAuthFeatureStore } from '@/features/auth'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import logo from '@/assets/images/logo.png'
 
