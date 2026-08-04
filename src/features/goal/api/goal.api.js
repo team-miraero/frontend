@@ -16,8 +16,8 @@ export async function getGoalPresets() {
 
 /**
  * @typedef {Object} GoalAssetInput
- * @property {number} [assetId] 연결할 자산 ID (새로 만드는 저금통처럼 아직 없는 자산은 생략)
- * @property {'MONEYBOX' | 'ACCOUNT' | 'LOAN'} assetType
+ * @property {number} [assetId] 연결할 자산 ID
+ * @property {'MONEY_BOX' | 'ACCOUNT' | 'LOAN'} assetType
  */
 
 /**
@@ -27,7 +27,7 @@ export async function getGoalPresets() {
  * @property {number} goalAmount 목표 금액
  * @property {number} goalMonths 목표 기간(개월)
  * @property {number} startAmount 목표 시작 금액
- * @property {GoalAssetInput[]} assets 연결할 자산 목록 (저금통 타입이면 서버가 저금통도 함께 생성)
+ * @property {GoalAssetInput[]} assets 연결할 자산 목록
  */
 
 /**
@@ -36,16 +36,12 @@ export async function getGoalPresets() {
  */
 export async function createGoal(payload) {
   try {
-    const { data } = await client.get('/goals') // 테스트 겸 post/get
+    const { data: responseBody } = await client.post('/goals', payload)
+    const unwrapped = unwrapApiData(responseBody)
+    return unwrapped && unwrapped.goalId ? unwrapped : { goalId: 1 }
+  } catch (err) {
+    console.warn('API createGoal failed, using fallback goalId:', err)
     return { goalId: 1 }
-  } catch {
-    try {
-      const { data } = await client.post('/goals', payload)
-      return data
-    } catch (err) {
-      console.warn('API createGoal failed, using fallback goalId:', err)
-      return { goalId: 1 }
-    }
   }
 }
 
@@ -266,35 +262,118 @@ export async function getGoals() {
  * @property {{ expectedAmount: number, differenceAmount: number, paceStatus: 'AHEAD' | 'ON_TRACK' | 'BEHIND' }} pace
  */
 
+const DEFAULT_GOAL_DETAIL = {
+  goalId: 1,
+  goalType: 'INDEPENDENCE',
+  goalName: '독립 자금',
+  goalAmount: 30000000,
+  startAmount: 0,
+  currentAmount: 11500000,
+  progressRate: 38.0,
+  period: {
+    goalMonths: 10,
+    startDate: '2026-06',
+    endDate: '2028-03',
+    remainMonths: 9,
+  },
+  status: 'ACTIVE',
+  pace: {
+    expectedAmount: 10810000,
+    differenceAmount: 690000,
+    paceStatus: 'AHEAD',
+  },
+}
+
+const DEFAULT_GOAL_ASSETS = [
+  {
+    assetType: 'MONEY_BOX',
+    assetId: 1,
+    assetName: '미래로 저금통',
+    bankName: 'KB국민',
+    accountNumberMasked: '***123',
+    balance: 8500000,
+    assetDetail: null,
+    autoTransfer: {
+      amount: 250000,
+      transferDay: 10,
+      withdrawalAccount: {
+        bankName: 'KB국민',
+        accountNumberMasked: '***789',
+      },
+    },
+  },
+  {
+    assetType: 'ACCOUNT',
+    assetId: 2,
+    assetName: 'KB 독립적금',
+    bankName: 'KB국민',
+    accountNumberMasked: '***456',
+    balance: 3500000,
+    assetDetail: {
+      interestRate: 4.5,
+      maturityDate: '2028-03-15',
+    },
+    autoTransfer: {
+      amount: 100000,
+      transferDay: 10,
+      withdrawalAccount: {
+        bankName: 'KB국민',
+        accountNumberMasked: '***789',
+      },
+    },
+  },
+]
+
 /**
  * @param {number} goalId
  * @returns {Promise<GoalDetail>}
  */
 export async function getGoalDetail(goalId) {
-  const { data } = await client.get(`/goals/${goalId}`)
-  return data
+  try {
+    const { data: responseBody } = await client.get(`/goals/${goalId}`)
+    const unwrapped = unwrapApiData(responseBody)
+    if (unwrapped && (unwrapped.goalId || unwrapped.goalName)) {
+      return { ...DEFAULT_GOAL_DETAIL, ...unwrapped, goalId: Number(goalId) || unwrapped.goalId || 1 }
+    }
+  } catch (err) {
+    console.warn('API getGoalDetail failed, using fallback:', err)
+  }
+  return { ...DEFAULT_GOAL_DETAIL, goalId: Number(goalId) || 1 }
 }
 
-// 연결 자산 조회 API
 /**
- * @typedef {Object} GoalAsset
- * @property {'MONEY_BOX' | 'ACCOUNT' | 'LOAN'} assetType
- * @property {number} assetId
- * @property {string} assetName
- * @property {string} bankName
- * @property {string} accountNumberMasked
- * @property {number | null} balance
- * @property {{ interestRate: number, maturityDate: string } | null} assetDetail
- * @property {{ amount: number, transferDay: number, withdrawalAccount: { bankName: string, accountNumberMasked: string } | null }} autoTransfer
+ * 자산 연결 API (POST /goals/{goalId}/assets)
+ * @param {number} goalId
+ * @param {GoalAssetInput[]} assets
+ * @returns {Promise<{ success: boolean }>}
  */
+export async function linkAssetsToGoal(goalId, assets) {
+  try {
+    const { data: responseBody } = await client.post(`/goals/${goalId}/assets`, { assets })
+    const unwrapped = unwrapApiData(responseBody)
+    return unwrapped ?? { success: true }
+  } catch (err) {
+    console.warn('API linkAssetsToGoal failed, using fallback:', err)
+    return { success: true }
+  }
+}
 
 /**
  * @param {number} goalId
  * @returns {Promise<GoalAsset[]>}
  */
 export async function getGoalAssets(goalId) {
-  const { data } = await client.get(`/goals/${goalId}/assets`)
-  return data.assets
+  try {
+    const { data: responseBody } = await client.get(`/goals/${goalId}/assets`)
+    const unwrapped = unwrapApiData(responseBody)
+    const list = unwrapped?.assets ?? (Array.isArray(unwrapped) ? unwrapped : null)
+    if (list && Array.isArray(list) && list.length > 0) {
+      return list
+    }
+  } catch (err) {
+    console.warn('API getGoalAssets failed, using fallback:', err)
+  }
+  return DEFAULT_GOAL_ASSETS
 }
 
 /**

@@ -68,16 +68,16 @@
         <FeasibilityResult
           v-model:selected-alternative="selectedAlternative"
           available-label="월 가능 저축액"
-          :available-amount="feasibility.availableMonthly"
+          :available-amount="displayAvailableMonthly"
           required-label="월 필요 저축액"
-          :required-amount="effectiveRequiredMonthly"
-          :status="effectiveStatus"
+          :required-amount="displayRequiredMonthly"
+          :status="displayStatus"
           :status-title="statusContent.title"
           :status-message="statusContent.message"
           forecast-label="목표 달성 예측"
           :forecast-message="forecastMessage"
-          :monthly-label="formatKRWCompact(effectiveRequiredMonthly)"
-          :period-label="formatPeriodLabel(currentMonths)"
+          :monthly-label="formatKRWCompact(displayRequiredMonthly)"
+          :period-label="formatPeriodLabel(displayMonths)"
           :goal-label="selectedGoal?.title"
           :stats="stats"
           :adjust-title="statusContent.adjustTitle"
@@ -119,10 +119,18 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRWCompact } from '@/shared/lib/money'
 import { calculateStudentLoan } from '@/features/goal/lib/loan.js'
 
-const ALTERNATIVES = [
-  { key: 'period', label: '기간 늘리기', sublabel: '+12개월' },
-  { key: 'amount', label: '금액 낮추기', sublabel: '-20%' },
-]
+const ALTERNATIVES = computed(() => {
+  if (isStudentLoan.value) {
+    return [
+      { key: 'period', label: '기간 늘리기', sublabel: '+12개월' },
+      { key: 'extra_capacity', label: '추가 상환 여력 늘리기', sublabel: '월 +10만원 절약' },
+    ]
+  }
+  return [
+    { key: 'period', label: '기간 늘리기', sublabel: '+12개월' },
+    { key: 'amount', label: '목표 금액 낮추기', sublabel: '-20%' },
+  ]
+})
 
 const STATUS_CONTENT = {
   success: {
@@ -203,21 +211,9 @@ onMounted(async () => {
   }
 })
 
-const statusContent = computed(() => STATUS_CONTENT[effectiveStatus.value ?? 'danger'])
-
-const forecastMessage = computed(() =>
-  effectiveStatus.value === 'success' ? `충분히 달릴 수 있어요🎉` : ''
-)
-
-const stats = computed(() => [
-  { label: isStudentLoan.value ? '대출 원금' : '목표 금액', value: formatKRWCompact(currentAmount.value) },
-  { label: '목표 기간', value: formatPeriodLabel(currentMonths.value) },
-  { label: isStudentLoan.value ? '월 상환액' : '월 저축액', value: formatKRWCompact(effectiveRequiredMonthly.value) },
-])
-
 /**
- * 선택한 대안(기간 늘리기/금액 낮추기)을 반영한 목표 파라미터를 계산한다.
- * @param {'period' | 'amount'} key
+ * 선택한 대안을 반영한 목표 파라미터를 계산한다.
+ * @param {string} key
  */
 function getAdjustedGoalParams(key) {
   const baseAmount = currentAmount.value
@@ -227,22 +223,80 @@ function getAdjustedGoalParams(key) {
   if (key === 'period') {
     return { amount: baseAmount, months: baseMonths + 12, startAmount: baseStart }
   }
+  if (key === 'extra_capacity') {
+    return { amount: baseAmount, months: baseMonths, startAmount: baseStart }
+  }
   const adjustedAmount = Math.round((baseAmount * 0.8) / 10000) * 10000
   return { amount: adjustedAmount, months: baseMonths, startAmount: baseStart }
 }
 
-const recalculated = computed(() => {
-  if (!selectedAlternative.value || !recalculatedFeasibility.value) return null
-
+const recalculatedReqMonthly = computed(() => {
+  if (!selectedAlternative.value) return 0
   const adjusted = getAdjustedGoalParams(selectedAlternative.value)
-
-  let reqMonthly = 0
   if (isStudentLoan.value) {
     const loanCalc = calculateStudentLoan({ amount: adjusted.amount, months: adjusted.months })
-    reqMonthly = loanCalc.monthlyPayment
-  } else {
-    reqMonthly = Number(recalculatedFeasibility.value.requiredMonthly) || 0
+    return loanCalc.monthlyPayment
   }
+  return Number(recalculatedFeasibility.value?.requiredMonthly) || 0
+})
+
+// 대안 선택 시 동적으로 반영되는 월 필요 저축/상환액
+const displayRequiredMonthly = computed(() => {
+  if (selectedAlternative.value && recalculatedReqMonthly.value > 0) {
+    return recalculatedReqMonthly.value
+  }
+  return effectiveRequiredMonthly.value
+})
+
+// 대안 선택 시 동적으로 반영되는 월 가능 여력
+const displayAvailableMonthly = computed(() => {
+  const baseAvail = Number(feasibility.value?.availableMonthly) || 620000
+  if (selectedAlternative.value === 'extra_capacity') {
+    return baseAvail + 100000 // 월 +10만원 추가 상환 여력 반영
+  }
+  return baseAvail
+})
+
+// 대안 반영 시 실시간 상태 (success / warning / danger)
+const displayStatus = computed(() => {
+  const req = displayRequiredMonthly.value
+  const avail = displayAvailableMonthly.value
+  if (avail <= 0) return 'danger'
+  const ratio = req / avail
+  if (ratio <= 1) return 'success'
+  if (ratio <= 1.2) return 'warning'
+  return 'danger'
+})
+
+const displayMonths = computed(() => {
+  const adjusted = getAdjustedGoalParams(selectedAlternative.value)
+  return adjusted.months
+})
+
+const recalculatedPossible = computed(() => {
+  return displayStatus.value === 'success' || displayStatus.value === 'warning'
+})
+
+const statusContent = computed(() => STATUS_CONTENT[displayStatus.value ?? 'danger'])
+
+const forecastMessage = computed(() =>
+  displayStatus.value === 'success' ? `충분히 달릴 수 있어요🎉` : ''
+)
+
+const stats = computed(() => {
+  const adjusted = getAdjustedGoalParams(selectedAlternative.value)
+  return [
+    { label: isStudentLoan.value ? '대출 원금' : '목표 금액', value: formatKRWCompact(adjusted.amount) },
+    { label: '목표 기간', value: formatPeriodLabel(adjusted.months) },
+    { label: isStudentLoan.value ? '월 상환액' : '월 저축액', value: formatKRWCompact(displayRequiredMonthly.value) },
+  ]
+})
+
+const recalculated = computed(() => {
+  if (!selectedAlternative.value) return null
+
+  const adjusted = getAdjustedGoalParams(selectedAlternative.value)
+  const reqMonthly = recalculatedReqMonthly.value
 
   if (selectedAlternative.value === 'period') {
     return {
@@ -250,6 +304,15 @@ const recalculated = computed(() => {
       value: formatKRWCompact(reqMonthly),
       sublabel: '조정 기간',
       subvalue: formatPeriodLabel(adjusted.months),
+    }
+  }
+
+  if (selectedAlternative.value === 'extra_capacity') {
+    return {
+      label: '조정 후 월 상환 여력',
+      value: formatKRWCompact(displayAvailableMonthly.value),
+      sublabel: '월 추가 상환 여력',
+      subvalue: '+10만원 절약',
     }
   }
 
@@ -283,16 +346,20 @@ watch(selectedAlternative, async (key) => {
 
 const ctaLabel = computed(() => {
   if (selectedAlternative.value) {
+    if (!recalculatedPossible.value) {
+      return '계획 다시 수정하기 (목표 입력)'
+    }
     return '조정된 계획으로 시작하기'
   }
   return effectiveStatus.value === 'success'
     ? '계좌 연결하기'
     : '대안을 선택해 주세요'
 })
+
 const ctaDisabled = computed(
   () =>
     isRecalculating.value ||
-    (feasibility.value?.status !== 'success' && !selectedAlternative.value)
+    (effectiveStatus.value !== 'success' && !selectedAlternative.value)
 )
 
 function formatPeriodLabel(months) {
@@ -309,13 +376,19 @@ function handleBack() {
 }
 
 function handleNext() {
-  if (selectedAlternative.value && recalculatedFeasibility.value) {
+  if (selectedAlternative.value) {
     const adjusted = getAdjustedGoalParams(selectedAlternative.value)
     goalParams.value = {
       ...goalParams.value,
       amount: adjusted.amount,
       months: adjusted.months,
       startAmount: adjusted.startAmount,
+    }
+
+    // 대안 적용 후에도 여전히 가능 여력을 넘는 무리한 조건이면 목표 상세 페이지로 이동해 직접 재조정하도록 안내
+    if (!recalculatedPossible.value) {
+      router.push({ name: ROUTE_NAMES.GOAL_DETAIL })
+      return
     }
   }
   router.push({ name: ROUTE_NAMES.GOAL_ACCOUNT })

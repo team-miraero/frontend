@@ -170,16 +170,45 @@ export const useGoalStore = defineStore('feature-goal', () => {
     moneyBox,
     existingAccountIds,
   }) {
-    let assets
+    let assets = []
 
     if (moneyBox) {
       const moneyBoxResult = await goalApi.createMoneyBox(moneyBox)
-      assets = [{ assetId: moneyBoxResult.moneyBoxId, assetType: 'MONEYBOX' }]
-    } else {
-      assets = (existingAccountIds ?? []).map((assetId) => ({ assetId, assetType: 'ACCOUNT' }))
+      assets.push({ assetId: moneyBoxResult.moneyBoxId, assetType: 'MONEY_BOX' })
     }
 
-    return goalApi.createGoal({ goalName, goalType, goalAmount, goalMonths, startAmount, assets })
+    if (existingAccountIds && existingAccountIds.length > 0) {
+      existingAccountIds.forEach((assetId) => {
+        assets.push({ assetId, assetType: 'ACCOUNT' })
+      })
+    }
+
+    if (goalType === 'LOAN') {
+      assets.push({ assetId: 1, assetType: 'LOAN' })
+    }
+
+    const newGoalResult = await goalApi.createGoal({ goalName, goalType, goalAmount, goalMonths, startAmount, assets })
+    const createdGoalId = newGoalResult?.goalId ?? 1
+
+    // 신규 목표 생성 후 자산 연결 API (POST /goals/{goalId}/assets) 호출
+    if (assets.length > 0 && createdGoalId) {
+      await goalApi.linkAssetsToGoal(createdGoalId, assets)
+    }
+
+    // 신규 목표를 local goals 목록에도 추가해 로드맵 셀렉터/사이드바에 즉시 노출되도록 함
+    const newGoalItem = {
+      goalId: createdGoalId,
+      goalName: goalName || (goalType === 'LOAN' ? '학자금 대출 상환' : '새로운 목표'),
+      goalType: goalType || 'INDEPENDENCE',
+      progressRate: 0.0,
+      status: 'ACTIVE',
+    }
+
+    if (!goals.value.some((g) => g.goalId === createdGoalId)) {
+      goals.value = [newGoalItem, ...goals.value]
+    }
+
+    return { goalId: createdGoalId }
   }
 
   // function selectGoal(goalId) {

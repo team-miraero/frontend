@@ -431,11 +431,10 @@ async function handleSubmit() {
     } else {
       router.push({ name: ROUTE_NAMES.DASHBOARD })
     }
-  } catch (err) {
-    console.error('Failed to submit goal creation:', err)
-    router.push({ name: ROUTE_NAMES.DASHBOARD })
   } catch (error) {
+    console.error('Failed to submit goal creation:', error)
     submitError.value = '목표 생성에 실패했어요. 잠시 후 다시 시도해 주세요.'
+    router.push({ name: ROUTE_NAMES.DASHBOARD })
   } finally {
     isSubmitting.value = false
   }
