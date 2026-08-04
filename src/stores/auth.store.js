@@ -44,5 +44,13 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem(STORAGE_KEY)
   }
 
-  return { accessToken, user, login, logout }
+  /**
+   * @param {Partial<AuthUser>} payload
+   */
+  function updateUser(payload) {
+    if (!user.value) return
+    user.value = { ...user.value, ...payload }
+  }
+
+  return { accessToken, user, login, logout, updateUser }
 })

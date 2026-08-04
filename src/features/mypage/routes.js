@@ -6,5 +6,6 @@ export const mypageRoutes = [
     path: '/mypage',
     name: ROUTE_NAMES.MYPAGE,
     component: () => import('@/pages/mypage/MyPage.vue'),
+    meta: { hideHeader: true },
   },
 ]
