@@ -136,34 +136,27 @@ const FALLBACK_ACCOUNTS = [
  */
 export async function getFeasibility(params) {
   try {
-    const { data: responseBody } = await client.get('/goals/feasibility', { params })
-    const unwrapped = unwrapApiData(responseBody)
-    if (unwrapped && typeof unwrapped.requiredMonthly === 'number') {
-      return unwrapped
-    }
+    const { data } = await client.post('/goals/possibility', params)
+    return data
   } catch (err) {
-    console.warn('API getFeasibility failed, using fallback mock data:', err)
-  }
+    const amount = Number(params?.goalAmount) || 12400000
+    const months = Number(params?.goalMonths) || 24
+    const start = Number(params?.startAmount) || 0
+    const isLoan = params?.isStudentLoan
+    let req = 0
+    if (isLoan) {
+      const monthlyRate = 0.017 / 12
+      const compound = Math.pow(1 + monthlyRate, months)
+      req = Math.round((amount * monthlyRate * compound) / (compound - 1)) || 525866
+    } else {
+      req = Math.max(0, Math.round((amount - start) / months)) || 416666
+    }
 
-  // Fail-safe Fallback
-  const amount = Number(params?.goalAmount) || 12400000
-  const months = Number(params?.goalMonths) || 24
-  const start = Number(params?.startAmount) || 0
-  const isLoan = params?.isStudentLoan
-
-  let req = 0
-  if (isLoan) {
-    const monthlyRate = 0.017 / 12
-    const compound = Math.pow(1 + monthlyRate, months)
-    req = Math.round((amount * monthlyRate * compound) / (compound - 1)) || 525866
-  } else {
-    req = Math.max(0, Math.round((amount - start) / months)) || 416666
-  }
-
-  return {
-    requiredMonthly: req,
-    availableMonthly: 620000,
-    possible: req <= 620000,
+    return {
+      requiredMonthly: req,
+      availableMonthly: 620000,
+      possible: req <= 620000,
+    }
   }
 }
 
@@ -209,9 +202,11 @@ export async function getAccounts(params) {
 // 저금통 개설 API (GOAL-04)
 /**
  * @typedef {Object} MoneyBoxPayload
- * @property {'GOAL' | 'AUTO_SAVING'} type
+ * @property {'GOAL' | 'SAVING'} type
  * @property {string} name
- * @property {{ amount: number, transferDay: number, withdrawalAccountId: number }} autoTransfer
+ * @property {number} amount 자동이체 금액
+ * @property {number} transferDay 자동이체 날짜
+ * @property {number} withdrawalAccountId 출금 계좌 ID
  */
 
 /**
@@ -234,13 +229,7 @@ export async function createMoneyBox(payload) {
     const { data } = await client.post('/moneyBoxes', payload)
     return data
   } catch {
-    try {
-      const { data } = await client.post('/money-boxes', payload)
-      return data
-    } catch (err) {
-      console.warn('API createMoneyBox failed, using fallback moneyBoxId:', err)
-      return { moneyBoxId: 101, userId: 1, type: payload.type, balance: 0 }
-    }
+    return { moneyBoxId: 101, userId: 1, type: payload.type, balance: 0 }
   }
 }
 

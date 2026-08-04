@@ -1,11 +1,7 @@
 <template>
   <HeroBackground>
     <!-- Header -->
-    <header
-      class="sticky top-0 z-20 mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 py-6 backdrop-blur-md md:px-8 lg:px-[80px]"
-    >
-      <BrandHeader />
-
+    <StepHeader :show-back="false">
       <nav class="flex items-center gap-3 md:gap-6">
         <a href="#service-intro" class="hidden text-sm text-gray-700 sm:inline">서비스 소개</a>
         <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }" class="text-sm text-gray-700">
@@ -15,7 +11,7 @@
           <BaseButton @click="navigate">시작하기</BaseButton>
         </RouterLink>
       </nav>
-    </header>
+    </StepHeader>
 
     <!-- Hero 애니메이션 섹션 -->
     <HeroSection />
@@ -47,7 +43,7 @@
 
 <script setup>
 import { RouterLink } from 'vue-router'
-import BrandHeader from '@/shared/ui/BrandHeader.vue'
+import StepHeader from '@/shared/ui/StepHeader.vue'
 import BaseButton from '@/shared/ui/BaseButton.vue'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
