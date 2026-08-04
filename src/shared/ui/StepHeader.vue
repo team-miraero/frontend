@@ -12,15 +12,17 @@
       class="mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 md:px-8 lg:px-[80px]"
     >
       <BrandHeader />
-      <button
-        v-if="showBack"
-        type="button"
-        class="flex items-center gap-1 text-sm text-gray-500 transition-colors hover:text-gray-900"
-        @click="emit('back')"
-      >
-        <span aria-hidden="true">‹</span>
-        <span>{{ backLabel }}</span>
-      </button>
+      <slot>
+        <button
+          v-if="showBack"
+          type="button"
+          class="flex items-center gap-1 text-sm text-gray-500 transition-colors hover:text-gray-900"
+          @click="emit('back')"
+        >
+          <span aria-hidden="true">‹</span>
+          <span>{{ backLabel }}</span>
+        </button>
+      </slot>
     </div>
   </header>
 </template>

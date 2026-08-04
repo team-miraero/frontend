@@ -1,7 +1,7 @@
 <!-- 회원가입 페이지 (AUTH-01) -->
 <template>
   <HeroBackground>
-    <AuthHeader back-label="로그인으로" :back-to="ROUTE_NAMES.LOGIN" />
+    <StepHeader back-label="로그인으로" @back="router.push({ name: ROUTE_NAMES.LOGIN })" />
 
     <main class="flex justify-center px-4 pb-16 pt-8">
       <div class="w-full max-w-[380px]">
@@ -113,7 +113,8 @@ import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import BaseInput from '@/shared/ui/BaseInput.vue'
 import BaseButton from '@/shared/ui/BaseButton.vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
-import { AuthHeader, PasswordInput, TermsAgreement, useAuthFeatureStore } from '@/features/auth'
+import StepHeader from '@/shared/ui/StepHeader.vue'
+import { PasswordInput, TermsAgreement, useAuthFeatureStore } from '@/features/auth'
 import { SIGNUP_TERMS } from '@/features/auth/constants/auth.constants'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import logo from '@/assets/images/logo.png'

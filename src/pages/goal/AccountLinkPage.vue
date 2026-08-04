@@ -1,25 +1,56 @@
 <!-- 계좌·저금통 연결 페이지 (GOAL-04) -->
 <template>
   <HeroBackground class="font-['Noto_Sans_KR',sans-serif]">
-    <div
-      class="sticky top-0 z-20 mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 py-6 backdrop-blur-md md:px-8 lg:px-[80px]"
-    >
-      <BrandHeader />
-      <button
-        type="button"
-        class="flex items-center gap-1 py-3 text-sm text-gray-500 transition-colors hover:text-gray-900"
-        @click="handleBack"
-      >
-        <span aria-hidden="true">‹</span>
-        <span>이전</span>
-      </button>
-    </div>
+    <StepHeader @back="handleBack" />
 
     <div class="relative z-10 mx-auto w-full max-w-[650px] animate-fade-in-up px-4 pb-40 pt-2">
       <span
-        class="inline-flex items-center gap-1 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
+        v-if="selectedGoal"
+        class="inline-flex items-center gap-1.5 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
       >
-        {{ selectedGoal?.title }}
+        <svg
+          v-if="selectedGoalId === 'INDEPENDENCE'"
+          class="h-3.5 w-3.5 text-primary"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <svg
+          v-else-if="selectedGoalId === 'EMERGENCY'"
+          class="h-3.5 w-3.5 text-primary"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <svg
+          v-else-if="selectedGoalId === 'MARRIAGE'"
+          class="h-3.5 w-3.5 text-primary"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+        <svg
+          v-else-if="selectedGoalId === 'STUDENT_LOAN'"
+          class="h-3.5 w-3.5 text-primary"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14v6.5" />
+        </svg>
+        <span>{{ selectedGoal?.title }}</span>
       </span>
 
       <h1 class="mt-4 text-[30px] font-bold leading-tight text-gray-900">
@@ -30,6 +61,24 @@
       </p>
 
       <LoadingSpinner v-if="areAccountsLoading" message="연결 가능한 계좌를 불러오고 있어요" />
+
+      <div
+        v-else-if="accountsError"
+        class="mt-6 flex min-h-[300px] flex-col items-center justify-center rounded-[18px] border border-gray-200 bg-white px-6 text-center"
+      >
+        <div class="flex size-11 items-center justify-center rounded-full bg-red-50 text-red-500">
+          !
+        </div>
+        <p class="mt-3 text-[15px] font-black text-gray-900">계좌 정보를 불러오지 못했어요</p>
+        <p class="mt-1 text-[13px] text-gray-400">잠시 후 다시 시도해 주세요.</p>
+        <button
+          type="button"
+          class="mt-4 rounded-xl bg-primary px-5 py-2.5 text-[13px] font-bold text-white"
+          @click="loadAccounts"
+        >
+          다시 시도
+        </button>
+      </div>
 
       <template v-else>
       <div class="mt-6 space-y-3">
@@ -93,11 +142,11 @@
               <div class="mt-1.5 flex items-center rounded-xl border border-gray-200 px-4 py-3">
                 <input
                   id="transfer-amount"
-                  v-model.number="transferAmount"
-                  type="number"
-                  min="0"
-                  step="10000"
+                  type="text"
+                  inputmode="numeric"
+                  :value="formattedTransferAmount"
                   class="w-full bg-transparent text-lg font-bold text-gray-900 outline-none"
+                  @input="handleTransferAmountInput"
                 />
                 <span class="shrink-0 text-sm text-gray-400">원</span>
               </div>
@@ -239,8 +288,11 @@
       </template>
     </div>
 
+    <p v-if="submitError" class="mx-auto w-full max-w-[650px] px-4 text-center text-xs text-red-500">
+      {{ submitError }}
+    </p>
     <BottomCTA
-      v-if="!areAccountsLoading"
+      v-if="!areAccountsLoading && !accountsError"
       :label="ctaLabel"
       :disabled="ctaDisabled"
       @click="handleSubmit"
@@ -253,7 +305,7 @@ import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
-import BrandHeader from '@/shared/ui/BrandHeader.vue'
+import StepHeader from '@/shared/ui/StepHeader.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
 import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import AccountOptionCard from '@/shared/ui/AccountOptionCard.vue'
@@ -262,7 +314,7 @@ import { useGoalStore } from '@/features/goal'
 import { GOAL_PRESETS } from '@/features/goal/constants/goal.constants.js'
 import { GOAL_API_TYPE_BY_PRESET_ID } from '@/features/goal/constants/goalApiType.js'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import { formatKRWCompact } from '@/shared/lib/money'
+import { formatKoreanNumber, formatKRWCompact } from '@/shared/lib/money'
 
 const TRANSFER_DAYS = [5, 10, 15, 20, 25]
 
@@ -271,7 +323,7 @@ const OTHER_ACTIVE_GOAL = { label: '비상금 목돈', monthlyAmount: 200000 }
 
 const router = useRouter()
 const goalStore = useGoalStore()
-const { selectedGoalId, goalParams, feasibility, accounts, areAccountsLoading } =
+const { selectedGoalId, goalParams, feasibility, accounts, areAccountsLoading, accountsError } =
   storeToRefs(goalStore)
 
 const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === selectedGoalId.value))
@@ -279,6 +331,13 @@ const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === 
 const mode = ref('moneybox')
 const transferAmount = ref(0)
 const transferDay = ref(10)
+
+const formattedTransferAmount = computed(() => formatKoreanNumber(transferAmount.value))
+
+function handleTransferAmountInput(event) {
+  const digitsOnly = event.target.value.replace(/[^0-9]/g, '')
+  transferAmount.value = digitsOnly ? Number(digitsOnly) : 0
+}
 const selectedWithdrawalAccountId = ref(null)
 const selectedExistingAccountIds = ref([])
 
@@ -298,6 +357,20 @@ function toggleExistingAccount(accountId) {
     : [...selectedExistingAccountIds.value, accountId]
 }
 
+async function loadAccounts() {
+  try {
+    const { accounts: fetchedAccounts } = await goalStore.fetchAccounts()
+    selectedWithdrawalAccountId.value =
+      fetchedAccounts.find((account) => account.accountType === 'CHECKING')?.accountId ?? null
+    const firstSavingAccountId = fetchedAccounts.find(
+      (account) => account.accountType !== 'CHECKING'
+    )?.accountId
+    selectedExistingAccountIds.value = firstSavingAccountId ? [firstSavingAccountId] : []
+  } catch {
+    // accountsError는 store에서 세팅됨. 화면은 아래 재시도 블록으로 안내.
+  }
+}
+
 onMounted(async () => {
   if (!goalParams.value) {
     router.replace({ name: ROUTE_NAMES.GOAL_DETAIL })
@@ -306,16 +379,11 @@ onMounted(async () => {
 
   transferAmount.value = feasibility.value?.requiredMonthly ?? 0
 
-  const { accounts: fetchedAccounts } = await goalStore.fetchAccounts()
-  selectedWithdrawalAccountId.value =
-    fetchedAccounts.find((account) => account.accountType === 'CHECKING')?.accountId ?? null
-  const firstSavingAccountId = fetchedAccounts.find(
-    (account) => account.accountType !== 'CHECKING'
-  )?.accountId
-  selectedExistingAccountIds.value = firstSavingAccountId ? [firstSavingAccountId] : []
+  await loadAccounts()
 })
 
 const isSubmitting = ref(false)
+const submitError = ref('')
 
 const ctaLabel = computed(() => {
   if (isSubmitting.value) return '만드는 중...'
@@ -324,7 +392,7 @@ const ctaLabel = computed(() => {
 const ctaDisabled = computed(() => {
   if (isSubmitting.value) return true
   return mode.value === 'moneybox'
-    ? !selectedWithdrawalAccountId.value || !transferAmount.value
+    ? !selectedWithdrawalAccountId.value || !transferAmount.value || transferAmount.value <= 0
     : selectedExistingAccountIds.value.length === 0
 })
 
@@ -334,6 +402,7 @@ function handleBack() {
 
 async function handleSubmit() {
   isSubmitting.value = true
+  submitError.value = ''
   try {
     await goalStore.submitGoalCreation({
       goalName: selectedGoal.value?.title,
@@ -346,17 +415,17 @@ async function handleSubmit() {
           ? {
               type: 'GOAL',
               name: `${selectedGoal.value?.title ?? '목표'} 저금통`,
-              autoTransfer: {
-                amount: transferAmount.value,
-                transferDay: transferDay.value,
-                withdrawalAccountId: selectedWithdrawalAccountId.value,
-              },
+              amount: transferAmount.value,
+              transferDay: transferDay.value,
+              withdrawalAccountId: selectedWithdrawalAccountId.value,
             }
           : null,
       existingAccountIds: mode.value === 'account' ? selectedExistingAccountIds.value : [],
     })
 
     router.push({ name: ROUTE_NAMES.DASHBOARD })
+  } catch (error) {
+    submitError.value = '목표 생성에 실패했어요. 잠시 후 다시 시도해 주세요.'
   } finally {
     isSubmitting.value = false
   }
