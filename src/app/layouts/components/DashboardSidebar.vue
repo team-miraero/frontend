@@ -204,7 +204,8 @@ const goalStore = useGoalStore()
 const userName = computed(() => authStore.user?.name ?? '')
 const userInitial = computed(() => userName.value.charAt(0))
 
-const isActive = (routeName) => route.name === routeName
+const isActive = (routeName) =>
+  route.name === routeName || route.meta.navRouteName === routeName
 
 const isRoadmapListExpanded = ref(true)
 
