@@ -7,4 +7,13 @@ export const pacemakerRoutes = [
     name: ROUTE_NAMES.PACEMAKER,
     component: () => import('@/pages/pacemaker/PacemakerPage.vue'),
   },
+  {
+    path: '/pacemaker/setup',
+    name: ROUTE_NAMES.PACEMAKER_SETUP,
+    component: () => import('@/pages/pacemaker/PacemakerSetupPage.vue'),
+    meta: {
+      navRouteName: ROUTE_NAMES.PACEMAKER,
+      pageTitle: '페이스메이커 설정',
+    },
+  },
 ]

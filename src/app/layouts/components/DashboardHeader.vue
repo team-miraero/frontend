@@ -65,7 +65,7 @@ const userName = computed(() => authStore.user?.name ?? '')
 const userInitial = computed(() => userName.value.charAt(0))
 
 const pageTitle = computed(
-  () => NAV_ITEMS.find((item) => item.routeName === route.name)?.pageTitle ?? ''
+  () => NAV_ITEMS.find((item) => item.routeName === route.name)?.pageTitle ?? route.meta.pageTitle ?? ''
 )
 
 // TODO: goal.sotre에 목표 title 전용 필드가 생기면 selectedGoalType 대신 그 필드로 교체

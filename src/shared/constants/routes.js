@@ -15,6 +15,7 @@ export const ROUTE_NAMES = {
   DASHBOARD_GOAL: 'dashboard-goal',
   COLLECTION: 'collection',
   PACEMAKER: 'pacemaker',
+  PACEMAKER_SETUP: 'pacemaker-setup',
   SPENDING: 'spending',
   PRODUCTS: 'products',
   COACH: 'coach',
