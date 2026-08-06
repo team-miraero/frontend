@@ -39,7 +39,7 @@
       <p class="text-[9px] leading-[13.5px] text-slate-500">오늘 하루 여유자금을 자동 저축</p>
       <div class="rounded-[10px] bg-[#eaf2ff] px-3 py-2">
         <p class="text-[11px] font-bold text-primary">
-          이번 달 {{ pacemaker.monthlySuccessCount ?? 0 }}회 자동 저축 성공
+          이번달 +{{ formatWon(pacemaker.monthlySecuredAmount) }} 자동 확보
         </p>
       </div>
     </template>
@@ -111,7 +111,7 @@ import { computed } from 'vue'
 const props = defineProps({
   pacemaker: {
     type: Object,
-    default: null, // { autoSavingId, registered, status, enabled, monthlySuccessCount }
+    default: null, // { autoSavingId, registered, status, enabled, monthlySecuredAmount }
   },
 })
 defineEmits(['toggle'])
@@ -140,7 +140,11 @@ const cardStyle = computed(() => {
 
 // 모바일 축약형: 설명 문단 대신 상태별 한 줄 요약만 노출
 const mobileStatusText = computed(() => {
-  if (isOn.value) return `이번 달 ${props.pacemaker.monthlySuccessCount ?? 0}회 성공`
+  if (isOn.value) return `이번달 +${formatWon(props.pacemaker.monthlySecuredAmount)} 확보`
   return isRegistered.value ? '지금은 OFF 상태예요' : '개설 후 이용할 수 있어요'
 })
+
+function formatWon(amount) {
+  return `${amount.toLocaleString()}원`
+}
 </script>
