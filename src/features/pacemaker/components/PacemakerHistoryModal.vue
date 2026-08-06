@@ -58,7 +58,8 @@ defineProps({
 defineEmits(['update:modelValue'])
 
 function describeHistory(item) {
-  return item.status === 'SAVED' ? '여유자금 자동 저축' : `${item.reason} — 저축 건너뜀`
+  if (item.description) return item.description
+  return item.status === 'SAVED' ? '여유자금 자동 저축' : '저축 건너뜀'
 }
 
 function formatDate(isoDate) {
@@ -66,6 +67,6 @@ function formatDate(isoDate) {
 }
 
 function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
+  return `${(amount ?? 0).toLocaleString()}원`
 }
 </script>

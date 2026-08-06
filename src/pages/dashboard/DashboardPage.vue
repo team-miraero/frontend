@@ -17,7 +17,7 @@
             <GoalSummaryCard :goal="goalStore.currentGoal" />
             <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
             <PacemakerToggleCard
-              :pacemaker="pacemakerStore.pacemakerStatus"
+              :pacemaker="pacemakerStore.pacemakerView"
               @toggle="handlePacemakerToggle"
             />
           </div>
@@ -67,7 +67,7 @@
               <p class="invisible text-sm font-bold">여유자금</p>
               <div class="mt-2">
                 <PacemakerToggleCard
-                  :pacemaker="pacemakerStore.pacemakerStatus"
+                  :pacemaker="pacemakerStore.pacemakerView"
                   @toggle="handlePacemakerToggle"
                 />
               </div>
@@ -92,7 +92,7 @@
     <PacemakerSetupModal v-model="isPacemakerModalOpen" />
     <PacemakerBalanceModal
       v-model="isPacemakerBalanceModalOpen"
-      :pacemaker="pacemakerStore.pacemakerStatus ?? {}"
+      :pacemaker="pacemakerStore.pacemakerView"
       :deposit-targets="pacemakerStore.depositTargets"
       @toggle-auto-saving="pacemakerStore.togglePacemaker"
       @deposit="handleOpenDeposit"
@@ -101,7 +101,7 @@
     <PacemakerDepositModal
       v-model="isPacemakerDepositModalOpen"
       :target="selectedDepositTarget"
-      :available-balance="pacemakerStore.pacemakerStatus?.balance ?? 0"
+      :available-balance="pacemakerStore.pacemakerView.moneyBoxBalance"
       @deposit="handleDeposit"
     />
     <PacemakerHistoryModal
@@ -256,6 +256,9 @@ onMounted(async () => {
 
   await loadGoalDashboard(goalId)
   await pacemakerStore.fetchPacemakerStatus()
+  if (pacemakerStore.pacemakerStatus?.registered) {
+    await pacemakerStore.fetchPacemakerDashboard()
+  }
   await pacemakerStore.fetchDepositTargets()
 })
 

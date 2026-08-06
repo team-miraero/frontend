@@ -23,17 +23,19 @@
     <div class="flex flex-col gap-4 px-7 py-5">
       <div
         class="relative overflow-hidden rounded-2xl px-5 py-4 shadow-[0_8px_24px_rgba(0,102,255,0.22)]"
-        style="background-image: linear-gradient(163deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%)"
+        style="
+          background-image: linear-gradient(163deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%);
+        "
       >
         <span class="absolute -right-6 -top-7 size-24 rounded-full bg-white/10" />
         <p class="relative text-xs font-bold text-white/80">페이스메이커 저금통 잔액</p>
         <p class="relative pt-1 text-[28px] font-black tracking-[-0.84px] text-white">
-          {{ formatNumber(pacemaker.balance) }}<span class="text-base"> 원</span>
+          {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="text-base"> 원</span>
         </p>
         <div class="relative flex items-center gap-2 pt-2 text-xs text-white/70">
-          <span>오늘 +{{ formatNumber(pacemaker.todayEarned) }}원</span>
+          <span>오늘 +{{ formatNumber(pacemaker.todaySavingAmount) }}원</span>
           <span class="size-1 rounded-full bg-white/40" />
-          <span>🔥 연속 {{ pacemaker.streakDays }}일</span>
+          <span>🔥 연속 {{ pacemaker.currentStreak }}일</span>
         </div>
       </div>
 
@@ -42,7 +44,9 @@
       >
         <div>
           <p class="text-sm font-bold text-[#0a192f]">자동 저축</p>
-          <p class="text-xs text-slate-500">하루 상한선 {{ formatNumber(pacemaker.dailyLimit) }}원</p>
+          <p class="text-xs text-slate-500">
+            하루 상한선 {{ formatNumber(pacemaker.maxAmount) }}원
+          </p>
         </div>
         <button
           type="button"
@@ -77,7 +81,13 @@
             <button
               type="button"
               class="rounded-full px-3 py-1.5 text-xs font-bold text-white"
-              style="background-image: linear-gradient(149deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%)"
+              style="
+                background-image: linear-gradient(
+                  149deg,
+                  rgb(0, 102, 255) 0%,
+                  rgb(102, 178, 255) 100%
+                );
+              "
               @click="$emit('deposit', account.goalId)"
             >
               입금
@@ -117,6 +127,6 @@ defineProps({
 defineEmits(['update:modelValue', 'toggle-auto-saving', 'deposit', 'view-history'])
 
 function formatNumber(amount) {
-  return amount.toLocaleString()
+  return (amount ?? 0).toLocaleString()
 }
 </script>
