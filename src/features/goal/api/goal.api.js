@@ -16,8 +16,8 @@ export async function getGoalPresets() {
 
 /**
  * @typedef {Object} GoalAssetInput
- * @property {number} [assetId] 연결할 자산 ID
- * @property {'MONEY_BOX' | 'ACCOUNT' | 'LOAN'} assetType
+ * @property {number} [assetId] 연결할 자산 ID (새로 만드는 저금통처럼 아직 없는 자산은 생략)
+ * @property {'MONEY_BOX' | 'MONEYBOX' | 'ACCOUNT' | 'LOAN'} assetType
  */
 
 /**
@@ -27,7 +27,7 @@ export async function getGoalPresets() {
  * @property {number} goalAmount 목표 금액
  * @property {number} goalMonths 목표 기간(개월)
  * @property {number} startAmount 목표 시작 금액
- * @property {GoalAssetInput[]} assets 연결할 자산 목록
+ * @property {GoalAssetInput[]} assets 연결할 자산 목록 (저금통 타입이면 서버가 저금통도 함께 생성)
  */
 
 /**
@@ -35,14 +35,8 @@ export async function getGoalPresets() {
  * @returns {Promise<{ goalId: number }>}
  */
 export async function createGoal(payload) {
-  try {
-    const { data: responseBody } = await client.post('/goals', payload)
-    const unwrapped = unwrapApiData(responseBody)
-    return unwrapped && unwrapped.goalId ? unwrapped : { goalId: 1 }
-  } catch (err) {
-    console.warn('API createGoal failed, using fallback goalId:', err)
-    return { goalId: 1 }
-  }
+  const { data: responseBody } = await client.post('/goals', payload)
+  return unwrapApiData(responseBody)
 }
 
 /**
@@ -60,100 +54,13 @@ export async function createGoal(payload) {
  * @property {boolean} possible 실현 가능 여부
  */
 
-const FALLBACK_ACCOUNTS = [
-  {
-    accountId: 1,
-    institutionName: 'KB국민은행',
-    accountType: 'CHECKING',
-    accountName: 'KB 국민은행 입출금',
-    maskedAccountNumber: '···2291',
-    balance: 1250000,
-    interestRate: null,
-  },
-  {
-    accountId: 2,
-    institutionName: 'NH농협은행',
-    accountType: 'CHECKING',
-    accountName: 'NH 농협은행 입출금',
-    maskedAccountNumber: '···5548',
-    balance: 320000,
-    interestRate: null,
-  },
-  {
-    accountId: 3,
-    institutionName: 'KB국민은행',
-    accountType: 'SAVING',
-    accountName: 'KB 스타적금',
-    maskedAccountNumber: '···3821',
-    balance: 640000,
-    interestRate: 4.5,
-  },
-  {
-    accountId: 4,
-    institutionName: '카카오뱅크',
-    accountType: 'SAVING',
-    accountName: '카카오뱅크 적금',
-    maskedAccountNumber: '···0047',
-    balance: 1200000,
-    interestRate: 3.8,
-  },
-  {
-    accountId: 5,
-    institutionName: '토스뱅크',
-    accountType: 'SAVING',
-    accountName: '토스뱅크 저금통',
-    maskedAccountNumber: '···7193',
-    balance: 320000,
-    interestRate: 2.3,
-  },
-  {
-    accountId: 6,
-    institutionName: 'KB국민은행',
-    accountType: 'SAVING',
-    accountName: 'KB 독립적금',
-    maskedAccountNumber: '***456',
-    balance: 3000000,
-    interestRate: 3.5,
-  },
-  {
-    accountId: 7,
-    institutionName: 'KB국민은행',
-    accountType: 'DEPOSIT',
-    accountName: 'KB Star 정기예금',
-    maskedAccountNumber: '***7890',
-    balance: 5000000,
-    interestRate: 3.5,
-  },
-]
-
 /**
  * @param {FeasibilityParams} params
  * @returns {Promise<FeasibilityResponse>}
  */
 export async function getFeasibility(params) {
-  try {
-    const { data } = await client.post('/goals/possibility', params)
-    return data
-  } catch (err) {
-    const amount = Number(params?.goalAmount) || 12400000
-    const months = Number(params?.goalMonths) || 24
-    const start = Number(params?.startAmount) || 0
-    const isLoan = params?.isStudentLoan
-    let req = 0
-    if (isLoan) {
-      const monthlyRate = 0.017 / 12
-      const compound = Math.pow(1 + monthlyRate, months)
-      req = Math.round((amount * monthlyRate * compound) / (compound - 1)) || 525866
-    } else {
-      req = Math.max(0, Math.round((amount - start) / months)) || 416666
-    }
-
-    return {
-      requiredMonthly: req,
-      availableMonthly: 620000,
-      possible: req <= 620000,
-    }
-  }
+  const { data: responseBody } = await client.post('/goals/possibility', params)
+  return unwrapApiData(responseBody)
 }
 
 // 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)
@@ -173,26 +80,8 @@ export async function getFeasibility(params) {
  * @returns {Promise<{ totalBalance: number, accounts: AccountItem[] }>}
  */
 export async function getAccounts(params) {
-  try {
-    const { data: responseBody } = await client.get('/accounts', { params })
-    const data = unwrapApiData(responseBody)
-
-    if (data && Array.isArray(data.accounts) && data.accounts.length > 0) {
-      return data
-    }
-  } catch (err) {
-    console.warn('API getAccounts failed, using fallback mock accounts:', err)
-  }
-
-  // Fail-safe Fallback
-  const filtered = params?.accountType
-    ? FALLBACK_ACCOUNTS.filter((acc) => acc.accountType === params.accountType)
-    : FALLBACK_ACCOUNTS
-
-  return {
-    totalBalance: filtered.reduce((sum, acc) => sum + acc.balance, 0),
-    accounts: filtered,
-  }
+  const { data: responseBody } = await client.get('/accounts', { params })
+  return unwrapApiData(responseBody)
 }
 
 // 저금통 개설 API (GOAL-04)
@@ -221,12 +110,8 @@ export async function getAccounts(params) {
  * @returns {Promise<MoneyBoxResponse>}
  */
 export async function createMoneyBox(payload) {
-  try {
-    const { data } = await client.post('/moneyBoxes', payload)
-    return data
-  } catch {
-    return { moneyBoxId: 101, userId: 1, type: payload.type, balance: 0 }
-  }
+  const { data: responseBody } = await client.post('/moneyBoxes', payload)
+  return unwrapApiData(responseBody)
 }
 
 // 목표 목록 조회 API
@@ -243,8 +128,9 @@ export async function createMoneyBox(payload) {
  * @returns {Promise<GoalListItem[]>}
  */
 export async function getGoals() {
-  const { data } = await client.get('/goals')
-  return data.goals
+  const { data: responseBody } = await client.get('/goals')
+  const data = unwrapApiData(responseBody)
+  return data?.goals ?? data
 }
 
 // 목표 상세 조회 API
@@ -262,83 +148,13 @@ export async function getGoals() {
  * @property {{ expectedAmount: number, differenceAmount: number, paceStatus: 'AHEAD' | 'ON_TRACK' | 'BEHIND' }} pace
  */
 
-const DEFAULT_GOAL_DETAIL = {
-  goalId: 1,
-  goalType: 'INDEPENDENCE',
-  goalName: '독립 자금',
-  goalAmount: 30000000,
-  startAmount: 0,
-  currentAmount: 11500000,
-  progressRate: 38.0,
-  period: {
-    goalMonths: 10,
-    startDate: '2026-06',
-    endDate: '2028-03',
-    remainMonths: 9,
-  },
-  status: 'ACTIVE',
-  pace: {
-    expectedAmount: 10810000,
-    differenceAmount: 690000,
-    paceStatus: 'AHEAD',
-  },
-}
-
-const DEFAULT_GOAL_ASSETS = [
-  {
-    assetType: 'MONEY_BOX',
-    assetId: 1,
-    assetName: '미래로 저금통',
-    bankName: 'KB국민',
-    accountNumberMasked: '***123',
-    balance: 8500000,
-    assetDetail: null,
-    autoTransfer: {
-      amount: 250000,
-      transferDay: 10,
-      withdrawalAccount: {
-        bankName: 'KB국민',
-        accountNumberMasked: '***789',
-      },
-    },
-  },
-  {
-    assetType: 'ACCOUNT',
-    assetId: 2,
-    assetName: 'KB 독립적금',
-    bankName: 'KB국민',
-    accountNumberMasked: '***456',
-    balance: 3500000,
-    assetDetail: {
-      interestRate: 4.5,
-      maturityDate: '2028-03-15',
-    },
-    autoTransfer: {
-      amount: 100000,
-      transferDay: 10,
-      withdrawalAccount: {
-        bankName: 'KB국민',
-        accountNumberMasked: '***789',
-      },
-    },
-  },
-]
-
 /**
  * @param {number} goalId
  * @returns {Promise<GoalDetail>}
  */
 export async function getGoalDetail(goalId) {
-  try {
-    const { data: responseBody } = await client.get(`/goals/${goalId}`)
-    const unwrapped = unwrapApiData(responseBody)
-    if (unwrapped && (unwrapped.goalId || unwrapped.goalName)) {
-      return { ...DEFAULT_GOAL_DETAIL, ...unwrapped, goalId: Number(goalId) || unwrapped.goalId || 1 }
-    }
-  } catch (err) {
-    console.warn('API getGoalDetail failed, using fallback:', err)
-  }
-  return { ...DEFAULT_GOAL_DETAIL, goalId: Number(goalId) || 1 }
+  const { data: responseBody } = await client.get(`/goals/${goalId}`)
+  return unwrapApiData(responseBody)
 }
 
 /**
@@ -355,9 +171,10 @@ export async function getGoalDetail(goalId) {
  * @returns {Promise<{ goalId: number }>}
  */
 export async function updateGoal(goalId, payload) {
-  const { data } = await client.patch(`/goals/${goalId}`, payload)
-  return data
+  const { data: responseBody } = await client.patch(`/goals/${goalId}`, payload)
+  return unwrapApiData(responseBody)
 }
+
 /**
  * 자산 연결 API (POST /goals/{goalId}/assets)
  * @param {number} goalId
@@ -365,32 +182,31 @@ export async function updateGoal(goalId, payload) {
  * @returns {Promise<{ success: boolean }>}
  */
 export async function linkAssetsToGoal(goalId, assets) {
-  try {
-    const { data: responseBody } = await client.post(`/goals/${goalId}/assets`, { assets })
-    const unwrapped = unwrapApiData(responseBody)
-    return unwrapped ?? { success: true }
-  } catch (err) {
-    console.warn('API linkAssetsToGoal failed, using fallback:', err)
-    return { success: true }
-  }
+  const { data: responseBody } = await client.post(`/goals/${goalId}/assets`, { assets })
+  return unwrapApiData(responseBody)
 }
+
+// 연결 자산 조회 API
+/**
+ * @typedef {Object} GoalAsset
+ * @property {'MONEY_BOX' | 'ACCOUNT' | 'LOAN'} assetType
+ * @property {number} assetId
+ * @property {string} assetName
+ * @property {string} bankName
+ * @property {string} accountNumberMasked
+ * @property {number | null} balance
+ * @property {{ interestRate: number, maturityDate: string } | null} assetDetail
+ * @property {{ amount: number, transferDay: number, withdrawalAccount: { bankName: string, accountNumberMasked: string } | null }} autoTransfer
+ */
 
 /**
  * @param {number} goalId
  * @returns {Promise<GoalAsset[]>}
  */
 export async function getGoalAssets(goalId) {
-  try {
-    const { data: responseBody } = await client.get(`/goals/${goalId}/assets`)
-    const unwrapped = unwrapApiData(responseBody)
-    const list = unwrapped?.assets ?? (Array.isArray(unwrapped) ? unwrapped : null)
-    if (list && Array.isArray(list) && list.length > 0) {
-      return list
-    }
-  } catch (err) {
-    console.warn('API getGoalAssets failed, using fallback:', err)
-  }
-  return DEFAULT_GOAL_ASSETS
+  const { data: responseBody } = await client.get(`/goals/${goalId}/assets`)
+  const unwrapped = unwrapApiData(responseBody)
+  return unwrapped?.assets ?? (Array.isArray(unwrapped) ? unwrapped : [])
 }
 
 /**
@@ -460,8 +276,9 @@ export async function getGoalLinkedAssets(goalId) {
  * @returns {Promise<AvailableMoneyBreakdown>}
  */
 export async function getMonthlyAvailableMoney(goalId) {
-  const { data } = await client.get(`/goals/${goalId}/monthly-available`)
-  return data.monthly
+  const { data: responseBody } = await client.get(`/goals/${goalId}/monthly-available`)
+  const data = unwrapApiData(responseBody)
+  return data?.monthly ?? data
 }
 
 // 일 여유자금 조회 API
@@ -470,8 +287,9 @@ export async function getMonthlyAvailableMoney(goalId) {
  * @returns {Promise<AvailableMoneyBreakdown>}
  */
 export async function getDailyAvailableMoney(goalId) {
-  const { data } = await client.get(`/goals/${goalId}/daily-available`)
-  return data.daily
+  const { data: responseBody } = await client.get(`/goals/${goalId}/daily-available`)
+  const data = unwrapApiData(responseBody)
+  return data?.daily ?? data
 }
 
 /**
@@ -480,6 +298,6 @@ export async function getDailyAvailableMoney(goalId) {
  * @returns {Promise<{ goalId: number, status: string, changedAt: string }>}
  */
 export async function updateGoalStatus(goalId, status) {
-  const { data } = await client.patch(`/goals/${goalId}/status`, { status })
-  return data
+  const { data: responseBody } = await client.patch(`/goals/${goalId}/status`, { status })
+  return unwrapApiData(responseBody)
 }

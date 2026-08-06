@@ -447,6 +447,15 @@ export const goalHandlers = [
     })
   }),
 
+  http.post('*/api/goals/:goalId/assets', async () => {
+    await delay(300)
+    return HttpResponse.json({
+      success: true,
+      data: { success: true },
+      error: null,
+    })
+  }),
+
   http.get('*/api/goals/:goalId/monthly-available', async () => {
     return HttpResponse.json({
       monthly: {
