@@ -14,9 +14,6 @@
 
       <!-- 상태 2: 달성 목표 존재 (Filled State) -->
       <div v-else class="flex flex-col gap-8">
-        <!-- 페이지 상단 헤더 -->
-        <CollectionHeader :achieved-count="collectionStore.achievedGoals.length" />
-
         <!-- 컬렉션 카드 그리드 목록 -->
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <CollectionCard
@@ -40,7 +37,6 @@ import { useRouter } from 'vue-router'
 import {
   useCollectionStore,
   EmptyCollection,
-  CollectionHeader,
   CollectionCard,
   NextGoalBanner,
 } from '@/features/collection'

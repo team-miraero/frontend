@@ -15,7 +15,9 @@
       class="relative z-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
     >
       <div>
-        <div class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-md">
+        <div
+          class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-md"
+        >
           <span>🎯 Next Goal</span>
         </div>
         <h3 class="mt-2 text-xl font-bold tracking-tight text-white sm:text-2xl">
@@ -31,10 +33,16 @@
         class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-2xl bg-white px-6 py-3.5 text-sm font-bold text-primary shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-50 hover:shadow-lg active:translate-y-0"
         @click="$emit('add-goal')"
       >
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
-        <span>+ 새 로드맵 추가</span>
+        <span>새 로드맵 추가</span>
       </button>
     </div>
   </div>
