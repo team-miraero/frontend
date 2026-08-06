@@ -15,7 +15,7 @@
       </button>
     </div>
 
-    <div v-if="goal" class="relative mt-8 h-24">
+    <div class="relative mt-8 h-24">
       <!-- 마일스톤 라벨 (금액/날짜) -->
       <div
         v-for="milestone in milestones"
@@ -81,14 +81,14 @@
       <!-- 현재 페이스 마커: progressRate(=currentAmount) 위치 -->
       <span
         class="absolute top-[30px] flex size-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-dashed border-primary bg-primary/60 shadow-[0_4px_14px_rgba(0,102,255,0.31)]"
-        :style="{ left: `${goal.progressRate ?? 0}%` }"
+        :style="{ left: `${goal.progressRate}%` }"
       >
         <img src="@/assets/icons/pace-current-runner.svg" alt="현재 페이스" class="size-3.5" />
       </span>
     </div>
 
     <!-- 현재, 목표페이스 설명 컨테이너 하단, 왼쪽 정렬 -->
-    <div v-if="goal" class="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+    <div class="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-1.5">
           <span
@@ -111,20 +111,19 @@
           </span>
           <span class="flex flex-col text-[10px] leading-tight text-slate-400 lg:block">
             <span class="lg:hidden">목표 페이스</span>
-            <span class="lg:hidden">{{ formatManwon(goal.pace?.expectedAmount ?? 0) }}원</span>
+            <span class="lg:hidden">{{ formatManwon(goal.pace.expectedAmount) }}원</span>
             <span class="hidden lg:inline"
-              >목표 페이스 · {{ formatManwon(goal.pace?.expectedAmount ?? 0) }}원</span
+              >목표 페이스 · {{ formatManwon(goal.pace.expectedAmount) }}원</span
             >
           </span>
         </div>
       </div>
 
       <span
-        v-if="goal.pace"
         class="shrink-0 whitespace-nowrap rounded-full border border-primary/20 bg-primary/[0.06] px-2 py-0.5 text-[9px] font-bold text-primary lg:px-2.5 lg:text-[10px]"
       >
         {{ goal.pace.paceStatus === 'BEHIND' ? '▼' : '▲' }}
-        {{ formatManwon(Math.abs(goal.pace.differenceAmount ?? 0)) }}
+        {{ formatManwon(Math.abs(goal.pace.differenceAmount)) }}
         <!-- 모바일: 문장 첫 단어(금액)까지만 노출, "앞섬/뒤처짐"은 데스크톱에서만 -->
         <span class="hidden lg:inline">{{
           goal.pace.paceStatus === 'BEHIND' ? '뒤처짐' : '앞섬'
@@ -138,11 +137,11 @@
 const props = defineProps({
   goal: {
     type: Object,
-    default: null,
+    required: true, // GoalDetail
   },
   milestones: {
     type: Array,
-    default: () => [],
+    required: true,
   },
 })
 defineEmits(['pause'])
@@ -158,30 +157,25 @@ function toTrackPercent(ratio) {
 }
 
 function milestonePosition(milestone) {
-  if (!props.goal || !props.goal.goalAmount) return TRACK_START
-  return toTrackPercent((milestone.targetAmount ?? 0) / props.goal.goalAmount)
+  return toTrackPercent(milestone.targetAmount / props.goal.goalAmount)
 }
 
 function progressFillWidth() {
-  if (!props.goal) return 0
-  return toTrackPercent((props.goal.progressRate ?? 0) / 100) - TRACK_START
+  return toTrackPercent(props.goal.progressRate / 100) - TRACK_START
 }
 
 function isLastMilestone(milestone) {
-  if (!Array.isArray(props.milestones) || props.milestones.length === 0) return false
   return props.milestones[props.milestones.length - 1]?.milestoneId === milestone.milestoneId
 }
 
 function formatManwon(amount) {
-  const num = Number(amount) || 0
-  return `${Math.round(num / 10000).toLocaleString()}만`
+  return `${Math.round(amount / 10000).toLocaleString()}만`
 }
 
 // 목표/현재 페이스 최소 간격 확보
 function pacePositions() {
-  if (!props.goal || !props.goal.goalAmount) return { target: TRACK_START, current: TRACK_START }
-  const target = toTrackPercent((props.goal.pace?.expectedAmount ?? 0) / props.goal.goalAmount)
-  const current = toTrackPercent((props.goal.progressRate ?? 0) / 100)
+  const target = toTrackPercent(props.goal.pace.expectedAmount / props.goal.goalAmount)
+  const current = toTrackPercent(props.goal.progressRate / 100)
   const MIN_GAP = 2.5
 
   if (Math.abs(current - target) >= MIN_GAP) {

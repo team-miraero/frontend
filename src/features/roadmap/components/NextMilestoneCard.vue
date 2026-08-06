@@ -1,7 +1,7 @@
 <!-- 다음 마일스톤: 파란 그라데이션 배경의 독립된 카드 -->
 <template>
   <div
-    v-if="nextMilestone && goal"
+    v-if="nextMilestone"
     class="flex flex-col gap-4 rounded-3xl p-6 shadow-[0_6px_14px_rgba(0,102,255,0.21)]"
     style="background-image: linear-gradient(165deg, rgb(0, 102, 255) 0%, rgb(61, 139, 255) 100%)"
   >
@@ -26,7 +26,7 @@
       </div>
       <div class="flex items-center justify-between pt-1.5 text-[10px]">
         <span class="font-bold text-white/85">
-          현재 {{ formatManwon(goal?.currentAmount ?? 0) }}원 ({{ segmentProgress }}% 도달)
+          현재 {{ formatManwon(goal.currentAmount) }}원 ({{ segmentProgress }}% 도달)
         </span>
         <span class="text-white/75">{{ formatManwon(remainingToNext) }} 남음</span>
       </div>
@@ -36,7 +36,7 @@
       <div class="rounded-xl bg-white/15 px-3 py-2.5">
         <p class="text-[9px] text-white/65">현재 잔액</p>
         <p class="pt-0.5 text-sm font-black tracking-[-0.28px] text-white">
-          {{ formatManwon(goal?.currentAmount ?? 0) }}
+          {{ formatManwon(goal.currentAmount) }}
         </p>
       </div>
       <div class="rounded-xl bg-white/15 px-3 py-2.5">
@@ -61,40 +61,35 @@ import { computed } from 'vue'
 const props = defineProps({
   goal: {
     type: Object,
-    default: null,
+    required: true,
   },
   milestones: {
     type: Array,
-    default: () => [],
+    required: true,
   },
 })
 
 const nextMilestone = computed(
-  () => (Array.isArray(props.milestones) ? props.milestones.find((m) => m.status === 'IN_PROGRESS') : null) ?? null
+  () => props.milestones.find((m) => m.status === 'IN_PROGRESS') ?? null
 )
 const previousMilestone = computed(() => {
-  if (!nextMilestone.value || !Array.isArray(props.milestones)) return null
+  if (!nextMilestone.value) return null
   const index = props.milestones.indexOf(nextMilestone.value)
   return index > 0 ? props.milestones[index - 1] : null
 })
 
 const segmentProgress = computed(() => {
-  if (!nextMilestone.value || !props.goal) return 0
+  if (!nextMilestone.value) return 0
   const from = previousMilestone.value?.targetAmount ?? 0
   const to = nextMilestone.value.targetAmount
-  const current = props.goal?.currentAmount ?? 0
-  if (to <= from) return 0
-  return Math.min(100, Math.round(((current - from) / (to - from)) * 100))
+  return Math.min(100, Math.round(((props.goal.currentAmount - from) / (to - from)) * 100))
 })
 
 const remainingToNext = computed(() =>
-  nextMilestone.value && props.goal
-    ? Math.max(0, nextMilestone.value.targetAmount - (props.goal.currentAmount ?? 0))
-    : 0
+  nextMilestone.value ? Math.max(0, nextMilestone.value.targetAmount - props.goal.currentAmount) : 0
 )
 
 function formatManwon(amount) {
-  const num = Number(amount) || 0
-  return `${Math.round(num / 10000).toLocaleString()}만`
+  return `${Math.round(amount / 10000).toLocaleString()}만`
 }
 </script>
