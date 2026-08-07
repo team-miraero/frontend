@@ -22,6 +22,14 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     const status = pacemakerStatus.value
     const dashboard = pacemakerDashboard.value
     const currentStatus = dashboard?.status ?? status?.status ?? null
+    const referenceDate = dashboard?.todaySaving?.savingDate ?? histories.value[0]?.date
+    const referenceMonth = referenceDate?.slice(0, 7)
+    const monthlySecuredAmount = referenceMonth
+      ? histories.value.reduce((total, item) => {
+          const isSavedThisMonth = item.status === 'SAVED' && item.date?.startsWith(referenceMonth)
+          return isSavedThisMonth ? total + (item.amount ?? 0) : total
+        }, 0)
+      : 0
 
     return {
       autoSavingId: status?.autoSavingId ?? dashboard?.autoSavingId ?? null,
@@ -34,6 +42,7 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
         dashboard?.todaySaving?.status === 'SUCCESS' ? (dashboard.todaySaving.amount ?? 0) : 0,
       currentStreak: dashboard?.currentStreak ?? 0,
       maxAmount: dashboard?.maxAmount ?? 0,
+      monthlySecuredAmount,
       monthlySuccessCount: dashboard?.monthlySuccessCount ?? 0,
       weeklyStreak: dashboard?.weeklyStreak ?? [],
     }

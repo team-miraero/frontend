@@ -268,10 +268,16 @@ onMounted(async () => {
 
   await loadGoalDashboard(goalId)
   await pacemakerStore.fetchPacemakerStatus()
+
+  const pacemakerRequests = [pacemakerStore.fetchDepositTargets()]
   if (pacemakerStore.pacemakerStatus?.registered) {
-    await pacemakerStore.fetchPacemakerDashboard()
+    pacemakerRequests.push(
+      pacemakerStore.fetchPacemakerDashboard(),
+      pacemakerStore.fetchHistories({ page: 0, size: 31 })
+    )
   }
-  await pacemakerStore.fetchDepositTargets()
+
+  await Promise.allSettled(pacemakerRequests)
 })
 
 // 사이드바 로드맵 목록에서 다른 목표를 클릭하면 라우트 파라미터만 바뀌고
