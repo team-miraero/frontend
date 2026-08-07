@@ -81,35 +81,35 @@
       aria-labelledby="streak-title"
     >
       <div class="mb-4 flex items-center justify-between gap-3">
-        <h3 id="streak-title" class="text-sm font-black text-[#0a192f]">
-          이번 주 자동 저축 스트릭
-        </h3>
-        <span class="rounded-full bg-[#eaf2ff] px-2.5 py-1 text-xs font-bold text-primary">
+        <div class="flex items-center gap-1.5">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h3 id="streak-title" class="text-sm font-black text-[#0a192f]">
+                {{ isMonthlyStreak ? '이번 달 자동 저축 스트릭' : '이번 주 자동 저축 스트릭' }}
+              </h3>
+              <button
+                type="button"
+                class="text-xs leading-none text-slate-400"
+                :aria-label="isMonthlyStreak ? '주간 스트릭 보기' : '월간 스트릭 보기'"
+                @click="isMonthlyStreak = !isMonthlyStreak"
+              >
+                {{ isMonthlyStreak ? '⌃' : '⌄' }}
+              </button>
+            </div>
+            <p class="mt-0.5 text-[11px] font-medium text-slate-400">{{ formatTodayLabel }} 기준</p>
+          </div>
+        </div>
+        <span class="text-xs font-black text-primary">
           🔥 {{ formatNumber(pacemaker.currentStreak) }}일 연속
         </span>
       </div>
 
-      <div
-        v-if="weeklyStreak.length"
-        class="grid gap-2"
-        :style="{ gridTemplateColumns: `repeat(${weeklyStreak.length}, minmax(0, 1fr))` }"
-      >
-        <div
-          v-for="day in weeklyStreak"
-          :key="day.savingDate"
-          class="flex flex-col items-center gap-1.5"
-        >
+      <div v-if="!isMonthlyStreak" class="grid grid-cols-7 gap-2">
+        <div v-for="day in weekDays" :key="day.label" class="flex flex-col items-center gap-1.5">
           <div
             class="flex size-9 items-center justify-center rounded-full text-xs font-black"
             :class="
-              day.status === 'SUCCESS'
-                ? 'text-white shadow-[0_3px_10px_rgba(0,102,255,0.22)]'
-                : 'bg-slate-100 text-slate-300'
-            "
-            :style="
-              day.status === 'SUCCESS'
-                ? { background: 'linear-gradient(135deg, #0066ff 0%, #66b2ff 100%)' }
-                : undefined
+              day.status === 'SUCCESS' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-300'
             "
           >
             {{ day.status === 'SUCCESS' ? '✓' : '—' }}
@@ -118,16 +118,31 @@
             class="text-xs font-bold"
             :class="day.status === 'SUCCESS' ? 'text-[#0a192f]' : 'text-slate-300'"
           >
-            {{ formatDayOfWeek(day.dayOfWeek) }}
+            {{ day.label }}
           </span>
         </div>
       </div>
-      <p v-else class="py-4 text-center text-xs text-slate-400">이번 주 저축 기록이 없어요.</p>
+      <div v-else class="flex flex-col gap-2.5">
+        <div class="grid grid-cols-7 gap-1.5 text-center text-[11px] font-medium text-slate-400">
+          <span v-for="label in WEEKDAY_LABELS" :key="label">{{ label }}</span>
+        </div>
+        <div class="grid grid-cols-7 gap-x-1.5 gap-y-3">
+          <span v-for="(day, index) in monthDays" :key="day?.date ?? `empty-${index}`">
+            <span
+              v-if="day"
+              class="mx-auto flex size-7 items-center justify-center rounded-full text-[10px] font-bold"
+              :class="monthDayClass(day)"
+            >
+              {{ day.day }}
+            </span>
+          </span>
+        </div>
+      </div>
 
       <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400">
-        <span>이번 달 자동 저축 성공</span>
+        <span>{{ monthLabel }} 자동 저축</span>
         <span class="font-black text-primary">
-          {{ formatNumber(pacemaker.monthlySuccessCount) }}회
+          {{ formatNumber(pacemaker.monthlySuccessCount) }}회 성공
         </span>
       </div>
     </section>
@@ -286,11 +301,13 @@ const DAY_OF_WEEK_LABEL = {
   SATURDAY: '토',
   SUNDAY: '일',
 }
+const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일']
 
 const pacemakerStore = usePacemakerStore()
 const selectedDepositTarget = ref(null)
 const selectedAssetIds = ref({})
 const expandedGoalId = ref(null)
+const isMonthlyStreak = ref(false)
 const depositedAmount = ref(0)
 const { isOpen: isDepositModalOpen, open: openDepositModal } = useModal()
 const { isOpen: isDepositSuccessModalOpen, open: openDepositSuccessModal } = useModal()
@@ -300,10 +317,51 @@ const pacemaker = computed(() => pacemakerStore.pacemakerView)
 const isActive = computed(() => pacemaker.value.status === 'ACTIVE')
 const recentHistories = computed(() => pacemakerStore.histories.slice(0, 5))
 const weeklyStreak = computed(() => dashboard.value?.weeklyStreak ?? [])
-
-const accountGroups = computed(() => {
-  return pacemakerStore.depositTargets
+const referenceDate = computed(
+  () => dashboard.value?.todaySaving?.savingDate ?? new Date().toISOString().slice(0, 10)
+)
+const weekDays = computed(() => {
+  const byDay = new Map(weeklyStreak.value.map((day) => [day.dayOfWeek, day]))
+  return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].map(
+    (dayOfWeek) => ({
+      ...(byDay.get(dayOfWeek) ?? { status: 'FAIL' }),
+      label: DAY_OF_WEEK_LABEL[dayOfWeek],
+    })
+  )
 })
+const monthDays = computed(() => {
+  const [year, month] = referenceDate.value.split('-').map(Number)
+  const lastDay = new Date(year, month, 0).getDate()
+  const savedDates = new Set(
+    pacemakerStore.histories.filter((item) => item.status === 'SAVED').map((item) => item.date)
+  )
+  const days = Array.from({ length: lastDay }, (_, index) => {
+    const day = index + 1
+    const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    return {
+      day,
+      date,
+      status: savedDates.has(date) ? 'SUCCESS' : 'FAIL',
+      isToday: date === referenceDate.value,
+      isFuture: date > referenceDate.value,
+    }
+  })
+  const firstDay = new Date(year, month - 1, 1).getDay()
+  const mondayOffset = firstDay === 0 ? 6 : firstDay - 1
+  return [...Array(mondayOffset).fill(null), ...days]
+})
+const formatTodayLabel = computed(() => {
+  const [, month, day] = referenceDate.value.split('-')
+  return `${month}월 ${day}일`
+})
+const monthLabel = computed(() => `${referenceDate.value.split('-')[1]}월`)
+
+const accountGroups = computed(() =>
+  pacemakerStore.depositTargets.map((group) => ({
+    ...group,
+    icon: group.icon ?? goalIcon(group.goalType),
+  }))
+)
 
 function selectedDepositAsset(group) {
   const selectedId = selectedAssetIds.value[group.goalId] ?? group.depositAssets?.[0]?.assetId
@@ -344,6 +402,7 @@ function openDeposit(group) {
     return {
       accountId: depositAsset.assetId,
       moneyBoxId: pacemaker.value.moneyBoxId,
+      icon: assetIcon(depositAsset),
       accountNickname: formatAssetName(depositAsset),
       accountBalance: depositAsset.balance ?? 0,
       bankName: linkedWithdrawal?.financialInstitutionName ?? '',
@@ -354,8 +413,8 @@ function openDeposit(group) {
     goalId: group.goalId,
     accountId: asset?.assetId,
     moneyBoxId: pacemaker.value.moneyBoxId,
+    icon: assetIcon(asset),
     goalName: group.goalName,
-    icon: goalIcon(group.goalType),
     accountNickname: asset?.financialInstitutionName ?? '페이스메이커 저금통',
     accountBalance: asset?.balance ?? 0,
     bankName: withdrawal?.financialInstitutionName ?? '',
@@ -396,10 +455,6 @@ function describeHistory(item) {
   return item.description ?? '여유자금 없음 — 저축 건너뜀'
 }
 
-function formatDayOfWeek(dayOfWeek) {
-  return DAY_OF_WEEK_LABEL[dayOfWeek] ?? dayOfWeek
-}
-
 function goalIcon(goalType) {
   return { TRAVEL: '✈️', EMERGENCY: '🛟', WEDDING: '💍', INDEPENDENCE: '🏠' }[goalType] ?? '🎯'
 }
@@ -408,5 +463,16 @@ function formatAssetName(asset) {
   if (!asset) return '입금 자산'
   if (asset.assetType === 'MONEY_BOX') return '저금통'
   return asset.financialInstitutionName ?? '입금 계좌'
+}
+
+function monthDayClass(day) {
+  if (day.status === 'SUCCESS') return 'bg-primary text-white'
+  if (day.isToday) return 'border border-primary text-primary'
+  if (day.isFuture) return 'text-slate-300'
+  return 'bg-slate-100 text-slate-400'
+}
+
+function assetIcon(asset) {
+  return asset?.assetType === 'MONEY_BOX' ? '🪙' : '🏦'
 }
 </script>

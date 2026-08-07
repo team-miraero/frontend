@@ -34,7 +34,7 @@
         <div>
           <p class="text-xs text-slate-400">입금할 계좌</p>
           <p class="pt-0.5 text-sm font-bold text-[#0a192f]">
-            {{ selectedOption?.accountNickname }}
+            {{ selectedOption?.icon }} {{ selectedOption?.accountNickname }}
           </p>
           <p class="text-xs text-slate-500">
             {{ selectedOption?.bankName }} {{ selectedOption?.accountNumberMasked }}
@@ -55,7 +55,9 @@
           @click="selectOption(option)"
         >
           <span>
-            <span class="block text-sm font-bold text-[#0a192f]">{{ option.accountNickname }}</span>
+            <span class="block text-sm font-bold text-[#0a192f]"
+              >{{ option.icon }} {{ option.accountNickname }}</span
+            >
             <span class="block text-xs text-slate-400"
               >{{ option.bankName }} {{ option.accountNumberMasked }}</span
             >

@@ -215,15 +215,26 @@ function handlePacemakerCtaClick() {
 }
 
 // 잔액 모달의 "입금" 클릭: 어떤 목표 계좌로 입금할지 선택하고 입금 모달을 염
-function handleOpenDeposit(goalId) {
-  selectedDepositTarget.value =
-    pacemakerStore.depositTargets.find((target) => target.goalId === goalId) ?? null
+function handleOpenDeposit(goal) {
+  const asset = goal?.depositAssets?.[0]
+  const withdrawal = goal?.withdrawalAccounts?.[0]
+  selectedDepositTarget.value = {
+    goalId: goal?.goalId,
+    accountId: asset?.assetId,
+    moneyBoxId: pacemakerStore.pacemakerView.moneyBoxId,
+    icon: asset?.assetType === 'MONEY_BOX' ? '🪙' : '🏦',
+    goalName: goal?.goalName,
+    accountNickname: asset?.financialInstitutionName ?? '저금통',
+    accountBalance: asset?.balance ?? 0,
+    bankName: withdrawal?.financialInstitutionName ?? '',
+    accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
+  }
   openPacemakerDepositModal()
 }
 
 // 입금 모달의 "입금하기" 클릭: 실제 입금 처리 후 완료 모달로 전환
-async function handleDeposit({ goalId, amount }) {
-  await pacemakerStore.depositToGoal(goalId, amount)
+async function handleDeposit({ accountId, amount, moneyBoxId }) {
+  await pacemakerStore.depositToGoal(accountId, amount, moneyBoxId)
   depositedAmount.value = amount
   isPacemakerDepositModalOpen.value = false
   openPacemakerDepositSuccessModal()

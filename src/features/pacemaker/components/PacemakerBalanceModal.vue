@@ -65,16 +65,17 @@
         <p class="pb-2 text-xs font-bold text-slate-500">연동된 목표 계좌 · 입금 가능</p>
         <div class="flex flex-col gap-2">
           <div
-            v-for="account in depositTargets"
-            :key="account.goalId"
+            v-for="goal in depositTargets"
+            :key="goal.goalId"
             class="flex items-center justify-between rounded-2xl border border-[#edf2ff] bg-[#f8fbff] px-4 py-3"
           >
             <div class="flex items-center gap-3">
-              <span class="text-lg leading-none">{{ account.icon }}</span>
+              <span class="text-lg leading-none">{{ goalIcon(goal.goalType) }}</span>
               <div>
-                <p class="text-xs font-bold text-[#0a192f]">{{ account.goalName }}</p>
+                <p class="text-xs font-bold text-[#0a192f]">{{ goal.goalName }}</p>
                 <p class="text-xs text-slate-400">
-                  {{ account.bankName }} {{ account.accountNumberMasked }}
+                  {{ goal.depositAssets?.[0]?.financialInstitutionName ?? '저금통' }}
+                  {{ goal.depositAssets?.[0]?.maskedAccountNumber }}
                 </p>
               </div>
             </div>
@@ -88,7 +89,7 @@
                   rgb(102, 178, 255) 100%
                 );
               "
-              @click="$emit('deposit', account.goalId)"
+              @click="$emit('deposit', goal)"
             >
               입금
             </button>
@@ -128,5 +129,9 @@ defineEmits(['update:modelValue', 'toggle-auto-saving', 'deposit', 'view-history
 
 function formatNumber(amount) {
   return (amount ?? 0).toLocaleString()
+}
+
+function goalIcon(goalType) {
+  return { TRAVEL: '✈️', INDEPENDENCE: '🏠', EMERGENCY: '☂️', WEDDING: '💍' }[goalType] ?? '🎯'
 }
 </script>
