@@ -216,19 +216,37 @@ function handlePacemakerCtaClick() {
 
 // 잔액 모달의 "입금" 클릭: 어떤 목표 계좌로 입금할지 선택하고 입금 모달을 염
 function handleOpenDeposit(goal) {
-  const asset = goal?.depositAssets?.[0]
-  const withdrawal = goal?.withdrawalAccounts?.[0]
+  const depositOptions = (goal?.depositAssets ?? []).map((asset, index) => {
+    const withdrawal = goal?.withdrawalAccounts?.[index] ?? goal?.withdrawalAccounts?.[0]
+
+    return {
+      accountId: asset.assetId,
+      moneyBoxId: pacemakerStore.pacemakerView.moneyBoxId,
+      icon: asset.assetType === 'MONEY_BOX' ? '🪙' : '🏦',
+      accountNickname:
+        asset.assetType === 'MONEY_BOX'
+          ? '저금통'
+          : (asset.financialInstitutionName ?? '입금 계좌'),
+      accountBalance: asset.balance ?? 0,
+      withdrawalBalance: withdrawal?.balance ?? 0,
+      bankName: withdrawal?.financialInstitutionName ?? '',
+      accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
+    }
+  })
+  const defaultOption = depositOptions[0]
+
   selectedDepositTarget.value = {
     goalId: goal?.goalId,
-    accountId: asset?.assetId,
+    accountId: defaultOption?.accountId,
     moneyBoxId: pacemakerStore.pacemakerView.moneyBoxId,
-    icon: asset?.assetType === 'MONEY_BOX' ? '🪙' : '🏦',
+    icon: defaultOption?.icon ?? '🎯',
     goalName: goal?.goalName,
-    accountNickname: asset?.financialInstitutionName ?? '저금통',
-    accountBalance: asset?.balance ?? 0,
-    withdrawalBalance: withdrawal?.balance ?? 0,
-    bankName: withdrawal?.financialInstitutionName ?? '',
-    accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
+    accountNickname: defaultOption?.accountNickname ?? '입금 계좌',
+    accountBalance: defaultOption?.accountBalance ?? 0,
+    withdrawalBalance: defaultOption?.withdrawalBalance ?? 0,
+    bankName: defaultOption?.bankName ?? '',
+    accountNumberMasked: defaultOption?.accountNumberMasked ?? '',
+    depositOptions,
   }
   openPacemakerDepositModal()
 }
