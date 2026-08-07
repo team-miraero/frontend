@@ -15,3 +15,5 @@ export { default as MonthlyAvailableMoneyModal } from '@/features/roadmap/compon
 export { default as LinkedAssetsModal } from '@/features/roadmap/components/LinkedAssetsModal.vue'
 export { default as GoalPausedBanner } from '@/features/roadmap/components/GoalPausedBanner.vue'
 export { default as GoalStatusConfirmModal } from '@/features/roadmap/components/GoalStatusConfirmModal.vue'
+export { default as ShareWithFriendsCard } from '@/features/roadmap/components/ShareWithFriendsCard.vue'
+export { default as ShareGoalModal } from '@/features/roadmap/components/ShareGoalModal.vue'
