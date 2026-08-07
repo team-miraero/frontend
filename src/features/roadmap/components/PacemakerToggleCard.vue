@@ -69,38 +69,50 @@
     </template>
   </div>
 
-  <!-- 모바일(lg 미만): 설명 문단 없이 타이틀 → 토글 → 상태 안내만 세로로 배치한 정사각형 카드
-       (옆 칸인 여유자금 패널이 더 길어도 그리드 stretch로 늘어지지 않도록 items-start와 함께 사용) -->
+  <!-- 모바일(lg 미만): [1행] 제목(좌) ↔ 스위치(우) / [2행] 미개설배지+상태안내 / [3행] 개설하기 -->
   <div
-    class="flex aspect-square flex-col items-center justify-between gap-2 rounded-[20px] border p-4 text-center lg:hidden"
+    class="flex h-full w-full flex-col justify-between gap-2.5 overflow-hidden rounded-[20px] border p-3 sm:p-4 lg:hidden"
     :class="cardClass"
     :style="cardStyle"
   >
-    <div class="flex items-center gap-1.5">
-      <p class="text-xs font-bold text-slate-400">다음달 자금마련</p>
+    <!-- 1행: 제목 (좌측) ↔ 토글 스위치 (우측 끝) -->
+    <div class="flex items-center justify-between gap-1">
+      <p class="text-[11px] sm:text-xs font-bold text-[#0a192f] whitespace-nowrap">다음달 자금마련</p>
+      <button
+        type="button"
+        class="relative h-5 w-9 shrink-0 rounded-full transition-colors"
+        :class="pacemaker?.enabled ? 'bg-primary' : 'bg-slate-300'"
+        @click="$emit('toggle')"
+      >
+        <span
+          class="absolute top-0.5 size-4 rounded-full bg-white transition-all"
+          :class="pacemaker?.enabled ? 'left-[17px]' : 'left-0.5'"
+        />
+      </button>
+    </div>
+
+    <!-- 2행: 미개설 배지 + 상태 안내 (한 줄로 결합) -->
+    <div class="flex items-center gap-1.5 pt-1">
       <span
         v-if="!isRegistered"
-        class="rounded-full bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-500"
+        class="shrink-0 rounded-full bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 whitespace-nowrap"
       >
         미개설
       </span>
+      <p class="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight whitespace-nowrap">
+        {{ mobileStatusText }}
+      </p>
     </div>
 
-    <button
-      type="button"
-      class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
-      :class="pacemaker?.enabled ? 'bg-primary' : 'bg-slate-300'"
-      @click="$emit('toggle')"
-    >
-      <span
-        class="absolute top-0.5 size-[18px] rounded-full bg-white transition-all"
-        :class="pacemaker?.enabled ? 'left-[23px]' : 'left-0.5'"
-      />
-    </button>
-
-    <div>
-      <p class="text-[11px] font-semibold text-slate-500">{{ mobileStatusText }}</p>
-      <p v-if="!isRegistered" class="pt-0.5 text-[11px] font-bold text-primary">개설하기 &gt;</p>
+    <!-- 3행: 개설하기 > (우측 끝) -->
+    <div v-if="!isRegistered" class="flex justify-end">
+      <button
+        type="button"
+        class="text-[10px] sm:text-[11px] font-bold text-primary whitespace-nowrap"
+        @click="$emit('toggle')"
+      >
+        개설하기 &gt;
+      </button>
     </div>
   </div>
 </template>
@@ -138,10 +150,10 @@ const cardStyle = computed(() => {
   return 'background-color: #f8fafc;'
 })
 
-// 모바일 축약형: 설명 문단 대신 상태별 한 줄 요약만 노출
+// 모바일 축약형 안내문
 const mobileStatusText = computed(() => {
-  if (isOn.value) return `이번달 +${formatWon(props.pacemaker.monthlySecuredAmount)} 확보`
-  return isRegistered.value ? '지금은 OFF 상태예요' : '개설 후 이용할 수 있어요'
+  if (isOn.value) return `+${formatWon(props.pacemaker.monthlySecuredAmount)} 확보`
+  return isRegistered.value ? 'OFF 상태' : '개설 후 이용 가능'
 })
 
 function formatWon(amount) {

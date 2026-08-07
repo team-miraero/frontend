@@ -3,33 +3,44 @@
   <div class="w-full">
     <p class="text-sm font-bold text-[#0a192f]">여유자금</p>
 
-    <button
-      type="button"
-      class="mt-2 w-full rounded-2xl border border-slate-200 bg-white p-5 text-left"
-      @click="$emit('open-today')"
-    >
-      <div class="flex items-center justify-between">
-        <span class="flex items-center gap-1.5 text-sm text-slate-500">☀️ 오늘</span>
-      </div>
-      <p class="pt-3 text-lg font-black text-[#0a192f] lg:text-2xl">
-        {{ formatWon(daily.availableMoney) }}
-      </p>
-      <p class="pt-1 text-xs text-slate-400">오늘 하루 안심하고 쓸 수 있는 돈 🎯</p>
-    </button>
+    <!-- 모바일(lg 미만): 오늘/이번 달을 한 행에 나란히, 데스크톱: 기존처럼 세로로 쌓음 -->
+    <div class="mt-2 grid grid-cols-2 gap-2.5 sm:gap-3 lg:block lg:gap-0">
+      <button
+        type="button"
+        class="flex w-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-3 sm:p-5 text-left transition-all hover:border-slate-300"
+        @click="$emit('open-today')"
+      >
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap">☀️ 오늘</span>
+          </div>
+          <p class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap">
+            {{ formatWon(daily.availableMoney) }}
+          </p>
+        </div>
+        <p class="pt-1 text-[10px] leading-tight text-slate-400 sm:text-xs">
+          오늘 하루 안심하고 쓸 수 있는 돈 🎯
+        </p>
+      </button>
 
-    <button
-      type="button"
-      class="mt-3 w-full rounded-2xl border border-slate-200 bg-white p-5 text-left"
-      @click="$emit('open-month')"
-    >
-      <div class="flex items-center justify-between">
-        <span class="flex items-center gap-1.5 text-sm text-slate-500">📅 이번 달</span>
-      </div>
-      <p class="pt-3 text-lg font-black text-[#0a192f] lg:text-2xl">
-        {{ formatWon(monthly.availableMoney) }}
-      </p>
-      <p class="pt-1 text-xs text-slate-400">고정지출 뺀 이번 달 순수 여유금 🍀</p>
-    </button>
+      <button
+        type="button"
+        class="flex w-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-3 sm:p-5 text-left transition-all hover:border-slate-300 lg:mt-3"
+        @click="$emit('open-month')"
+      >
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap">📅 이번 달</span>
+          </div>
+          <p class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap">
+            {{ formatWon(monthly.availableMoney) }}
+          </p>
+        </div>
+        <p class="pt-1 text-[10px] leading-tight text-slate-400 sm:text-xs">
+          고정지출 뺀 이번 달 순수 여유금 🍀
+        </p>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -37,11 +48,11 @@
 defineProps({
   monthly: {
     type: Object,
-    required: true, // { income, fixedExpense, targetGoalAutoTransfer, otherGoalAutoTransfer, variableExpense, availableMoney }
+    required: true,
   },
   daily: {
     type: Object,
-    required: true, // 위와 동일한 형태의 일 단위 값 (백엔드가 계산해서 내려줌)
+    required: true,
   },
 })
 defineEmits(['open-today', 'open-month'])
