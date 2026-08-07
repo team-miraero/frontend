@@ -32,16 +32,6 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
         }, 0)
       : 0
 
-    const historyDates = new Set(
-      histories.value.filter((item) => item.status === 'SAVED').map((item) => item.date)
-    )
-    let calculatedStreak = 0
-    let streakDate = referenceDate
-    while (streakDate && historyDates.has(streakDate)) {
-      calculatedStreak += 1
-      streakDate = getPreviousDateKey(streakDate)
-    }
-
     return {
       autoSavingId: status?.autoSavingId ?? dashboard?.autoSavingId ?? null,
       registered: status?.registered ?? false,
@@ -52,7 +42,7 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
       maskedAccountNumber: dashboard?.moneyBox?.maskedAccountNumber ?? '',
       todaySavingAmount:
         dashboard?.todaySaving?.status === 'SUCCESS' ? (dashboard.todaySaving.amount ?? 0) : 0,
-      currentStreak: histories.value.length ? calculatedStreak : (dashboard?.currentStreak ?? 0),
+      currentStreak: dashboard?.currentStreak ?? 0,
       maxAmount: dashboard?.maxAmount ?? 0,
       monthlySecuredAmount,
       monthlySuccessCount: dashboard?.monthlySuccessCount ?? 0,
@@ -71,15 +61,6 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
       .map((date) => String(date).slice(0, 10))
       .sort()
     return candidates.at(-1) ?? null
-  }
-
-  function getPreviousDateKey(dateKey) {
-    const [year, month, day] = dateKey.split('-').map(Number)
-    const previousDate = new Date(year, month - 1, day - 1)
-    const previousYear = previousDate.getFullYear()
-    const previousMonth = String(previousDate.getMonth() + 1).padStart(2, '0')
-    const previousDay = String(previousDate.getDate()).padStart(2, '0')
-    return `${previousYear}-${previousMonth}-${previousDay}`
   }
 
   /**
