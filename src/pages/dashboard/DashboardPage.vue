@@ -226,6 +226,7 @@ function handleOpenDeposit(goal) {
     goalName: goal?.goalName,
     accountNickname: asset?.financialInstitutionName ?? '저금통',
     accountBalance: asset?.balance ?? 0,
+    withdrawalBalance: withdrawal?.balance ?? 0,
     bankName: withdrawal?.financialInstitutionName ?? '',
     accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
   }

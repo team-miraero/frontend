@@ -141,9 +141,7 @@
 
       <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400">
         <span>{{ monthLabel }} 자동 저축</span>
-        <span class="font-black text-primary">
-          {{ formatNumber(pacemaker.monthlySuccessCount) }}회 성공
-        </span>
+        <span class="font-black text-primary">{{ formatNumber(monthlySuccessCount) }}회 성공</span>
       </div>
     </section>
 
@@ -355,6 +353,9 @@ const formatTodayLabel = computed(() => {
   return `${month}월 ${day}일`
 })
 const monthLabel = computed(() => `${referenceDate.value.split('-')[1]}월`)
+const monthlySuccessCount = computed(
+  () => monthDays.value.filter((day) => day?.status === 'SUCCESS').length
+)
 
 const accountGroups = computed(() =>
   pacemakerStore.depositTargets.map((group) => ({
@@ -405,6 +406,7 @@ function openDeposit(group) {
       icon: assetIcon(depositAsset),
       accountNickname: formatAssetName(depositAsset),
       accountBalance: depositAsset.balance ?? 0,
+      withdrawalBalance: linkedWithdrawal?.balance ?? 0,
       bankName: linkedWithdrawal?.financialInstitutionName ?? '',
       accountNumberMasked: linkedWithdrawal?.maskedAccountNumber ?? '',
     }
@@ -417,6 +419,7 @@ function openDeposit(group) {
     goalName: group.goalName,
     accountNickname: asset?.financialInstitutionName ?? '페이스메이커 저금통',
     accountBalance: asset?.balance ?? 0,
+    withdrawalBalance: withdrawal?.balance ?? 0,
     bankName: withdrawal?.financialInstitutionName ?? '',
     accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
     depositOptions,
