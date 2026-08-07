@@ -152,8 +152,8 @@
               <div class="min-w-0">
                 <p class="truncate text-sm font-black text-[#0a192f]">{{ group.goalName }}</p>
                 <p class="truncate text-xs text-slate-400">
-                  출금계좌: {{ group.accounts[0].bankName }}
-                  {{ group.accounts[0].accountNumberMasked }}
+                  출금계좌: {{ selectedWithdrawalAccount(group)?.financialInstitutionName }}
+                  {{ selectedWithdrawalAccount(group)?.maskedAccountNumber }}
                 </p>
               </div>
             </div>
@@ -161,29 +161,60 @@
               type="button"
               class="shrink-0 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-[0_3px_10px_rgba(0,102,255,0.2)] transition hover:bg-[#0055dd] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
               :disabled="!pacemaker.moneyBoxBalance"
-              @click="openDeposit(group.accounts[0])"
+              @click="openDeposit(group)"
             >
               입금하기
             </button>
           </div>
 
-          <div class="grid gap-2 sm:grid-cols-3">
-            <div
-              v-for="account in group.accounts.slice(0, 2)"
-              :key="account.accountNumberMasked"
-              class="rounded-xl border border-[#edf2ff] bg-[#f8fbff] px-3 py-2.5"
+          <div class="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              class="rounded-xl border border-[#c5dcff] bg-[#f8fbff] px-3 py-2.5 text-left"
+              @click="toggleAssetList(group.goalId)"
             >
-              <p class="truncate text-xs text-slate-400">{{ account.accountNickname }}</p>
+              <p class="truncate text-xs text-slate-400">
+                {{ formatAssetName(selectedDepositAsset(group)) }}
+              </p>
               <p class="mt-0.5 text-sm font-black text-primary">
-                {{ formatCompactWon(account.accountBalance) }}
+                {{ formatCompactWon(selectedDepositAsset(group)?.balance) }}
               </p>
-            </div>
-            <div class="rounded-xl border border-[#edf2ff] bg-[#f8fbff] px-3 py-2.5">
-              <p class="text-xs text-slate-400">페이스메이커 저금통</p>
+            </button>
+            <div class="rounded-xl border border-[#c5dcff] bg-[#f8fbff] px-3 py-2.5">
+              <p class="truncate text-xs text-slate-400">연결 출금계좌 잔액</p>
               <p class="mt-0.5 text-sm font-black text-[#0a192f]">
-                {{ formatCompactWon(pacemaker.moneyBoxBalance) }}
+                {{ formatCompactWon(selectedWithdrawalAccount(group)?.balance) }}
               </p>
             </div>
+          </div>
+          <div v-if="expandedGoalId === group.goalId" class="grid gap-2">
+            <button
+              v-for="asset in selectableAssets(group)"
+              :key="asset.assetId"
+              type="button"
+              class="grid grid-cols-2 gap-2 p-0 text-left"
+              :class="
+                selectedAssetIds[group.goalId] === asset.assetId
+                  ? 'border-primary bg-[#eaf2ff]'
+                  : 'border-[#edf2ff] bg-white'
+              "
+              @click="selectDepositAsset(group.goalId, asset.assetId)"
+            >
+              <span class="rounded-xl border border-[#edf2ff] bg-[#f8fbff] px-3 py-2.5">
+                <span class="block truncate text-xs text-slate-400">{{
+                  formatAssetName(asset)
+                }}</span>
+                <span class="mt-0.5 block text-sm font-black text-primary">{{
+                  formatCompactWon(asset.balance)
+                }}</span>
+              </span>
+              <span class="rounded-xl border border-[#edf2ff] bg-[#f8fbff] px-3 py-2.5">
+                <span class="block truncate text-xs text-slate-400">연결 출금계좌 잔액</span>
+                <span class="mt-0.5 block text-sm font-black text-[#0a192f]">{{
+                  formatCompactWon(withdrawalForAsset(group, asset)?.balance)
+                }}</span>
+              </span>
+            </button>
           </div>
         </article>
       </div>
@@ -258,6 +289,8 @@ const DAY_OF_WEEK_LABEL = {
 
 const pacemakerStore = usePacemakerStore()
 const selectedDepositTarget = ref(null)
+const selectedAssetIds = ref({})
+const expandedGoalId = ref(null)
 const depositedAmount = ref(0)
 const { isOpen: isDepositModalOpen, open: openDepositModal } = useModal()
 const { isOpen: isDepositSuccessModalOpen, open: openDepositSuccessModal } = useModal()
@@ -269,28 +302,59 @@ const recentHistories = computed(() => pacemakerStore.histories.slice(0, 5))
 const weeklyStreak = computed(() => dashboard.value?.weeklyStreak ?? [])
 
 const accountGroups = computed(() => {
-  const groups = new Map()
-  pacemakerStore.depositTargets.forEach((account) => {
-    if (!groups.has(account.goalId)) {
-      groups.set(account.goalId, {
-        goalId: account.goalId,
-        goalName: account.goalName,
-        icon: account.icon,
-        accounts: [],
-      })
-    }
-    groups.get(account.goalId).accounts.push(account)
-  })
-  return Array.from(groups.values())
+  return pacemakerStore.depositTargets
 })
 
-function openDeposit(account) {
-  selectedDepositTarget.value = account
+function selectedDepositAsset(group) {
+  const selectedId = selectedAssetIds.value[group.goalId] ?? group.depositAssets?.[0]?.assetId
+  return (
+    group.depositAssets?.find((asset) => asset.assetId === selectedId) ?? group.depositAssets?.[0]
+  )
+}
+
+function selectableAssets(group) {
+  const selectedAssetId = selectedDepositAsset(group)?.assetId
+  return group.depositAssets?.filter((asset) => asset.assetId !== selectedAssetId) ?? []
+}
+
+function selectedWithdrawalAccount(group) {
+  const selectedAsset = selectedDepositAsset(group)
+  return withdrawalForAsset(group, selectedAsset)
+}
+
+function withdrawalForAsset(group, asset) {
+  const selectedIndex = group.depositAssets?.findIndex((item) => item.assetId === asset?.assetId)
+  return group.withdrawalAccounts?.[selectedIndex] ?? group.withdrawalAccounts?.[0]
+}
+
+function toggleAssetList(goalId) {
+  expandedGoalId.value = expandedGoalId.value === goalId ? null : goalId
+}
+
+function selectDepositAsset(goalId, assetId) {
+  selectedAssetIds.value = { ...selectedAssetIds.value, [goalId]: assetId }
+  expandedGoalId.value = null
+}
+
+function openDeposit(group) {
+  const asset = selectedDepositAsset(group)
+  const withdrawal = selectedWithdrawalAccount(group)
+  selectedDepositTarget.value = {
+    goalId: group.goalId,
+    accountId: asset?.assetId,
+    moneyBoxId: pacemaker.value.moneyBoxId,
+    goalName: group.goalName,
+    icon: goalIcon(group.goalType),
+    accountNickname: asset?.financialInstitutionName ?? '페이스메이커 저금통',
+    accountBalance: asset?.balance ?? 0,
+    bankName: withdrawal?.financialInstitutionName ?? '',
+    accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
+  }
   openDepositModal()
 }
 
-async function handleDeposit({ goalId, amount }) {
-  await pacemakerStore.depositToGoal(goalId, amount)
+async function handleDeposit({ accountId, amount, moneyBoxId }) {
+  await pacemakerStore.depositToGoal(accountId, amount, moneyBoxId)
   depositedAmount.value = amount
   isDepositModalOpen.value = false
   openDepositSuccessModal()
@@ -322,5 +386,15 @@ function describeHistory(item) {
 
 function formatDayOfWeek(dayOfWeek) {
   return DAY_OF_WEEK_LABEL[dayOfWeek] ?? dayOfWeek
+}
+
+function goalIcon(goalType) {
+  return { TRAVEL: '✈️', EMERGENCY: '🛟', WEDDING: '💍', INDEPENDENCE: '🏠' }[goalType] ?? '🎯'
+}
+
+function formatAssetName(asset) {
+  if (!asset) return '입금 자산'
+  if (asset.assetType === 'MONEY_BOX') return '저금통'
+  return asset.financialInstitutionName ?? '입금 계좌'
 }
 </script>

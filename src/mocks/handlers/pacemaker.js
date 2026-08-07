@@ -5,6 +5,69 @@ let mockRegistered = false
 let mockPacemakerStatus = null // 'ACTIVE' | 'PAUSED' | null
 let mockBalance = 520000
 let mockMaxAmount = 10000
+const mockGoals = [
+  {
+    goalId: 1,
+    goalName: '유럽 여행',
+    goalType: 'TRAVEL',
+    goalAmount: 3000000,
+    totalSavedAmount: 1200000,
+    depositAssets: [
+      {
+        assetType: 'ACCOUNT',
+        assetId: 3,
+        financialInstitutionName: 'KB국민은행',
+        maskedAccountNumber: '123-***-789',
+        balance: 700000,
+      },
+      {
+        assetType: 'MONEY_BOX',
+        assetId: 5,
+        financialInstitutionName: null,
+        maskedAccountNumber: '456-***-111',
+        balance: 500000,
+      },
+    ],
+    withdrawalAccounts: [
+      {
+        accountId: 8,
+        financialInstitutionName: 'KB국민은행',
+        maskedAccountNumber: '987-***-123',
+        balance: 1000000,
+      },
+      {
+        accountId: 9,
+        financialInstitutionName: '우리은행',
+        maskedAccountNumber: '111-***-222',
+        balance: 2300000,
+      },
+    ],
+  },
+  {
+    goalId: 2,
+    goalName: '비상금',
+    goalType: 'EMERGENCY',
+    goalAmount: 1000000,
+    totalSavedAmount: 250000,
+    depositAssets: [
+      {
+        assetType: 'ACCOUNT',
+        assetId: 11,
+        financialInstitutionName: '신한은행',
+        maskedAccountNumber: '222-***-333',
+        balance: 250000,
+      },
+    ],
+    withdrawalAccounts: [
+      {
+        accountId: 12,
+        financialInstitutionName: '신한은행',
+        maskedAccountNumber: '999-***-000',
+        balance: 500000,
+      },
+    ],
+  },
+]
 
 export const pacemakerHandlers = [
   http.get('*/api/pace-maker', () => {
@@ -41,6 +104,10 @@ export const pacemakerHandlers = [
       ],
       monthlySuccessCount: 18,
     })
+  }),
+
+  http.get('*/api/pace-maker/goals', () => {
+    return HttpResponse.json({ goals: mockGoals })
   }),
 
   http.post('*/api/money-boxes', async ({ request }) => {
@@ -87,12 +154,13 @@ export const pacemakerHandlers = [
     })
   }),
 
-  http.post('*/api/pace-maker/deposit', async ({ request }) => {
-    const { goalId, amount } = await request.json()
+  http.post('*/api/pace-maker/deposits', async ({ request }) => {
+    const { accountId, amount, moneyBoxId } = await request.json()
     mockBalance = Math.max(0, mockBalance - amount)
 
     return HttpResponse.json({
-      goalId,
+      accountId,
+      moneyBoxId,
       depositedAmount: amount,
       remainingBalance: mockBalance,
     })
@@ -101,17 +169,20 @@ export const pacemakerHandlers = [
   http.get('*/api/pace-maker/histories', () => {
     return HttpResponse.json({
       content: [
-        { date: '2026-07-18', status: 'SAVED', amount: 3200, description: null },
         {
-          date: '2026-07-17',
-          status: 'SKIPPED',
-          amount: null,
-          description: '지출 초과',
+          date: '2026-07-22',
+          status: 'SAVED',
+          amount: 10000,
+          description: '오늘의 여유자금 자동 저축',
         },
+        { date: '2026-07-21', status: 'SAVED', amount: 20000, description: null },
+        { date: '2026-07-20', status: 'SAVED', amount: 15000, description: null },
+        { date: '2026-07-19', status: 'SAVED', amount: 12000, description: null },
+        { date: '2026-07-18', status: 'SAVED', amount: 18000, description: null },
       ],
       page: 0,
-      size: 20,
-      totalElements: 2,
+      size: 31,
+      totalElements: 5,
       totalPages: 1,
       first: true,
       last: true,

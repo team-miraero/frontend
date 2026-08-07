@@ -153,7 +153,11 @@ async function handleSubmit() {
   if (!canSubmit.value || !props.target) return
   isSubmitting.value = true
   try {
-    emit('deposit', { goalId: props.target.goalId, amount: amount.value })
+    emit('deposit', {
+      accountId: props.target.accountId,
+      amount: amount.value,
+      moneyBoxId: props.target.moneyBoxId,
+    })
   } finally {
     isSubmitting.value = false
   }

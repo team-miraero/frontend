@@ -2,8 +2,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as pacemakerApi from '@/features/pacemaker/api/pacemaker.api'
-import { goalApi } from '@/features/goal'
-import { GOAL_TYPE_ICON } from '@/features/pacemaker/constants/pacemaker.constants'
 
 export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   /** @type {import('vue').Ref<import('@/features/pacemaker/api/pacemaker.api').PacemakerStatus | null>} */
@@ -31,16 +29,27 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
         }, 0)
       : 0
 
+    const historyDates = new Set(
+      histories.value.filter((item) => item.status === 'SAVED').map((item) => item.date)
+    )
+    let calculatedStreak = 0
+    let streakDate = referenceDate ? new Date(`${referenceDate}T00:00:00`) : null
+    while (streakDate && historyDates.has(formatDateKey(streakDate))) {
+      calculatedStreak += 1
+      streakDate.setDate(streakDate.getDate() - 1)
+    }
+
     return {
       autoSavingId: status?.autoSavingId ?? dashboard?.autoSavingId ?? null,
       registered: status?.registered ?? false,
       status: currentStatus,
       enabled: currentStatus === 'ACTIVE',
       moneyBoxBalance: dashboard?.moneyBox?.balance ?? 0,
+      moneyBoxId: dashboard?.moneyBox?.moneyBoxId ?? null,
       maskedAccountNumber: dashboard?.moneyBox?.maskedAccountNumber ?? '',
       todaySavingAmount:
         dashboard?.todaySaving?.status === 'SUCCESS' ? (dashboard.todaySaving.amount ?? 0) : 0,
-      currentStreak: dashboard?.currentStreak ?? 0,
+      currentStreak: histories.value.length ? calculatedStreak : (dashboard?.currentStreak ?? 0),
       maxAmount: dashboard?.maxAmount ?? 0,
       monthlySecuredAmount,
       monthlySuccessCount: dashboard?.monthlySuccessCount ?? 0,
@@ -51,6 +60,13 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   async function fetchPacemakerStatus() {
     pacemakerStatus.value = await pacemakerApi.getPacemakerStatus()
     return pacemakerStatus.value
+  }
+
+  function formatDateKey(date) {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 
   /**
@@ -94,24 +110,10 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     }
   }
 
-  // 입금 가능 계좌 = 각 목표의 연결 자산(/api/goals/{goalId}/assets) 중 LOAN이 아닌 것들
   async function fetchDepositTargets() {
-    const goals = await goalApi.getGoals()
-    const assetsByGoal = await Promise.all(goals.map((goal) => goalApi.getGoalAssets(goal.goalId)))
-
-    depositTargets.value = goals.flatMap((goal, index) =>
-      assetsByGoal[index]
-        .filter((asset) => asset.assetType !== 'LOAN')
-        .map((asset) => ({
-          goalId: goal.goalId,
-          goalName: goal.goalName,
-          icon: GOAL_TYPE_ICON[goal.goalType] ?? '🎯',
-          accountNickname: asset.assetName,
-          accountBalance: asset.balance,
-          bankName: asset.bankName,
-          accountNumberMasked: asset.accountNumberMasked,
-        }))
-    )
+    const result = await pacemakerApi.getPacemakerGoals()
+    depositTargets.value = result?.goals ?? []
+    return depositTargets.value
   }
 
   async function togglePacemaker() {
@@ -133,8 +135,8 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     return result
   }
 
-  async function depositToGoal(goalId, amount) {
-    const result = await pacemakerApi.depositToGoalAccount(goalId, amount)
+  async function depositToGoal(accountId, amount, moneyBoxId) {
+    const result = await pacemakerApi.depositToGoalAccount(accountId, amount, moneyBoxId)
     if (pacemakerDashboard.value?.moneyBox) {
       pacemakerDashboard.value.moneyBox.balance = result.remainingBalance
     }
