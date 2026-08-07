@@ -214,15 +214,45 @@ function handlePacemakerCtaClick() {
 }
 
 // 잔액 모달의 "입금" 클릭: 어떤 목표 계좌로 입금할지 선택하고 입금 모달을 염
-function handleOpenDeposit(goalId) {
-  selectedDepositTarget.value =
-    pacemakerStore.depositTargets.find((target) => target.goalId === goalId) ?? null
+function handleOpenDeposit(goal) {
+  const depositOptions = (goal?.depositAssets ?? []).map((asset, index) => {
+    const withdrawal = goal?.withdrawalAccounts?.[index] ?? goal?.withdrawalAccounts?.[0]
+
+    return {
+      accountId: asset.assetId,
+      moneyBoxId: pacemakerStore.pacemakerView.moneyBoxId,
+      icon: asset.assetType === 'MONEY_BOX' ? '🪙' : '🏦',
+      accountNickname:
+        asset.assetType === 'MONEY_BOX'
+          ? '저금통'
+          : (asset.financialInstitutionName ?? '입금 계좌'),
+      accountBalance: asset.balance ?? 0,
+      withdrawalBalance: withdrawal?.balance ?? 0,
+      bankName: withdrawal?.financialInstitutionName ?? '',
+      accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
+    }
+  })
+  const defaultOption = depositOptions[0]
+
+  selectedDepositTarget.value = {
+    goalId: goal?.goalId,
+    accountId: defaultOption?.accountId,
+    moneyBoxId: pacemakerStore.pacemakerView.moneyBoxId,
+    icon: defaultOption?.icon ?? '🎯',
+    goalName: goal?.goalName,
+    accountNickname: defaultOption?.accountNickname ?? '입금 계좌',
+    accountBalance: defaultOption?.accountBalance ?? 0,
+    withdrawalBalance: defaultOption?.withdrawalBalance ?? 0,
+    bankName: defaultOption?.bankName ?? '',
+    accountNumberMasked: defaultOption?.accountNumberMasked ?? '',
+    depositOptions,
+  }
   openPacemakerDepositModal()
 }
 
 // 입금 모달의 "입금하기" 클릭: 실제 입금 처리 후 완료 모달로 전환
-async function handleDeposit({ goalId, amount }) {
-  await pacemakerStore.depositToGoal(goalId, amount)
+async function handleDeposit({ accountId, amount, moneyBoxId }) {
+  await pacemakerStore.depositToGoal(accountId, amount, moneyBoxId)
   depositedAmount.value = amount
   isPacemakerDepositModalOpen.value = false
   openPacemakerDepositSuccessModal()
@@ -267,10 +297,16 @@ onMounted(async () => {
 
   await loadGoalDashboard(goalId)
   await pacemakerStore.fetchPacemakerStatus()
+
+  const pacemakerRequests = [pacemakerStore.fetchDepositTargets()]
   if (pacemakerStore.pacemakerStatus?.registered) {
-    await pacemakerStore.fetchPacemakerDashboard()
+    pacemakerRequests.push(
+      pacemakerStore.fetchPacemakerDashboard(),
+      pacemakerStore.fetchHistories({ page: 0, size: 31 })
+    )
   }
-  await pacemakerStore.fetchDepositTargets()
+
+  await Promise.allSettled(pacemakerRequests)
 })
 
 // 사이드바 로드맵 목록에서 다른 목표를 클릭하면 라우트 파라미터만 바뀌고

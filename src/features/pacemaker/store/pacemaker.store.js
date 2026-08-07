@@ -2,8 +2,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as pacemakerApi from '@/features/pacemaker/api/pacemaker.api'
-import { goalApi } from '@/features/goal'
-import { GOAL_TYPE_ICON } from '@/features/pacemaker/constants/pacemaker.constants'
 
 export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   /** @type {import('vue').Ref<import('@/features/pacemaker/api/pacemaker.api').PacemakerStatus | null>} */
@@ -22,6 +20,17 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     const status = pacemakerStatus.value
     const dashboard = pacemakerDashboard.value
     const currentStatus = dashboard?.status ?? status?.status ?? null
+    const referenceDate = getLatestReferenceDate(
+      dashboard?.todaySaving?.savingDate,
+      histories.value
+    )
+    const referenceMonth = referenceDate?.slice(0, 7)
+    const monthlySecuredAmount = referenceMonth
+      ? histories.value.reduce((total, item) => {
+          const isSavedThisMonth = item.status === 'SAVED' && item.date?.startsWith(referenceMonth)
+          return isSavedThisMonth ? total + (item.amount ?? 0) : total
+        }, 0)
+      : 0
 
     return {
       autoSavingId: status?.autoSavingId ?? dashboard?.autoSavingId ?? null,
@@ -29,11 +38,13 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
       status: currentStatus,
       enabled: currentStatus === 'ACTIVE',
       moneyBoxBalance: dashboard?.moneyBox?.balance ?? 0,
+      moneyBoxId: dashboard?.moneyBox?.moneyBoxId ?? null,
       maskedAccountNumber: dashboard?.moneyBox?.maskedAccountNumber ?? '',
       todaySavingAmount:
         dashboard?.todaySaving?.status === 'SUCCESS' ? (dashboard.todaySaving.amount ?? 0) : 0,
       currentStreak: dashboard?.currentStreak ?? 0,
       maxAmount: dashboard?.maxAmount ?? 0,
+      monthlySecuredAmount,
       monthlySuccessCount: dashboard?.monthlySuccessCount ?? 0,
       weeklyStreak: dashboard?.weeklyStreak ?? [],
     }
@@ -42,6 +53,14 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   async function fetchPacemakerStatus() {
     pacemakerStatus.value = await pacemakerApi.getPacemakerStatus()
     return pacemakerStatus.value
+  }
+
+  function getLatestReferenceDate(todaySavingDate, historyItems) {
+    const candidates = [todaySavingDate, ...historyItems.map((item) => item.date)]
+      .filter(Boolean)
+      .map((date) => String(date).slice(0, 10))
+      .sort()
+    return candidates.at(-1) ?? null
   }
 
   /**
@@ -85,24 +104,10 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     }
   }
 
-  // 입금 가능 계좌 = 각 목표의 연결 자산(/api/goals/{goalId}/assets) 중 LOAN이 아닌 것들
   async function fetchDepositTargets() {
-    const goals = await goalApi.getGoals()
-    const assetsByGoal = await Promise.all(goals.map((goal) => goalApi.getGoalAssets(goal.goalId)))
-
-    depositTargets.value = goals.flatMap((goal, index) =>
-      assetsByGoal[index]
-        .filter((asset) => asset.assetType !== 'LOAN')
-        .map((asset) => ({
-          goalId: goal.goalId,
-          goalName: goal.goalName,
-          icon: GOAL_TYPE_ICON[goal.goalType] ?? '🎯',
-          accountNickname: asset.assetName,
-          accountBalance: asset.balance,
-          bankName: asset.bankName,
-          accountNumberMasked: asset.accountNumberMasked,
-        }))
-    )
+    const result = await pacemakerApi.getPacemakerGoals()
+    depositTargets.value = result?.goals ?? []
+    return depositTargets.value
   }
 
   async function togglePacemaker() {
@@ -124,8 +129,8 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     return result
   }
 
-  async function depositToGoal(goalId, amount) {
-    const result = await pacemakerApi.depositToGoalAccount(goalId, amount)
+  async function depositToGoal(accountId, amount, moneyBoxId) {
+    const result = await pacemakerApi.depositToGoalAccount(accountId, amount, moneyBoxId)
     if (pacemakerDashboard.value?.moneyBox) {
       pacemakerDashboard.value.moneyBox.balance = result.remainingBalance
     }

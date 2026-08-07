@@ -10,7 +10,13 @@
         @click="goBack"
       >
         <span aria-hidden="true">←</span>
-        {{ currentStep === 'money-box' ? '소개로 돌아가기' : '이전으로' }}
+        {{
+          isEditMode
+            ? '대시보드로 돌아가기'
+            : currentStep === 'money-box'
+              ? '소개로 돌아가기'
+              : '이전으로'
+        }}
       </button>
 
       <PacemakerMoneyBoxStep
@@ -23,8 +29,9 @@
         v-model="maxAmount"
         :is-submitting="isSubmitting"
         :error-message="submitError"
+        :is-edit-mode="isEditMode"
         @complete="completeSetup"
-        @back="currentStep = 'money-box'"
+        @back="goBack"
       />
       <PacemakerSetupCompleteStep v-else :max-amount="maxAmount" @open-dashboard="goToDashboard" />
     </div>
@@ -32,8 +39,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import {
   PacemakerLimitStep,
   PacemakerMoneyBoxStep,
@@ -42,18 +49,52 @@ import {
 } from '@/features/pacemaker'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
+const route = useRoute()
 const router = useRouter()
 const pacemakerStore = usePacemakerStore()
-const currentStep = ref('money-box')
+const isEditMode = computed(() => route.query.mode === 'max-amount')
+const currentStep = ref(isEditMode.value ? 'limit' : 'money-box')
 const maxAmount = ref(10000)
 const isSubmitting = ref(false)
 const submitError = ref('')
+
+onMounted(async () => {
+  document.querySelector('main')?.scrollTo({ top: 0 })
+  if (!isEditMode.value) return
+
+  isSubmitting.value = true
+  submitError.value = ''
+
+  try {
+    const status = pacemakerStore.pacemakerStatus ?? (await pacemakerStore.fetchPacemakerStatus())
+
+    if (!status.registered) {
+      goToIntro()
+      return
+    }
+
+    if (!pacemakerStore.pacemakerDashboard) {
+      await pacemakerStore.fetchPacemakerDashboard()
+    }
+
+    maxAmount.value = pacemakerStore.pacemakerDashboard.maxAmount
+  } catch (error) {
+    submitError.value = error?.message ?? '현재 상한액을 불러오지 못했어요.'
+  } finally {
+    isSubmitting.value = false
+  }
+})
 
 function goToIntro() {
   router.push({ name: ROUTE_NAMES.PACEMAKER })
 }
 
 function goBack() {
+  if (isEditMode.value) {
+    goToDashboard()
+    return
+  }
+
   if (currentStep.value === 'limit') {
     currentStep.value = 'money-box'
     return
@@ -65,10 +106,26 @@ function goBack() {
 async function completeSetup() {
   if (isSubmitting.value) return
 
+  if (
+    !Number.isInteger(maxAmount.value) ||
+    maxAmount.value < 1000 ||
+    maxAmount.value > 50000 ||
+    maxAmount.value % 1000 !== 0
+  ) {
+    submitError.value = '1,000원 이상 50,000원 이하의 금액을 1,000원 단위로 설정해 주세요.'
+    return
+  }
+
   isSubmitting.value = true
   submitError.value = ''
 
   try {
+    if (isEditMode.value) {
+      await pacemakerStore.updateMaxAmount(maxAmount.value)
+      goToDashboard()
+      return
+    }
+
     await pacemakerStore.setupPacemaker(maxAmount.value)
     currentStep.value = 'complete'
   } catch (error) {

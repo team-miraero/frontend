@@ -157,6 +157,6 @@ const mobileStatusText = computed(() => {
 })
 
 function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
+  return `${Number(amount ?? 0).toLocaleString('ko-KR')}원`
 }
 </script>

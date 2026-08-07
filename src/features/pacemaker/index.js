@@ -9,4 +9,5 @@ export { default as PacemakerDepositSuccessModal } from '@/features/pacemaker/co
 export { default as PacemakerMoneyBoxStep } from '@/features/pacemaker/components/PacemakerMoneyBoxStep.vue'
 export { default as PacemakerLimitStep } from '@/features/pacemaker/components/PacemakerLimitStep.vue'
 export { default as PacemakerSetupCompleteStep } from '@/features/pacemaker/components/PacemakerSetupCompleteStep.vue'
+export { default as PacemakerDashboard } from '@/features/pacemaker/components/PacemakerDashboard.vue'
 export * as pacemakerApi from '@/features/pacemaker/api/pacemaker.api'
