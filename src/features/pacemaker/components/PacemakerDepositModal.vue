@@ -6,7 +6,7 @@
         <p class="text-xs font-bold text-slate-400">
           {{ target?.icon }} {{ target?.goalName }} 목표
         </p>
-        <h3 class="pt-0.5 text-base font-black text-[#0a192f]">출금계좌에 입금하기</h3>
+        <h3 class="pt-0.5 text-base font-black text-[#0a192f]">입금할 계좌에 입금하기</h3>
       </div>
       <button
         type="button"
@@ -26,19 +26,44 @@
         <p class="text-base font-black text-primary">{{ formatWon(availableBalance) }}</p>
       </div>
 
-      <div
-        class="flex items-center justify-between rounded-2xl border border-slate-200 bg-[#f8fbff] px-4 py-3.5"
+      <button
+        type="button"
+        class="flex w-full items-center justify-between rounded-2xl border border-[#c5dcff] bg-[#f8fbff] px-4 py-3.5 text-left"
+        @click="isAccountListOpen = !isAccountListOpen"
       >
         <div>
-          <p class="text-xs text-slate-400">입금 계좌</p>
-          <p class="pt-0.5 text-sm font-bold text-[#0a192f]">{{ target?.accountNickname }}</p>
+          <p class="text-xs text-slate-400">입금할 계좌</p>
+          <p class="pt-0.5 text-sm font-bold text-[#0a192f]">
+            {{ selectedOption?.accountNickname }}
+          </p>
           <p class="text-xs text-slate-500">
-            {{ target?.bankName }} {{ target?.accountNumberMasked }}
+            {{ selectedOption?.bankName }} {{ selectedOption?.accountNumberMasked }}
           </p>
         </div>
-        <p v-if="target?.accountBalance != null" class="text-sm font-bold text-[#0a192f]">
-          {{ formatManwon(target.accountBalance) }}
+        <p v-if="selectedOption?.accountBalance != null" class="text-sm font-bold text-[#0a192f]">
+          {{ formatManwon(selectedOption.accountBalance) }}
         </p>
+      </button>
+
+      <div v-if="isAccountListOpen" class="flex flex-col gap-2">
+        <button
+          v-for="option in target?.depositOptions ?? []"
+          :key="option.accountId"
+          type="button"
+          class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left"
+          :class="option.accountId === selectedOption?.accountId ? 'border-[#c5dcff]' : ''"
+          @click="selectOption(option)"
+        >
+          <span>
+            <span class="block text-sm font-bold text-[#0a192f]">{{ option.accountNickname }}</span>
+            <span class="block text-xs text-slate-400"
+              >{{ option.bankName }} {{ option.accountNumberMasked }}</span
+            >
+          </span>
+          <span class="text-sm font-black text-primary">{{
+            formatManwon(option.accountBalance)
+          }}</span>
+        </button>
       </div>
 
       <div>
@@ -124,6 +149,8 @@ const QUICK_ADD_CHIPS = [
 
 const amountInput = ref('0')
 const isSubmitting = ref(false)
+const isAccountListOpen = ref(false)
+const selectedOption = ref(null)
 
 const amount = computed(() => Number(amountInput.value) || 0)
 const isOverLimit = computed(() => amount.value > props.availableBalance)
@@ -133,9 +160,18 @@ const canSubmit = computed(() => amount.value > 0 && !isOverLimit.value)
 watch(
   () => props.modelValue,
   (isOpen) => {
-    if (isOpen) amountInput.value = '0'
+    if (isOpen) {
+      amountInput.value = '0'
+      selectedOption.value = props.target
+      isAccountListOpen.value = false
+    }
   }
 )
+
+function selectOption(option) {
+  selectedOption.value = option
+  isAccountListOpen.value = false
+}
 
 function handleAmountInput(event) {
   amountInput.value = event.target.value.replace(/[^0-9]/g, '')
@@ -154,9 +190,9 @@ async function handleSubmit() {
   isSubmitting.value = true
   try {
     emit('deposit', {
-      accountId: props.target.accountId,
+      accountId: selectedOption.value.accountId,
       amount: amount.value,
-      moneyBoxId: props.target.moneyBoxId,
+      moneyBoxId: selectedOption.value.moneyBoxId,
     })
   } finally {
     isSubmitting.value = false

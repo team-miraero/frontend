@@ -339,6 +339,17 @@ function selectDepositAsset(goalId, assetId) {
 function openDeposit(group) {
   const asset = selectedDepositAsset(group)
   const withdrawal = selectedWithdrawalAccount(group)
+  const depositOptions = (group.depositAssets ?? []).map((depositAsset) => {
+    const linkedWithdrawal = withdrawalForAsset(group, depositAsset)
+    return {
+      accountId: depositAsset.assetId,
+      moneyBoxId: pacemaker.value.moneyBoxId,
+      accountNickname: formatAssetName(depositAsset),
+      accountBalance: depositAsset.balance ?? 0,
+      bankName: linkedWithdrawal?.financialInstitutionName ?? '',
+      accountNumberMasked: linkedWithdrawal?.maskedAccountNumber ?? '',
+    }
+  })
   selectedDepositTarget.value = {
     goalId: group.goalId,
     accountId: asset?.assetId,
@@ -349,6 +360,7 @@ function openDeposit(group) {
     accountBalance: asset?.balance ?? 0,
     bankName: withdrawal?.financialInstitutionName ?? '',
     accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
+    depositOptions,
   }
   openDepositModal()
 }
