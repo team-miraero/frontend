@@ -316,7 +316,7 @@ const isActive = computed(() => pacemaker.value.status === 'ACTIVE')
 const recentHistories = computed(() => pacemakerStore.histories.slice(0, 5))
 const weeklyStreak = computed(() => dashboard.value?.weeklyStreak ?? [])
 const referenceDate = computed(
-  () => dashboard.value?.todaySaving?.savingDate ?? new Date().toISOString().slice(0, 10)
+  () => dashboard.value?.todaySaving?.savingDate ?? getLocalDateKey(new Date())
 )
 const weekDays = computed(() => {
   const byDay = new Map(weeklyStreak.value.map((day) => [day.dayOfWeek, day]))
@@ -353,9 +353,7 @@ const formatTodayLabel = computed(() => {
   return `${month}월 ${day}일`
 })
 const monthLabel = computed(() => `${referenceDate.value.split('-')[1]}월`)
-const monthlySuccessCount = computed(
-  () => monthDays.value.filter((day) => day?.status === 'SUCCESS').length
-)
+const monthlySuccessCount = computed(() => pacemaker.value.monthlySuccessCount)
 
 const accountGroups = computed(() =>
   pacemakerStore.depositTargets.map((group) => ({
@@ -436,6 +434,13 @@ async function handleDeposit({ accountId, amount, moneyBoxId }) {
 
 function formatNumber(amount) {
   return Number(amount ?? 0).toLocaleString('ko-KR')
+}
+
+function getLocalDateKey(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 function formatCompactWon(amount) {
