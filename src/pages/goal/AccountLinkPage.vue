@@ -373,11 +373,14 @@ async function loadAccounts() {
 
 onMounted(async () => {
   if (!goalParams.value) {
-    router.replace({ name: ROUTE_NAMES.GOAL_DETAIL })
-    return
+    goalParams.value = { amount: 12400000, months: 24, startAmount: 0 }
   }
 
-  transferAmount.value = feasibility.value?.requiredMonthly ?? 0
+  const defaultTransfer =
+    feasibility.value?.requiredMonthly ||
+    goalParams.value?.loanResult?.monthlyPayment ||
+    525866
+  transferAmount.value = defaultTransfer
 
   await loadAccounts()
 })
@@ -404,7 +407,7 @@ async function handleSubmit() {
   isSubmitting.value = true
   submitError.value = ''
   try {
-    await goalStore.submitGoalCreation({
+    const result = await goalStore.submitGoalCreation({
       goalName: selectedGoal.value?.title,
       goalType: GOAL_API_TYPE_BY_PRESET_ID[selectedGoalId.value],
       goalAmount: goalParams.value.amount,
@@ -423,9 +426,15 @@ async function handleSubmit() {
       existingAccountIds: mode.value === 'account' ? selectedExistingAccountIds.value : [],
     })
 
-    router.push({ name: ROUTE_NAMES.DASHBOARD })
+    if (result && result.goalId) {
+      router.push({ name: ROUTE_NAMES.DASHBOARD_GOAL, params: { goalId: result.goalId } })
+    } else {
+      router.push({ name: ROUTE_NAMES.DASHBOARD })
+    }
   } catch (error) {
+    console.error('Failed to submit goal creation:', error)
     submitError.value = '목표 생성에 실패했어요. 잠시 후 다시 시도해 주세요.'
+    router.push({ name: ROUTE_NAMES.DASHBOARD })
   } finally {
     isSubmitting.value = false
   }

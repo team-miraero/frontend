@@ -17,7 +17,7 @@ export async function getGoalPresets() {
 /**
  * @typedef {Object} GoalAssetInput
  * @property {number} [assetId] 연결할 자산 ID (새로 만드는 저금통처럼 아직 없는 자산은 생략)
- * @property {'MONEYBOX' | 'ACCOUNT' | 'LOAN'} assetType
+ * @property {'MONEY_BOX' | 'MONEYBOX' | 'ACCOUNT' | 'LOAN'} assetType
  */
 
 /**
@@ -35,8 +35,8 @@ export async function getGoalPresets() {
  * @returns {Promise<{ goalId: number }>}
  */
 export async function createGoal(payload) {
-  const { data } = await client.post('/goals', payload)
-  return data
+  const { data: responseBody } = await client.post('/goals', payload)
+  return unwrapApiData(responseBody)
 }
 
 /**
@@ -44,6 +44,7 @@ export async function createGoal(payload) {
  * @property {number} goalAmount 목표금액
  * @property {number} goalMonths 목표 개월수
  * @property {number} startAmount 이미 모아둔 금액
+ * @property {boolean} [isStudentLoan] 학자금 대출 여부
  */
 
 /**
@@ -58,8 +59,8 @@ export async function createGoal(payload) {
  * @returns {Promise<FeasibilityResponse>}
  */
 export async function getFeasibility(params) {
-  const { data } = await client.post('/goals/possibility', params)
-  return data
+  const { data: responseBody } = await client.post('/goals/possibility', params)
+  return unwrapApiData(responseBody)
 }
 
 // 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)
@@ -80,13 +81,7 @@ export async function getFeasibility(params) {
  */
 export async function getAccounts(params) {
   const { data: responseBody } = await client.get('/accounts', { params })
-  const data = unwrapApiData(responseBody)
-
-  if (!data || !Array.isArray(data.accounts)) {
-    throw new TypeError('계좌 목록 API 응답 형식이 올바르지 않습니다.')
-  }
-
-  return data
+  return unwrapApiData(responseBody)
 }
 
 // 저금통 개설 API (GOAL-04)
@@ -115,8 +110,8 @@ export async function getAccounts(params) {
  * @returns {Promise<MoneyBoxResponse>}
  */
 export async function createMoneyBox(payload) {
-  const { data } = await client.post('/moneyBoxes', payload)
-  return data
+  const { data: responseBody } = await client.post('/moneyBoxes', payload)
+  return unwrapApiData(responseBody)
 }
 
 // 목표 목록 조회 API
@@ -133,8 +128,9 @@ export async function createMoneyBox(payload) {
  * @returns {Promise<GoalListItem[]>}
  */
 export async function getGoals() {
-  const { data } = await client.get('/goals')
-  return data.goals
+  const { data: responseBody } = await client.get('/goals')
+  const data = unwrapApiData(responseBody)
+  return data?.goals ?? data
 }
 
 // 목표 상세 조회 API
@@ -157,8 +153,8 @@ export async function getGoals() {
  * @returns {Promise<GoalDetail>}
  */
 export async function getGoalDetail(goalId) {
-  const { data } = await client.get(`/goals/${goalId}`)
-  return data
+  const { data: responseBody } = await client.get(`/goals/${goalId}`)
+  return unwrapApiData(responseBody)
 }
 
 /**
@@ -175,8 +171,19 @@ export async function getGoalDetail(goalId) {
  * @returns {Promise<{ goalId: number }>}
  */
 export async function updateGoal(goalId, payload) {
-  const { data } = await client.patch(`/goals/${goalId}`, payload)
-  return data
+  const { data: responseBody } = await client.patch(`/goals/${goalId}`, payload)
+  return unwrapApiData(responseBody)
+}
+
+/**
+ * 자산 연결 API (POST /goals/{goalId}/assets)
+ * @param {number} goalId
+ * @param {GoalAssetInput[]} assets
+ * @returns {Promise<{ success: boolean }>}
+ */
+export async function linkAssetsToGoal(goalId, assets) {
+  const { data: responseBody } = await client.post(`/goals/${goalId}/assets`, { assets })
+  return unwrapApiData(responseBody)
 }
 
 // 연결 자산 조회 API
@@ -197,8 +204,9 @@ export async function updateGoal(goalId, payload) {
  * @returns {Promise<GoalAsset[]>}
  */
 export async function getGoalAssets(goalId) {
-  const { data } = await client.get(`/goals/${goalId}/assets`)
-  return data.assets
+  const { data: responseBody } = await client.get(`/goals/${goalId}/assets`)
+  const unwrapped = unwrapApiData(responseBody)
+  return unwrapped?.assets ?? (Array.isArray(unwrapped) ? unwrapped : [])
 }
 
 /**
@@ -268,8 +276,9 @@ export async function getGoalLinkedAssets(goalId) {
  * @returns {Promise<AvailableMoneyBreakdown>}
  */
 export async function getMonthlyAvailableMoney(goalId) {
-  const { data } = await client.get(`/goals/${goalId}/monthly-available`)
-  return data.monthly
+  const { data: responseBody } = await client.get(`/goals/${goalId}/monthly-available`)
+  const data = unwrapApiData(responseBody)
+  return data?.monthly ?? data
 }
 
 // 일 여유자금 조회 API
@@ -278,8 +287,9 @@ export async function getMonthlyAvailableMoney(goalId) {
  * @returns {Promise<AvailableMoneyBreakdown>}
  */
 export async function getDailyAvailableMoney(goalId) {
-  const { data } = await client.get(`/goals/${goalId}/daily-available`)
-  return data.daily
+  const { data: responseBody } = await client.get(`/goals/${goalId}/daily-available`)
+  const data = unwrapApiData(responseBody)
+  return data?.daily ?? data
 }
 
 /**
@@ -288,6 +298,6 @@ export async function getDailyAvailableMoney(goalId) {
  * @returns {Promise<{ goalId: number, status: string, changedAt: string }>}
  */
 export async function updateGoalStatus(goalId, status) {
-  const { data } = await client.patch(`/goals/${goalId}/status`, { status })
-  return data
+  const { data: responseBody } = await client.patch(`/goals/${goalId}/status`, { status })
+  return unwrapApiData(responseBody)
 }

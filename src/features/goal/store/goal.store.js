@@ -4,6 +4,7 @@ import { router } from '@/app/router'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import * as goalApi from '@/features/goal/api/goal.api'
 import { resolveFeasibilityStatus } from '@/features/goal/composables/useFeasibility'
+import { GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
 
 /**
  * 목표 설정 플로우 및 로드맵 상태를 관리하는 스토어
@@ -11,7 +12,7 @@ import { resolveFeasibilityStatus } from '@/features/goal/composables/useFeasibi
 export const useGoalStore = defineStore('feature-goal', () => {
   // 온보딩 및 기본 선택 상태
   const selectedGoalType = ref(null)
-  const selectedGoalId = ref(null)
+  const selectedGoalId = ref(GOAL_PRESET_IDS.STUDENT_LOAN)
   const goalParams = ref(null)
   const feasibilityResult = ref(null)
   const linkedAccountIds = ref([])
@@ -26,12 +27,17 @@ export const useGoalStore = defineStore('feature-goal', () => {
   const accounts = ref([])
   const areAccountsLoading = ref(false)
   const accountsError = ref(null)
+
   // 대시보드 및 로드맵 공통 선택 상태
   const goals = ref([])
   const goalsError = ref(null)
   const areGoalsLoading = ref(false)
+
   const selectedGoal = computed(
-    () => goals.value.find((goal) => goal.goalId === selectedGoalId.value) ?? null
+    () =>
+      goals.value.find(
+        (goal) => String(goal.goalId) === String(selectedGoalId.value)
+      ) ?? null
   )
 
   // 메인 대시보드 관련 목표 상태
@@ -72,9 +78,12 @@ export const useGoalStore = defineStore('feature-goal', () => {
   // 진행 중인 요청의 Promise를 공유해서 동시 호출자가 모두 같은 완료 시점을 기다리게 한다.
   let fetchGoalsPromise = null
 
-  async function fetchGoals() {
-    if (goals.value.length > 0) return
-    if (fetchGoalsPromise) return fetchGoalsPromise
+  /**
+   * @param {boolean} [force=false]
+   */
+  async function fetchGoals(force = false) {
+    if (goals.value.length > 0 && !force) return
+    if (fetchGoalsPromise && !force) return fetchGoalsPromise
 
     areGoalsLoading.value = true
     goalsError.value = null
@@ -168,23 +177,54 @@ export const useGoalStore = defineStore('feature-goal', () => {
     moneyBox,
     existingAccountIds,
   }) {
-    let assets
+    let assets = []
 
     if (moneyBox) {
       const moneyBoxResult = await goalApi.createMoneyBox(moneyBox)
-      assets = [{ assetId: moneyBoxResult.moneyBoxId, assetType: 'MONEYBOX' }]
-    } else {
-      assets = (existingAccountIds ?? []).map((assetId) => ({ assetId, assetType: 'ACCOUNT' }))
+      assets.push({ assetId: moneyBoxResult.moneyBoxId, assetType: 'MONEY_BOX' })
     }
 
-    return goalApi.createGoal({ goalName, goalType, goalAmount, goalMonths, startAmount, assets })
-  }
+    if (existingAccountIds && existingAccountIds.length > 0) {
+      existingAccountIds.forEach((assetId) => {
+        assets.push({ assetId, assetType: 'ACCOUNT' })
+      })
+    }
 
-  // function selectGoal(goalId) {
-  //   if (goals.value.some((goal) => goal.goalId === goalId)) {
-  //     selectedGoalId.value = goalId
-  //   }
-  // }
+    if (goalType === 'LOAN') {
+      assets.push({ assetId: 1, assetType: 'LOAN' })
+    }
+
+    const newGoalResult = await goalApi.createGoal({
+      goalName,
+      goalType,
+      goalAmount,
+      goalMonths,
+      startAmount,
+      assets,
+    })
+    const createdGoalId = newGoalResult?.goalId ?? 1
+    selectedGoalId.value = createdGoalId
+
+    // 신규 목표 생성 후 자산 연결 API (POST /goals/{goalId}/assets) 호출
+    if (assets.length > 0 && createdGoalId) {
+      await goalApi.linkAssetsToGoal(createdGoalId, assets)
+    }
+
+    // 신규 목표를 local goals 목록에도 추가해 로드맵 셀렉터/사이드바에 즉시 노출되도록 함
+    const newGoalItem = {
+      goalId: createdGoalId,
+      goalName: goalName || (goalType === 'LOAN' ? '학자금 대출 상환' : '새로운 목표'),
+      goalType: goalType || 'INDEPENDENCE',
+      progressRate: 0.0,
+      status: 'ACTIVE',
+    }
+
+    if (!goals.value.some((g) => String(g.goalId) === String(createdGoalId))) {
+      goals.value = [newGoalItem, ...goals.value]
+    }
+
+    return { goalId: createdGoalId }
+  }
 
   /**
    * @param {number} goalId
@@ -208,6 +248,22 @@ export const useGoalStore = defineStore('feature-goal', () => {
   }
 
   /**
+   * @param {number} goalId
+   * @param {import('@/features/goal/api/goal.api').UpdateGoalPayload} payload
+   */
+  async function updateGoal(goalId, payload) {
+    const result = await goalApi.updateGoal(goalId, payload)
+    const targetGoal = goals.value.find((g) => String(g.goalId) === String(goalId))
+    if (targetGoal) {
+      if (payload.status) targetGoal.status = payload.status
+    }
+    if (currentGoal.value && String(currentGoal.value.goalId) === String(goalId)) {
+      currentGoal.value = { ...currentGoal.value, ...payload }
+    }
+    return result
+  }
+
+  /**
    * @param {'ACTIVE' | 'PAUSE'} status
    */
   async function updateCurrentGoalStatus(status) {
@@ -215,6 +271,12 @@ export const useGoalStore = defineStore('feature-goal', () => {
     const result = await goalApi.updateGoalStatus(currentGoal.value.goalId, status)
     if (currentGoal.value) {
       currentGoal.value.status = result.status
+    }
+    const targetGoal = goals.value.find(
+      (g) => String(g.goalId) === String(currentGoal.value.goalId)
+    )
+    if (targetGoal) {
+      targetGoal.status = result.status
     }
   }
 
@@ -243,6 +305,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
     resetGoalStore,
     fetchGoals,
     fetchDashboardData,
+    updateGoal,
     updateCurrentGoalStatus,
     fetchFeasibility,
     fetchRecalculatedFeasibility,
