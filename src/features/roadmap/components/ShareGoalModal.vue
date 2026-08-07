@@ -6,9 +6,9 @@
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <div class="max-h-[90vh] w-full overflow-y-auto">
-      <div class="grid grid-cols-3 items-center border-b border-slate-100 px-5 py-3">
+      <div class="grid grid-cols-3 items-center border-b border-slate-100 px-3 sm:px-5 py-3">
         <button type="button" class="justify-self-start text-xl text-slate-700" @click="close">‹</button>
-        <p class="text-center text-base font-bold text-[#0a192f]">친구에게 공유하기</p>
+        <p class="whitespace-nowrap text-center text-sm sm:text-base font-bold text-[#0a192f]">친구에게 공유하기</p>
         <button type="button" class="justify-self-end text-sm font-bold text-primary" @click="close">완료</button>
       </div>
 

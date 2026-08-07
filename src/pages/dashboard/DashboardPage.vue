@@ -57,7 +57,7 @@
             <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
           </div>
 
-          <div class="grid grid-cols-2 items-start gap-4 pt-4">
+          <div class="pt-4">
             <AvailableMoneyPanel
               v-if="goalStore.monthlyAvailableMoney && goalStore.dailyAvailableMoney"
               :monthly="goalStore.monthlyAvailableMoney"
@@ -65,15 +65,15 @@
               @open-today="openTodayAvailableMoneyModal"
               @open-month="openMonthlyAvailableMoneyModal"
             />
-            <div>
-              <!-- AvailableMoneyPanel의 "여유자금" 타이틀과 같은 높이의 투명 스페이서-->
-              <p class="invisible text-sm font-bold">여유자금</p>
-              <div class="mt-2">
-                <PacemakerToggleCard
-                  :pacemaker="pacemakerStore.pacemakerView"
-                  @toggle="handlePacemakerToggle"
-                />
-              </div>
+
+            <hr class="my-4 border-slate-200" />
+
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 items-stretch">
+              <PacemakerToggleCard
+                :pacemaker="pacemakerStore.pacemakerView"
+                @toggle="handlePacemakerToggle"
+              />
+              <ShareWithFriendsCard @open="openShareGoalModal" />
             </div>
           </div>
 
@@ -87,7 +87,6 @@
               :goal="goalStore.currentGoal"
               :milestones="roadmapStore.milestones"
             />
-            <ShareWithFriendsCard @open="openShareGoalModal" />
             <MilestoneList :milestones="roadmapStore.milestones" />
           </div>
         </div>
