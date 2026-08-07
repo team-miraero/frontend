@@ -43,6 +43,9 @@
                 @open-today="openTodayAvailableMoneyModal"
                 @open-month="openMonthlyAvailableMoneyModal"
               />
+              <div class="mt-7 border-t border-slate-200/70 pt-5">
+                <ShareWithFriendsCard @open="openShareGoalModal" />
+              </div>
             </div>
           </div>
         </div>
@@ -84,6 +87,7 @@
               :goal="goalStore.currentGoal"
               :milestones="roadmapStore.milestones"
             />
+            <ShareWithFriendsCard @open="openShareGoalModal" />
             <MilestoneList :milestones="roadmapStore.milestones" />
           </div>
         </div>
@@ -129,6 +133,11 @@
       :mode="statusConfirmMode"
       @confirm="handleStatusConfirm"
     />
+    <ShareGoalModal
+      v-model="isShareGoalModalOpen"
+      :goal="goalStore.currentGoal"
+      :milestones="roadmapStore.milestones"
+    />
   </div>
 </template>
 
@@ -151,6 +160,8 @@ import {
   LinkedAssetsModal,
   GoalPausedBanner,
   GoalStatusConfirmModal,
+  ShareWithFriendsCard,
+  ShareGoalModal,
 } from '@/features/roadmap'
 import {
   usePacemakerStore,
@@ -177,6 +188,7 @@ const { isOpen: isMonthlyAvailableMoneyModalOpen, open: openMonthlyAvailableMone
   useModal()
 const { isOpen: isLinkedAssetsModalOpen, open: openLinkedAssetsModal } = useModal()
 const { isOpen: isStatusConfirmModalOpen, open: openStatusConfirmModal } = useModal()
+const { isOpen: isShareGoalModalOpen, open: openShareGoalModal } = useModal()
 
 const selectedDepositTarget = ref(null)
 const depositedAmount = ref(0)
