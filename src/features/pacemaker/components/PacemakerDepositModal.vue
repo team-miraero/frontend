@@ -40,8 +40,11 @@
             {{ selectedOption?.bankName }} {{ selectedOption?.accountNumberMasked }}
           </p>
         </div>
-        <p v-if="selectedOption?.accountBalance != null" class="text-sm font-bold text-[#0a192f]">
-          {{ formatManwon(selectedOption.accountBalance) }}
+        <p
+          v-if="selectedOption?.withdrawalBalance != null"
+          class="text-sm font-bold text-[#0a192f]"
+        >
+          {{ formatManwon(selectedOption.withdrawalBalance) }}
         </p>
       </button>
 
@@ -63,7 +66,7 @@
             >
           </span>
           <span class="text-sm font-black text-primary">{{
-            formatManwon(option.accountBalance)
+            formatManwon(option.withdrawalBalance)
           }}</span>
         </button>
       </div>
