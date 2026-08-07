@@ -391,6 +391,10 @@ function handleNext() {
       return
     }
   }
+  goalStore.applyRecalculatedFeasibility()
+  if (goalParams.value?.loanResult) {
+    goalParams.value.loanResult.monthlyPayment = feasibility.value?.requiredMonthly
+  }
   router.push({ name: ROUTE_NAMES.GOAL_ACCOUNT })
 }
 </script>

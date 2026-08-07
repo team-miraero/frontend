@@ -280,6 +280,18 @@ export const useGoalStore = defineStore('feature-goal', () => {
     }
   }
 
+  /**
+   * 재계산된 실현가능성(recalculatedFeasibility) 결과가 존재할 경우 기존 feasibility 객체에 덮어씌워 병합합니다.
+   */
+  function applyRecalculatedFeasibility() {
+    if (recalculatedFeasibility.value) {
+      feasibility.value = {
+        ...feasibility.value,
+        ...recalculatedFeasibility.value,
+      }
+    }
+  }
+
   return {
     selectedGoalType,
     selectedGoalId,
@@ -311,5 +323,6 @@ export const useGoalStore = defineStore('feature-goal', () => {
     fetchRecalculatedFeasibility,
     fetchAccounts,
     submitGoalCreation,
+    applyRecalculatedFeasibility,
   }
 })
