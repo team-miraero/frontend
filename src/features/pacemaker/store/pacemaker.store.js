@@ -20,7 +20,10 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     const status = pacemakerStatus.value
     const dashboard = pacemakerDashboard.value
     const currentStatus = dashboard?.status ?? status?.status ?? null
-    const referenceDate = dashboard?.todaySaving?.savingDate ?? histories.value[0]?.date
+    const referenceDate = getLatestReferenceDate(
+      dashboard?.todaySaving?.savingDate,
+      histories.value
+    )
     const referenceMonth = referenceDate?.slice(0, 7)
     const monthlySecuredAmount = referenceMonth
       ? histories.value.reduce((total, item) => {
@@ -33,10 +36,10 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
       histories.value.filter((item) => item.status === 'SAVED').map((item) => item.date)
     )
     let calculatedStreak = 0
-    let streakDate = referenceDate ? new Date(`${referenceDate}T00:00:00`) : null
-    while (streakDate && historyDates.has(formatDateKey(streakDate))) {
+    let streakDate = referenceDate
+    while (streakDate && historyDates.has(streakDate)) {
       calculatedStreak += 1
-      streakDate.setDate(streakDate.getDate() - 1)
+      streakDate = getPreviousDateKey(streakDate)
     }
 
     return {
@@ -62,11 +65,21 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     return pacemakerStatus.value
   }
 
-  function formatDateKey(date) {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+  function getLatestReferenceDate(todaySavingDate, historyItems) {
+    const candidates = [todaySavingDate, ...historyItems.map((item) => item.date)]
+      .filter(Boolean)
+      .map((date) => String(date).slice(0, 10))
+      .sort()
+    return candidates.at(-1) ?? null
+  }
+
+  function getPreviousDateKey(dateKey) {
+    const [year, month, day] = dateKey.split('-').map(Number)
+    const previousDate = new Date(year, month - 1, day - 1)
+    const previousYear = previousDate.getFullYear()
+    const previousMonth = String(previousDate.getMonth() + 1).padStart(2, '0')
+    const previousDay = String(previousDate.getDate()).padStart(2, '0')
+    return `${previousYear}-${previousMonth}-${previousDay}`
   }
 
   /**

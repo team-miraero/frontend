@@ -167,7 +167,7 @@ watch(
   (isOpen) => {
     if (isOpen) {
       amountInput.value = '0'
-      selectedOption.value = props.target
+      selectedOption.value = props.target?.depositOptions?.[0] ?? null
       isAccountListOpen.value = false
     }
   }
@@ -191,7 +191,7 @@ function handleClose(value) {
 }
 
 async function handleSubmit() {
-  if (!canSubmit.value || !props.target) return
+  if (!canSubmit.value || !selectedOption.value) return
   isSubmitting.value = true
   try {
     emit('deposit', {

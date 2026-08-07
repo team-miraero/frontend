@@ -73,10 +73,11 @@
               <span class="text-lg leading-none">{{ goalIcon(goal.goalType) }}</span>
               <div>
                 <p class="text-xs font-bold text-[#0a192f]">{{ goal.goalName }}</p>
-                <p class="text-xs text-slate-400">
-                  {{ goal.depositAssets?.[0]?.financialInstitutionName ?? '저금통' }}
-                  {{ goal.depositAssets?.[0]?.maskedAccountNumber }}
+                <p v-if="goal.depositAssets?.[0]" class="text-xs text-slate-400">
+                  {{ goal.depositAssets[0].financialInstitutionName ?? '저금통' }}
+                  {{ goal.depositAssets[0].maskedAccountNumber ?? '' }}
                 </p>
+                <p v-else class="text-xs text-slate-400">연결된 입금 계좌 없음</p>
               </div>
             </div>
             <button
