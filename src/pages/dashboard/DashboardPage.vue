@@ -1,94 +1,52 @@
 <!-- 로드맵 메인 대시보드 -->
 <template>
-  <div v-if="goalStore.currentGoal" class="flex justify-center bg-[#f8fbff] pb-16">
-    <div class="w-full max-w-[1440px] px-10 py-7">
-      <GoalPausedBanner v-if="isGoalPaused" class="mb-4" @resume-click="openResumeConfirm" />
+  <div v-if="goalStore.currentGoal" class="flex justify-center bg-[#f8fbff] pb-8">
+    <div class="w-full max-w-[1440px] px-8 py-3">
+      <GoalPausedBanner v-if="isGoalPaused" class="mb-3" @resume-click="openResumeConfirm" />
       <PaceBanner
         :pace="goalStore.currentGoal.pace"
         :progress-rate="goalStore.currentGoal.progressRate"
         :disabled="isGoalPaused"
+        :current-amount="goalStore.currentGoal.currentAmount"
+        :daily-available-money="goalStore.dailyAvailableMoney"
+        :monthly-available-money="goalStore.monthlyAvailableMoney"
         @cta-click="handlePacemakerCtaClick"
+        @pause="openPauseConfirm"
+        @open-today="openTodayAvailableMoneyModal"
+        @open-month="openMonthlyAvailableMoneyModal"
       />
       <!-- 목표가 일시정지 상태면 아래 액션 영역 전체를 흐리게 하고 클릭이 통하지 않도록 막음 -->
       <div :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''">
-        <!-- ============ 데스크톱 (lg 이상): 기존 3열 + 사이드 패널 구조 유지 ============ -->
-        <div class="hidden lg:block">
-          <div class="grid grid-cols-3 gap-4 pt-6">
-            <GoalSummaryCard :goal="goalStore.currentGoal" />
-            <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
-            <PacemakerToggleCard
-              :pacemaker="pacemakerStore.pacemakerView"
-              @toggle="handlePacemakerToggle"
-            />
-          </div>
+        <div class="mt-2 sm:mt-3">
+          <MilestoneProgressBar
+            :goal="goalStore.currentGoal"
+            :milestones="roadmapStore.milestones"
+          />
 
-          <div class="flex gap-5 pt-6">
-            <div class="flex flex-1 min-w-0 flex-col gap-4">
-              <MilestoneProgressBar
-                :goal="goalStore.currentGoal"
-                :milestones="roadmapStore.milestones"
-                @pause="openPauseConfirm"
-              />
-              <NextMilestoneCard
-                :goal="goalStore.currentGoal"
-                :milestones="roadmapStore.milestones"
-              />
-              <MilestoneList :milestones="roadmapStore.milestones" />
-            </div>
-            <div class="w-[300px] shrink-0">
-              <AvailableMoneyPanel
-                v-if="goalStore.monthlyAvailableMoney && goalStore.dailyAvailableMoney"
-                :monthly="goalStore.monthlyAvailableMoney"
-                :daily="goalStore.dailyAvailableMoney"
-                @open-today="openTodayAvailableMoneyModal"
-                @open-month="openMonthlyAvailableMoneyModal"
-              />
-              <div class="mt-7 border-t border-slate-200/70 pt-5">
-                <ShareWithFriendsCard @open="openShareGoalModal" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ============ 모바일 (lg 미만): 2열 페어 그리드로 재배치 ============ -->
-        <div class="lg:hidden">
-          <div class="grid grid-cols-2 gap-4 pt-6">
-            <GoalSummaryCard :goal="goalStore.currentGoal" />
-            <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
-          </div>
-
-          <div class="pt-4">
-            <AvailableMoneyPanel
-              v-if="goalStore.monthlyAvailableMoney && goalStore.dailyAvailableMoney"
-              :monthly="goalStore.monthlyAvailableMoney"
-              :daily="goalStore.dailyAvailableMoney"
-              @open-today="openTodayAvailableMoneyModal"
-              @open-month="openMonthlyAvailableMoneyModal"
-            />
-
-            <hr class="my-4 border-slate-200" />
-
-            <div class="grid grid-cols-2 gap-3 sm:gap-4 items-stretch">
-              <PacemakerToggleCard
-                :pacemaker="pacemakerStore.pacemakerView"
-                @toggle="handlePacemakerToggle"
-              />
-              <ShareWithFriendsCard @open="openShareGoalModal" />
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-4 pt-4">
-            <MilestoneProgressBar
-              :goal="goalStore.currentGoal"
-              :milestones="roadmapStore.milestones"
-              @pause="openPauseConfirm"
-            />
+          <!-- 스플릿 기록: 예전엔 토글로 접어뒀는데 굳이 숨길 필요 없어서 항상 노출 -->
+          <div class="mt-3 flex flex-col gap-3">
+            <!-- NextMilestoneCard: SPLIT 2(진행 중) 카드 안에 동일한 진행률 정보가 이미 있어 중복이라 잠시 주석 처리.
+                 나중에 다시 쓸 수도 있어서 삭제하지 않고 남겨둠. -->
+            <!--
             <NextMilestoneCard
               :goal="goalStore.currentGoal"
               :milestones="roadmapStore.milestones"
             />
-            <MilestoneList :milestones="roadmapStore.milestones" />
+            -->
+            <MilestoneList :milestones="roadmapStore.milestones" :goal="goalStore.currentGoal" />
           </div>
+        </div>
+
+        <!-- 요약 통계 그룹: 도로/스플릿과 이어지는 하나의 카드로 묶음 -->
+        <div class="pt-1">
+          <RaceRecordSummary
+            :goal="goalStore.currentGoal"
+            :assets="goalStore.assets"
+            :pacemaker="pacemakerStore.pacemakerView"
+            @open-detail="openLinkedAssetsModal"
+            @toggle="handlePacemakerToggle"
+            @open="openShareGoalModal"
+          />
         </div>
       </div>
     </div>
@@ -147,19 +105,15 @@ import { useGoalStore } from '@/features/goal'
 import {
   useRoadmapStore,
   PaceBanner,
-  GoalSummaryCard,
-  ConnectedAssetsCard,
-  PacemakerToggleCard,
   MilestoneProgressBar,
-  NextMilestoneCard,
+  // NextMilestoneCard, // 템플릿에서 주석 처리한 것과 짝 — 나중에 다시 쓰면 여기도 같이 복원
   MilestoneList,
-  AvailableMoneyPanel,
   TodayAvailableMoneyModal,
   MonthlyAvailableMoneyModal,
   LinkedAssetsModal,
   GoalPausedBanner,
   GoalStatusConfirmModal,
-  ShareWithFriendsCard,
+  RaceRecordSummary,
   ShareGoalModal,
 } from '@/features/roadmap'
 import {

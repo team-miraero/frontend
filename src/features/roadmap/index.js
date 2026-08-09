@@ -16,4 +16,5 @@ export { default as LinkedAssetsModal } from '@/features/roadmap/components/Link
 export { default as GoalPausedBanner } from '@/features/roadmap/components/GoalPausedBanner.vue'
 export { default as GoalStatusConfirmModal } from '@/features/roadmap/components/GoalStatusConfirmModal.vue'
 export { default as ShareWithFriendsCard } from '@/features/roadmap/components/ShareWithFriendsCard.vue'
+export { default as RaceRecordSummary } from '@/features/roadmap/components/RaceRecordSummary.vue'
 export { default as ShareGoalModal } from '@/features/roadmap/components/ShareGoalModal.vue'
