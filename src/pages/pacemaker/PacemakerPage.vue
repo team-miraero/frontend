@@ -44,7 +44,9 @@
           >
             <path d="M12 8v4" />
             <path d="M12 16h.01" />
-            <path d="M10.3 3.8 2.4 17.3A2 2 0 0 0 4.1 20h15.8a2 2 0 0 0 1.7-2.7L13.7 3.8a2 2 0 0 0-3.4 0Z" />
+            <path
+              d="M10.3 3.8 2.4 17.3A2 2 0 0 0 4.1 20h15.8a2 2 0 0 0 1.7-2.7L13.7 3.8a2 2 0 0 0-3.4 0Z"
+            />
           </svg>
         </div>
         <h2 class="mt-5 text-xl font-black tracking-[-0.4px] text-[#0a192f]">
@@ -195,7 +197,10 @@
       <button
         type="button"
         class="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-[18px] px-5 text-base font-black tracking-[-0.01em] text-white shadow-[0_8px_28px_rgba(0,102,255,0.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:animate-fade-in-up motion-safe:transition motion-safe:hover:scale-[1.01] motion-safe:active:scale-[0.98]"
-        style="background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%); animation-delay: 400ms"
+        style="
+          background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%);
+          animation-delay: 400ms;
+        "
         @click="goToSetup"
       >
         <svg
@@ -214,17 +219,14 @@
       </button>
     </div>
 
-    <!-- 개설 사용자의 전용 메인 화면은 후속 이슈 전까지 기존 플레이스홀더 유지 -->
-    <div v-else class="p-6">
-      <h1 class="text-xl font-bold">페이스메이커</h1>
-    </div>
+    <PacemakerDashboard v-else @edit-max-amount="goToMaxAmountSettings" />
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { usePacemakerStore } from '@/features/pacemaker'
+import { PacemakerDashboard, usePacemakerStore } from '@/features/pacemaker'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const router = useRouter()
@@ -277,6 +279,14 @@ async function loadPacemakerStatus() {
     if (typeof pacemakerStore.pacemakerStatus?.registered !== 'boolean') {
       throw new Error('페이스메이커 상태를 확인할 수 없습니다.')
     }
+
+    if (pacemakerStore.pacemakerStatus.registered) {
+      await pacemakerStore.fetchPacemakerDashboard()
+      await Promise.allSettled([
+        pacemakerStore.fetchDepositTargets(),
+        pacemakerStore.fetchHistories({ page: 0, size: 31 }),
+      ])
+    }
   } catch (error) {
     errorMessage.value = error?.message ?? '페이스메이커 상태를 불러오지 못했습니다.'
   } finally {
@@ -288,5 +298,12 @@ function goToSetup() {
   router.push({ name: ROUTE_NAMES.PACEMAKER_SETUP })
 }
 
-onMounted(loadPacemakerStatus)
+function goToMaxAmountSettings() {
+  router.push({ name: ROUTE_NAMES.PACEMAKER_SETUP, query: { mode: 'max-amount' } })
+}
+
+onMounted(() => {
+  document.querySelector('main')?.scrollTo({ top: 0 })
+  loadPacemakerStatus()
+})
 </script>
