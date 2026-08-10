@@ -335,7 +335,7 @@ function categoryMeta(categoryCode) {
 }
 
 function formatAmount(amount) {
-  return formatKRW(Number(amount))
+  return formatKRW(Math.abs(Number(amount)))
 }
 
 function formatTime(transactedAt) {
