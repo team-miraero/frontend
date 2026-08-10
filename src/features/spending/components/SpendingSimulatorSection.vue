@@ -163,10 +163,7 @@ const getSelectorStyle = (category) => {
   }
 }
 
-const getStatusColor = (category) => {
-  const isActive = category.mode === 'maintain' || category.target !== null
-  return isActive ? category.accent : '#CBD5E1'
-}
+const getStatusColor = (category) => (category.target !== null ? category.accent : '#CBD5E1')
 
 const selectPreviousCategory = () => selectCategoryByOffset(-1)
 
