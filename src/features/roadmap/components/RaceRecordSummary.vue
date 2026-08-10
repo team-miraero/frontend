@@ -22,7 +22,14 @@
 
     <!-- 다음달 자금마련 / 공유하기: 옆 카드와 높이를 동일하게 맞춘 배너 그리드 -->
     <div class="grid grid-cols-1 items-stretch gap-2.5 pt-2.5 sm:grid-cols-2">
-      <PacemakerToggleCard :pacemaker="pacemaker" @toggle="$emit('toggle')" />
+      <PacemakerToggleCard
+        :pacemaker="pacemaker"
+        :is-toggling="isToggling"
+        :toggle-error-message="toggleErrorMessage"
+        :dashboard-error-message="dashboardErrorMessage"
+        @toggle="$emit('toggle')"
+        @retry-dashboard="$emit('retry-dashboard')"
+      />
       <ShareWithFriendsCard @open="$emit('open')" />
     </div>
   </div>
@@ -48,6 +55,18 @@ defineProps({
     type: Object,
     default: null,
   },
+  isToggling: {
+    type: Boolean,
+    default: false,
+  },
+  toggleErrorMessage: {
+    type: String,
+    default: '',
+  },
+  dashboardErrorMessage: {
+    type: String,
+    default: '',
+  },
 })
-defineEmits(['open-detail', 'toggle', 'open'])
+defineEmits(['open-detail', 'toggle', 'open', 'retry-dashboard'])
 </script>

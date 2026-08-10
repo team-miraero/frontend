@@ -153,10 +153,6 @@ function milestonePosition(milestone) {
   return toTrackPercent(milestone.targetAmount / props.goal.goalAmount)
 }
 
-function progressFillWidth() {
-  return toTrackPercent(props.goal.progressRate / 100) - TRACK_START
-}
-
 function isLastMilestone(milestone) {
   return props.milestones[props.milestones.length - 1]?.milestoneId === milestone.milestoneId
 }
@@ -167,22 +163,6 @@ function formatManwon(amount) {
 
 function formatEndDate(yyyyMM) {
   return yyyyMM.replace('-', '.')
-}
-
-// 목표/현재 페이스 최소 간격 확보
-function pacePositions() {
-  const target = toTrackPercent(props.goal.pace.expectedAmount / props.goal.goalAmount)
-  const current = toTrackPercent(props.goal.progressRate / 100)
-  const MIN_GAP = 2.5
-
-  if (Math.abs(current - target) >= MIN_GAP) {
-    return { target, current }
-  }
-
-  const mid = (current + target) / 2
-  return current >= target
-    ? { target: mid - MIN_GAP / 2, current: mid + MIN_GAP / 2 }
-    : { target: mid + MIN_GAP / 2, current: mid - MIN_GAP / 2 }
 }
 
 function milestonePercent(milestone) {

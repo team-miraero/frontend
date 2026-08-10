@@ -43,9 +43,13 @@
             :goal="goalStore.currentGoal"
             :assets="goalStore.assets"
             :pacemaker="pacemakerStore.pacemakerView"
+            :is-toggling="pacemakerStore.isToggling"
+            :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
+            :dashboard-error-message="dashboardErrorMessage"
             @open-detail="openLinkedAssetsModal"
             @toggle="handlePacemakerToggle"
             @open="openShareGoalModal"
+            @retry-dashboard="retryPacemakerDashboard"
           />
         </div>
       </div>
