@@ -10,10 +10,18 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   const pacemakerDashboard = ref(null)
   const depositTargets = ref([])
   const histories = ref([])
-  const historyPage = ref(null)
-  const hasMoreHistories = ref(false)
-  const isDashboardLoading = ref(false)
+  const isDepositTargetsLoading = ref(false)
+  const depositTargetsError = ref(null)
+  const isHistoriesLoading = ref(false)
+  const historiesError = ref(null)
+  const isToggling = ref(false)
+  const toggleError = ref(null)
   const dashboardError = ref(null)
+  /** @type {import('vue').Ref<Record<number, import('@/features/pacemaker/api/pacemaker.api').AccountDetail>>} */
+  const accountDetails = ref({})
+  const accountDetailRequests = new Map()
+  let depositTargetsRequestId = 0
+  let historiesRequestId = 0
 
   // 기존 대시보드 컴포넌트가 최신 API 필드를 사용할 수 있도록 만든 화면용 모델
   const pacemakerView = computed(() => {
@@ -33,7 +41,6 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
       : 0
 
     return {
-      autoSavingId: status?.autoSavingId ?? dashboard?.autoSavingId ?? null,
       registered: status?.registered ?? false,
       status: currentStatus,
       enabled: currentStatus === 'ACTIVE',
@@ -46,7 +53,6 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
       maxAmount: dashboard?.maxAmount ?? 0,
       monthlySecuredAmount,
       monthlySuccessCount: dashboard?.monthlySuccessCount ?? 0,
-      weeklyStreak: dashboard?.weeklyStreak ?? [],
     }
   })
 
@@ -91,36 +97,80 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   }
 
   async function fetchPacemakerDashboard() {
-    isDashboardLoading.value = true
-    dashboardError.value = null
-
     try {
       pacemakerDashboard.value = await pacemakerApi.getPacemakerDashboard()
+      dashboardError.value = null
+      return pacemakerDashboard.value
     } catch (error) {
       dashboardError.value = error
       throw error
-    } finally {
-      isDashboardLoading.value = false
     }
   }
 
   async function fetchDepositTargets() {
-    const result = await pacemakerApi.getPacemakerGoals()
-    depositTargets.value = result?.goals ?? []
-    return depositTargets.value
+    const requestId = ++depositTargetsRequestId
+    isDepositTargetsLoading.value = true
+
+    try {
+      const result = await pacemakerApi.getPacemakerGoals()
+      if (requestId === depositTargetsRequestId) {
+        depositTargets.value = result?.goals ?? []
+        depositTargetsError.value = null
+      }
+      return depositTargets.value
+    } catch (error) {
+      if (requestId === depositTargetsRequestId) depositTargetsError.value = error
+      throw error
+    } finally {
+      if (requestId === depositTargetsRequestId) isDepositTargetsLoading.value = false
+    }
+  }
+
+  /**
+   * 계좌/저금통 상세(accountName 등)를 조회해 캐시합니다. 이미 캐시됐거나 요청 중이면 그대로 재사용합니다.
+   * @param {number} accountId
+   * @returns {Promise<import('@/features/pacemaker/api/pacemaker.api').AccountDetail | null>}
+   */
+  async function fetchAccountDetail(accountId) {
+    if (!accountId) return null
+    if (accountDetails.value[accountId]) return accountDetails.value[accountId]
+    if (accountDetailRequests.has(accountId)) return accountDetailRequests.get(accountId)
+
+    const request = pacemakerApi
+      .getAccountDetail(accountId)
+      .then((detail) => {
+        accountDetails.value = { ...accountDetails.value, [accountId]: detail }
+        return detail
+      })
+      .catch(() => null)
+      .finally(() => accountDetailRequests.delete(accountId))
+
+    accountDetailRequests.set(accountId, request)
+    return request
   }
 
   async function togglePacemaker() {
-    if (!pacemakerStatus.value?.autoSavingId) return
+    if (!pacemakerStatus.value?.autoSavingId || isToggling.value) return null
 
     const nextStatus = pacemakerStatus.value.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE'
-    const result = await pacemakerApi.updatePacemakerStatus(
-      pacemakerStatus.value.autoSavingId,
-      nextStatus
-    )
+    isToggling.value = true
+    toggleError.value = null
 
-    pacemakerStatus.value = { ...pacemakerStatus.value, ...result }
-    if (pacemakerDashboard.value) pacemakerDashboard.value.status = result.status
+    try {
+      const result = await pacemakerApi.updatePacemakerStatus(
+        pacemakerStatus.value.autoSavingId,
+        nextStatus
+      )
+
+      pacemakerStatus.value = { ...pacemakerStatus.value, ...result }
+      if (pacemakerDashboard.value) pacemakerDashboard.value.status = result.status
+      return result
+    } catch (error) {
+      toggleError.value = error
+      return null
+    } finally {
+      isToggling.value = false
+    }
   }
 
   async function updateMaxAmount(maxAmount) {
@@ -138,10 +188,22 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   }
 
   async function fetchHistories(params) {
-    const result = await pacemakerApi.getPacemakerHistories(params)
-    histories.value = result.content
-    historyPage.value = result
-    hasMoreHistories.value = !result.last
+    const requestId = ++historiesRequestId
+    isHistoriesLoading.value = true
+
+    try {
+      const result = await pacemakerApi.getPacemakerHistories(params)
+      if (requestId === historiesRequestId) {
+        histories.value = result?.content ?? []
+        historiesError.value = null
+      }
+      return histories.value
+    } catch (error) {
+      if (requestId === historiesRequestId) historiesError.value = error
+      throw error
+    } finally {
+      if (requestId === historiesRequestId) isHistoriesLoading.value = false
+    }
   }
 
   return {
@@ -150,14 +212,19 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     pacemakerView,
     depositTargets,
     histories,
-    historyPage,
-    hasMoreHistories,
-    isDashboardLoading,
+    isDepositTargetsLoading,
+    depositTargetsError,
+    isHistoriesLoading,
+    historiesError,
+    isToggling,
+    toggleError,
     dashboardError,
+    accountDetails,
     fetchPacemakerStatus,
     setupPacemaker,
     fetchPacemakerDashboard,
     fetchDepositTargets,
+    fetchAccountDetail,
     togglePacemaker,
     updateMaxAmount,
     depositToGoal,

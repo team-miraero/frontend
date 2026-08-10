@@ -72,8 +72,39 @@ export async function getPacemakerGoals() {
   return unwrapApiResponse(data)
 }
 
+/**
+ * @typedef {Object} AccountDetail
+ * @property {number} accountId
+ * @property {string} institutionName
+ * @property {string} accountType
+ * @property {string} accountName
+ * @property {string} maskedAccountNumber
+ * @property {number} balance
+ * @property {string | null} maturityAt
+ * @property {number | null} interestRate
+ * @property {number | null} monthlyPaymentLimit
+ */
+
+/**
+ * 계좌/저금통 상세 정보를 조회합니다. (계좌명 표시용)
+ * @param {number} accountId
+ * @returns {Promise<AccountDetail>}
+ */
+export async function getAccountDetail(accountId) {
+  const { data } = await client.get(`/accounts/${accountId}`)
+  return unwrapApiResponse(data)
+}
+
 function unwrapApiResponse(payload) {
-  return payload?.success === true && payload.data !== undefined ? payload.data : payload
+  if (payload && typeof payload === 'object' && Object.hasOwn(payload, 'success')) {
+    if (payload.success !== true) {
+      throw new Error(payload.error?.message ?? payload.message ?? 'API 요청에 실패했습니다.')
+    }
+
+    return payload.data
+  }
+
+  return payload
 }
 
 /** @returns {Promise<PacemakerStatus>} */

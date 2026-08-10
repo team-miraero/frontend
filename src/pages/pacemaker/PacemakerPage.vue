@@ -282,9 +282,9 @@ async function loadPacemakerStatus() {
 
     if (pacemakerStore.pacemakerStatus.registered) {
       await pacemakerStore.fetchPacemakerDashboard()
-      await Promise.allSettled([
-        pacemakerStore.fetchDepositTargets(),
-        pacemakerStore.fetchHistories({ page: 0, size: 31 }),
+      await Promise.all([
+        pacemakerStore.fetchDepositTargets().catch(() => undefined),
+        pacemakerStore.fetchHistories({ page: 0, size: 31 }).catch(() => undefined),
       ])
     }
   } catch (error) {

@@ -38,6 +38,7 @@
           :step="DAILY_LIMIT_STEP"
           class="limit-slider w-full cursor-pointer appearance-none rounded-full"
           :style="limitSliderStyle"
+          :disabled="isSubmitting"
         />
         <div class="mt-3 grid grid-cols-5 gap-1.5">
           <button
@@ -51,6 +52,7 @@
                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
             "
             :aria-pressed="selectedMaxAmount === amount"
+            :disabled="isSubmitting"
             @click="selectedMaxAmount = amount"
           >
             {{ formatPreset(amount) }}
