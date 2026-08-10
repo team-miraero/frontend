@@ -4,7 +4,6 @@ import { router } from '@/app/router'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import * as goalApi from '@/features/goal/api/goal.api'
 import { resolveFeasibilityStatus } from '@/features/goal/composables/useFeasibility'
-import { GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
 
 /**
  * 목표 설정 플로우 및 로드맵 상태를 관리하는 스토어
@@ -12,7 +11,10 @@ import { GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
 export const useGoalStore = defineStore('feature-goal', () => {
   // 온보딩 및 기본 선택 상태
   const selectedGoalType = ref(null)
-  const selectedGoalId = ref(GOAL_PRESET_IDS.STUDENT_LOAN)
+  // 온보딩 중 고른 목표 프리셋('INDEPENDENCE' 등 문자열). 실제 생성된 로드맵의 goalId와는 별개.
+  const selectedGoalPresetId = ref(null)
+  // 대시보드/지출관리/KB상품 등에서 쓰는 "적용 대상" 로드맵의 실제 숫자 goalId.
+  const selectedGoalId = ref(null)
   const goalParams = ref(null)
   const feasibilityResult = ref(null)
   const linkedAccountIds = ref([])
@@ -56,10 +58,18 @@ export const useGoalStore = defineStore('feature-goal', () => {
   }
 
   /**
+   * 온보딩 중 선택한 목표 프리셋 ID를 설정합니다.
+   * @param {string | null} id - GOAL_PRESET_IDS 값 또는 null
+   */
+  function selectGoalPreset(id) {
+    selectedGoalPresetId.value = id
+  }
+
+  /**
    * 다음 단계(목표 상세 입력 페이지)로 이동합니다.
    */
   function moveToNextStep() {
-    if (!selectedGoalId.value) return
+    if (!selectedGoalPresetId.value) return
     router.push({ name: ROUTE_NAMES.GOAL_DETAIL })
   }
 
@@ -68,7 +78,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
    */
   function resetGoalStore() {
     selectedGoalType.value = null
-    selectedGoalId.value = null
+    selectedGoalPresetId.value = null
     goalParams.value = { amount: 0, period: 0, seedMoney: 0 }
     feasibilityResult.value = null
     linkedAccountIds.value = []
@@ -294,6 +304,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
 
   return {
     selectedGoalType,
+    selectedGoalPresetId,
     selectedGoalId,
     goalParams,
     feasibility,
@@ -313,6 +324,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
     dailyAvailableMoney,
     isLoading,
     selectGoal,
+    selectGoalPreset,
     moveToNextStep,
     resetGoalStore,
     fetchGoals,

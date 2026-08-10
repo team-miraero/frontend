@@ -19,8 +19,10 @@
       </div>
       <button
         type="button"
-        class="relative h-6 w-11 rounded-full transition-colors"
+        class="relative h-6 w-11 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         :class="pacemaker?.enabled ? 'bg-primary' : 'bg-slate-300'"
+        :disabled="isToggling"
+        :aria-pressed="pacemaker?.enabled === true"
         @click="$emit('toggle')"
       >
         <span
@@ -29,6 +31,9 @@
         />
       </button>
     </div>
+    <p v-if="toggleErrorMessage" class="text-[9px] font-bold text-red-500" role="alert">
+      {{ toggleErrorMessage }}
+    </p>
 
     <!-- ON 상태: 헤드라인 2줄 + 캡션 + 하이라이트 박스 -->
     <template v-if="isOn">
@@ -37,7 +42,20 @@
         <p>미리 마련해줄게요</p>
       </div>
       <p class="text-[9px] leading-[13.5px] text-slate-500">오늘 하루 여유자금을 자동 저축</p>
-      <div class="rounded-[10px] bg-[#eaf2ff] px-3 py-2">
+      <div
+        v-if="dashboardErrorMessage"
+        class="flex items-center justify-between gap-2 rounded-[10px] bg-red-50 px-3 py-2"
+      >
+        <p class="text-[11px] font-bold text-red-500" role="alert">{{ dashboardErrorMessage }}</p>
+        <button
+          type="button"
+          class="shrink-0 text-[11px] font-bold text-red-500 underline"
+          @click.stop="$emit('retry-dashboard')"
+        >
+          다시 시도
+        </button>
+      </div>
+      <div v-else class="rounded-[10px] bg-[#eaf2ff] px-3 py-2">
         <p class="text-[11px] font-bold text-primary">
           이번달 +{{ formatWon(pacemaker.monthlySecuredAmount) }} 자동 확보
         </p>
@@ -77,11 +95,15 @@
   >
     <!-- 1행: 제목 (좌측) ↔ 토글 스위치 (우측 끝) -->
     <div class="flex items-center justify-between gap-1">
-      <p class="text-[11px] sm:text-xs font-bold text-[#0a192f] whitespace-nowrap">다음달 자금마련</p>
+      <p class="text-[11px] sm:text-xs font-bold text-[#0a192f] whitespace-nowrap">
+        다음달 자금마련
+      </p>
       <button
         type="button"
-        class="relative h-5 w-9 shrink-0 rounded-full transition-colors"
+        class="relative h-5 w-9 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         :class="pacemaker?.enabled ? 'bg-primary' : 'bg-slate-300'"
+        :disabled="isToggling"
+        :aria-pressed="pacemaker?.enabled === true"
         @click="$emit('toggle')"
       >
         <span
@@ -90,6 +112,9 @@
         />
       </button>
     </div>
+    <p v-if="toggleErrorMessage" class="text-[9px] font-bold text-red-500" role="alert">
+      {{ toggleErrorMessage }}
+    </p>
 
     <!-- 2행: 미개설 배지 + 상태 안내 (한 줄로 결합) -->
     <div class="flex items-center gap-1.5 pt-1">
@@ -99,7 +124,9 @@
       >
         미개설
       </span>
-      <p class="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight whitespace-nowrap">
+      <p
+        class="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight whitespace-nowrap"
+      >
         {{ mobileStatusText }}
       </p>
     </div>
@@ -109,6 +136,7 @@
       <button
         type="button"
         class="text-[10px] sm:text-[11px] font-bold text-primary whitespace-nowrap"
+        :disabled="isToggling"
         @click="$emit('toggle')"
       >
         개설하기 &gt;
@@ -125,8 +153,20 @@ const props = defineProps({
     type: Object,
     default: null, // { autoSavingId, registered, status, enabled, monthlySecuredAmount }
   },
+  isToggling: {
+    type: Boolean,
+    default: false,
+  },
+  toggleErrorMessage: {
+    type: String,
+    default: '',
+  },
+  dashboardErrorMessage: {
+    type: String,
+    default: '',
+  },
 })
-defineEmits(['toggle'])
+defineEmits(['toggle', 'retry-dashboard'])
 
 const isRegistered = computed(() => props.pacemaker?.registered === true)
 const isOn = computed(() => isRegistered.value && props.pacemaker?.enabled === true)
@@ -152,11 +192,15 @@ const cardStyle = computed(() => {
 
 // 모바일 축약형 안내문
 const mobileStatusText = computed(() => {
-  if (isOn.value) return `+${formatWon(props.pacemaker.monthlySecuredAmount)} 확보`
+  if (isOn.value) {
+    return props.dashboardErrorMessage
+      ? '정보를 불러오지 못했어요'
+      : `+${formatWon(props.pacemaker.monthlySecuredAmount)} 확보`
+  }
   return isRegistered.value ? 'OFF 상태' : '개설 후 이용 가능'
 })
 
 function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
+  return `${Number(amount ?? 0).toLocaleString('ko-KR')}원`
 }
 </script>

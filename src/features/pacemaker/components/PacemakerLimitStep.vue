@@ -5,7 +5,9 @@
     aria-labelledby="limit-title"
   >
     <div class="border-b border-slate-100 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
-      <p class="text-xs font-black tracking-[0.12em] text-primary">페이스메이커 설정 2/2</p>
+      <p class="text-xs font-black tracking-[0.12em] text-primary">
+        {{ isEditMode ? '페이스메이커 상한선 변경' : '페이스메이커 설정 2/2' }}
+      </p>
       <h2
         id="limit-title"
         class="mt-2 text-xl font-black leading-7 tracking-[-0.4px] text-[#0a192f]"
@@ -36,6 +38,7 @@
           :step="DAILY_LIMIT_STEP"
           class="limit-slider w-full cursor-pointer appearance-none rounded-full"
           :style="limitSliderStyle"
+          :disabled="isSubmitting"
         />
         <div class="mt-3 grid grid-cols-5 gap-1.5">
           <button
@@ -49,6 +52,7 @@
                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
             "
             :aria-pressed="selectedMaxAmount === amount"
+            :disabled="isSubmitting"
             @click="selectedMaxAmount = amount"
           >
             {{ formatPreset(amount) }}
@@ -79,7 +83,15 @@
         :disabled="isSubmitting"
         @click="$emit('complete')"
       >
-        {{ isSubmitting ? '개설 중...' : '개설 완료' }}
+        {{
+          isSubmitting
+            ? isEditMode
+              ? '변경 중...'
+              : '개설 중...'
+            : isEditMode
+              ? '변경 완료'
+              : '개설 완료'
+        }}
       </button>
       <button
         type="button"
@@ -87,7 +99,7 @@
         :disabled="isSubmitting"
         @click="$emit('back')"
       >
-        이전으로
+        {{ isEditMode ? '취소' : '이전으로' }}
       </button>
     </div>
   </section>
@@ -112,6 +124,10 @@ const props = defineProps({
   errorMessage: {
     type: String,
     default: '',
+  },
+  isEditMode: {
+    type: Boolean,
+    default: false,
   },
 })
 

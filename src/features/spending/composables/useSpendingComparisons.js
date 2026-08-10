@@ -1,10 +1,13 @@
 import { computed, ref } from 'vue'
 import {
   DEFAULT_SPENDING_AGE_GROUP_ID,
-  PEER_SPENDING_BY_AGE_GROUP,
+  DEFAULT_SPENDING_INCOME_GROUP_ID,
+  PEER_SPENDING_BY_BASIS,
   PREVIOUS_MONTH_SPENDING_BY_CATEGORY,
   SPENDING_AGE_GROUPS,
+  SPENDING_CATEGORY_TYPES,
   SPENDING_CATEGORIES,
+  SPENDING_INCOME_GROUPS,
 } from '@/features/spending/constants/spending.constants'
 import { formatKoreanNumber } from '@/shared/lib/money'
 
@@ -83,18 +86,46 @@ export function useSpendingSummaryComparison(props) {
 }
 
 export function usePeerSpendingComparison(summary) {
+  const selectedComparisonBasis = ref('AGE')
+  const selectedCategoryType = ref(SPENDING_CATEGORY_TYPES.VARIABLE)
   const selectedAgeGroupId = ref(DEFAULT_SPENDING_AGE_GROUP_ID)
+  const selectedIncomeGroupId = ref(DEFAULT_SPENDING_INCOME_GROUP_ID)
 
-  const selectedAgeGroupLabel = computed(
-    () =>
-      SPENDING_AGE_GROUPS.find((ageGroup) => ageGroup.id === selectedAgeGroupId.value)?.label ?? ''
+  const peerGroupOptions = computed(() =>
+    selectedComparisonBasis.value === 'AGE' ? SPENDING_AGE_GROUPS : SPENDING_INCOME_GROUPS
   )
 
+  const selectedPeerGroupId = computed({
+    get: () =>
+      selectedComparisonBasis.value === 'AGE'
+        ? selectedAgeGroupId.value
+        : selectedIncomeGroupId.value,
+    set: (value) => {
+      if (selectedComparisonBasis.value === 'AGE') selectedAgeGroupId.value = value
+      else selectedIncomeGroupId.value = value
+    },
+  })
+
+  const selectedPeerGroupLabel = computed(
+    () =>
+      peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
+  )
+
+  const peerSpending = computed(
+    () => PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value]
+  )
+
+  const categorySpending = computed(() => summary.value.categorySpending ?? {})
+
   const comparisonItems = computed(() =>
-    [...SPENDING_CATEGORIES]
+    SPENDING_CATEGORIES.filter((category) => category.type === selectedCategoryType.value)
+      .map((category) => ({
+        ...category,
+        current: categorySpending.value[category.id] ?? category.current,
+      }))
       .sort((firstCategory, secondCategory) => secondCategory.current - firstCategory.current)
       .map((category) => {
-        const peerAmount = PEER_SPENDING_BY_AGE_GROUP[selectedAgeGroupId.value][category.id]
+        const peerAmount = peerSpending.value[category.id] ?? 0
         const maximumAmount = Math.max(category.current, peerAmount, 1)
 
         return {
@@ -107,14 +138,14 @@ export function usePeerSpendingComparison(summary) {
       })
   )
 
+  const currentTotalSpending = computed(() =>
+    comparisonItems.value.reduce((total, category) => total + category.current, 0)
+  )
   const peerTotalSpending = computed(() =>
-    Object.values(PEER_SPENDING_BY_AGE_GROUP[selectedAgeGroupId.value]).reduce(
-      (totalAmount, amount) => totalAmount + amount,
-      0
-    )
+    comparisonItems.value.reduce((total, category) => total + category.peerAmount, 0)
   )
 
-  const totalDifference = computed(() => summary.value.totalSpending - peerTotalSpending.value)
+  const totalDifference = computed(() => currentTotalSpending.value - peerTotalSpending.value)
   const absoluteTotalDifference = computed(() => Math.abs(totalDifference.value))
 
   const totalDifferenceLabel = computed(() => {
@@ -130,19 +161,23 @@ export function usePeerSpendingComparison(summary) {
   })
 
   const largestDifferenceCategoryNames = computed(() =>
-    [...comparisonItems.value]
-      .sort(
-        (firstCategory, secondCategory) =>
-          Math.abs(secondCategory.difference) - Math.abs(firstCategory.difference)
-      )
-      .slice(0, 2)
-      .map((category) => category.name)
-      .join('와 ')
+    joinKoreanNames(
+      [...comparisonItems.value]
+        .sort(
+          (firstCategory, secondCategory) =>
+            Math.abs(secondCategory.difference) - Math.abs(firstCategory.difference)
+        )
+        .slice(0, 2)
+        .map((category) => category.name)
+    )
   )
 
   return {
-    selectedAgeGroupId,
-    selectedAgeGroupLabel,
+    selectedComparisonBasis,
+    selectedCategoryType,
+    selectedPeerGroupId,
+    selectedPeerGroupLabel,
+    peerGroupOptions,
     comparisonItems,
     totalDifference,
     absoluteTotalDifference,
@@ -151,19 +186,35 @@ export function usePeerSpendingComparison(summary) {
   }
 }
 
-export function useMonthlySpendingComparison() {
-  const monthlyComparisonItems = computed(() =>
-    [...SPENDING_CATEGORIES]
-      .sort((firstCategory, secondCategory) => secondCategory.current - firstCategory.current)
-      .map((category) => {
-        const previousAmount = PREVIOUS_MONTH_SPENDING_BY_CATEGORY[category.id]
+function joinKoreanNames(names) {
+  if (names.length < 2) return names[0] ?? ''
 
-        return {
-          ...category,
-          previousAmount,
-          difference: category.current - previousAmount,
-        }
-      })
+  const firstName = names[0]
+  const lastCharacterCode = firstName.charCodeAt(firstName.length - 1)
+  const hasFinalConsonant =
+    lastCharacterCode >= 0xac00 &&
+    lastCharacterCode <= 0xd7a3 &&
+    (lastCharacterCode - 0xac00) % 28 !== 0
+
+  return `${firstName}${hasFinalConsonant ? '과' : '와'} ${names[1]}`
+}
+
+export function useMonthlySpendingComparison(summary) {
+  const categorySpending = computed(() => summary.value.categorySpending ?? {})
+  const monthlyComparisonItems = computed(() =>
+    SPENDING_CATEGORIES.filter(
+      (category) => category.type === SPENDING_CATEGORY_TYPES.VARIABLE
+    ).map((category) => {
+      const current = categorySpending.value[category.id] ?? category.current
+      const previousAmount = PREVIOUS_MONTH_SPENDING_BY_CATEGORY[category.id] ?? current
+
+      return {
+        ...category,
+        current,
+        previousAmount,
+        difference: current - previousAmount,
+      }
+    })
   )
 
   return {

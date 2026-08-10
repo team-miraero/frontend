@@ -27,7 +27,7 @@
           :loading="isProfileLoading"
           :error="profileError"
           @edit-image="openProfileImageModal"
-          @retry="refreshProfile"
+          @retry="refreshProfile(true)"
         />
 
         <MyDataSection
@@ -244,9 +244,12 @@ function openPasswordModal() {
 }
 
 function toggleNotification(id) {
-  const currentItem = notificationItems.value.find((item) => item.id === id)
+  const targetItem = notificationItems.value.find((item) => item.id === id)
+  if (!targetItem) return
+
+  const willEnable = !targetItem.enabled
   mypageStore.toggleNotification(id)
-  showToast(`${currentItem.label}을 ${currentItem.enabled ? '껐어요.' : '켰어요.'}`)
+  showToast(`${targetItem.label}을 ${willEnable ? '켰어요.' : '껐어요.'}`)
 }
 
 function openGoalResetModal() {
@@ -279,18 +282,9 @@ async function saveGoalReset(payload) {
     isGoalSaving.value = false
   }
 
-  currentGoal.value = {
-    ...currentGoal.value,
-    goalAmount: payload.goalAmount,
-    status: nextStatus,
-    period: {
-      ...currentGoal.value.period,
-      endDate: payload.goalDate,
-    },
-  }
   goalResetModalOpen.value = false
   showToast('목표가 재설정되었습니다.')
-  fetchCurrentGoal()
+  await fetchCurrentGoal()
 }
 
 function openPolicy(policyKey) {

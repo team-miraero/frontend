@@ -14,7 +14,14 @@ function loadNotificationSettings() {
     const savedSettings = JSON.parse(
       window.localStorage.getItem(MYPAGE_NOTIFICATION_STORAGE_KEY) ?? '{}'
     )
-    return { ...DEFAULT_NOTIFICATION_SETTINGS, ...savedSettings }
+
+    // 목록에서 삭제된 알림 항목의 값이 저장소에 남지 않도록 현재 항목만 반영한다.
+    return Object.fromEntries(
+      Object.entries(DEFAULT_NOTIFICATION_SETTINGS).map(([id, defaultEnabled]) => [
+        id,
+        typeof savedSettings[id] === 'boolean' ? savedSettings[id] : defaultEnabled,
+      ])
+    )
   } catch {
     return { ...DEFAULT_NOTIFICATION_SETTINGS }
   }

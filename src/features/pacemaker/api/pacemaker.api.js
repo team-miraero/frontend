@@ -63,8 +63,48 @@ import { client } from '@/shared/api/client'
  * @property {boolean} last
  */
 
+/**
+ * 페이스메이커 입금 대상 목표 목록을 조회합니다.
+ * @returns {Promise<{ goals: Array<Object> }>}
+ */
+export async function getPacemakerGoals() {
+  const { data } = await client.get('/pace-maker/goals')
+  return unwrapApiResponse(data)
+}
+
+/**
+ * @typedef {Object} AccountDetail
+ * @property {number} accountId
+ * @property {string} institutionName
+ * @property {string} accountType
+ * @property {string} accountName
+ * @property {string} maskedAccountNumber
+ * @property {number} balance
+ * @property {string | null} maturityAt
+ * @property {number | null} interestRate
+ * @property {number | null} monthlyPaymentLimit
+ */
+
+/**
+ * 계좌/저금통 상세 정보를 조회합니다. (계좌명 표시용)
+ * @param {number} accountId
+ * @returns {Promise<AccountDetail>}
+ */
+export async function getAccountDetail(accountId) {
+  const { data } = await client.get(`/accounts/${accountId}`)
+  return unwrapApiResponse(data)
+}
+
 function unwrapApiResponse(payload) {
-  return payload?.success === true && payload.data !== undefined ? payload.data : payload
+  if (payload && typeof payload === 'object' && Object.hasOwn(payload, 'success')) {
+    if (payload.success !== true) {
+      throw new Error(payload.error?.message ?? payload.message ?? 'API 요청에 실패했습니다.')
+    }
+
+    return payload.data
+  }
+
+  return payload
 }
 
 /** @returns {Promise<PacemakerStatus>} */
@@ -112,12 +152,13 @@ export async function updatePacemakerMaxAmount(maxAmount) {
 }
 
 /**
- * @param {number} goalId
+ * @param {number} accountId
  * @param {number} amount
+ * @param {number} moneyBoxId
  * @returns {Promise<{ goalId: number, depositedAmount: number, remainingBalance: number }>}
  */
-export async function depositToGoalAccount(goalId, amount) {
-  const { data } = await client.post('/pace-maker/deposit', { goalId, amount })
+export async function depositToGoalAccount(accountId, amount, moneyBoxId) {
+  const { data } = await client.post('/pace-maker/deposits', { accountId, amount, moneyBoxId })
   return unwrapApiResponse(data)
 }
 

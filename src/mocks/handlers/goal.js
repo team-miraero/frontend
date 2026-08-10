@@ -81,6 +81,15 @@ const MOCK_ACCOUNTS = [
     balance: 5000000,
     interestRate: 3.5,
   },
+  {
+    accountId: 11,
+    institutionName: '신한은행',
+    accountType: 'SAVING',
+    accountName: '신한 비상금 저금통',
+    maskedAccountNumber: '···3333',
+    balance: 250000,
+    interestRate: 2.8,
+  },
 ]
 
 export const goalHandlers = [
@@ -133,6 +142,30 @@ export const goalHandlers = [
       data: {
         totalBalance: accounts.reduce((sum, account) => sum + account.balance, 0),
         accounts,
+      },
+      error: null,
+    })
+  }),
+
+  // 계좌 상세 조회 API (연결된 계좌/저금통 이름 등 표시용)
+  http.get('*/api/accounts/:accountId', async ({ params }) => {
+    await delay(200)
+    const accountId = Number(params.accountId)
+    const account = MOCK_ACCOUNTS.find((item) => item.accountId === accountId)
+
+    if (!account) {
+      return HttpResponse.json(
+        { success: false, data: null, error: { message: '계좌 정보를 찾을 수 없습니다.' } },
+        { status: 404 }
+      )
+    }
+
+    return HttpResponse.json({
+      success: true,
+      data: {
+        ...account,
+        maturityAt: null,
+        monthlyPaymentLimit: null,
       },
       error: null,
     })

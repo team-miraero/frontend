@@ -51,25 +51,25 @@
       </button>
     </div>
 
-    <dl v-if="profile">
+    <div v-if="profile">
       <MypageRow label="이름">
-        <dd class="font-medium text-[#0a192f]">{{ profile.nickname }}</dd>
+        <p class="font-medium text-[#0a192f]">{{ profile.nickname }}</p>
       </MypageRow>
       <MypageRow label="이메일">
-        <dd>{{ profile.email }}</dd>
+        <p>{{ profile.email }}</p>
       </MypageRow>
       <MypageRow label="생년월일">
-        <dd>{{ formatDate(profile.birthDate) }}</dd>
+        <p>{{ formatDate(profile.birthDate) }}</p>
       </MypageRow>
       <MypageRow label="직장" description="마이데이터에서 확인">
-        <dd class="font-medium text-[#0a192f]">{{ profile.company || '확인되지 않음' }}</dd>
+        <p class="font-medium text-[#0a192f]">{{ profile.company || '확인되지 않음' }}</p>
       </MypageRow>
       <MypageRow label="월 소득" description="마이데이터에서 확인" :bordered="false">
-        <dd class="font-bold text-primary">
+        <p class="font-bold text-primary">
           {{ profile.monthlyIncome === null ? '확인되지 않음' : formatKRW(profile.monthlyIncome) }}
-        </dd>
+        </p>
       </MypageRow>
-    </dl>
+    </div>
 
     <div
       v-else-if="error"
