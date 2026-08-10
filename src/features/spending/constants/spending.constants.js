@@ -38,13 +38,13 @@ export const SPENDING_CATEGORIES = [
   { id: 'loanRepayment', code: 'LOAN_REPAYMENT', name: '대출상환', type: 'FIXED', icon: '🏦', current: 15, accent: '#64748B', softColor: '#F1F5F9', borderColor: '#CBD5E1' },
   { id: 'savings', code: 'SAVINGS', name: '저축', type: 'FIXED', icon: '🐷', current: 20, accent: '#10B981', softColor: '#ECFDF5', borderColor: '#A7F3D0' },
   { id: 'investment', code: 'INVESTMENT', name: '투자', type: 'FIXED', icon: '📈', current: 10, accent: '#14B8A6', softColor: '#F0FDFA', borderColor: '#99F6E4' },
-  { id: 'food', code: 'FOOD', name: '식비', type: 'VARIABLE', icon: '🍴', current: 32, mode: 'adjustable', min: 0, step: 1, accent: '#FF6B6B', softColor: '#FFF1F2', borderColor: '#FFCDD2' },
-  { id: 'cafe', code: 'CAFE', name: '카페', type: 'VARIABLE', icon: '☕', current: 14, mode: 'adjustable', min: 0, step: 1, accent: '#F59E0B', softColor: '#FFF7E8', borderColor: '#FDD99A' },
+  { id: 'food', code: 'FOOD', name: '식비', type: 'VARIABLE', icon: '🍴', current: 32, min: 0, step: 1, accent: '#FF6B6B', softColor: '#FFF1F2', borderColor: '#FFCDD2' },
+  { id: 'cafe', code: 'CAFE', name: '카페', type: 'VARIABLE', icon: '☕', current: 14, min: 0, step: 1, accent: '#F59E0B', softColor: '#FFF7E8', borderColor: '#FDD99A' },
   { id: 'transportation', code: 'TRANSPORTATION', name: '교통', type: 'VARIABLE', icon: '🚌', current: 9, accent: '#10B981', softColor: '#ECFDF5', borderColor: '#A7F3D0' },
-  { id: 'shopping', code: 'SHOPPING', name: '쇼핑', type: 'VARIABLE', icon: '🛍️', current: 22, mode: 'adjustable', min: 0, step: 1, accent: '#A855F7', softColor: '#F8F0FF', borderColor: '#DDB9FF' },
-  { id: 'culture', code: 'CULTURE', name: '문화', type: 'VARIABLE', icon: '🎬', current: 7, mode: 'adjustable', min: 0, step: 1, accent: '#EC4899', softColor: '#FDF2F8', borderColor: '#FBCFE8' },
-  { id: 'medical', code: 'MEDICAL', name: '의료', type: 'VARIABLE', icon: '🩺', current: 5, mode: 'adjustable', min: 0, step: 1, accent: '#06B6D4', softColor: '#ECFEFF', borderColor: '#A5F3FC' },
-  { id: 'other', code: 'OTHER', name: '기타', type: 'VARIABLE', icon: '💳', current: 3, mode: 'adjustable', min: 0, step: 1, accent: '#64748B', softColor: '#F1F5F9', borderColor: '#CBD5E1' },
+  { id: 'shopping', code: 'SHOPPING', name: '쇼핑', type: 'VARIABLE', icon: '🛍️', current: 22, min: 0, step: 1, accent: '#A855F7', softColor: '#F8F0FF', borderColor: '#DDB9FF' },
+  { id: 'culture', code: 'CULTURE', name: '문화', type: 'VARIABLE', icon: '🎬', current: 7, min: 0, step: 1, accent: '#EC4899', softColor: '#FDF2F8', borderColor: '#FBCFE8' },
+  { id: 'medical', code: 'MEDICAL', name: '의료', type: 'VARIABLE', icon: '🩺', current: 5, min: 0, step: 1, accent: '#06B6D4', softColor: '#ECFEFF', borderColor: '#A5F3FC' },
+  { id: 'other', code: 'OTHER', name: '기타', type: 'VARIABLE', icon: '💳', current: 3, min: 0, step: 1, accent: '#64748B', softColor: '#F1F5F9', borderColor: '#CBD5E1' },
 ]
 
 export const PREVIOUS_MONTH_SPENDING_BY_CATEGORY = {

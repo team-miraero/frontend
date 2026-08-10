@@ -207,10 +207,12 @@ let previousAppAriaHidden = null
 const formattedTotalExpense = computed(() => formatKRWCompact(Math.abs(props.totalExpense)))
 
 const categoryFilters = computed(() => {
-  return [
-    { code: 'ALL', name: '전체' },
-    ...SPENDING_CATEGORIES.map(({ code, name }) => ({ code, name })),
-  ]
+  const presentCodes = new Set(props.transactions.map((transaction) => transaction.categoryCode))
+  const presentCategories = SPENDING_CATEGORIES.filter((category) =>
+    presentCodes.has(category.code)
+  ).map(({ code, name }) => ({ code, name }))
+
+  return [{ code: 'ALL', name: '전체' }, ...presentCategories]
 })
 
 const filteredTransactions = computed(() => {
