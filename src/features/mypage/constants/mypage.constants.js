@@ -2,12 +2,6 @@ export const MYPAGE_NOTIFICATION_STORAGE_KEY = 'miraero:mypage-notifications'
 
 export const MYPAGE_NOTIFICATION_ITEMS = Object.freeze([
   {
-    id: 'overBudget',
-    label: '예산 초과 알림',
-    description: '카테고리별 예산을 초과하면 즉시 알려요',
-    defaultEnabled: true,
-  },
-  {
     id: 'monthlySave',
     label: '월 저축 달성 알림',
     description: '목표 저축액 달성 시 알림',
