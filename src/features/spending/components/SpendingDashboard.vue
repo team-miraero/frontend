@@ -12,8 +12,10 @@
     <div
       class="mx-auto w-full max-w-[1660px] px-4 pb-24 pt-3 sm:px-6 md:px-8 md:pb-12 md:pt-4 lg:px-10"
     >
+      <LoadingSpinner v-if="isLoading" message="지출 정보를 불러오고 있어요" />
+
       <p
-        v-if="error"
+        v-else-if="error"
         class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700"
         role="alert"
       >
@@ -58,10 +60,12 @@ import SpendingHistoryModal from '@/features/spending/components/SpendingHistory
 import SpendingSummarySection from '@/features/spending/components/SpendingSummarySection.vue'
 import { useSpendingStore } from '@/features/spending/store/spending.store'
 import RoadmapSelector from '@/shared/ui/RoadmapSelector.vue'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 
 const spendingStore = useSpendingStore()
 const {
   spendingSummary,
+  isLoading,
   error,
   transactionHistory,
   transactionSummary,

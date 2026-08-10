@@ -19,10 +19,6 @@
       </div>
 
       <div class="mt-2 flex items-end gap-1">
-        <span v-if="valuePrefix" class="pb-0.5 text-[13px] font-medium text-[#64748B]">
-          {{ valuePrefix }}
-        </span>
-
         <strong
           class="text-[30px] font-bold leading-none tracking-[-0.03em]"
           :class="valueColorClass"
@@ -94,10 +90,6 @@ const props = defineProps({
   value: {
     type: [Number, String],
     required: true,
-  },
-  valuePrefix: {
-    type: String,
-    default: '',
   },
   unit: {
     type: String,

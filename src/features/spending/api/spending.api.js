@@ -1,14 +1,18 @@
 // spending 도메인 API 함수 골격 (EXP-01~04)
 import { client } from '@/shared/api/client'
+import { SPENDING_CATEGORIES } from '@/features/spending/constants/spending.constants'
 
 const MOCK_SPENDING_SUMMARY = {
-  totalSpending: 90,
+  totalSpending: 202,
   savingCapacity: 35,
   remainingMonths: 53,
   monthlyDifference: 4,
   goalProgress: 62,
   myDataLinked: true,
   referenceMonth: '2026-07',
+  categorySpending: Object.fromEntries(
+    SPENDING_CATEGORIES.map((category) => [category.id, category.current])
+  ),
 }
 
 /**
@@ -20,6 +24,7 @@ const MOCK_SPENDING_SUMMARY = {
  * @property {number} goalProgress
  * @property {boolean} myDataLinked 마이데이터 연동 여부
  * @property {string | null} referenceMonth 데이터 기준 월 (YYYY-MM)
+ * @property {Record<string, number>} categorySpending 카테고리별 이번 달 지출 (만원 단위)
  */
 
 /**

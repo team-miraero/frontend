@@ -124,23 +124,23 @@ import { useSpendingSummaryComparison } from '@/features/spending/composables/us
 const props = defineProps({
   totalSpending: {
     type: Number,
-    default: 90,
+    required: true,
   },
   savingCapacity: {
     type: Number,
-    default: 35,
+    required: true,
   },
   remainingMonths: {
     type: Number,
-    default: 53,
+    required: true,
   },
   monthlyDifference: {
     type: Number,
-    default: 4,
+    required: true,
   },
   goalProgress: {
     type: Number,
-    default: 62,
+    required: true,
   },
 })
 

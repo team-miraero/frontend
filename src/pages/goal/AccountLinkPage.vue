@@ -9,7 +9,7 @@
         class="inline-flex items-center gap-1.5 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
       >
         <svg
-          v-if="selectedGoalId === 'INDEPENDENCE'"
+          v-if="selectedGoalPresetId === 'INDEPENDENCE'"
           class="h-3.5 w-3.5 text-primary"
           fill="none"
           viewBox="0 0 24 24"
@@ -19,7 +19,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
         </svg>
         <svg
-          v-else-if="selectedGoalId === 'EMERGENCY'"
+          v-else-if="selectedGoalPresetId === 'EMERGENCY'"
           class="h-3.5 w-3.5 text-primary"
           fill="none"
           viewBox="0 0 24 24"
@@ -29,7 +29,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
         <svg
-          v-else-if="selectedGoalId === 'MARRIAGE'"
+          v-else-if="selectedGoalPresetId === 'MARRIAGE'"
           class="h-3.5 w-3.5 text-primary"
           fill="none"
           viewBox="0 0 24 24"
@@ -39,7 +39,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
         <svg
-          v-else-if="selectedGoalId === 'STUDENT_LOAN'"
+          v-else-if="selectedGoalPresetId === 'STUDENT_LOAN'"
           class="h-3.5 w-3.5 text-primary"
           fill="none"
           viewBox="0 0 24 24"
@@ -323,10 +323,10 @@ const OTHER_ACTIVE_GOAL = { label: '비상금 목돈', monthlyAmount: 200000 }
 
 const router = useRouter()
 const goalStore = useGoalStore()
-const { selectedGoalId, goalParams, feasibility, accounts, areAccountsLoading, accountsError } =
+const { selectedGoalPresetId, goalParams, feasibility, accounts, areAccountsLoading, accountsError } =
   storeToRefs(goalStore)
 
-const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === selectedGoalId.value))
+const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === selectedGoalPresetId.value))
 
 const mode = ref('moneybox')
 const transferAmount = ref(0)
@@ -409,7 +409,7 @@ async function handleSubmit() {
   try {
     const result = await goalStore.submitGoalCreation({
       goalName: selectedGoal.value?.title,
-      goalType: GOAL_API_TYPE_BY_PRESET_ID[selectedGoalId.value],
+      goalType: GOAL_API_TYPE_BY_PRESET_ID[selectedGoalPresetId.value],
       goalAmount: goalParams.value.amount,
       goalMonths: goalParams.value.months,
       startAmount: goalParams.value.startAmount,

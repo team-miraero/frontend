@@ -29,7 +29,7 @@
           </svg>
 
           <span class="text-right leading-4 sm:whitespace-nowrap" aria-live="polite">
-            {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }}개월 단축
+            {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }} 단축
           </span>
         </div>
       </div>
@@ -83,6 +83,7 @@
           v-if="selectedCategory"
           :category="selectedCategory"
           :selected-goal="selectedGoal"
+          id-prefix="mobile-"
           selected
           @update-target="updateCategoryTarget"
         />
@@ -127,11 +128,16 @@
 </template>
 
 <script setup>
+import { toRef } from 'vue'
 import SpendingCategoryCard from '@/features/spending/components/SpendingCategoryCard.vue'
 import { useSpendingSimulator } from '@/features/spending/composables/useSpendingSimulator'
 import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 
-defineProps({
+const props = defineProps({
+  summary: {
+    type: Object,
+    required: true,
+  },
   selectedGoal: {
     type: String,
     default: DEFAULT_SELECTED_GOAL,
@@ -147,7 +153,7 @@ const {
   selectCategory,
   selectCategoryByOffset,
   updateCategoryTarget,
-} = useSpendingSimulator()
+} = useSpendingSimulator(toRef(props, 'summary'))
 
 const getSelectorStyle = (category) => {
   const isSelected = selectedCategoryId.value === category.id
@@ -158,10 +164,7 @@ const getSelectorStyle = (category) => {
   }
 }
 
-const getStatusColor = (category) => {
-  const isActive = category.mode === 'maintain' || category.target !== null
-  return isActive ? category.accent : '#CBD5E1'
-}
+const getStatusColor = (category) => (category.target !== null ? category.accent : '#CBD5E1')
 
 const selectPreviousCategory = () => selectCategoryByOffset(-1)
 

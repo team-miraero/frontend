@@ -32,7 +32,7 @@
           v-for="preset in presets"
           :key="preset.id"
           v-bind="preset"
-          :is-selected="goalStore.selectedGoalId === preset.id"
+          :is-selected="goalStore.selectedGoalPresetId === preset.id"
           @select="toggleGoal(preset.id)"
         />
       </div>
@@ -64,7 +64,7 @@ const goalStore = useGoalStore()
 const presets = ref([])
 
 const selectedGoal = computed(() => {
-  return presets.value.find((p) => p.id === goalStore.selectedGoalId)
+  return presets.value.find((p) => p.id === goalStore.selectedGoalPresetId)
 })
 
 const buttonText = computed(() => {
@@ -73,10 +73,10 @@ const buttonText = computed(() => {
 })
 
 function toggleGoal(id) {
-  if (goalStore.selectedGoalId === id) {
-    goalStore.selectGoal(null) // 선택 해제
+  if (goalStore.selectedGoalPresetId === id) {
+    goalStore.selectGoalPreset(null) // 선택 해제
   } else {
-    goalStore.selectGoal(id) // 새로운 목표 선택
+    goalStore.selectGoalPreset(id) // 새로운 목표 선택
   }
 }
 
