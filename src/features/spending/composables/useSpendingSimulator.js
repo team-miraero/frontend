@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import {
   MONTHS_SHORTENED_PER_SAVING_UNIT,
   RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY,
@@ -7,25 +7,43 @@ import {
 } from '@/features/spending/constants/spending.constants'
 
 const roundToOneDecimal = (value) => Math.round(value * 10) / 10
+const DAYS_PER_MONTH = 30
 
 export function calculateSavingAmount(category) {
-  if (category.mode !== 'adjustable' || category.target === null) {
+  if (category.target === null) {
     return 0
   }
 
   return Math.max(category.recentThreeMonthAverage - category.target, 0)
 }
 
+/**
+ * 절감액을 단축 개월 수(반올림 없는 원값)로 환산한다.
+ * 카드별 표시값과 총합 표시값이 같은 원값에서 계산돼야 서로 어긋나지 않는다.
+ */
 export function calculateShortenedMonths(savingAmount) {
   if (savingAmount <= 0) {
     return 0
   }
 
-  return Math.max(roundToOneDecimal(savingAmount * MONTHS_SHORTENED_PER_SAVING_UNIT), 0.1)
+  return savingAmount * MONTHS_SHORTENED_PER_SAVING_UNIT
 }
 
-export function formatShortenedMonths(months) {
-  return Number.isInteger(months) ? String(months) : months.toFixed(1)
+/**
+ * 1개월 미만은 일 단위, 이상은 개월 단위(소수 첫째 자리)로 표시한다.
+ * 0.04개월처럼 "개월" 그릇에 담기엔 너무 작은 값을 억지로 부풀리지 않기 위함.
+ */
+export function formatShortenedPeriod(months) {
+  if (months <= 0) {
+    return '0일'
+  }
+
+  if (months < 1) {
+    return `${Math.max(Math.round(months * DAYS_PER_MONTH), 1)}일`
+  }
+
+  const rounded = roundToOneDecimal(months)
+  return `${Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)}개월`
 }
 
 export function useSpendingSimulator(summary) {
@@ -47,13 +65,8 @@ export function useSpendingSimulator(summary) {
           category.current,
       }))
   )
+  // SPENDING_CATEGORIES는 정적 상수라 categories의 카테고리 구성(6개)은 항상 고정된다.
   const selectedCategoryId = ref(categories.value[0]?.id ?? null)
-
-  watch(categories, (nextCategories) => {
-    if (!nextCategories.some((category) => category.id === selectedCategoryId.value)) {
-      selectedCategoryId.value = nextCategories[0]?.id ?? null
-    }
-  })
 
   const selectedCategoryIndex = computed(() =>
     categories.value.findIndex((category) => category.id === selectedCategoryId.value)
@@ -73,7 +86,7 @@ export function useSpendingSimulator(summary) {
   const totalShortenedMonths = computed(() => calculateShortenedMonths(totalSavingAmount.value))
 
   const formattedTotalShortenedMonths = computed(() =>
-    formatShortenedMonths(totalShortenedMonths.value)
+    formatShortenedPeriod(totalShortenedMonths.value)
   )
 
   function selectCategory(categoryId) {
@@ -93,7 +106,7 @@ export function useSpendingSimulator(summary) {
   function updateCategoryTarget({ id, target }) {
     const category = categories.value.find((item) => item.id === id)
 
-    if (!category || category.mode !== 'adjustable') {
+    if (!category) {
       return
     }
 
@@ -106,8 +119,6 @@ export function useSpendingSimulator(summary) {
     selectedCategoryId,
     selectedCategoryIndex,
     selectedCategory,
-    totalSavingAmount,
-    totalShortenedMonths,
     formattedTotalShortenedMonths,
     selectCategory,
     selectCategoryByOffset,

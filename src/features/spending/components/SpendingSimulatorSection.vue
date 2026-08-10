@@ -29,7 +29,7 @@
           </svg>
 
           <span class="text-right leading-4 sm:whitespace-nowrap" aria-live="polite">
-            {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }}개월 단축
+            {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }} 단축
           </span>
         </div>
       </div>
@@ -83,6 +83,7 @@
           v-if="selectedCategory"
           :category="selectedCategory"
           :selected-goal="selectedGoal"
+          id-prefix="mobile-"
           selected
           @update-target="updateCategoryTarget"
         />

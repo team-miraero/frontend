@@ -79,12 +79,10 @@
 
     <!-- 슬라이더 -->
     <div class="relative mt-5">
-      <label :for="`spending-range-${category.id}`" class="sr-only">
-        {{ category.name }} 목표 지출 조절
-      </label>
+      <label :for="rangeInputId" class="sr-only"> {{ category.name }} 목표 지출 조절 </label>
 
       <input
-        :id="`spending-range-${category.id}`"
+        :id="rangeInputId"
         class="spending-range block w-full cursor-pointer"
         type="range"
         :min="category.min"
@@ -123,7 +121,7 @@
       :style="{ backgroundColor: category.softColor }"
     >
       <span class="font-semibold" :style="{ color: category.accent }">
-        {{ selectedGoal }} {{ formattedShortenedMonths }}개월 단축
+        {{ selectedGoal }} {{ formattedShortenedMonths }} 단축
       </span>
 
       <span class="shrink-0 text-[#64748B]"> 월 {{ formatAmount(savingAmount) }}만원 추가 </span>
@@ -136,7 +134,7 @@ import { computed } from 'vue'
 import {
   calculateSavingAmount,
   calculateShortenedMonths,
-  formatShortenedMonths,
+  formatShortenedPeriod,
 } from '@/features/spending/composables/useSpendingSimulator'
 import { formatKoreanNumber } from '@/shared/lib/money'
 
@@ -153,11 +151,18 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  // 모바일용/데스크톱용 카드가 동시에 DOM에 렌더되므로, 같은 카테고리라도 id가 겹치지 않도록 구분한다.
+  idPrefix: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['update-target'])
 
 const formatAmount = formatKoreanNumber
+
+const rangeInputId = computed(() => `spending-range-${props.idPrefix}${props.category.id}`)
 
 const sliderValue = computed(() => props.category.target ?? props.category.recentThreeMonthAverage)
 const hasTarget = computed(() => props.category.target !== null)
@@ -166,7 +171,7 @@ const savingAmount = computed(() => calculateSavingAmount(props.category))
 
 const shortenedMonths = computed(() => calculateShortenedMonths(savingAmount.value))
 
-const formattedShortenedMonths = computed(() => formatShortenedMonths(shortenedMonths.value))
+const formattedShortenedMonths = computed(() => formatShortenedPeriod(shortenedMonths.value))
 
 const savingBadge = computed(() => {
   if (!hasTarget.value) {
