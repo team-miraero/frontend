@@ -52,7 +52,7 @@
         tabindex="0"
         class="min-w-0 min-[1400px]:order-1 min-[1400px]:col-span-2"
       >
-        <SpendingSimulatorSection :selected-goal="selectedGoal" />
+        <SpendingSimulatorSection :summary="summary" :selected-goal="selectedGoal" />
       </div>
 
       <div
@@ -62,7 +62,7 @@
         aria-labelledby="spending-tab-monthly"
         tabindex="0"
       >
-        <SpendingMonthlyComparisonSection />
+        <SpendingMonthlyComparisonSection :summary="summary" />
       </div>
     </div>
   </section>
@@ -87,7 +87,7 @@ defineProps({
 })
 
 const tabs = [
-  { id: 'peers', label: '또래 비교' },
+  { id: 'peers', label: '맞춤 지출 비교' },
   { id: 'adjustment', label: '절감 조정' },
   { id: 'monthly', label: '지난달 비교' },
 ]

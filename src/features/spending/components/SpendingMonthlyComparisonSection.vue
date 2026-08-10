@@ -4,7 +4,7 @@
     aria-labelledby="spending-category-monthly-title"
   >
     <article
-      class="min-w-0 w-full rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 min-[1400px]:order-3 min-[1400px]:flex min-[1400px]:flex-col"
+      class="min-w-0 h-full w-full rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 min-[1400px]:order-3"
     >
       <div class="category-header">
         <h2 id="spending-category-monthly-title" class="text-base font-bold text-[#0A192F]">
@@ -14,7 +14,7 @@
         <p class="text-xs text-[#64748B]">각 항목의 지난달과 이번 달 지출을 비교해보세요.</p>
       </div>
 
-      <ul class="category-list min-[1400px]:min-h-0 min-[1400px]:flex-1">
+      <ul class="category-list">
         <li
           v-for="category in monthlyComparisonItems"
           :key="category.id"
@@ -67,11 +67,19 @@
 </template>
 
 <script setup>
+import { toRef } from 'vue'
 import { useMonthlySpendingComparison } from '@/features/spending/composables/useSpendingComparisons'
 import { formatKoreanNumber } from '@/shared/lib/money'
 
+const props = defineProps({
+  summary: {
+    type: Object,
+    required: true,
+  },
+})
+
 const formatAmount = formatKoreanNumber
-const { monthlyComparisonItems } = useMonthlySpendingComparison()
+const { monthlyComparisonItems } = useMonthlySpendingComparison(toRef(props, 'summary'))
 
 const getDifferenceClass = (difference) => {
   if (difference > 0) {
