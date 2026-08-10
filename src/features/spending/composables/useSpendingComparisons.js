@@ -205,8 +205,8 @@ export function useMonthlySpendingComparison(summary) {
       (category) => category.type === SPENDING_CATEGORY_TYPES.VARIABLE
     )
       .map((category) => {
-        const previousAmount = PREVIOUS_MONTH_SPENDING_BY_CATEGORY[category.id]
         const current = categorySpending.value[category.id] ?? category.current
+        const previousAmount = PREVIOUS_MONTH_SPENDING_BY_CATEGORY[category.id] ?? current
 
         return {
           ...category,

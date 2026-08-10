@@ -36,9 +36,9 @@
       <div
         id="spending-panel-peers"
         :class="activeTab === 'peers' ? 'block' : 'hidden min-[1400px]:block'"
-        role="tabpanel"
-        aria-labelledby="spending-tab-peers"
-        tabindex="0"
+        :role="isTabbedLayout ? 'tabpanel' : undefined"
+        :aria-labelledby="isTabbedLayout ? 'spending-tab-peers' : undefined"
+        :tabindex="isTabbedLayout ? 0 : undefined"
         class="min-w-0 min-[1400px]:order-2"
       >
         <SpendingPeerComparisonSection :summary="summary" />
@@ -47,9 +47,9 @@
       <div
         id="spending-panel-adjustment"
         :class="activeTab === 'adjustment' ? 'block' : 'hidden min-[1400px]:block'"
-        role="tabpanel"
-        aria-labelledby="spending-tab-adjustment"
-        tabindex="0"
+        :role="isTabbedLayout ? 'tabpanel' : undefined"
+        :aria-labelledby="isTabbedLayout ? 'spending-tab-adjustment' : undefined"
+        :tabindex="isTabbedLayout ? 0 : undefined"
         class="min-w-0 min-[1400px]:order-1 min-[1400px]:col-span-2"
       >
         <SpendingSimulatorSection :summary="summary" :selected-goal="selectedGoal" />
@@ -58,9 +58,9 @@
       <div
         id="spending-panel-monthly"
         :class="[activeTab === 'monthly' ? 'block' : 'hidden', 'min-w-0 min-[1400px]:contents']"
-        role="tabpanel"
-        aria-labelledby="spending-tab-monthly"
-        tabindex="0"
+        :role="isTabbedLayout ? 'tabpanel' : undefined"
+        :aria-labelledby="isTabbedLayout ? 'spending-tab-monthly' : undefined"
+        :tabindex="isTabbedLayout ? 0 : undefined"
       >
         <SpendingMonthlyComparisonSection :summary="summary" />
       </div>
@@ -69,11 +69,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import SpendingMonthlyComparisonSection from '@/features/spending/components/SpendingMonthlyComparisonSection.vue'
 import SpendingPeerComparisonSection from '@/features/spending/components/SpendingPeerComparisonSection.vue'
 import SpendingSimulatorSection from '@/features/spending/components/SpendingSimulatorSection.vue'
 import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
+import { useMediaQuery } from '@/shared/composables/useMediaQuery'
 
 defineProps({
   summary: {
@@ -94,6 +95,11 @@ const tabs = [
 
 const activeTab = ref('adjustment')
 const tabButtons = ref([])
+
+// min-[1400px] 이상에서는 탭 버튼이 숨겨지고 패널 3개가 동시에 노출되는 레이아웃으로 바뀌므로,
+// 그 구간에서는 tabpanel 관련 ARIA를 걷어내 숨겨진 탭 버튼을 aria-labelledby로 가리키지 않게 한다.
+const isWideLayout = useMediaQuery('(min-width: 1400px)')
+const isTabbedLayout = computed(() => !isWideLayout.value)
 
 function selectTab(tabId) {
   if (tabs.some((tab) => tab.id === tabId)) {
