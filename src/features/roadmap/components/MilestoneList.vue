@@ -8,9 +8,10 @@
       <p class="text-xs font-bold uppercase tracking-[1.2px] text-slate-400">스플릿 기록</p>
     </div>
 
-    <div class="flex items-start gap-0 overflow-x-auto pb-1">
+    <div ref="scrollContainer" class="flex items-start gap-0 overflow-x-auto pb-1">
       <template v-for="(milestone, index) in milestones" :key="milestone.milestoneId">
         <div
+          :data-in-progress="milestone.status === 'IN_PROGRESS' ? 'true' : null"
           class="flex min-w-[140px] flex-1 flex-col rounded-2xl border p-3"
           :class="[
             milestone.status === 'COMPLETED'
@@ -136,6 +137,10 @@
 </template>
 
 <script setup>
+import { ref, watch } from 'vue'
+
+const scrollContainer = ref(null)
+
 const props = defineProps({
   milestones: {
     type: Array,
@@ -146,6 +151,22 @@ const props = defineProps({
     default: null, // NextMilestoneCard와 동일하게 currentAmount만 사용
   },
 })
+
+let hasScrolledToInProgress = false
+
+// 가로 스크롤 목록이라 "진행 중" 카드가 화면 밖에 있을 수 있어서, milestones 데이터가 실제로 도착하면
+// (컴포넌트 마운트 시점엔 아직 빈 배열이라 onMounted로는 타이밍이 안 맞음) 그 카드가 보이도록 한 번만 스크롤
+watch(
+  () => props.milestones,
+  (milestones) => {
+    if (hasScrolledToInProgress || !milestones?.length) return
+    const inProgressCardEl = scrollContainer.value?.querySelector('[data-in-progress="true"]')
+    if (!inProgressCardEl) return
+    inProgressCardEl.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' })
+    hasScrolledToInProgress = true
+  },
+  { immediate: true, flush: 'post' }
+)
 
 function formatManwon(amount) {
   return `${Math.round(amount / 10000).toLocaleString()}만`
