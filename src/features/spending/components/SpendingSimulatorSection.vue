@@ -127,11 +127,16 @@
 </template>
 
 <script setup>
+import { toRef } from 'vue'
 import SpendingCategoryCard from '@/features/spending/components/SpendingCategoryCard.vue'
 import { useSpendingSimulator } from '@/features/spending/composables/useSpendingSimulator'
 import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 
-defineProps({
+const props = defineProps({
+  summary: {
+    type: Object,
+    required: true,
+  },
   selectedGoal: {
     type: String,
     default: DEFAULT_SELECTED_GOAL,
@@ -147,7 +152,7 @@ const {
   selectCategory,
   selectCategoryByOffset,
   updateCategoryTarget,
-} = useSpendingSimulator()
+} = useSpendingSimulator(toRef(props, 'summary'))
 
 const getSelectorStyle = (category) => {
   const isSelected = selectedCategoryId.value === category.id

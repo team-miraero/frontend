@@ -1,7 +1,8 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   MONTHS_SHORTENED_PER_SAVING_UNIT,
   RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY,
+  SPENDING_CATEGORY_TYPES,
   SPENDING_CATEGORIES,
 } from '@/features/spending/constants/spending.constants'
 
@@ -27,15 +28,32 @@ export function formatShortenedMonths(months) {
   return Number.isInteger(months) ? String(months) : months.toFixed(1)
 }
 
-export function useSpendingSimulator() {
-  const categories = ref(
-    SPENDING_CATEGORIES.map((category) => ({
-      ...category,
-      recentThreeMonthAverage:
-        RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY[category.id] ?? category.current,
-    }))
+export function useSpendingSimulator(summary) {
+  const categoryTargets = ref({})
+  const categorySpending = computed(() => summary?.value?.categorySpending ?? {})
+  const categories = computed(() =>
+    SPENDING_CATEGORIES.filter(
+      (category) =>
+        category.type === SPENDING_CATEGORY_TYPES.VARIABLE &&
+        category.id !== 'transportation'
+    )
+      .map((category) => ({
+        ...category,
+        current: categorySpending.value[category.id] ?? category.current,
+        target: categoryTargets.value[category.id] ?? null,
+        recentThreeMonthAverage:
+          RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY[category.id] ??
+          categorySpending.value[category.id] ??
+          category.current,
+      }))
   )
   const selectedCategoryId = ref(categories.value[0]?.id ?? null)
+
+  watch(categories, (nextCategories) => {
+    if (!nextCategories.some((category) => category.id === selectedCategoryId.value)) {
+      selectedCategoryId.value = nextCategories[0]?.id ?? null
+    }
+  })
 
   const selectedCategoryIndex = computed(() =>
     categories.value.findIndex((category) => category.id === selectedCategoryId.value)
@@ -79,7 +97,8 @@ export function useSpendingSimulator() {
       return
     }
 
-    category.target = target < category.recentThreeMonthAverage ? target : null
+    categoryTargets.value[category.id] =
+      target < category.recentThreeMonthAverage ? target : null
   }
 
   return {
