@@ -50,8 +50,11 @@
         </div>
         <button
           type="button"
-          class="relative h-6 w-11 rounded-full transition-colors"
+          class="relative h-6 w-11 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           :class="pacemaker.enabled ? 'bg-primary' : 'bg-slate-300'"
+          :disabled="isToggling"
+          :aria-pressed="pacemaker.enabled"
+          :aria-label="pacemaker.enabled ? '자동 저축 끄기' : '자동 저축 켜기'"
           @click="$emit('toggle-auto-saving')"
         >
           <span
@@ -60,12 +63,41 @@
           />
         </button>
       </div>
+      <p
+        v-if="toggleErrorMessage"
+        class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-bold text-red-600"
+        role="alert"
+      >
+        {{ toggleErrorMessage }} 다시 시도해 주세요.
+      </p>
 
       <div>
         <p class="pb-2 text-xs font-bold text-slate-500">연동된 목표 계좌 · 입금 가능</p>
         <div class="flex flex-col gap-2">
           <div
-            v-for="goal in depositTargets"
+            v-if="depositTargetsError"
+            class="rounded-2xl border border-red-200 bg-red-50 px-4 py-5 text-center"
+            role="alert"
+          >
+            <p class="text-xs font-bold text-red-600">입금 계좌를 불러오지 못했어요.</p>
+            <button
+              type="button"
+              class="mt-3 rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+              :disabled="isDepositTargetsLoading"
+              @click="$emit('retry-deposit-targets')"
+            >
+              {{ isDepositTargetsLoading ? '불러오는 중...' : '다시 시도' }}
+            </button>
+          </div>
+          <p
+            v-else-if="isDepositTargetsLoading"
+            class="rounded-2xl border border-slate-200 px-4 py-5 text-center text-xs text-slate-400"
+            role="status"
+          >
+            입금 계좌를 불러오는 중이에요.
+          </p>
+          <div
+            v-for="goal in depositTargetsError || isDepositTargetsLoading ? [] : depositTargets"
             :key="goal.goalId"
             class="flex items-center justify-between rounded-2xl border border-[#edf2ff] bg-[#f8fbff] px-4 py-3"
           >
@@ -73,16 +105,17 @@
               <span class="text-lg leading-none">{{ goalIcon(goal.goalType) }}</span>
               <div>
                 <p class="text-xs font-bold text-[#0a192f]">{{ goal.goalName }}</p>
-                <p v-if="goal.depositAssets?.[0]" class="text-xs text-slate-400">
-                  {{ goal.depositAssets[0].financialInstitutionName ?? '저금통' }}
-                  {{ goal.depositAssets[0].maskedAccountNumber ?? '' }}
+                <p v-if="goal.withdrawalAccounts?.[0]" class="text-xs text-slate-400">
+                  {{ goal.withdrawalAccounts[0].financialInstitutionName ?? '입금 계좌' }}
+                  {{ goal.withdrawalAccounts[0].maskedAccountNumber ?? '' }}
                 </p>
                 <p v-else class="text-xs text-slate-400">연결된 입금 계좌 없음</p>
               </div>
             </div>
             <button
               type="button"
-              class="rounded-full px-3 py-1.5 text-xs font-bold text-white"
+              class="rounded-full px-3 py-1.5 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="!goal.withdrawalAccounts?.length"
               style="
                 background-image: linear-gradient(
                   149deg,
@@ -95,6 +128,12 @@
               입금
             </button>
           </div>
+          <p
+            v-if="!depositTargetsError && !isDepositTargetsLoading && depositTargets.length === 0"
+            class="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-center text-xs text-slate-400"
+          >
+            연결된 입금 계좌가 없어요.
+          </p>
         </div>
       </div>
 
@@ -111,6 +150,7 @@
 
 <script setup>
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import { GOAL_TYPE_ICON } from '@/features/pacemaker/constants/pacemaker.constants'
 
 defineProps({
   modelValue: {
@@ -125,14 +165,36 @@ defineProps({
     type: Array,
     default: () => [],
   },
+  isDepositTargetsLoading: {
+    type: Boolean,
+    default: false,
+  },
+  depositTargetsError: {
+    type: Object,
+    default: null,
+  },
+  isToggling: {
+    type: Boolean,
+    default: false,
+  },
+  toggleErrorMessage: {
+    type: String,
+    default: '',
+  },
 })
-defineEmits(['update:modelValue', 'toggle-auto-saving', 'deposit', 'view-history'])
+defineEmits([
+  'update:modelValue',
+  'toggle-auto-saving',
+  'deposit',
+  'view-history',
+  'retry-deposit-targets',
+])
 
 function formatNumber(amount) {
   return (amount ?? 0).toLocaleString()
 }
 
 function goalIcon(goalType) {
-  return { TRAVEL: '✈️', INDEPENDENCE: '🏠', EMERGENCY: '☂️', WEDDING: '💍' }[goalType] ?? '🎯'
+  return GOAL_TYPE_ICON[goalType] ?? '🎯'
 }
 </script>

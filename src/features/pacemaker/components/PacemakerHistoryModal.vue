@@ -19,7 +19,22 @@
 
     <div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto px-7 py-5">
       <div
-        v-for="item in histories"
+        v-if="error"
+        class="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-center"
+        role="alert"
+      >
+        <p class="text-sm font-bold text-red-600">자동 저축 내역을 불러오지 못했어요.</p>
+        <button
+          type="button"
+          class="mt-3 rounded-full border border-red-200 bg-white px-4 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="isLoading"
+          @click="$emit('retry')"
+        >
+          {{ isLoading ? '불러오는 중...' : '다시 시도' }}
+        </button>
+      </div>
+      <div
+        v-for="item in error || isLoading ? [] : histories"
         :key="item.date"
         class="flex items-center justify-between border-b border-slate-100 py-3 last:border-b-0"
       >
@@ -35,7 +50,13 @@
         </p>
       </div>
 
-      <p v-if="histories.length === 0" class="py-6 text-center text-sm text-slate-400">
+      <p v-if="!error && isLoading" class="py-6 text-center text-sm text-slate-400" role="status">
+        자동 저축 내역을 불러오는 중이에요
+      </p>
+      <p
+        v-if="!error && !isLoading && histories.length === 0"
+        class="py-6 text-center text-sm text-slate-400"
+      >
         아직 저축 내역이 없어요
       </p>
     </div>
@@ -54,8 +75,16 @@ defineProps({
     type: Array,
     default: () => [],
   },
+  isLoading: {
+    type: Boolean,
+    default: false,
+  },
+  error: {
+    type: Object,
+    default: null,
+  },
 })
-defineEmits(['update:modelValue'])
+defineEmits(['update:modelValue', 'retry'])
 
 function describeHistory(item) {
   if (item.description) return item.description

@@ -18,7 +18,11 @@
             <ConnectedAssetsCard :assets="goalStore.assets" @open-detail="openLinkedAssetsModal" />
             <PacemakerToggleCard
               :pacemaker="pacemakerStore.pacemakerView"
+              :is-toggling="pacemakerStore.isToggling"
+              :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
+              :dashboard-error-message="dashboardErrorMessage"
               @toggle="handlePacemakerToggle"
+              @retry-dashboard="retryPacemakerDashboard"
             />
           </div>
 
@@ -71,7 +75,11 @@
             <div class="grid grid-cols-2 gap-3 sm:gap-4 items-stretch">
               <PacemakerToggleCard
                 :pacemaker="pacemakerStore.pacemakerView"
+                :is-toggling="pacemakerStore.isToggling"
+                :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
+                :dashboard-error-message="dashboardErrorMessage"
                 @toggle="handlePacemakerToggle"
+                @retry-dashboard="retryPacemakerDashboard"
               />
               <ShareWithFriendsCard @open="openShareGoalModal" />
             </div>
@@ -97,19 +105,29 @@
       v-model="isPacemakerBalanceModalOpen"
       :pacemaker="pacemakerStore.pacemakerView"
       :deposit-targets="pacemakerStore.depositTargets"
+      :is-deposit-targets-loading="pacemakerStore.isDepositTargetsLoading"
+      :deposit-targets-error="pacemakerStore.depositTargetsError"
+      :is-toggling="pacemakerStore.isToggling"
+      :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
       @toggle-auto-saving="pacemakerStore.togglePacemaker"
       @deposit="handleOpenDeposit"
       @view-history="handleOpenHistory"
+      @retry-deposit-targets="retryDepositTargets"
     />
     <PacemakerDepositModal
       v-model="isPacemakerDepositModalOpen"
       :target="selectedDepositTarget"
       :available-balance="pacemakerStore.pacemakerView.moneyBoxBalance"
+      :is-submitting="isDepositing"
+      :error-message="depositErrorMessage"
       @deposit="handleDeposit"
     />
     <PacemakerHistoryModal
       v-model="isPacemakerHistoryModalOpen"
       :histories="pacemakerStore.histories"
+      :is-loading="pacemakerStore.isHistoriesLoading"
+      :error="pacemakerStore.historiesError"
+      @retry="retryHistories"
     />
     <PacemakerDepositSuccessModal
       v-model="isPacemakerDepositSuccessModalOpen"
@@ -164,6 +182,7 @@ import {
 } from '@/features/roadmap'
 import {
   usePacemakerStore,
+  usePacemakerDeposit,
   PacemakerSetupModal,
   PacemakerBalanceModal,
   PacemakerDepositModal,
@@ -189,11 +208,22 @@ const { isOpen: isLinkedAssetsModalOpen, open: openLinkedAssetsModal } = useModa
 const { isOpen: isStatusConfirmModalOpen, open: openStatusConfirmModal } = useModal()
 const { isOpen: isShareGoalModalOpen, open: openShareGoalModal } = useModal()
 
-const selectedDepositTarget = ref(null)
-const depositedAmount = ref(0)
+const {
+  selectedDepositTarget,
+  depositedAmount,
+  isDepositing,
+  depositErrorMessage,
+  openDeposit,
+  submitDeposit,
+  retryDepositTargets,
+  retryHistories,
+} = usePacemakerDeposit()
 const statusConfirmMode = ref('pause')
 
 const isGoalPaused = computed(() => goalStore.currentGoal?.status === 'PAUSE')
+const dashboardErrorMessage = computed(() =>
+  pacemakerStore.dashboardError ? '정보를 불러오지 못했어요' : ''
+)
 
 // 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
 function handlePacemakerToggle() {
@@ -202,6 +232,11 @@ function handlePacemakerToggle() {
   } else {
     openPacemakerModal()
   }
+}
+
+// 페이스메이커 카드의 "다시 시도": 대시보드 조회만 다시 시도
+async function retryPacemakerDashboard() {
+  await pacemakerStore.fetchPacemakerDashboard().catch(() => undefined)
 }
 
 // 페이스메이커 CTA, 아직 전용 저금통이 있으면 개설 안내 모달, 있으면 토글 동작
@@ -215,53 +250,22 @@ function handlePacemakerCtaClick() {
 
 // 잔액 모달의 "입금" 클릭: 어떤 목표 계좌로 입금할지 선택하고 입금 모달을 염
 function handleOpenDeposit(goal) {
-  const depositOptions = (goal?.depositAssets ?? []).map((asset, index) => {
-    const withdrawal = goal?.withdrawalAccounts?.[index] ?? goal?.withdrawalAccounts?.[0]
-
-    return {
-      accountId: asset.assetId,
-      moneyBoxId: pacemakerStore.pacemakerView.moneyBoxId,
-      icon: asset.assetType === 'MONEY_BOX' ? '🪙' : '🏦',
-      accountNickname:
-        asset.assetType === 'MONEY_BOX'
-          ? '저금통'
-          : (asset.financialInstitutionName ?? '입금 계좌'),
-      accountBalance: asset.balance ?? 0,
-      withdrawalBalance: withdrawal?.balance ?? 0,
-      bankName: withdrawal?.financialInstitutionName ?? '',
-      accountNumberMasked: withdrawal?.maskedAccountNumber ?? '',
-    }
-  })
-  const defaultOption = depositOptions[0]
-
-  selectedDepositTarget.value = {
-    goalId: goal?.goalId,
-    accountId: defaultOption?.accountId,
-    moneyBoxId: pacemakerStore.pacemakerView.moneyBoxId,
-    icon: defaultOption?.icon ?? '🎯',
-    goalName: goal?.goalName,
-    accountNickname: defaultOption?.accountNickname ?? '입금 계좌',
-    accountBalance: defaultOption?.accountBalance ?? 0,
-    withdrawalBalance: defaultOption?.withdrawalBalance ?? 0,
-    bankName: defaultOption?.bankName ?? '',
-    accountNumberMasked: defaultOption?.accountNumberMasked ?? '',
-    depositOptions,
-  }
+  openDeposit(goal)
   openPacemakerDepositModal()
 }
 
 // 입금 모달의 "입금하기" 클릭: 실제 입금 처리 후 완료 모달로 전환
-async function handleDeposit({ accountId, amount, moneyBoxId }) {
-  await pacemakerStore.depositToGoal(accountId, amount, moneyBoxId)
-  depositedAmount.value = amount
-  isPacemakerDepositModalOpen.value = false
-  openPacemakerDepositSuccessModal()
+function handleDeposit(payload) {
+  submitDeposit(payload, () => {
+    isPacemakerDepositModalOpen.value = false
+    openPacemakerDepositSuccessModal()
+  })
 }
 
 // 잔액 모달의 "전체 자동 저축 내역 보기" 클릭: 필요할 때만 조회
 async function handleOpenHistory() {
   openPacemakerHistoryModal()
-  await pacemakerStore.fetchHistories()
+  await retryHistories()
 }
 
 // "목표 일시정지" 버튼: 바로 멈추지 않고 확인 모달을 먼저 염
@@ -306,7 +310,7 @@ onMounted(async () => {
     )
   }
 
-  await Promise.allSettled(pacemakerRequests)
+  await Promise.all(pacemakerRequests.map((request) => request.catch(() => undefined)))
 })
 
 // 사이드바 로드맵 목록에서 다른 목표를 클릭하면 라우트 파라미터만 바뀌고
