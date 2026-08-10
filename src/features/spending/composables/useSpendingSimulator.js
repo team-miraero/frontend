@@ -52,18 +52,16 @@ export function useSpendingSimulator(summary) {
   const categories = computed(() =>
     SPENDING_CATEGORIES.filter(
       (category) =>
-        category.type === SPENDING_CATEGORY_TYPES.VARIABLE &&
-        category.id !== 'transportation'
-    )
-      .map((category) => ({
-        ...category,
-        current: categorySpending.value[category.id] ?? category.current,
-        target: categoryTargets.value[category.id] ?? null,
-        recentThreeMonthAverage:
-          RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY[category.id] ??
-          categorySpending.value[category.id] ??
-          category.current,
-      }))
+        category.type === SPENDING_CATEGORY_TYPES.VARIABLE && category.id !== 'transportation'
+    ).map((category) => ({
+      ...category,
+      current: categorySpending.value[category.id] ?? category.current,
+      target: categoryTargets.value[category.id] ?? null,
+      recentThreeMonthAverage:
+        RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY[category.id] ??
+        categorySpending.value[category.id] ??
+        category.current,
+    }))
   )
   // SPENDING_CATEGORIES는 정적 상수라 categories의 카테고리 구성(6개)은 항상 고정된다.
   const selectedCategoryId = ref(categories.value[0]?.id ?? null)
@@ -110,8 +108,7 @@ export function useSpendingSimulator(summary) {
       return
     }
 
-    categoryTargets.value[category.id] =
-      target < category.recentThreeMonthAverage ? target : null
+    categoryTargets.value[category.id] = target < category.recentThreeMonthAverage ? target : null
   }
 
   return {

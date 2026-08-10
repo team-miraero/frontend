@@ -333,7 +333,9 @@ function trapFocus(event) {
 }
 
 function categoryMeta(categoryCode) {
-  return SPENDING_CATEGORIES.find((category) => category.code === categoryCode) ?? DEFAULT_CATEGORY_META
+  return (
+    SPENDING_CATEGORIES.find((category) => category.code === categoryCode) ?? DEFAULT_CATEGORY_META
+  )
 }
 
 function formatAmount(amount) {

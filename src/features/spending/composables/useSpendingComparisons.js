@@ -107,7 +107,8 @@ export function usePeerSpendingComparison(summary) {
   })
 
   const selectedPeerGroupLabel = computed(
-    () => peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
+    () =>
+      peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
   )
 
   const peerSpending = computed(
@@ -162,12 +163,12 @@ export function usePeerSpendingComparison(summary) {
   const largestDifferenceCategoryNames = computed(() =>
     joinKoreanNames(
       [...comparisonItems.value]
-      .sort(
-        (firstCategory, secondCategory) =>
-          Math.abs(secondCategory.difference) - Math.abs(firstCategory.difference)
-      )
-      .slice(0, 2)
-      .map((category) => category.name)
+        .sort(
+          (firstCategory, secondCategory) =>
+            Math.abs(secondCategory.difference) - Math.abs(firstCategory.difference)
+        )
+        .slice(0, 2)
+        .map((category) => category.name)
     )
   )
 
@@ -203,18 +204,17 @@ export function useMonthlySpendingComparison(summary) {
   const monthlyComparisonItems = computed(() =>
     SPENDING_CATEGORIES.filter(
       (category) => category.type === SPENDING_CATEGORY_TYPES.VARIABLE
-    )
-      .map((category) => {
-        const current = categorySpending.value[category.id] ?? category.current
-        const previousAmount = PREVIOUS_MONTH_SPENDING_BY_CATEGORY[category.id] ?? current
+    ).map((category) => {
+      const current = categorySpending.value[category.id] ?? category.current
+      const previousAmount = PREVIOUS_MONTH_SPENDING_BY_CATEGORY[category.id] ?? current
 
-        return {
-          ...category,
-          current,
-          previousAmount,
-          difference: current - previousAmount,
-        }
-      })
+      return {
+        ...category,
+        current,
+        previousAmount,
+        difference: current - previousAmount,
+      }
+    })
   )
 
   return {
