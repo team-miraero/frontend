@@ -15,7 +15,6 @@ let mydataConnections = [
   {
     connectionId: 1,
     institutionName: 'KB국민은행',
-    institutionTypeName: '은행',
     agreedAt: '2026-07-15T10:30:00',
     expiresAt: '2027-07-15T10:30:00',
     lastSyncedAt: '2026-07-20T09:30:00',
@@ -23,7 +22,6 @@ let mydataConnections = [
   {
     connectionId: 2,
     institutionName: 'KB Pay',
-    institutionTypeName: '페이',
     agreedAt: '2026-07-16T14:00:00',
     expiresAt: '2027-07-16T14:00:00',
     lastSyncedAt: '2026-07-20T09:35:00',
@@ -31,7 +29,6 @@ let mydataConnections = [
   {
     connectionId: 3,
     institutionName: 'KB증권',
-    institutionTypeName: '투자',
     agreedAt: '2025-07-10T11:00:00',
     expiresAt: '2026-07-10T11:00:00',
     lastSyncedAt: '2026-07-09T18:20:00',

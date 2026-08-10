@@ -50,7 +50,6 @@ export async function changePassword(payload) {
  * @typedef {Object} MydataConnection
  * @property {number} connectionId
  * @property {string} institutionName
- * @property {string} institutionTypeName
  * @property {string} agreedAt
  * @property {string} expiresAt
  * @property {string | null} lastSyncedAt

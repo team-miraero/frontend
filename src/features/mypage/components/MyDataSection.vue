@@ -48,11 +48,7 @@
             마지막 동기화 {{ formatLastSyncedAt(connection.lastSyncedAt) }}
           </p>
         </div>
-        <span
-          class="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500"
-        >
-          {{ connection.institutionTypeName }}
-        </span>
+
         <span
           class="flex shrink-0 items-center gap-1.5 text-xs font-medium"
           :class="isExpired(connection.expiresAt) ? 'text-amber-600' : 'text-emerald-600'"
