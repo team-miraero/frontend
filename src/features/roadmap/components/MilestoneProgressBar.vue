@@ -1,139 +1,110 @@
-<!-- 목표 진행 로드맵: 전체 마일스톤 진행바 + 현재/목표 페이스 비교 -->
+<!-- 목표 진행 로드맵: 전체 마일스톤 진행바 + 현재/목표 페이스 비교 (도로 이미지 버전, 카드 없이 페이지에 바로 배치) -->
 <template>
-  <div
-    class="w-full rounded-3xl border border-slate-200 bg-white px-7 py-6 shadow-[0_2px_7px_rgba(0,102,255,0.06)]"
-  >
-    <div class="flex items-center justify-between">
-      <p class="text-xs font-bold uppercase tracking-[1.2px] text-slate-400">목표 진행 로드맵</p>
-      <button
-        type="button"
-        class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-100 px-4 py-2"
-        @click="$emit('pause')"
-      >
-        <img src="@/assets/icons/goal-pause.svg" alt="" class="size-[11px]" />
-        <span class="text-xs font-bold text-slate-500">목표 일시정지</span>
-      </button>
-    </div>
+  <div class="relative w-full" style="aspect-ratio: 2172 / 592">
+    <div class="absolute top-0 left-0 w-full" style="aspect-ratio: 2172 / 592">
+      <img :src="roadmapImage" alt="" class="absolute inset-0 size-full object-contain" />
 
-    <div class="relative mt-8 h-24">
-      <!-- 마일스톤 라벨 (금액/날짜) -->
+      <!-- 마일스톤 라벨 + 마커: 도로 곡선 위 지점(pointOnRoad)에 배치 -->
       <div
         v-for="milestone in milestones"
         :key="milestone.milestoneId"
-        class="absolute top-0 flex w-max -translate-x-[58%] flex-col items-center lg:-translate-x-1/2"
-        :style="{ left: `${milestonePosition(milestone)}%` }"
+        class="absolute flex w-max -translate-x-1/2 -translate-y-full flex-col items-center"
+        :style="markerStyle(milestonePosition(milestone), isLastMilestone(milestone))"
       >
-        <span
-          class="text-[10px] font-black tracking-[-0.1px]"
-          :class="milestone.status === 'COMPLETED' ? 'text-primary' : 'text-slate-400'"
+        <div
+          class="hidden flex-col items-center rounded-lg border px-1.5 py-1 sm:flex sm:rounded-xl sm:px-3 sm:py-1.5"
+          :class="
+            milestone.status === 'COMPLETED'
+              ? 'border-primary/20 bg-white'
+              : 'border-slate-200 bg-white'
+          "
         >
-          {{ formatManwon(milestone.targetAmount) }}
-        </span>
+          <span
+            class="text-[9px] font-black tracking-[-0.1px] sm:text-xs"
+            :class="milestone.status === 'COMPLETED' ? 'text-primary' : 'text-slate-400'"
+          >
+            {{ formatManwon(milestone.targetAmount) }}원
+          </span>
+          <span
+            class="text-[8px] font-bold sm:text-[11px]"
+            :class="milestone.status === 'COMPLETED' ? 'text-primary/70' : 'text-slate-400'"
+          >
+            {{ milestonePercent(milestone) }}%
+          </span>
+          <span
+            v-if="isLastMilestone(milestone)"
+            class="mt-0.5 flex items-center gap-1 whitespace-nowrap border-t border-slate-100 pt-1 text-[8px] font-bold text-slate-400 sm:text-[10px]"
+          >
+            예상 도착일 {{ formatEndDate(goal.period.endDate) }}
+          </span>
+        </div>
         <span
-          class="pt-px text-[9px]"
-          :class="milestone.status === 'COMPLETED' ? 'text-primary/60' : 'text-slate-300'"
+          class="mt-0.5 flex size-3 translate-y-1/2 items-center justify-center rounded-full border-2 sm:mt-1 sm:size-4"
+          :class="
+            milestone.status === 'COMPLETED'
+              ? 'border-primary bg-primary'
+              : 'border-slate-300 bg-white'
+          "
         >
-          {{ milestone.targetDate }}
+          <img
+            v-if="milestone.status === 'COMPLETED'"
+            src="@/assets/icons/milestone-complete-check.svg"
+            alt=""
+            class="size-[5px] sm:size-[7px]"
+          />
         </span>
       </div>
 
-      <!-- 트랙: 마커와 동일하게 좌우 7%씩 여백을 두고 시작/끝 -->
-      <div class="absolute top-11 h-[5px] rounded-full bg-slate-200" style="left: 7%; right: 7%" />
+      <!-- 현재 페이스: 토끼와 브로콜리(페이스메이커)가 나란히 도로 위를 함께 달림 -->
       <div
-        class="absolute top-11 h-[5px] rounded-full bg-primary"
-        :style="{ left: `${TRACK_START}%`, width: `${progressFillWidth()}%` }"
-      />
-
-      <!-- 마일스톤 동그라미 마커: 트랙 '위'에 겹쳐서 배치 -->
-      <span
-        v-for="milestone in milestones"
-        :key="`dot-${milestone.milestoneId}`"
-        class="absolute top-[37px] flex size-[19px] -translate-x-1/2 items-center justify-center rounded-full border-2"
-        :class="
-          milestone.status === 'COMPLETED'
-            ? 'border-primary bg-primary shadow-[0_2px_5px_rgba(0,102,255,0.25)]'
-            : 'border-slate-300 bg-white'
-        "
-        :style="{ left: `${milestonePosition(milestone)}%` }"
+        class="absolute flex -translate-x-1/2 -translate-y-full items-end"
+        :style="characterMarkerStyle(goal.progressRate)"
       >
         <img
-          v-if="milestone.status === 'COMPLETED'"
-          src="@/assets/icons/milestone-complete-check.svg"
-          alt=""
-          class="size-2"
+          :src="goalCharacterImage"
+          alt="현재 페이스"
+          class="h-9 w-auto drop-shadow-md sm:h-20 md:h-24 lg:h-28 xl:h-36"
+          :style="goalCharacterFootStyle"
         />
-        <img
-          v-else-if="isLastMilestone(milestone)"
-          src="@/assets/icons/milestone-final-flag.svg"
-          alt=""
-          class="size-[7px]"
-        />
-      </span>
-
-      <!-- 목표 페이스 마커: expectedAmount 위치 -->
-      <span
-        class="absolute top-[30px] flex size-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-dashed border-[#639bde] bg-slate-200"
-        :style="{ left: `${pacePositions().target}%` }"
-      >
-        <img src="@/assets/icons/pace-target-runner.svg" alt="목표 페이스" class="size-4" />
-      </span>
-
-      <!-- 현재 페이스 마커: progressRate(=currentAmount) 위치 -->
-      <span
-        class="absolute top-[30px] flex size-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-dashed border-primary bg-primary/60 shadow-[0_4px_14px_rgba(0,102,255,0.31)]"
-        :style="{ left: `${goal.progressRate}%` }"
-      >
-        <img src="@/assets/icons/pace-current-runner.svg" alt="현재 페이스" class="size-3.5" />
-      </span>
-    </div>
-
-    <!-- 현재, 목표페이스 설명 컨테이너 하단, 왼쪽 정렬 -->
-    <div class="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
-      <div class="flex items-center gap-4">
-        <div class="flex items-center gap-1.5">
-          <span
-            class="flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-primary bg-primary/60 shadow-[0_4px_14px_rgba(0,102,255,0.31)]"
+        <div class="relative ml-1 flex items-end sm:ml-2">
+          <!-- 브로콜리 말풍선 -->
+          <div
+            class="absolute -top-7 left-1/2 z-20 flex w-max -translate-x-1/2 flex-col items-center sm:-top-13 lg:-top-15"
           >
-            <img src="@/assets/icons/pace-current-runner-sm.svg" alt="" class="size-2.5" />
-          </span>
-          <!-- 모바일: 라벨/금액 줄바꿈, 데스크톱: 기존 "현재 · 금액" 한 줄 그대로 -->
-          <span class="flex flex-col text-[10px] leading-tight text-slate-500 lg:block">
-            <span class="lg:hidden">현재</span>
-            <span class="lg:hidden">{{ formatManwon(goal.currentAmount) }}원</span>
-            <span class="hidden lg:inline">현재 · {{ formatManwon(goal.currentAmount) }}원</span>
-          </span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span
-            class="flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-[#639bde] bg-slate-200"
-          >
-            <img src="@/assets/icons/pace-target-runner-sm.svg" alt="" class="size-2.5" />
-          </span>
-          <span class="flex flex-col text-[10px] leading-tight text-slate-400 lg:block">
-            <span class="lg:hidden">목표 페이스</span>
-            <span class="lg:hidden">{{ formatManwon(goal.pace.expectedAmount) }}원</span>
-            <span class="hidden lg:inline"
-              >목표 페이스 · {{ formatManwon(goal.pace.expectedAmount) }}원</span
+            <div
+              class="relative rounded-xl border border-slate-200 bg-white px-2 py-1 text-[8px] font-black text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.12)] sm:rounded-2xl sm:px-3 sm:py-1.5 sm:text-xs"
             >
-          </span>
+              페이스 유지 중!
+              <!-- 말풍선 꼬리 (아래쪽 화살표) -->
+              <div
+                class="absolute -bottom-1.5 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[4px] border-t-[5px] border-x-transparent border-t-white sm:-bottom-2 sm:border-x-[6px] sm:border-t-[7px]"
+              ></div>
+              <div
+                class="absolute -bottom-[7px] left-1/2 -z-10 h-0 w-0 -translate-x-1/2 border-x-[4px] border-t-[5px] border-x-transparent border-t-slate-200 sm:-bottom-[9px] sm:border-x-[6px] sm:border-t-[7px]"
+              ></div>
+            </div>
+          </div>
+          <img
+            :src="coliBottomImage"
+            alt="페이스메이커"
+            class="h-6 w-auto drop-shadow-md sm:h-12 md:h-14 lg:h-16 xl:h-20"
+            style="transform: translateY(9.2%)"
+          />
         </div>
       </div>
-
-      <span
-        class="shrink-0 whitespace-nowrap rounded-full border border-primary/20 bg-primary/[0.06] px-2 py-0.5 text-[9px] font-bold text-primary lg:px-2.5 lg:text-[10px]"
-      >
-        {{ goal.pace.paceStatus === 'BEHIND' ? '▼' : '▲' }}
-        {{ formatManwon(Math.abs(goal.pace.differenceAmount)) }}
-        <!-- 모바일: 문장 첫 단어(금액)까지만 노출, "앞섬/뒤처짐"은 데스크톱에서만 -->
-        <span class="hidden lg:inline">{{
-          goal.pace.paceStatus === 'BEHIND' ? '뒤처짐' : '앞섬'
-        }}</span>
-      </span>
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import roadmapImage from '@/assets/images/roadmap-wide-vector.svg'
+import rabbitImage from '@/assets/images/rabbit_new.png'
+import lamaImage from '@/assets/images/lama.png'
+import bearImage from '@/assets/images/bear.png'
+import duckImage from '@/assets/images/duck.png'
+import coliBottomImage from '@/assets/images/coli8-thick.png'
+
 const props = defineProps({
   goal: {
     type: Object,
@@ -144,7 +115,29 @@ const props = defineProps({
     required: true,
   },
 })
-defineEmits(['pause'])
+
+// 목표 종류(goal.goalType)에 따라 로드맵 메인 캐릭터를 바꿔서 보여줌
+// 독립자금(포스아거)/결혼자금(롤로라무)/비상금(심쿵비비)/학자금대출(루나키키), 콜리(페이스메이커)는 종류 무관 고정
+const GOAL_TYPE_CHARACTER = {
+  INDEPENDENCE: duckImage,
+  WEDDING: lamaImage,
+  EMERGENCY: bearImage,
+  LOAN: rabbitImage,
+}
+
+const goalCharacterImage = computed(() => GOAL_TYPE_CHARACTER[props.goal.goalType] ?? rabbitImage)
+
+// 각 PNG의 아래쪽 투명 여백만큼 이미지를 내려 실제 발끝이 공통 기준선에 닿도록 보정
+const GOAL_TYPE_FOOT_OFFSET = {
+  INDEPENDENCE: 7,
+  WEDDING: 2.7,
+  EMERGENCY: 1.8,
+  LOAN: 8,
+}
+
+const goalCharacterFootStyle = computed(() => ({
+  transform: `translateY(${GOAL_TYPE_FOOT_OFFSET[props.goal.goalType] ?? 4.6}%)`,
+}))
 
 // 마일스톤/페이스 마커 위치: goalAmount 대비 금액 비율(%)
 const TRACK_START = 7
@@ -160,10 +153,6 @@ function milestonePosition(milestone) {
   return toTrackPercent(milestone.targetAmount / props.goal.goalAmount)
 }
 
-function progressFillWidth() {
-  return toTrackPercent(props.goal.progressRate / 100) - TRACK_START
-}
-
 function isLastMilestone(milestone) {
   return props.milestones[props.milestones.length - 1]?.milestoneId === milestone.milestoneId
 }
@@ -172,19 +161,68 @@ function formatManwon(amount) {
   return `${Math.round(amount / 10000).toLocaleString()}만`
 }
 
-// 목표/현재 페이스 최소 간격 확보
-function pacePositions() {
-  const target = toTrackPercent(props.goal.pace.expectedAmount / props.goal.goalAmount)
-  const current = toTrackPercent(props.goal.progressRate / 100)
-  const MIN_GAP = 2.5
+function formatEndDate(yyyyMM) {
+  return yyyyMM.replace('-', '.')
+}
 
-  if (Math.abs(current - target) >= MIN_GAP) {
-    return { target, current }
+function milestonePercent(milestone) {
+  return Math.round((milestone.targetAmount / props.goal.goalAmount) * 100)
+}
+
+// 캐릭터 전용 앵커 좌표 (도로 아스팔트 표면에 발이 닿아 달리는 위치)
+const CHARACTER_ROAD_ANCHORS = [
+  { t: 0, left: 4, top: 58.81 },
+  { t: 0.25, left: 24, top: 52.11 },
+  { t: 0.5, left: 48, top: 52.81 },
+  { t: 0.75, left: 72, top: 61.18 },
+  { t: 1, left: 92, top: 54.27 },
+]
+
+// 마일스톤 마커 앵커 좌표: 현재 SVG 중심선에서 외곽선 반두께를 뺀 위쪽 검정 외곽선 실측값
+const ROAD_ANCHORS = [
+  { t: 0, left: 7, top: 45.49 },
+  { t: 0.25, left: 28.5, top: 43.75 },
+  { t: 0.5, left: 50, top: 40.04 },
+  { t: 0.75, left: 71.5, top: 49.36 },
+  { t: 1, left: 93, top: 42.76 },
+]
+
+// 앵커 좌표간 선형 보간
+function interpolateAnchors(anchors, trackPercent) {
+  const t = Math.min(1, Math.max(0, (trackPercent - TRACK_START) / (TRACK_END - TRACK_START)))
+  for (let i = 0; i < anchors.length - 1; i++) {
+    const a = anchors[i]
+    const b = anchors[i + 1]
+    if (t >= a.t && t <= b.t) {
+      const localT = (t - a.t) / (b.t - a.t)
+      return {
+        left: a.left + (b.left - a.left) * localT,
+        top: a.top + (b.top - a.top) * localT,
+      }
+    }
+  }
+  return anchors[anchors.length - 1]
+}
+
+function pointOnRoad(trackPercent) {
+  return interpolateAnchors(ROAD_ANCHORS, trackPercent)
+}
+
+function markerStyle(trackPercent, isFinish = false) {
+  if (isFinish) {
+    return { left: '88.536%', top: '42.891%' }
   }
 
-  const mid = (current + target) / 2
-  return current >= target
-    ? { target: mid - MIN_GAP / 2, current: mid + MIN_GAP / 2 }
-    : { target: mid + MIN_GAP / 2, current: mid - MIN_GAP / 2 }
+  const { left, top } = pointOnRoad(trackPercent)
+  return { left: `${left}%`, top: `${top}%` }
+}
+
+function characterPointOnRoad(trackPercent) {
+  return interpolateAnchors(CHARACTER_ROAD_ANCHORS, trackPercent)
+}
+
+function characterMarkerStyle(trackPercent) {
+  const { left, top } = characterPointOnRoad(trackPercent)
+  return { left: `${left}%`, top: `${top}%` }
 }
 </script>

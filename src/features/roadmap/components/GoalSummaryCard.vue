@@ -2,7 +2,7 @@
 <template>
   <!-- 데스크톱(lg 이상): 기존 한 줄 배치 그대로 유지 -->
   <div
-    class="hidden rounded-[20px] border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:block"
+    class="hidden rounded-[20px] border border-slate-200 bg-white p-4 shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:block"
   >
     <p class="text-xs font-bold text-slate-400">모인 금액 / 목표</p>
 
@@ -13,7 +13,7 @@
       <span class="pb-0.5 text-sm text-slate-400">/ {{ formatWon(goal.goalAmount) }}</span>
     </div>
 
-    <div class="pt-3">
+    <div class="pt-2.5">
       <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
         <div class="h-2 rounded-full bg-primary" :style="{ width: `${goal.progressRate}%` }" />
       </div>
@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <div class="mt-2.5 flex items-center gap-2 border-t border-slate-100 pt-2.5">
+    <div class="mt-2 flex items-center gap-2 border-t border-slate-100 pt-2">
       <span class="size-1.5 rounded-full" :class="paceDotClass" />
       <span class="text-xs font-bold" :class="paceTextClass">{{ paceLabel }}</span>
     </div>
@@ -31,7 +31,7 @@
 
   <!-- 모바일(lg 미만): 글자 크기를 줄이고 목표/모인 금액을 각각 한 줄씩 줄바꿈한 축약형 -->
   <div
-    class="rounded-[20px] border border-slate-200 bg-white p-4 shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:hidden"
+    class="rounded-[20px] border border-slate-200 bg-white p-3.5 shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:hidden"
   >
     <p class="text-xs font-bold text-slate-400">모인 금액 / 목표</p>
 
@@ -45,7 +45,7 @@
       </p>
     </div>
 
-    <div class="pt-3">
+    <div class="pt-2.5">
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
         <div class="h-1.5 rounded-full bg-primary" :style="{ width: `${goal.progressRate}%` }" />
       </div>

@@ -2,7 +2,7 @@
 <template>
   <!-- 데스크톱(lg 이상): 기존 배치 그대로 유지 -->
   <div
-    class="hidden flex-col gap-3 rounded-[20px] border p-[25px] lg:flex"
+    class="hidden flex-col gap-2.5 rounded-[20px] border p-4 lg:flex"
     :class="cardClass"
     :style="cardStyle"
   >

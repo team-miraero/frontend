@@ -3,7 +3,7 @@
   <!-- 데스크톱(lg 이상): 기존 배치 그대로 유지 -->
   <button
     type="button"
-    class="hidden w-full rounded-[20px] border border-slate-200 bg-white p-[25px] text-left shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:block"
+    class="hidden w-full rounded-[20px] border border-slate-200 bg-white p-4 text-left shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:block"
     @click="$emit('open-detail')"
   >
     <div class="flex items-center justify-between">
@@ -34,7 +34,7 @@
   <!-- 모바일(lg 미만): 타이틀을 "연동된 자산"으로 줄이고 합계 잔액을 줄바꿈한 축약형 -->
   <button
     type="button"
-    class="w-full rounded-[20px] border border-slate-200 bg-white p-4 text-left shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:hidden"
+    class="w-full rounded-[20px] border border-slate-200 bg-white p-3.5 text-left shadow-[0_2px_7px_rgba(0,102,255,0.06)] lg:hidden"
     @click="$emit('open-detail')"
   >
     <p class="text-xs font-bold text-slate-400">연동된 자산</p>

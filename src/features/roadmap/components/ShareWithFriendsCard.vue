@@ -2,32 +2,39 @@
 <template>
   <button
     type="button"
-    class="flex h-full w-full flex-col justify-between rounded-2xl border p-3 sm:p-5 text-left transition-all hover:opacity-95 shadow-[0_2px_8px_rgba(0,102,255,0.06)]"
+    class="group relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[20px] border p-3.5 sm:p-4 text-left transition-all hover:shadow-md shadow-[0_2px_8px_rgba(0,102,255,0.06)]"
     :style="{ borderColor: theme.cardBorder, backgroundImage: theme.cardGradient }"
     @click="$emit('open')"
   >
-    <div>
-      <div class="flex items-center justify-between">
-        <span
-          class="flex items-center gap-1 text-[11px] sm:text-sm font-bold text-[#0a192f] whitespace-nowrap"
-        >
-          🧑‍🤝‍🧑 친구에게 공유하기
-        </span>
+    <div class="relative z-10 flex items-start justify-between gap-2 pr-20 sm:pr-24">
+      <div>
+        <h3 class="text-[11px] sm:text-xs font-bold text-[#0a192f] whitespace-nowrap">
+          친구에게 공유하기
+        </h3>
+        <p class="pt-1 text-[10px] leading-tight text-slate-500 sm:text-xs text-left">
+          목표 달성 현황을 친구들에게 자랑해 보세요!
+        </p>
       </div>
-      <p class="pt-1 text-[10px] leading-tight text-slate-500 sm:text-xs text-left">
-        목표 달성 현황을 친구들에게 자랑해 보세요!
-      </p>
     </div>
-    <div class="flex justify-end pt-1.5">
-      <span class="text-[11px] sm:text-sm font-bold text-primary whitespace-nowrap"
-        >공유하기 →</span
-      >
+
+    <!-- 우측 대형 friends.png 캐릭터 일러스트 -->
+    <img
+      :src="friendsImage"
+      alt="친구들"
+      class="absolute -bottom-1 right-2 sm:right-3 h-20 sm:h-24 w-auto object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5"
+    />
+
+    <div class="relative z-10 flex items-center justify-start pt-2">
+      <span class="text-[11px] sm:text-xs font-bold text-primary whitespace-nowrap">
+        공유하기 →
+      </span>
     </div>
   </button>
 </template>
 
 <script setup>
 import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
+import friendsImage from '@/assets/images/friends.png'
 
 defineEmits(['open'])
 
