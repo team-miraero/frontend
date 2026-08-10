@@ -143,11 +143,8 @@ const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value),
 })
-const minimumGoalDate = computed(() => {
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  return toLocalDate(tomorrow)
-})
+// 반응형 의존성이 없어 computed로 두면 자정을 넘겨도 갱신되지 않으므로 열릴 때마다 계산한다.
+const minimumGoalDate = ref('')
 
 function toLocalDate(date) {
   const year = date.getFullYear()
@@ -170,9 +167,13 @@ function formatGoalDate(value) {
 }
 
 function resetForm() {
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
   form.goalAmount = props.goal?.goalAmount ?? 0
   form.goalDate = normalizeGoalDate(props.goal?.period?.endDate)
   form.status = ['PAUSE', 'PAUSED'].includes(props.goal?.status) ? 'PAUSE' : 'ACTIVE'
+  minimumGoalDate.value = toLocalDate(tomorrow)
   validationError.value = ''
 }
 

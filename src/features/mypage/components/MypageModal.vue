@@ -124,7 +124,10 @@ watch(
   }
 )
 
+// 닫혀 있던 모달까지 body 스타일과 포커스를 되돌리면 다른 모달의 상태를 덮어쓴다.
 onBeforeUnmount(() => {
+  if (!props.modelValue) return
+
   document.body.style.overflow = previousBodyOverflow
   previouslyFocusedElement?.focus?.()
 })

@@ -29,10 +29,10 @@
 
     <div v-else class="mb-5 flex flex-col">
       <div
-        v-for="(connection, index) in connections"
-        :key="connection.connectionId"
+        v-for="(institution, index) in institutions"
+        :key="institution.id"
         class="flex min-h-[57px] items-center gap-3 py-3 sm:gap-4"
-        :class="index < connections.length - 1 ? 'border-b border-[#f4f8ff]' : ''"
+        :class="index < institutions.length - 1 ? 'border-b border-[#f4f8ff]' : ''"
       >
         <div
           class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#eaf2ff]"
@@ -41,24 +41,21 @@
           <img src="@/assets/icons/bank-account.svg" alt="" class="size-4" />
         </div>
         <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-medium text-[#0a192f]">
-            {{ connection.institutionName }}
-          </p>
+          <p class="truncate text-sm font-medium text-[#0a192f]">{{ institution.name }}</p>
           <p class="truncate text-xs text-slate-400">
-            마지막 동기화 {{ formatLastSyncedAt(connection.lastSyncedAt) }}
+            마지막 동기화 {{ institution.lastSyncedLabel }}
           </p>
         </div>
-
         <span
           class="flex shrink-0 items-center gap-1.5 text-xs font-medium"
-          :class="isExpired(connection.expiresAt) ? 'text-amber-600' : 'text-emerald-600'"
+          :class="institution.expired ? 'text-amber-600' : 'text-emerald-600'"
         >
           <i
             class="size-2 rounded-full"
-            :class="isExpired(connection.expiresAt) ? 'bg-amber-500' : 'bg-emerald-600'"
+            :class="institution.expired ? 'bg-amber-500' : 'bg-emerald-600'"
             aria-hidden="true"
           />
-          {{ isExpired(connection.expiresAt) ? '만료됨' : '연동됨' }}
+          {{ institution.expired ? '만료됨' : '연동됨' }}
         </span>
       </div>
     </div>
@@ -95,6 +92,16 @@ const props = defineProps({
 
 const emit = defineEmits(['sync', 'retry-load'])
 const showSyncing = ref(false)
+const institutions = computed(() =>
+  props.connections.map((connection) => ({
+    id: connection.connectionId,
+    name: connection.institutionName,
+    lastSyncedLabel: connection.lastSyncedAt
+      ? formatDateTime(connection.lastSyncedAt)
+      : '기록 없음',
+    expired: isExpired(connection.expiresAt),
+  }))
+)
 const idleButtonLabel = computed(() => {
   if (props.syncError) return '다시 시도하기'
   if (props.loadError && props.connections.length === 0) return '연결 기관 다시 불러오기'
@@ -115,10 +122,6 @@ watch(
   },
   { immediate: true }
 )
-
-function formatLastSyncedAt(value) {
-  return value ? formatDateTime(value) : '기록 없음'
-}
 
 function isExpired(value) {
   if (!value) return false

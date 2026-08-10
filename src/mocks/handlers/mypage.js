@@ -63,7 +63,7 @@ export const mypageHandlers = [
     return new HttpResponse(null, { status: 204 })
   }),
 
-  http.get('*/mydata/connections', () =>
+  http.get('*/api/mydata/connections', () =>
     HttpResponse.json({
       success: true,
       code: 'SUCCESS',

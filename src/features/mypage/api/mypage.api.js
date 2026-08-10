@@ -59,9 +59,7 @@ export async function changePassword(payload) {
  * @returns {Promise<MydataConnection[]>}
  */
 export async function getMydataConnections() {
-  const { data: responseBody } = await client.get('/mydata/connections', {
-    baseURL: getApiOrigin(),
-  })
+  const { data: responseBody } = await client.get('/mydata/connections')
   const connections = responseBody?.data?.connections ?? responseBody?.connections
 
   if (!Array.isArray(connections)) {
@@ -69,14 +67,6 @@ export async function getMydataConnections() {
   }
 
   return connections
-}
-
-function getApiOrigin() {
-  const baseURL = client.defaults.baseURL
-  if (!baseURL) return undefined
-
-  const fallbackOrigin = typeof window === 'undefined' ? 'http://localhost' : window.location.origin
-  return new URL(baseURL, fallbackOrigin).origin
 }
 
 /**
