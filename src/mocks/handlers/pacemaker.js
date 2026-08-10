@@ -9,7 +9,7 @@ const mockGoals = [
   {
     goalId: 1,
     goalName: '유럽 여행',
-    goalType: 'TRAVEL',
+    goalType: 'WEDDING',
     goalAmount: 3000000,
     totalSavedAmount: 1200000,
     depositAssets: [
@@ -156,7 +156,16 @@ export const pacemakerHandlers = [
 
   http.post('*/api/pace-maker/deposits', async ({ request }) => {
     const { accountId, amount, moneyBoxId } = await request.json()
-    mockBalance = Math.max(0, mockBalance - amount)
+    const targetAccount = mockGoals
+      .flatMap((goal) => goal.withdrawalAccounts)
+      .find((account) => account.accountId === accountId)
+
+    if (!targetAccount || moneyBoxId !== 31 || amount <= 0 || amount > mockBalance) {
+      return HttpResponse.json({ message: '입금 요청 정보를 확인해 주세요.' }, { status: 400 })
+    }
+
+    mockBalance -= amount
+    targetAccount.balance += amount
 
     return HttpResponse.json({
       accountId,

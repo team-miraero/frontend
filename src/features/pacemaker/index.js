@@ -1,6 +1,7 @@
 // pacemaker feature 공개 API barrel
 export { pacemakerRoutes } from '@/features/pacemaker/routes'
 export { usePacemakerStore } from '@/features/pacemaker/store/pacemaker.store'
+export { usePacemakerDeposit } from '@/features/pacemaker/composables/usePacemakerDeposit'
 export { default as PacemakerSetupModal } from '@/features/pacemaker/components/PacemakerSetupModal.vue'
 export { default as PacemakerBalanceModal } from '@/features/pacemaker/components/PacemakerBalanceModal.vue'
 export { default as PacemakerDepositModal } from '@/features/pacemaker/components/PacemakerDepositModal.vue'
@@ -10,4 +11,3 @@ export { default as PacemakerMoneyBoxStep } from '@/features/pacemaker/component
 export { default as PacemakerLimitStep } from '@/features/pacemaker/components/PacemakerLimitStep.vue'
 export { default as PacemakerSetupCompleteStep } from '@/features/pacemaker/components/PacemakerSetupCompleteStep.vue'
 export { default as PacemakerDashboard } from '@/features/pacemaker/components/PacemakerDashboard.vue'
-export * as pacemakerApi from '@/features/pacemaker/api/pacemaker.api'
