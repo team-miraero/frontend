@@ -116,7 +116,7 @@
                 >
                   <span
                     class="flex size-10 shrink-0 items-center justify-center rounded-full text-lg"
-                    :class="categoryMeta(transaction.categoryCode).backgroundClass"
+                    :style="{ backgroundColor: categoryMeta(transaction.categoryCode).softColor }"
                     aria-hidden="true"
                   >
                     {{ categoryMeta(transaction.categoryCode).icon }}
@@ -160,16 +160,9 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
+import { SPENDING_CATEGORIES } from '@/features/spending/constants/spending.constants'
 
-const CATEGORY_META = {
-  FOOD: { icon: '🍴', backgroundClass: 'bg-[#FFF1F2]' },
-  CAFE: { icon: '☕', backgroundClass: 'bg-[#ECFDF5]' },
-  SHOPPING: { icon: '🛍️', backgroundClass: 'bg-[#F8F0FF]' },
-  TRANSPORTATION: { icon: '🚌', backgroundClass: 'bg-[#ECFDF5]' },
-  SUBSCRIPTION: { icon: '📺', backgroundClass: 'bg-[#EEF5FF]' },
-  EXERCISE: { icon: '🏋️', backgroundClass: 'bg-[#F1F5F9]' },
-  DEFAULT: { icon: '💳', backgroundClass: 'bg-[#F1F5F9]' },
-}
+const DEFAULT_CATEGORY_META = { icon: '💳', softColor: '#F1F5F9' }
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
 const FOCUSABLE_SELECTOR =
@@ -214,17 +207,10 @@ let previousAppAriaHidden = null
 const formattedTotalExpense = computed(() => formatKRWCompact(Math.abs(props.totalExpense)))
 
 const categoryFilters = computed(() => {
-  const seen = new Set()
-  const categories = props.transactions.reduce((result, transaction) => {
-    if (!seen.has(transaction.categoryCode)) {
-      seen.add(transaction.categoryCode)
-      result.push({ code: transaction.categoryCode, name: transaction.categoryName })
-    }
-
-    return result
-  }, [])
-
-  return [{ code: 'ALL', name: '전체' }, ...categories]
+  return [
+    { code: 'ALL', name: '전체' },
+    ...SPENDING_CATEGORIES.map(({ code, name }) => ({ code, name })),
+  ]
 })
 
 const filteredTransactions = computed(() => {
@@ -345,7 +331,7 @@ function trapFocus(event) {
 }
 
 function categoryMeta(categoryCode) {
-  return CATEGORY_META[categoryCode] ?? CATEGORY_META.DEFAULT
+  return SPENDING_CATEGORIES.find((category) => category.code === categoryCode) ?? DEFAULT_CATEGORY_META
 }
 
 function formatAmount(amount) {
