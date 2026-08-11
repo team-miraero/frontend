@@ -35,13 +35,21 @@ export const useAuthStore = defineStore('auth', () => {
   function login(payload) {
     accessToken.value = payload.accessToken
     user.value = payload.user
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+    } catch {
+      // 저장소가 차단되어도 현재 탭의 로그인 상태는 유지한다.
+    }
   }
 
   function logout() {
     accessToken.value = null
     user.value = null
-    localStorage.removeItem(STORAGE_KEY)
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {
+      // 저장소 오류가 로그아웃과 401 복구 흐름을 막지 않도록 한다.
+    }
   }
 
   /**

@@ -2,7 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from '@/app/router/routes'
 import { useAuthStore } from '@/stores/auth.store'
-import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { AUTH_UNAUTHORIZED_EVENT, ROUTE_NAMES } from '@/shared/constants/routes'
 
 const PUBLIC_ROUTE_NAMES = new Set([ROUTE_NAMES.ONBOARDING, ROUTE_NAMES.LOGIN, ROUTE_NAMES.SIGNUP])
 
@@ -10,6 +10,14 @@ export const router = createRouter({
   history: createWebHistory(),
   routes,
 })
+
+if (typeof window !== 'undefined') {
+  window.addEventListener(AUTH_UNAUTHORIZED_EVENT, () => {
+    if (router.currentRoute.value.name !== ROUTE_NAMES.LOGIN) {
+      router.replace({ name: ROUTE_NAMES.LOGIN })
+    }
+  })
+}
 
 router.beforeEach((to) => {
   const authStore = useAuthStore()
