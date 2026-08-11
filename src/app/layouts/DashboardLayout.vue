@@ -4,7 +4,7 @@
     <DashboardSidebar />
     <div class="flex min-w-0 flex-1 flex-col">
       <DashboardHeader v-if="!route.meta.hideHeader" />
-      <main class="flex-1 overflow-y-auto">
+      <main class="flex-1 overflow-y-auto [scrollbar-gutter:stable]">
         <RouterView />
       </main>
     </div>

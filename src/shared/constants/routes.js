@@ -20,4 +20,5 @@ export const ROUTE_NAMES = {
   PRODUCTS: 'products',
   COACH: 'coach',
   MYPAGE: 'mypage',
+  YOUTH_POLICY: 'youth-policy',
 }

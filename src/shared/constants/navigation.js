@@ -7,6 +7,7 @@ import spendingIcon from '@/assets/icons/spending.svg'
 import productsIcon from '@/assets/icons/products.svg'
 import coachIcon from '@/assets/icons/coach.svg'
 import mypageIcon from '@/assets/icons/mypage.svg'
+import youthPolicyIcon from '@/assets/icons/youth-policy.svg'
 
 export const NAV_ITEMS = [
   {
@@ -38,6 +39,12 @@ export const NAV_ITEMS = [
     label: 'KB 상품',
     pageTitle: 'KB 상품 추천',
     icon: productsIcon,
+  },
+  {
+    routeName: ROUTE_NAMES.YOUTH_POLICY,
+    label: '청년 정책',
+    pageTitle: '청년 정책',
+    icon: youthPolicyIcon,
   },
   {
     routeName: ROUTE_NAMES.COACH,

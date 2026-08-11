@@ -158,10 +158,16 @@
         >
           <img :src="item.icon" alt="" class="size-4" />
           <span
-            class="text-sm font-bold"
+            class="flex-1 text-left text-sm font-bold"
             :class="isActive(item.routeName) ? 'text-primary' : 'text-slate-500'"
           >
             {{ item.label }}
+          </span>
+          <span
+            v-if="item.isNew"
+            class="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white"
+          >
+            NEW
           </span>
         </RouterLink>
       </div>
@@ -230,8 +236,12 @@ const pacemakerNav = NAV_ITEMS.find((item) => item.routeName === ROUTE_NAMES.PAC
 const collectionNav = NAV_ITEMS.find((item) => item.routeName === ROUTE_NAMES.COLLECTION)
 
 const bottomNavItems = NAV_ITEMS.filter((item) =>
-  [ROUTE_NAMES.SPENDING, ROUTE_NAMES.PRODUCTS, ROUTE_NAMES.COACH, ROUTE_NAMES.MYPAGE].includes(
-    item.routeName
-  )
+  [
+    ROUTE_NAMES.SPENDING,
+    ROUTE_NAMES.PRODUCTS,
+    ROUTE_NAMES.YOUTH_POLICY,
+    ROUTE_NAMES.COACH,
+    ROUTE_NAMES.MYPAGE,
+  ].includes(item.routeName)
 )
 </script>
