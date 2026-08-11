@@ -356,7 +356,9 @@ export const youthPolicyHandlers = [
     }
 
     // region · recommended는 mock 전용 내부 필드라 상세 응답에서도 제외한다.
-    const { region, recommended, ...detail } = policy
+    const detail = { ...policy }
+    delete detail.region
+    delete detail.recommended
     return HttpResponse.json({ success: true, data: detail, error: null })
   }),
 ]
