@@ -172,7 +172,7 @@ export const goalHandlers = [
   }),
 
   // 저금통 개설 API (GOAL-04)
-  http.post('*/api/moneyBoxes', async ({ request }) => {
+  http.post('*/api/money-boxes', async ({ request }) => {
     await delay(500)
     const payload = await request.json()
 
@@ -180,7 +180,7 @@ export const goalHandlers = [
       {
         moneyBoxId: Math.floor(Math.random() * 100000),
         userId: 0,
-        type: payload.type,
+        moneyBoxType: payload.moneyBoxType,
         balance: 0,
         maskedAccountNumber: '123-****-7890',
         createdAt: new Date().toISOString(),
