@@ -20,10 +20,7 @@ export const authHandlers = [
 
   http.post('*/api/auth/signup', async ({ request }) => {
     const payload = await request.json()
-    return HttpResponse.json(
-      { userId: 1, name: '', email: payload.email },
-      { status: 201 }
-    )
+    return HttpResponse.json({ userId: 1, name: '', email: payload.email }, { status: 201 })
   }),
 
   http.post('*/api/auth/refresh', async () => {
@@ -35,5 +32,16 @@ export const authHandlers = [
 
   http.post('*/api/auth/logout', async () => {
     return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.post('*/api/mydata/connect', async () => {
+    return HttpResponse.json({
+      success: true,
+      data: { connectionId: 1 },
+    })
+  }),
+
+  http.post('*/api/mydata/sync', async () => {
+    return HttpResponse.json({ success: true, data: null })
   }),
 ]

@@ -1,4 +1,6 @@
 // 라우트 name 상수 모음 (오타 방지용, 전역에서 재사용)
+export const AUTH_UNAUTHORIZED_EVENT = 'miraero:auth-unauthorized'
+
 export const ROUTE_NAMES = {
   ONBOARDING: 'onboarding',
 

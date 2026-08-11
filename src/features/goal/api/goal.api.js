@@ -1,5 +1,6 @@
 import { GOAL_PRESETS } from '@/features/goal/constants/goal.constants.js'
 import { client } from '@/shared/api/client'
+import { unwrapApiData } from '@/shared/api/unwrapApiData'
 
 /**
  * @typedef {import('@/features/goal/constants/goal.constants.js').GoalPreset} GoalPreset
@@ -110,7 +111,14 @@ export async function getAccounts(params) {
  * @returns {Promise<MoneyBoxResponse>}
  */
 export async function createMoneyBox(payload) {
-  const { data: responseBody } = await client.post('/moneyBoxes', payload)
+  const { data: responseBody } = await client.post('/money-boxes', {
+    moneyBoxType: payload.type,
+    autoTransfer: {
+      withdrawalAccountId: payload.withdrawalAccountId,
+      amount: payload.amount,
+      transferDay: payload.transferDay,
+    },
+  })
   return unwrapApiData(responseBody)
 }
 
@@ -227,22 +235,6 @@ export async function getGoalAssets(goalId) {
  * @property {LinkedGoalAsset[]} linkedAssets
  */
 
-function unwrapApiData(responseBody) {
-  if (
-    responseBody &&
-    typeof responseBody === 'object' &&
-    Object.hasOwn(responseBody, 'success') &&
-    Object.hasOwn(responseBody, 'data')
-  ) {
-    if (!responseBody.success) {
-      throw new Error(responseBody.error?.message ?? 'API 요청에 실패했습니다.')
-    }
-    return responseBody.data
-  }
-
-  return responseBody
-}
-
 /**
  * 상품 추천 화면용 목표 연결 자산 조회
  *
@@ -250,14 +242,25 @@ function unwrapApiData(responseBody) {
  * @returns {Promise<LinkedGoalAssets>}
  */
 export async function getGoalLinkedAssets(goalId) {
-  const { data: responseBody } = await client.get(`/goals/${goalId}/linked-assets`)
+  const { data: responseBody } = await client.get(`/goals/${goalId}/assets`)
   const data = unwrapApiData(responseBody)
 
-  if (!data || !Array.isArray(data.linkedAssets)) {
-    throw new TypeError('연결 자산 API 응답 형식이 올바르지 않습니다.')
-  }
+  const assets = data?.assets ?? []
+  const linkedAssets = assets.map((asset) => ({
+    assetType: asset.assetType,
+    assetId: asset.assetId,
+    assetName: asset.assetName,
+    institutionName: asset.bankName ?? null,
+    maskedAccountNumber: asset.accountNumberMasked ?? null,
+    balance: asset.balance ?? 0,
+    interestRate: asset.assetDetail?.interestRate ?? null,
+  }))
 
-  return data
+  return {
+    goalId,
+    totalLinkedBalance: linkedAssets.reduce((sum, a) => sum + (a.balance ?? 0), 0),
+    linkedAssets,
+  }
 }
 
 /**

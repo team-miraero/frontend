@@ -1,5 +1,6 @@
 // auth 도메인 API 함수 골격 (AUTH-01~03)
 import { client } from '@/shared/api/client'
+import { unwrapApiData } from '@/shared/api/unwrapApiData'
 
 /**
  * @typedef {Object} LoginCredentials
@@ -40,7 +41,7 @@ import { client } from '@/shared/api/client'
  */
 export async function login(credentials) {
   const { data } = await client.post('/auth/login', credentials)
-  return data
+  return unwrapApiData(data)
 }
 
 /**
@@ -56,7 +57,23 @@ export async function login(credentials) {
  */
 export async function signup(payload) {
   const { data } = await client.post('/auth/signup', payload)
-  return data
+  return unwrapApiData(data)
+}
+
+/**
+ * 로그인 사용자의 KB Pay 마이데이터 연결을 생성하거나 갱신한다.
+ */
+export async function connectMydata() {
+  const { data } = await client.post('/mydata/connect')
+  return unwrapApiData(data)
+}
+
+/**
+ * 연결된 KB Pay 마이데이터의 자산 정보를 동기화한다.
+ */
+export async function syncMydata() {
+  const { data } = await client.post('/mydata/sync')
+  return unwrapApiData(data)
 }
 
 /**

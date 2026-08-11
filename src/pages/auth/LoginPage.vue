@@ -36,7 +36,14 @@
           <p v-if="authFeatureStore.loginError" class="text-xs text-red-500">
             {{ authFeatureStore.loginError }}
           </p>
-          <BaseButton type="submit" full-width size="lg">로그인</BaseButton>
+          <BaseButton
+            type="submit"
+            full-width
+            size="lg"
+            :disabled="authFeatureStore.isSubmittingLogin"
+          >
+            {{ authFeatureStore.isSubmittingLogin ? '로그인 중...' : '로그인' }}
+          </BaseButton>
         </form>
 
         <p class="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-400">
@@ -96,10 +103,14 @@ onMounted(() => {
 })
 
 function validateEmail() {
-  errors.value.email = EMAIL_PATTERN.test(form.value.email) ? '' : '올바른 이메일 형식을 입력해 주세요.'
+  errors.value.email = EMAIL_PATTERN.test(form.value.email)
+    ? ''
+    : '올바른 이메일 형식을 입력해 주세요.'
 }
 
 async function handleLogin() {
+  if (authFeatureStore.isSubmittingLogin) return
+
   validateEmail()
 
   if (errors.value.email) return
