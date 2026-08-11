@@ -102,6 +102,7 @@ const GOAL_TYPE_CHARACTER = {
   WEDDING: lamaImage,
   EMERGENCY: bearImage,
   LOAN: rabbitImage,
+  SAVE: bearImage,
 }
 
 const GOAL_TYPE_LABEL = {
@@ -109,6 +110,7 @@ const GOAL_TYPE_LABEL = {
   WEDDING: '결혼자금 로드맵',
   EMERGENCY: '비상금 로드맵',
   LOAN: '학자금대출 로드맵',
+  SAVE: '저축/목돈 로드맵',
 }
 
 const characterImage = computed(() => {

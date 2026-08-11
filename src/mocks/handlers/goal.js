@@ -194,6 +194,28 @@ export const goalHandlers = [
     return HttpResponse.json(mydata)
   }),
 
+  // 목표 컬렉션 조회 API (GET /api/goals/collection)
+  http.get('*/api/goals/collection', async () => {
+    return HttpResponse.json({
+      collections: [
+        {
+          goalId: 12,
+          goalName: '유럽 여행',
+          goalType: 'SAVE',
+          goalAmount: 3000000,
+          completedDate: '2026-07-21',
+        },
+        {
+          goalId: 8,
+          goalName: '학자금 대출 상환',
+          goalType: 'LOAN',
+          goalAmount: 5000000,
+          completedDate: '2026-06-18',
+        },
+      ],
+    })
+  }),
+
   // 메인 대시보드용 mock 호출 핸들러
   http.get('*/api/goals', async () => {
     return HttpResponse.json({
