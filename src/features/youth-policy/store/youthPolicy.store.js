@@ -1,0 +1,200 @@
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import * as youthPolicyApi from '@/features/youth-policy/api/youthPolicy.api'
+import { useMypageStore } from '@/features/mypage'
+import { getEligibilityChecklist } from '@/features/youth-policy/composables/useEligibilityCheck'
+import {
+  DEFAULT_PAGE_SIZE,
+  POLICY_CATEGORIES,
+  POLICY_CATEGORY_IDS,
+} from '@/features/youth-policy/constants/youthPolicy.constants'
+
+/**
+ * 청년 정책 목록/상세 조회 상태를 관리하는 스토어
+ */
+export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
+  const categoryId = ref(POLICY_CATEGORY_IDS.ALL)
+  const region = ref('전체')
+  const searchKeyword = ref('')
+
+  const policies = ref([])
+  const page = ref(1)
+  const size = ref(DEFAULT_PAGE_SIZE)
+  const totalElements = ref(0)
+  const totalPages = ref(0)
+  const isLastPage = ref(true)
+  const isLoading = ref(false)
+  const error = ref(null)
+
+  const selectedPolicy = ref(null)
+  const isDetailLoading = ref(false)
+  const detailError = ref(null)
+
+  // 페이지네이션과 무관하게 별도로 조회하는 나이·소득 조건 일치 정책
+  const recommendedPolicies = ref([])
+  const isRecommendedLoading = ref(false)
+  const recommendedError = ref(null)
+
+  const activeCategory = computed(
+    () =>
+      POLICY_CATEGORIES.find((category) => category.id === categoryId.value) ?? POLICY_CATEGORIES[0]
+  )
+
+  const hasActiveFilters = computed(
+    () =>
+      categoryId.value !== POLICY_CATEGORY_IDS.ALL ||
+      region.value !== '전체' ||
+      searchKeyword.value !== ''
+  )
+
+  let fetchRequestId = 0
+
+  /**
+   * 카테고리/지역/검색어와 페이지 번호를 기준으로 정책 목록을 조회한다.
+   * @param {number} targetPage
+   */
+  async function fetchPolicies(targetPage = 1) {
+    const requestId = ++fetchRequestId
+    isLoading.value = true
+    error.value = null
+    const requestedPage = Math.max(1, targetPage)
+
+    try {
+      const response = await youthPolicyApi.getYouthPolicies({
+        keyword: activeCategory.value.keyword || undefined,
+        region: region.value === '전체' ? undefined : region.value,
+        search: searchKeyword.value || undefined,
+        page: requestedPage,
+        size: size.value,
+      })
+      if (requestId !== fetchRequestId) return
+
+      policies.value = response.content
+      page.value = response.page
+      totalElements.value = response.totalElements
+      totalPages.value = response.totalPages
+      isLastPage.value = response.last
+    } catch (caughtError) {
+      if (requestId === fetchRequestId) error.value = caughtError
+    } finally {
+      if (requestId === fetchRequestId) isLoading.value = false
+    }
+  }
+
+  /**
+   * 나이·월소득 조건을 충족하는 정책을 조회하며 일반 목록 필터와 분리한다.
+   * 후보 전체의 상세(나이·소득 조건 등)를 불러와 자격 조건을 하나라도 충족하지 못하면 제외한다.
+   * 후보군 자체가 mock 단계에서 소수로 관리되는 값이라 상세를 전부 불러와도 N+1 부담은 작다.
+   */
+  async function fetchRecommendedPolicies() {
+    isRecommendedLoading.value = true
+    recommendedError.value = null
+    try {
+      const mypageStore = useMypageStore()
+      const [profile, response] = await Promise.all([
+        mypageStore.profile ?? mypageStore.fetchProfile(),
+        youthPolicyApi.getRecommendedYouthPolicies(),
+      ])
+
+      const details = await Promise.all(
+        response.content.map((item) => youthPolicyApi.getYouthPolicyDetail(item.youthPolicyId))
+      )
+      const eligible = details.filter((policy) =>
+        getEligibilityChecklist(policy, profile).every((item) => item.matched)
+      )
+      recommendedPolicies.value = eligible
+    } catch (caughtError) {
+      recommendedError.value = caughtError
+    } finally {
+      isRecommendedLoading.value = false
+    }
+  }
+
+  /**
+   * @param {string} id POLICY_CATEGORY_IDS 값
+   */
+  async function setCategory(id) {
+    if (categoryId.value === id) return
+    categoryId.value = id
+    await fetchPolicies()
+  }
+
+  /**
+   * @param {string} nextRegion
+   */
+  function setRegion(nextRegion) {
+    if (region.value === nextRegion) return
+    region.value = nextRegion
+    fetchPolicies()
+  }
+
+  /**
+   * @param {string} nextKeyword
+   */
+  function setSearchKeyword(nextKeyword) {
+    searchKeyword.value = nextKeyword
+    fetchPolicies()
+  }
+
+  /**
+   * 카테고리·지역·검색어 필터를 모두 초기 상태로 되돌리고 목록을 다시 조회한다.
+   */
+  function resetFilters() {
+    if (!hasActiveFilters.value) return
+    categoryId.value = POLICY_CATEGORY_IDS.ALL
+    region.value = '전체'
+    searchKeyword.value = ''
+    fetchPolicies()
+  }
+
+  /**
+   * @param {number} youthPolicyId
+   */
+  async function fetchPolicyDetail(youthPolicyId) {
+    isDetailLoading.value = true
+    detailError.value = null
+    selectedPolicy.value = null
+    try {
+      selectedPolicy.value = await youthPolicyApi.getYouthPolicyDetail(youthPolicyId)
+    } catch (caughtError) {
+      detailError.value = caughtError
+    } finally {
+      isDetailLoading.value = false
+    }
+  }
+
+  function clearSelectedPolicy() {
+    selectedPolicy.value = null
+    detailError.value = null
+  }
+
+  return {
+    categoryId,
+    region,
+    searchKeyword,
+    policies,
+    page,
+    size,
+    totalElements,
+    totalPages,
+    isLastPage,
+    isLoading,
+    error,
+    selectedPolicy,
+    isDetailLoading,
+    detailError,
+    activeCategory,
+    recommendedPolicies,
+    isRecommendedLoading,
+    recommendedError,
+    hasActiveFilters,
+    fetchPolicies,
+    fetchRecommendedPolicies,
+    setCategory,
+    setRegion,
+    setSearchKeyword,
+    resetFilters,
+    fetchPolicyDetail,
+    clearSelectedPolicy,
+  }
+})
