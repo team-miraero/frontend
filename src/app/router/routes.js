@@ -9,6 +9,7 @@ import { coachRoutes } from '@/features/coach'
 import { collectionRoutes } from '@/features/collection'
 import { mypageRoutes } from '@/features/mypage'
 import { pacemakerRoutes } from '@/features/pacemaker'
+import { youthPolicyRoutes } from '@/features/youth-policy'
 
 export const routes = [
   {
@@ -33,6 +34,7 @@ export const routes = [
       ...collectionRoutes,
       ...spendingRoutes,
       ...productsRoutes,
+      ...youthPolicyRoutes,
       ...coachRoutes,
       ...mypageRoutes,
     ],
