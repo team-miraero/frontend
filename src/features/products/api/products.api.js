@@ -1,5 +1,4 @@
 import { client } from '@/shared/api/client'
-import { unwrapApiData } from '@/shared/api/unwrapApiData'
 
 function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -39,28 +38,22 @@ function validateProductDetailResponse(data, productIdKey) {
 
 export async function getDepositProducts(params = {}) {
   const { data } = await client.get('/deposits', { params })
-  const unwrapped = unwrapApiData(data)
-  const source = isRecord(unwrapped) ? unwrapped : {}
-  const normalized = { ...source, deposits: source.products ?? source.deposits ?? [] }
-  return validateProductListResponse(normalized, 'deposits', 'depositProductId')
+  return validateProductListResponse(data, 'deposits', 'depositProductId')
 }
 
 export async function getDepositProductDetail(depositProductId) {
   const { data } = await client.get(`/deposits/${depositProductId}`)
-  return validateProductDetailResponse(unwrapApiData(data), 'depositProductId')
+  return validateProductDetailResponse(data, 'depositProductId')
 }
 
 export async function getSavingProducts(params = {}) {
   const { data } = await client.get('/savings', { params })
-  const unwrapped = unwrapApiData(data)
-  const source = isRecord(unwrapped) ? unwrapped : {}
-  const normalized = { ...source, savings: source.products ?? source.savings ?? [] }
-  return validateProductListResponse(normalized, 'savings', 'savingProductId')
+  return validateProductListResponse(data, 'savings', 'savingProductId')
 }
 
 export async function getSavingProductDetail(savingProductId) {
   const { data } = await client.get(`/savings/${savingProductId}`)
-  return validateProductDetailResponse(unwrapApiData(data), 'savingProductId')
+  return validateProductDetailResponse(data, 'savingProductId')
 }
 
 const productApiByType = {
