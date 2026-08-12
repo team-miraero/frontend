@@ -7,20 +7,25 @@
   >
     <div class="max-h-[90vh] w-full overflow-y-auto">
       <div class="grid grid-cols-3 items-center border-b border-slate-100 px-3 sm:px-5 py-3">
-        <button type="button" class="justify-self-start text-xl text-slate-700" @click="close">‹</button>
-        <div class="flex items-center justify-center gap-2 justify-self-center">
-          <img :src="friendsImage" alt="친구들" class="h-8 sm:h-9 w-auto object-contain shrink-0 drop-shadow-sm" />
-          <p class="whitespace-nowrap text-center text-sm sm:text-base font-bold text-[#0a192f]">친구에게 공유하기</p>
-        </div>
-        <button type="button" class="justify-self-end text-sm font-bold text-primary" @click="close">완료</button>
+        <button type="button" class="justify-self-start text-xl text-slate-700" @click="close">
+          ‹
+        </button>
+        <p
+          class="justify-self-center whitespace-nowrap text-center text-sm sm:text-base font-bold text-[#0a192f]"
+        >
+          친구에게 공유하기
+        </p>
+        <button
+          type="button"
+          class="justify-self-end text-sm font-bold text-primary"
+          @click="close"
+        >
+          완료
+        </button>
       </div>
 
       <div class="p-3">
-        <ShareCardPreview
-          ref="cardPreviewRef"
-          :goal="goal"
-          :milestones="milestones"
-        />
+        <ShareCardPreview ref="cardPreviewRef" :goal="goal" :milestones="milestones" />
 
         <ShareActionButtons
           :is-saving-share-image="isSavingShareImage"
@@ -53,7 +58,6 @@ import BaseModal from '@/shared/ui/BaseModal.vue'
 import { useShare, shouldCaptureNode } from '@/features/roadmap/composables/useShare'
 import ShareCardPreview from '@/features/roadmap/components/ShareCardPreview.vue'
 import ShareActionButtons from '@/features/roadmap/components/ShareActionButtons.vue'
-import friendsImage from '@/assets/images/friends.png'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -209,6 +213,8 @@ watch(
       nextTick(() => {
         cardPreviewRef.value?.fireConfetti()
       })
+    } else {
+      cardPreviewRef.value?.stopConfetti()
     }
   },
   { immediate: true }
