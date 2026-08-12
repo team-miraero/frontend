@@ -15,6 +15,12 @@ export const useCollectionStore = defineStore('feature-collection', () => {
     () => Array.isArray(achievedGoals.value) && achievedGoals.value.length > 0
   )
 
+  const totalAchievedCount = computed(() => achievedGoals.value.length)
+
+  const totalAchievedAmount = computed(() =>
+    achievedGoals.value.reduce((sum, goal) => sum + (Number(goal?.achievedAmount) || 0), 0)
+  )
+
   async function fetchAchievedGoals() {
     isLoading.value = true
     error.value = null
@@ -42,6 +48,8 @@ export const useCollectionStore = defineStore('feature-collection', () => {
     isLoading,
     error,
     hasGoals,
+    totalAchievedCount,
+    totalAchievedAmount,
     fetchAchievedGoals,
     clearAchievedGoals,
   }

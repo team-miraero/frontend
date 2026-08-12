@@ -1,10 +1,37 @@
 <!-- 목표 컬렉션 (Goal Collection) 페이지 (COLL-01~02) -->
 <template>
-  <div class="flex justify-center bg-[#f8fbff] min-h-[calc(100vh-80px)] pb-20">
-    <div class="w-full max-w-[1440px] px-6 py-8 sm:px-10">
+  <div class="flex justify-center bg-[#f8fbff] min-h-[calc(100vh-80px)] pb-12">
+    <div class="w-full max-w-[1440px] px-8 py-3">
       <!-- 로딩 중일 때 스피너 표시 -->
       <div v-if="collectionStore.isLoading" class="flex h-96 items-center justify-center">
         <LoadingSpinner message="달성한 목표 컬렉션을 불러오고 있어요" />
+      </div>
+
+      <!-- 상태 0: 통신 에러 (Error State) -->
+      <div
+        v-else-if="collectionStore.error"
+        class="flex flex-col items-center justify-center py-20 text-center"
+      >
+        <div
+          class="flex size-16 items-center justify-center rounded-2xl border border-red-100 bg-red-50 text-2xl shadow-sm"
+        >
+          ⚠️
+        </div>
+        <h3 class="mt-4 text-lg font-black text-[#0a192f] sm:text-xl">
+          목표 컬렉션을 불러오지 못했어요
+        </h3>
+        <p class="mt-1.5 max-w-sm text-xs font-medium leading-relaxed text-slate-500 sm:text-sm">
+          서버와의 연결이 원활하지 않거나 서버가 켜져 있지 않아요.<br />
+          연결 상태를 확인하고 다시 시도해 주세요.
+        </p>
+        <button
+          type="button"
+          class="mt-5 inline-flex items-center gap-1.5 rounded-2xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-lg active:translate-y-0"
+          @click="collectionStore.fetchAchievedGoals()"
+        >
+          <span>다시 시도</span>
+          <span class="text-xs">↺</span>
+        </button>
       </div>
 
       <!-- 상태 1: 빈 컬렉션 (Empty State) -->
@@ -13,9 +40,15 @@
       </div>
 
       <!-- 상태 2: 달성 목표 존재 (Filled State) -->
-      <div v-else class="flex flex-col gap-8">
+      <div v-else class="flex flex-col gap-5">
+        <!-- 상단 명예의 전당 요약 히어로 배너 -->
+        <CollectionHeroBanner
+          :total-count="collectionStore.totalAchievedCount"
+          :total-amount="collectionStore.totalAchievedAmount"
+        />
+
         <!-- 컬렉션 카드 그리드 목록 -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <CollectionCard
             v-for="goal in collectionStore.achievedGoals"
             :key="goal.id"
@@ -25,7 +58,7 @@
         </div>
 
         <!-- 하단 배너 (Call to Action) -->
-        <NextGoalBanner class="mt-4" @add-goal="handleGoToGoalSelect" />
+        <NextGoalBanner class="mt-2" @add-goal="handleGoToGoalSelect" />
       </div>
     </div>
   </div>
@@ -39,6 +72,7 @@ import {
   EmptyCollection,
   CollectionCard,
   NextGoalBanner,
+  CollectionHeroBanner,
 } from '@/features/collection'
 import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'

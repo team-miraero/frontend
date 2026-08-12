@@ -1,10 +1,13 @@
 // collection 도메인 API 함수 (COLL-01~02)
+import { client } from '@/shared/api/client'
 
 /**
- * @typedef {Object} CollectionStatus
- * @property {string} goalId
- * @property {number} collectedAmount
- * @property {number} targetAmount
+ * @typedef {Object} CollectionItemResponse
+ * @property {number} goalId
+ * @property {string} goalName
+ * @property {'SAVE' | 'LOAN' | 'INDEPENDENCE' | 'EMERGENCY' | 'WEDDING'} goalType
+ * @property {number} goalAmount
+ * @property {string} completedDate
  */
 
 /**
@@ -13,18 +16,57 @@
  * @property {string} title
  * @property {number} achievedAmount
  * @property {string} achievedDate
- * @property {string} accountName
- * @property {string} badgeIcon
- * @property {number} progress
- * @property {'INDEPENDENCE' | 'EMERGENCY' | 'MARRIAGE' | 'LOAN'} [goalType]
+ * @property {string} [accountName]
+ * @property {string} [badgeIcon]
+ * @property {number} [progress]
+ * @property {'SAVE' | 'LOAN' | 'INDEPENDENCE' | 'EMERGENCY' | 'WEDDING'} [goalType]
  */
+
+function unwrapApiData(responseBody) {
+  if (
+    responseBody &&
+    typeof responseBody === 'object' &&
+    Object.hasOwn(responseBody, 'success') &&
+    Object.hasOwn(responseBody, 'data')
+  ) {
+    if (!responseBody.success) {
+      throw new Error(responseBody.error?.message ?? 'API 요청에 실패했습니다.')
+    }
+    return responseBody.data
+  }
+  return responseBody
+}
+
+function formatDateToDot(dateStr) {
+  if (!dateStr) return '-'
+  return String(dateStr).replace(/-/g, '.')
+}
+
+/**
+ * 목표 컬렉션 조회 API (GET /api/goals/collection)
+ * @returns {Promise<AchievedGoal[]>}
+ */
+export async function getAchievedGoals() {
+  const { data: responseBody } = await client.get('/goals/collection')
+  const data = unwrapApiData(responseBody)
+  const rawList = data?.collections ?? (Array.isArray(data) ? data : [])
+
+  return rawList.map((item) => ({
+    id: item.goalId,
+    title: item.goalName,
+    goalType: item.goalType,
+    achievedAmount: item.goalAmount,
+    achievedDate: formatDateToDot(item.completedDate),
+    accountName: item.accountName || '완주 저금통',
+    progress: 100,
+  }))
+}
 
 /**
  * @param {string} goalId
- * @returns {Promise<CollectionStatus>}
+ * @returns {Promise<{ goalId: string, collectedAmount: number, targetAmount: number }>}
  */
 export async function getCollectionStatus(goalId) {
-  // TODO: 실제 API 연동 시 client.get(`/goals/${goalId}/collection`)로 교체
   return { goalId: goalId ?? '', collectedAmount: 0, targetAmount: 0 }
 }
 
@@ -33,44 +75,5 @@ export async function getCollectionStatus(goalId) {
  * @returns {Promise<void>}
  */
 export async function addManualDeposit(payload) {
-  // TODO: 실제 API 연동 시 client.post(`/goals/${payload?.goalId}/collection/deposit`, payload)로 교체
-}
-
-/**
- * 달성한 목표 목록 조회 (Mock API)
- * @returns {Promise<AchievedGoal[]>}
- */
-export async function getAchievedGoals() {
-  return Promise.resolve([
-    {
-      id: 1,
-      title: '유럽 여행자금',
-      achievedAmount: 3000000,
-      achievedDate: '2026.07',
-      accountName: '미래로 저금통',
-      badgeIcon: '✈️',
-      progress: 100,
-      goalType: 'INDEPENDENCE',
-    },
-    {
-      id: 2,
-      title: '비상금 500만원 모으기',
-      achievedAmount: 5000000,
-      achievedDate: '2026.05',
-      accountName: 'KB 국민은행 입출금',
-      badgeIcon: '💰',
-      progress: 100,
-      goalType: 'EMERGENCY',
-    },
-    {
-      id: 3,
-      title: '학자금 대출 1차 원금 완제',
-      achievedAmount: 2500000,
-      achievedDate: '2026.03',
-      accountName: 'KB 독립적금',
-      badgeIcon: '🎓',
-      progress: 100,
-      goalType: 'LOAN',
-    },
-  ])
+  // 수동 입금 필요 시 구현
 }
