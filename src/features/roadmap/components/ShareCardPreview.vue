@@ -1,267 +1,253 @@
-<!-- 친구에게 공유하기 카드 미리보기 (트로피/달성률/마일스톤 로드맵/후광 애니메이션) -->
+<!-- 친구에게 공유하기 카드 미리보기: 목표별 캐릭터 + 대시보드 진행률 -->
 <template>
   <div
     ref="cardRef"
-    class="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-b from-[#eaf2ff] via-white to-white px-5 py-5"
+    class="relative overflow-hidden rounded-3xl border border-[#dbeafe] bg-[#f4f8ff] px-5 py-5"
   >
-    <!-- 카드 제목 (이번 목표 자랑하기) -->
-    <div class="relative z-10 flex items-center justify-center gap-1.5 pb-3 text-center whitespace-nowrap">
+    <div
+      class="relative z-20 flex min-w-0 items-center justify-center gap-1.5 pb-2 text-center whitespace-nowrap"
+    >
       <input
         v-if="isEditingTitle"
         ref="titleInputRef"
         v-model="titleText"
         type="text"
         maxlength="20"
-        class="whitespace-nowrap border-b border-primary bg-transparent text-center text-sm font-bold text-slate-700 outline-none"
+        class="w-40 whitespace-nowrap border-b border-primary bg-transparent text-center text-sm font-bold text-[#0a192f] outline-none"
         @blur="isEditingTitle = false"
         @keyup.enter="isEditingTitle = false"
       />
-      <p v-else class="whitespace-nowrap text-sm font-bold leading-none text-slate-600">{{ titleText }}</p>
-      <button
-        type="button"
-        class="shrink-0"
-        data-html2canvas-ignore="true"
-        @click="startEditTitle"
-      >
+      <p v-else class="shrink-0 whitespace-nowrap text-sm font-bold text-[#0a192f]">
+        {{ titleText }}
+      </p>
+      <button type="button" class="shrink-0" data-html2canvas-ignore="true" @click="startEditTitle">
         <img src="@/assets/images/pencil.png" alt="편집" class="size-3.5 object-contain" />
       </button>
     </div>
 
-    <!-- 컨페티: canvas-confetti 물리 엔진을 이용한 극도로 자연스러운 축하 폭죽 연출 -->
+    <!-- 기존 모달 오픈 시 실행되는 canvas-confetti 애니메이션을 그대로 사용 -->
     <canvas
       ref="confettiCanvasRef"
       class="pointer-events-none absolute inset-0 z-10 size-full"
       data-html2canvas-ignore="true"
     />
 
-    <div class="relative z-10 mx-auto mt-3 flex size-32 items-center justify-center">
-      <!-- 후광: 황금빛 펄스 글로우 + 회전하는 빛줄기 모션 -->
-      <div
-        class="pointer-events-none absolute left-1/2 top-1/2 size-52 -translate-x-1/2 -translate-y-1/2"
-        data-html2canvas-ignore="true"
-      >
-        <!-- 1. 은은한 블루/화이트 펄스 글로우 -->
-        <div
-          class="absolute inset-0 animate-halo-pulse rounded-full"
-          style="
-            background: radial-gradient(
-              circle,
-              rgba(255, 255, 255, 0.85) 0%,
-              rgba(153, 197, 255, 0.45) 40%,
-              rgba(102, 178, 255, 0) 70%
-            );
-            filter: blur(6px);
-          "
-        />
-        <!-- 2. 은은하게 회전하는 빛줄기 -->
-        <div
-          class="absolute inset-0 animate-halo-spin rounded-full opacity-50"
-          style="
-            background: conic-gradient(
-              from 0deg,
-              rgba(153, 197, 255, 0.35) 0deg 18deg,
-              transparent 18deg 36deg,
-              rgba(153, 197, 255, 0.35) 36deg 54deg,
-              transparent 54deg 72deg,
-              rgba(153, 197, 255, 0.35) 72deg 90deg,
-              transparent 90deg 108deg,
-              rgba(153, 197, 255, 0.35) 108deg 126deg,
-              transparent 126deg 144deg,
-              rgba(153, 197, 255, 0.35) 144deg 162deg,
-              transparent 162deg 180deg,
-              rgba(153, 197, 255, 0.35) 180deg 198deg,
-              transparent 198deg 216deg,
-              rgba(153, 197, 255, 0.35) 216deg 234deg,
-              transparent 234deg 252deg,
-              rgba(153, 197, 255, 0.35) 252deg 270deg,
-              transparent 270deg 288deg,
-              rgba(153, 197, 255, 0.35) 288deg 306deg,
-              transparent 306deg 324deg,
-              rgba(153, 197, 255, 0.35) 324deg 342deg,
-              transparent 342deg 360deg
-            );
-            filter: blur(2px);
-            mask-image: radial-gradient(circle, black 30%, transparent 70%);
-            -webkit-mask-image: radial-gradient(circle, black 30%, transparent 70%);
-          "
-        />
-      </div>
-      <!-- 반짝이는 별 장식 -->
-      <span
-        v-for="sparkle in SPARKLES"
-        :key="sparkle.id"
-        class="pointer-events-none absolute animate-twinkle"
-        :style="{
-          left: sparkle.left,
-          top: sparkle.top,
-          fontSize: sparkle.size,
-          color: sparkle.color,
-          animationDelay: sparkle.delay,
-        }"
-        >✦</span
-      >
-
-      <svg class="absolute inset-0" viewBox="0 0 100 100">
-        <g transform="rotate(-90 50 50)">
-          <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" stroke-width="6" />
-          <circle
-            cx="50"
-            cy="50"
-            r="45"
-            fill="none"
-            stroke="#0066FF"
-            stroke-width="6"
-            stroke-linecap="round"
-            :stroke-dasharray="`${(goal.progressRate / 100) * 282.7} 282.7`"
-          />
-        </g>
-      </svg>
-      <div class="relative z-10 size-28">
-        <img
-          src="@/assets/images/gold_trophy_3d.png"
-          alt="목표 트로피"
-          class="trophy-image size-28 object-contain animate-trophy-pop"
-        />
-
-        <div
-          class="trophy-shine pointer-events-none absolute inset-0"
-          data-html2canvas-ignore="true"
-        />
-      </div>
-    </div>
-
-    <p class="relative z-10 pt-2 text-center text-4xl font-black text-primary">
-      {{ goal.progressRate }}<span class="text-2xl">%</span>
-    </p>
-    <p class="relative z-10 pt-1 text-center text-xs text-slate-500">
-      {{ formatWon(goal.goalAmount) }} 목표
-    </p>
-    <p class="relative z-10 pt-1 text-center text-xs font-bold text-primary">
-      {{ goal.pace.paceStatus === 'BEHIND' ? '▼' : '▲' }}
-      {{ formatWon(Math.abs(goal.pace.differenceAmount)) }}
-      {{ goal.pace.paceStatus === 'BEHIND' ? '뒤처짐' : '앞섬' }}
-    </p>
-
+    <!-- 100%: 목표 캐릭터와 콜리가 가까이 붙어 완주를 축하 -->
     <div
-      class="relative z-10 mt-2.5 rounded-2xl border border-slate-100 bg-slate-50 px-3.5 py-2"
+      v-if="isCompleted"
+      class="relative z-0 mx-auto mt-1 flex h-44 max-w-[235px] items-end justify-center pb-3 sm:h-48 sm:max-w-[255px]"
     >
-      <p class="text-center text-[11px] font-bold text-slate-400">목표 진행 로드맵</p>
-      <div class="relative mt-2 h-14">
-        <!-- 트랙: 대시보드 MilestoneProgressBar와 동일하게 좌우 7%씩 여백 -->
-        <div
-          class="absolute top-6 h-[5px] rounded-full bg-slate-200"
-          style="left: 7%; right: 7%"
+      <img
+        :src="goalCharacterImage"
+        :alt="`${goal.goalName} 캐릭터`"
+        class="celebration-character h-[130px] w-[55%] object-contain sm:h-[144px]"
+      />
+      <div class="-ml-8 flex w-[48%] items-end sm:-ml-9" :style="celebrationColiStyle">
+        <img
+          :src="coliFriendImage"
+          alt="페이스메이커 콜리"
+          class="celebration-character h-[120px] w-full object-contain sm:h-[134px]"
         />
-        <div
-          class="absolute top-6 h-[5px] rounded-full bg-primary"
-          :style="{ left: `${TRACK_START}%`, width: `${progressFillWidth()}%` }"
-        />
-
-        <!-- 마일스톤 동그라미 마커 -->
-        <span
-          v-for="milestone in milestones"
-          :key="`dot-${milestone.milestoneId}`"
-          class="absolute top-[17px] flex size-[19px] -translate-x-1/2 items-center justify-center rounded-full border-2"
-          :class="
-            milestone.status === 'COMPLETED'
-              ? 'border-primary bg-primary shadow-[0_2px_5px_rgba(0,102,255,0.25)]'
-              : 'border-slate-300 bg-white'
-          "
-          :style="{ left: `${milestonePosition(milestone)}%` }"
-        >
-          <img
-            v-if="milestone.status === 'COMPLETED'"
-            src="@/assets/icons/milestone-complete-check.svg"
-            alt=""
-            class="size-2 block shrink-0"
-          />
-          <img
-            v-else-if="isLastMilestone(milestone)"
-            src="@/assets/icons/milestone-final-flag.svg"
-            alt=""
-            class="size-[7px] block shrink-0"
-          />
-        </span>
-
-        <!-- 목표 페이스 마커 -->
-        <span
-          class="absolute top-[12px] flex size-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-dashed border-[#639bde] bg-slate-200"
-          :style="{ left: `${pacePositions().target}%` }"
-        >
-          <img src="@/assets/icons/pace-target-runner.svg" alt="목표 페이스" class="size-4 block shrink-0" />
-        </span>
-
-        <!-- 현재 페이스 마커 -->
-        <span
-          class="absolute top-[12px] flex size-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-dashed border-primary bg-[rgba(0,102,255,0.6)] shadow-[0_4px_14px_rgba(0,102,255,0.31)] animate-pace-glow"
-          :style="{ left: `${pacePositions().current}%` }"
-        >
-          <img
-            src="@/assets/icons/pace-current-runner.svg"
-            alt="현재 페이스"
-            class="size-3.5 block shrink-0"
-          />
-        </span>
       </div>
+    </div>
 
+    <!-- 100% 미만: 메인 대시보드와 동일한 목표별 달리기 캐릭터 + 콜리 페이스메이커 -->
+    <div
+      v-else
+      class="relative z-0 mx-auto mt-1 flex h-40 max-w-[230px] items-end justify-center pb-0.5 sm:h-44"
+    >
+      <img
+        :src="runningGoalCharacterImage"
+        :alt="`${goal.goalName} 달리기 캐릭터`"
+        class="running-character h-[112px] w-[54%] object-contain sm:h-[124px]"
+        :style="runningGoalCharacterStyle"
+      />
       <div
-        class="mt-1.5 flex flex-wrap items-center justify-center border-t border-slate-100 pt-1.5"
+        class="relative -ml-7 flex h-[94px] w-[32%] items-end justify-center sm:-ml-8 sm:h-[104px]"
       >
-        <div class="my-1 table mx-1.5">
-          <span class="table-cell w-[15px] align-middle">
-            <span
-              class="flex size-[15px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-primary bg-[rgba(0,102,255,0.6)]"
-            >
-              <img src="@/assets/icons/pace-current-runner-sm.svg" alt="" class="size-2 block shrink-0" />
-            </span>
+        <img
+          :src="coliRunningImage"
+          alt="페이스메이커 콜리"
+          class="running-character h-[72px] w-full object-contain sm:h-[80px]"
+        />
+      </div>
+    </div>
+
+    <div class="relative z-20 mt-0 px-1">
+      <div class="relative h-20">
+        <div class="absolute left-[5%] right-[5%] top-5 h-[3px] rounded-full bg-slate-300" />
+        <div
+          class="absolute left-[5%] top-5 h-[3px] rounded-full bg-primary transition-[width] duration-500"
+          :style="{ width: `${progressFillWidth}%` }"
+        />
+
+        <div
+          v-for="milestone in shareMilestones"
+          :key="milestone.id"
+          class="absolute top-[12px] flex -translate-x-1/2 flex-col items-center"
+          :style="{ left: `${milestone.position}%` }"
+        >
+          <span
+            class="flex size-[18px] items-center justify-center rounded-full border-2"
+            :class="
+              milestone.completed
+                ? '!border-primary !bg-primary text-white'
+                : milestone.current
+                  ? 'border-primary bg-white shadow-[0_0_0_4px_rgba(0,102,255,0.12)]'
+                  : 'border-slate-300 bg-white'
+            "
+          >
+            <svg v-if="milestone.completed" viewBox="0 0 16 16" class="size-3" aria-hidden="true">
+              <path
+                d="m3 8.2 3 3L13 4.8"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.2"
+              />
+            </svg>
+            <span v-else-if="milestone.current" class="size-2 rounded-full bg-primary" />
           </span>
-          <span class="table-cell whitespace-nowrap pl-1.5 align-middle text-[10px] font-medium leading-none text-slate-500">
-            현재 · {{ formatWon(goal.currentAmount) }}
+          <span
+            class="mt-2.5 whitespace-nowrap text-[11px] font-bold"
+            :class="milestone.completed || milestone.current ? 'text-primary' : 'text-slate-500'"
+          >
+            {{ milestone.percent }}%
           </span>
-        </div>
-        <div class="my-1 table mx-1.5">
-          <span class="table-cell w-[15px] align-middle">
-            <span
-              class="flex size-[15px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-[#639bde] bg-slate-200"
-            >
-              <img src="@/assets/icons/pace-target-runner-sm.svg" alt="" class="size-2 block shrink-0" />
-            </span>
-          </span>
-          <span class="table-cell whitespace-nowrap pl-1.5 align-middle text-[10px] font-medium leading-none text-slate-400">
-            목표 페이스 · {{ formatWon(goal.pace.expectedAmount) }}
+          <span
+            class="mt-0.5 whitespace-nowrap text-[10px]"
+            :class="milestone.current ? 'font-bold text-primary' : 'text-slate-500'"
+          >
+            {{ milestone.label }}
           </span>
         </div>
       </div>
     </div>
 
-    <div class="relative z-10 mt-2.5 flex justify-center">
-      <span class="table">
-        <span class="table-cell align-middle">
-          <img
-            src="@/assets/images/logo.png"
-            alt="미래로"
-            class="h-4 w-auto shrink-0 object-contain"
-          />
-        </span>
-        <span class="table-cell whitespace-nowrap pl-1.5 align-middle text-[10px] leading-none text-slate-400"
-          >| 내 금융을, 내 미래로</span
-        >
-      </span>
+    <p class="relative z-20 mt-1 text-center text-5xl font-black tracking-tight text-primary">
+      {{ normalizedProgress }}<span class="ml-1 text-2xl">%</span>
+    </p>
+    <p
+      class="relative z-20 mx-auto mt-2 w-max max-w-full shrink-0 whitespace-nowrap rounded-full bg-[#eaf2ff] px-5 py-2 text-center text-xs font-bold text-[#0a192f]"
+    >
+      {{ achievementMessage }}
+    </p>
+
+    <div class="relative z-20 mt-4 border-t border-blue-100 pt-3">
+      <div class="mx-auto flex w-max items-center justify-center gap-1.5 whitespace-nowrap">
+        <img src="@/assets/images/logo.png" alt="" class="block size-4 shrink-0 object-contain" />
+        <span class="shrink-0 text-xs font-bold tracking-[-0.2px] text-primary">미래로</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { nextTick, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import confetti from 'canvas-confetti'
+import duckFriendImage from '@/assets/images/duck_friend.png'
+import lamaFriendImage from '@/assets/images/lama_friend.png'
+import bearFriendImage from '@/assets/images/bear_friend.png'
+import rabbitFriendImage from '@/assets/images/rabbit_friend.png'
+import coliFriendImage from '@/assets/images/coli_friend.png'
+import duckRunningImage from '@/assets/images/duck.png'
+import lamaRunningImage from '@/assets/images/lama.png'
+import bearRunningImage from '@/assets/images/bear.png'
+import rabbitRunningImage from '@/assets/images/rabbit_new.png'
+import coliRunningImage from '@/assets/images/coli8-thick.png'
 
 const props = defineProps({
   goal: { type: Object, required: true },
   milestones: { type: Array, required: true },
 })
 
+const GOAL_TYPE_CHARACTER = {
+  INDEPENDENCE: duckFriendImage,
+  WEDDING: lamaFriendImage,
+  EMERGENCY: bearFriendImage,
+  LOAN: rabbitFriendImage,
+}
+
+const GOAL_TYPE_RUNNING_CHARACTER = {
+  INDEPENDENCE: duckRunningImage,
+  WEDDING: lamaRunningImage,
+  EMERGENCY: bearRunningImage,
+  LOAN: rabbitRunningImage,
+}
+
+const GOAL_TYPE_FOOT_OFFSET = {
+  INDEPENDENCE: 7,
+  WEDDING: 2.7,
+  EMERGENCY: 1.8,
+  LOAN: 8,
+}
+
+// friend PNG별 하단 투명 여백 차이를 보정해 콜리의 발끝을 왼쪽 캐릭터 기준선에 맞춘다.
+const CELEBRATION_COLI_FOOT_OFFSET = {
+  INDEPENDENCE: 6,
+  WEDDING: 0,
+  EMERGENCY: -4,
+  LOAN: 4,
+}
+
+const goalCharacterImage = computed(
+  () => GOAL_TYPE_CHARACTER[props.goal.goalType] ?? rabbitFriendImage
+)
+const normalizedProgress = computed(() =>
+  Math.min(100, Math.max(0, Math.round(Number(props.goal.progressRate) || 0)))
+)
+const isCompleted = computed(() => normalizedProgress.value >= 100)
+const celebrationColiStyle = computed(() => ({
+  transform: `translateY(${CELEBRATION_COLI_FOOT_OFFSET[props.goal.goalType] ?? 0}px)`,
+}))
+const runningGoalCharacterImage = computed(
+  () => GOAL_TYPE_RUNNING_CHARACTER[props.goal.goalType] ?? rabbitRunningImage
+)
+const runningGoalCharacterStyle = computed(() => ({
+  transform: `translateY(${GOAL_TYPE_FOOT_OFFSET[props.goal.goalType] ?? 4.6}%)`,
+}))
+
+// 대시보드와 동일하게 목표 금액 대비 마일스톤 목표 금액의 비율을 사용한다.
+const shareMilestones = computed(() => {
+  const fallbackPercents = [25, 50, 75, 100]
+  const source = props.milestones.length
+    ? props.milestones.slice(0, 4).map((milestone, index) => ({
+        id: milestone.milestoneId ?? index,
+        percent: Math.round((milestone.targetAmount / props.goal.goalAmount) * 100),
+      }))
+    : fallbackPercents.map((percent) => ({ id: percent, percent }))
+
+  return source.map((milestone, index) => {
+    const completed = isCompleted.value || normalizedProgress.value >= milestone.percent
+    const previousPercent = source[index - 1]?.percent ?? 0
+    const current = !completed && normalizedProgress.value >= previousPercent
+
+    return {
+      ...milestone,
+      completed,
+      current,
+      position: 8 + index * (84 / Math.max(1, source.length - 1)),
+      label:
+        milestone.percent >= 100
+          ? completed
+            ? '완주!'
+            : '완주'
+          : current
+            ? `${index + 1}단계 (현재)`
+            : `${index + 1}단계`,
+    }
+  })
+})
+
+const progressFillWidth = computed(() => (normalizedProgress.value / 100) * 90)
+const achievementMessage = computed(() =>
+  normalizedProgress.value >= 100 ? '멋지게 목표를 완주했어요!' : '목표까지 잘 달려가고 있어요!'
+)
+
 const cardRef = ref(null)
 const confettiCanvasRef = ref(null)
+let confettiRainTimer = null
 const titleText = ref('이번 목표 자랑하기')
 const isEditingTitle = ref(false)
 const titleInputRef = ref(null)
@@ -272,67 +258,29 @@ async function startEditTitle() {
   titleInputRef.value?.focus()
 }
 
-const TRACK_START = 7
-const TRACK_END = 93
-
-function toTrackPercent(ratio) {
-  const clampedRatio = Math.min(1, Math.max(0, ratio))
-  return TRACK_START + clampedRatio * (TRACK_END - TRACK_START)
-}
-
-function milestonePosition(milestone) {
-  return toTrackPercent(milestone.targetAmount / props.goal.goalAmount)
-}
-
-function isLastMilestone(milestone) {
-  return props.milestones[props.milestones.length - 1]?.milestoneId === milestone.milestoneId
-}
-
-function progressFillWidth() {
-  return toTrackPercent(props.goal.progressRate / 100) - TRACK_START
-}
-
-function pacePositions() {
-  const target = toTrackPercent(props.goal.pace.expectedAmount / props.goal.goalAmount)
-  const current = toTrackPercent(props.goal.progressRate / 100)
-  const MIN_GAP = 2.5
-
-  if (Math.abs(current - target) >= MIN_GAP) {
-    return { target, current }
-  }
-
-  const mid = (current + target) / 2
-  return current >= target
-    ? { target: mid - MIN_GAP / 2, current: mid + MIN_GAP / 2 }
-    : { target: mid + MIN_GAP / 2, current: mid - MIN_GAP / 2 }
-}
-
-function formatWon(amount) {
-  return `${Math.round(amount / 10000).toLocaleString()}만원`
-}
-
-const SPARKLES = [
-  { id: 1, left: '2%', top: '10%', size: '14px', color: '#66B2FF', delay: '0s' },
-  { id: 2, left: '88%', top: '6%', size: '10px', color: '#FFC542', delay: '0.4s' },
-  { id: 3, left: '92%', top: '55%', size: '12px', color: '#0066FF', delay: '0.8s' },
-  { id: 4, left: '4%', top: '62%', size: '9px', color: '#8B5CF6', delay: '1.2s' },
-  { id: 5, left: '50%', top: '-4%', size: '11px', color: '#66B2FF', delay: '0.2s' },
-]
-
 function fireConfetti() {
-  if (!confettiCanvasRef.value) return
+  if (!isCompleted.value || !confettiCanvasRef.value) return
 
-  const myConfetti = confetti.create(confettiCanvasRef.value, {
-    resize: true,
-    useWorker: true,
-  })
+  stopConfetti()
+
+  const myConfetti = confetti.create(confettiCanvasRef.value, { resize: true, useWorker: true })
+  const colors = [
+    '#FFC542',
+    '#0066FF',
+    '#66B2FF',
+    '#FF4D4D',
+    '#FF8FAB',
+    '#8B5CF6',
+    '#10B981',
+    '#FFD700',
+  ]
 
   myConfetti({
     particleCount: 55,
     spread: 90,
     startVelocity: 35,
     origin: { x: 0.5, y: 0.25 },
-    colors: ['#FFC542', '#0066FF', '#66B2FF', '#FF4D4D', '#FF8FAB', '#8B5CF6', '#10B981', '#FFD700'],
+    colors,
     ticks: 220,
     gravity: 0.8,
     decay: 0.92,
@@ -345,143 +293,73 @@ function fireConfetti() {
       spread: 110,
       startVelocity: 28,
       origin: { x: 0.5, y: 0.25 },
-      colors: ['#FFC542', '#0066FF', '#66B2FF', '#FF8FAB', '#8B5CF6'],
+      colors: colors.slice(0, 6),
       ticks: 180,
       gravity: 0.75,
       decay: 0.91,
       scalar: 0.75,
     })
   }, 120)
+
+  // 첫 폭죽 뒤에는 작은 조각을 위에서 계속 내려 축하 분위기를 유지한다.
+  confettiRainTimer = setInterval(() => {
+    myConfetti({
+      particleCount: 8,
+      angle: 270,
+      spread: 75,
+      startVelocity: 5,
+      origin: { x: 0.15 + Math.random() * 0.7, y: -0.05 },
+      colors,
+      ticks: 240,
+      gravity: 0.55,
+      drift: (Math.random() - 0.5) * 0.8,
+      decay: 0.94,
+      scalar: 0.65,
+    })
+  }, 420)
 }
 
-defineExpose({
-  cardRef,
-  fireConfetti,
+function stopConfetti() {
+  if (!confettiRainTimer) return
+  clearInterval(confettiRainTimer)
+  confettiRainTimer = null
+}
+
+onBeforeUnmount(() => {
+  stopConfetti()
 })
+
+defineExpose({ cardRef, fireConfetti, stopConfetti })
 </script>
 
 <style scoped>
-.animate-trophy-pop {
-  animation: trophyPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+.celebration-character {
+  animation: characterPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-@keyframes trophyPop {
-  0% {
-    transform: scale(0.6);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+.running-character {
+  animation: runnerEnter 0.5s cubic-bezier(0.34, 1.3, 0.64, 1) both;
 }
 
-.trophy-shine {
-  position: absolute;
-  inset: 0;
-
-  background: linear-gradient(
-    115deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.75) 50%,
-    transparent 62%
-  );
-
-  background-size: 220% 220%;
-  animation: trophyShine 3.5s ease-in-out infinite;
-  opacity: 0.9;
-
-  -webkit-mask-image: url('/src/assets/images/gold_trophy_3d.png');
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  -webkit-mask-size: contain;
-
-  mask-image: url('/src/assets/images/gold_trophy_3d.png');
-  mask-repeat: no-repeat;
-  mask-position: center;
-  mask-size: contain;
-}
-
-@keyframes trophyShine {
-  0% {
-    background-position: -180% 0;
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  35% {
-    background-position: 180% 0;
-    opacity: 1;
-  }
-  45% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-.animate-pace-glow {
-  animation: paceGlow 1.8s ease-in-out infinite;
-}
-
-@keyframes paceGlow {
-  0%,
-  100% {
-    box-shadow:
-      0 4px 14px rgba(0, 102, 255, 0.31),
-      0 0 0 0 rgba(0, 102, 255, 0.35);
-  }
-  50% {
-    box-shadow:
-      0 4px 14px rgba(0, 102, 255, 0.31),
-      0 0 0 6px rgba(0, 102, 255, 0.12);
-  }
-}
-
-.animate-halo-pulse {
-  animation: haloPulse 2.4s ease-in-out infinite;
-}
-
-@keyframes haloPulse {
-  0%,
-  100% {
-    transform: scale(0.92);
-    opacity: 0.7;
-  }
-  50% {
-    transform: scale(1.12);
-    opacity: 1;
-  }
-}
-
-.animate-halo-spin {
-  animation: haloSpin 14s linear infinite;
-}
-
-@keyframes haloSpin {
+@keyframes characterPop {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(12px) scale(0.82);
   }
   to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-twinkle {
-  animation: twinkle 2.2s ease-in-out infinite;
-}
-
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.25;
-    transform: scale(0.75) rotate(0deg);
-  }
-  50% {
     opacity: 1;
-    transform: scale(1.15) rotate(15deg);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes runnerEnter {
+  from {
+    opacity: 0;
+    scale: 0.88;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
   }
 }
 </style>
