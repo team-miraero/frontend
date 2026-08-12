@@ -1,10 +1,37 @@
 <!-- 목표 컬렉션 (Goal Collection) 페이지 (COLL-01~02) -->
 <template>
-  <div class="flex justify-center bg-[#f8fbff] min-h-[calc(100vh-80px)] pb-16">
-    <div class="w-full max-w-[1440px] px-6 py-4 sm:px-8">
+  <div class="flex justify-center bg-[#f8fbff] min-h-[calc(100vh-80px)] pb-12">
+    <div class="w-full max-w-[1440px] px-8 py-3">
       <!-- 로딩 중일 때 스피너 표시 -->
       <div v-if="collectionStore.isLoading" class="flex h-96 items-center justify-center">
         <LoadingSpinner message="달성한 목표 컬렉션을 불러오고 있어요" />
+      </div>
+
+      <!-- 상태 0: 통신 에러 (Error State) -->
+      <div
+        v-else-if="collectionStore.error"
+        class="flex flex-col items-center justify-center py-20 text-center"
+      >
+        <div
+          class="flex size-16 items-center justify-center rounded-2xl border border-red-100 bg-red-50 text-2xl shadow-sm"
+        >
+          ⚠️
+        </div>
+        <h3 class="mt-4 text-lg font-black text-[#0a192f] sm:text-xl">
+          목표 컬렉션을 불러오지 못했어요
+        </h3>
+        <p class="mt-1.5 max-w-sm text-xs font-medium leading-relaxed text-slate-500 sm:text-sm">
+          서버와의 연결이 원활하지 않거나 서버가 켜져 있지 않아요.<br />
+          연결 상태를 확인하고 다시 시도해 주세요.
+        </p>
+        <button
+          type="button"
+          class="mt-5 inline-flex items-center gap-1.5 rounded-2xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-lg active:translate-y-0"
+          @click="collectionStore.fetchAchievedGoals()"
+        >
+          <span>다시 시도</span>
+          <span class="text-xs">↺</span>
+        </button>
       </div>
 
       <!-- 상태 1: 빈 컬렉션 (Empty State) -->
@@ -19,19 +46,6 @@
           :total-count="collectionStore.totalAchievedCount"
           :total-amount="collectionStore.totalAchievedAmount"
         />
-
-        <!-- 섹션 헤더 (대시보드 스플릿 기록 헤더 스타일) -->
-        <div class="flex items-center justify-between pt-2">
-          <div class="flex items-center gap-1.5">
-            <span class="text-xs">🎖️</span>
-            <p class="text-xs font-bold uppercase tracking-[1.2px] text-slate-400">
-              완주한 로드맵 목록
-            </p>
-          </div>
-          <span class="text-xs font-bold text-slate-400">
-            총 {{ collectionStore.totalAchievedCount }}개
-          </span>
-        </div>
 
         <!-- 컬렉션 카드 그리드 목록 -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

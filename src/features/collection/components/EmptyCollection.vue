@@ -22,7 +22,7 @@
     <!-- 버튼 (목표 로드맵 시작하기) -->
     <button
       type="button"
-      class="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-primary/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-lg active:translate-y-0"
+      class="mt-6 inline-flex items-center justify-center gap-1.5 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-md active:translate-y-0"
       @click="$emit('start-roadmap')"
     >
       <span>첫 목표 로드맵 시작하기</span>

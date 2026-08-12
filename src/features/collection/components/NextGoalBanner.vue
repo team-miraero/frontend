@@ -25,23 +25,15 @@
       class="pointer-events-none absolute -bottom-1 right-36 hidden h-24 w-auto object-contain drop-shadow-sm md:block lg:right-48"
     />
 
-    <!-- 액션 버튼 -->
+    <!-- 액션 버튼 (자연스럽고 정갈한 화이트 솔리드 CTA) -->
     <div class="relative z-10 mt-4 shrink-0 md:mt-0">
       <button
         type="button"
-        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-md shadow-primary/25 transition-all hover:bg-primary-dark hover:shadow-lg sm:w-auto"
+        class="inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-slate-200/90 bg-white px-5 py-3 text-sm font-bold text-[#0a192f] shadow-[0_2px_8px_rgba(0,102,255,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary hover:shadow-[0_4px_14px_rgba(0,102,255,0.12)] active:translate-y-0 sm:w-auto"
         @click="$emit('add-goal')"
       >
-        <svg
-          class="size-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2.5"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
         <span>새 로드맵 시작하기</span>
+        <span class="text-xs">→</span>
       </button>
     </div>
   </div>

@@ -1,14 +1,20 @@
-<!-- 달성 목표 컬렉션 카드 (GoalSummaryCard / MilestoneList 디자인 결 반영) -->
+<!-- 달성 목표 컬렉션 카드 -->
 <template>
   <div
-    class="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_2px_7px_rgba(0,102,255,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_6px_18px_rgba(0,102,255,0.08)]"
+    class="group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_2px_7px_rgba(0,102,255,0.06)] transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(0,102,255,0.08)]"
+    tabindex="0"
+    role="button"
+    :aria-label="`${goal?.title || '완주 목표'} 로드맵 보기`"
+    @click="$emit('view-roadmap', goal)"
+    @keydown.enter="$emit('view-roadmap', goal)"
+    @keydown.space.prevent="$emit('view-roadmap', goal)"
   >
-    <!-- 상단 영역: 목표 마스코트 & 완주 배지 -->
+    <!-- 상단 영역: 마스코트 캐릭터 & 완주 완료 배지 -->
     <div>
       <div class="flex items-start justify-between gap-3">
-        <!-- 목표 캐릭터/아이콘 아바타 -->
+        <!-- 목표 캐릭터 아바타 (은은한 웜톤 배경 유지) -->
         <div
-          class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-slate-100 bg-[#f8fbff] p-1.5 shadow-sm transition-transform duration-200 group-hover:scale-105"
+          class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-amber-200/60 bg-gradient-to-br from-[#fffdf5] to-[#fff9eb] p-1.5 shadow-sm transition-transform duration-200 group-hover:scale-105"
         >
           <img
             v-if="characterImage"
@@ -19,7 +25,7 @@
           <span v-else class="text-2xl">{{ goal?.badgeIcon || '🏆' }}</span>
         </div>
 
-        <!-- 완주 완료 배지 -->
+        <!-- 완주 완료 배지 (대시보드 블루 톤) -->
         <span
           class="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-[#eaf2ff] px-2.5 py-1 text-xs font-bold text-primary"
         >
@@ -28,7 +34,7 @@
         </span>
       </div>
 
-      <!-- 목표 제목 & 달성 금액 -->
+      <!-- 목표 유형 & 제목 & 달성 금액 -->
       <div class="mt-3.5">
         <span class="text-[11px] font-bold text-slate-400">
           {{ goalTypeLabel }}
@@ -38,7 +44,7 @@
         >
           {{ goal?.title || '달성된 목표' }}
         </h3>
-        <p class="mt-1 text-xl font-black tracking-[-0.5px] text-[#0a192f]">
+        <p class="mt-1 text-2xl font-black tracking-[-0.6px] text-[#0a192f]">
           {{ formattedAmount }}
           <span class="text-xs font-bold text-slate-400">달성</span>
         </p>
@@ -47,34 +53,26 @@
 
     <!-- 하단 상세 정보 박스 & 액션 -->
     <div class="mt-4">
-      <!-- 완주 메타 데이터 박스 (대시보드 스타일) -->
+      <!-- 완주 메타 데이터 박스 -->
       <div
-        class="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-slate-50/70 p-3 text-xs"
+        class="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/70 px-3.5 py-2.5 text-xs"
       >
-        <div class="flex items-center justify-between">
-          <span class="font-medium text-slate-400">완주 시기</span>
-          <span class="font-bold text-[#0a192f]">{{ goal?.achievedDate || '-' }}</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="font-medium text-slate-400">연동 자산</span>
-          <span class="font-bold text-slate-700">{{ goal?.accountName || '연동 계좌' }}</span>
-        </div>
+        <span class="font-medium text-slate-400">완주 시기</span>
+        <span class="font-bold text-[#0a192f]">{{ goal?.achievedDate || '-' }}</span>
       </div>
 
-      <!-- 하단 링크 버튼 -->
+      <!-- 하단 액션 링크 영역 -->
       <div class="mt-3.5 flex items-center justify-between border-t border-slate-100 pt-3">
-        <span class="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-          <span>✓ 마일스톤 100% 완주</span>
+        <span class="flex items-center gap-1 text-[11px] font-bold text-emerald-600">
+          <span>✓ 마일스톤 달성</span>
         </span>
 
-        <button
-          type="button"
-          class="inline-flex items-center gap-1 text-xs font-bold text-primary transition-colors hover:underline"
-          @click="$emit('view-roadmap', goal)"
+        <div
+          class="inline-flex items-center gap-1 text-xs font-bold text-primary transition-transform group-hover:translate-x-0.5"
         >
           <span>로드맵 보기</span>
           <span class="text-xs">→</span>
-        </button>
+        </div>
       </div>
     </div>
   </div>

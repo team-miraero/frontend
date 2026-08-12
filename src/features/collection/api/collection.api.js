@@ -47,43 +47,19 @@ function formatDateToDot(dateStr) {
  * @returns {Promise<AchievedGoal[]>}
  */
 export async function getAchievedGoals() {
-  try {
-    const { data: responseBody } = await client.get('/goals/collection')
-    const data = unwrapApiData(responseBody)
-    const rawList = data?.collections ?? (Array.isArray(data) ? data : [])
+  const { data: responseBody } = await client.get('/goals/collection')
+  const data = unwrapApiData(responseBody)
+  const rawList = data?.collections ?? (Array.isArray(data) ? data : [])
 
-    return rawList.map((item) => ({
-      id: item.goalId,
-      title: item.goalName,
-      goalType: item.goalType,
-      achievedAmount: item.goalAmount,
-      achievedDate: formatDateToDot(item.completedDate),
-      accountName: item.accountName || '완주 저금통',
-      progress: 100,
-    }))
-  } catch (error) {
-    console.warn('[Collection API] 실제 서버 통신 대기 중 (Mock 데이터 폴백):', error)
-    return [
-      {
-        id: 12,
-        title: '유럽 여행',
-        achievedAmount: 3000000,
-        achievedDate: '2026.07.21',
-        accountName: '미래로 저금통',
-        progress: 100,
-        goalType: 'SAVE',
-      },
-      {
-        id: 8,
-        title: '학자금 대출 상환',
-        achievedAmount: 5000000,
-        achievedDate: '2026.06.18',
-        accountName: 'KB 독립적금',
-        progress: 100,
-        goalType: 'LOAN',
-      },
-    ]
-  }
+  return rawList.map((item) => ({
+    id: item.goalId,
+    title: item.goalName,
+    goalType: item.goalType,
+    achievedAmount: item.goalAmount,
+    achievedDate: formatDateToDot(item.completedDate),
+    accountName: item.accountName || '완주 저금통',
+    progress: 100,
+  }))
 }
 
 /**
