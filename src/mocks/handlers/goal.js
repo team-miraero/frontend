@@ -5,6 +5,22 @@ import mydata from '@/mocks/fixtures/mydata.json'
 // TODO: 실제 마이데이터 연동 전까지 사용하는 mock 월 저축 가능 금액
 const MOCK_MONTHLY_SAVING_CAPACITY = 620000
 const MOCK_GOAL_UPDATES = new Map()
+const MOCK_COLLECTIONS = [
+  {
+    goalId: 12,
+    goalName: '유럽 여행',
+    goalType: 'SAVE',
+    goalAmount: 3000000,
+    completedDate: '2026-07-21',
+  },
+  {
+    goalId: 8,
+    goalName: '학자금 대출 상환',
+    goalType: 'LOAN',
+    goalAmount: 5000000,
+    completedDate: '2026-06-18',
+  },
+]
 
 function getGoalMonths(goalDate) {
   if (!goalDate) return 10
@@ -197,23 +213,23 @@ export const goalHandlers = [
   // 목표 컬렉션 조회 API (GET /api/goals/collection)
   http.get('*/api/goals/collection', async () => {
     return HttpResponse.json({
-      collections: [
-        {
-          goalId: 12,
-          goalName: '유럽 여행',
-          goalType: 'SAVE',
-          goalAmount: 3000000,
-          completedDate: '2026-07-21',
-        },
-        {
-          goalId: 8,
-          goalName: '학자금 대출 상환',
-          goalType: 'LOAN',
-          goalAmount: 5000000,
-          completedDate: '2026-06-18',
-        },
-      ],
+      collections: MOCK_COLLECTIONS,
     })
+  }),
+
+  // 완료 목표를 컬렉션에 담기
+  http.patch('*/api/goals/:goalId/collection', async ({ params }) => {
+    const goalId = Number(params.goalId)
+    if (!MOCK_COLLECTIONS.some((goal) => goal.goalId === goalId)) {
+      MOCK_COLLECTIONS.unshift({
+        goalId,
+        goalName: '독립자금',
+        goalType: 'INDEPENDENCE',
+        goalAmount: 30000000,
+        completedDate: new Date().toISOString().slice(0, 10),
+      })
+    }
+    return HttpResponse.json({ goalId })
   }),
 
   // 메인 대시보드용 mock 호출 핸들러

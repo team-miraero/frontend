@@ -9,6 +9,7 @@ export const useCollectionStore = defineStore('feature-collection', () => {
   /** @type {import('vue').Ref<import('@/features/collection/api/collection.api').AchievedGoal[]>} */
   const achievedGoals = ref([])
   const isLoading = ref(false)
+  const isAdding = ref(false)
   const error = ref(null)
 
   const hasGoals = computed(
@@ -35,6 +36,17 @@ export const useCollectionStore = defineStore('feature-collection', () => {
     }
   }
 
+  async function addAchievedGoal(goalId) {
+    isAdding.value = true
+    error.value = null
+    try {
+      await collectionApi.addGoalToCollection(goalId)
+      await fetchAchievedGoals()
+    } finally {
+      isAdding.value = false
+    }
+  }
+
   /**
    * 테스트/시연용: 빈 상태로 토글하는 함수
    */
@@ -46,11 +58,13 @@ export const useCollectionStore = defineStore('feature-collection', () => {
     collectionStatus,
     achievedGoals,
     isLoading,
+    isAdding,
     error,
     hasGoals,
     totalAchievedCount,
     totalAchievedAmount,
     fetchAchievedGoals,
+    addAchievedGoal,
     clearAchievedGoals,
   }
 })

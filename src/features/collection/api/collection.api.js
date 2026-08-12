@@ -63,6 +63,16 @@ export async function getAchievedGoals() {
 }
 
 /**
+ * 완료된 목표를 컬렉션에 저장하는 API (PATCH /api/goals/{goalId}/collection)
+ * @param {number | string} goalId
+ * @returns {Promise<void>}
+ */
+export async function addGoalToCollection(goalId) {
+  const { data: responseBody } = await client.patch(`/goals/${goalId}/collection`)
+  unwrapApiData(responseBody)
+}
+
+/**
  * @param {string} goalId
  * @returns {Promise<{ goalId: string, collectedAmount: number, targetAmount: number }>}
  */

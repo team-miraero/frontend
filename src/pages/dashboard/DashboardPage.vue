@@ -109,13 +109,22 @@
       :goal="goalStore.currentGoal"
       :milestones="roadmapStore.milestones"
     />
+    <GoalAchievementModal
+      v-model="isGoalAchievementModalOpen"
+      :goal="goalStore.currentGoal"
+      :is-adding="collectionStore.isAdding"
+      :error-message="achievementErrorMessage"
+      @add-to-collection="handleAddToCollection"
+      @later="handleAchievementLater"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
+import { useCollectionStore } from '@/features/collection'
 import {
   useRoadmapStore,
   PaceBanner,
@@ -129,6 +138,7 @@ import {
   GoalStatusConfirmModal,
   RaceRecordSummary,
   ShareGoalModal,
+  GoalAchievementModal,
 } from '@/features/roadmap'
 import {
   usePacemakerStore,
@@ -140,11 +150,14 @@ import {
   PacemakerDepositSuccessModal,
 } from '@/features/pacemaker'
 import { useModal } from '@/shared/composables/useModal'
+import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const route = useRoute()
+const router = useRouter()
 const goalStore = useGoalStore()
 const roadmapStore = useRoadmapStore()
 const pacemakerStore = usePacemakerStore()
+const collectionStore = useCollectionStore()
 const { isOpen: isPacemakerModalOpen, open: openPacemakerModal } = useModal()
 const { isOpen: isPacemakerBalanceModalOpen, open: openPacemakerBalanceModal } = useModal()
 const { isOpen: isPacemakerDepositModalOpen, open: openPacemakerDepositModal } = useModal()
@@ -157,6 +170,11 @@ const { isOpen: isMonthlyAvailableMoneyModalOpen, open: openMonthlyAvailableMone
 const { isOpen: isLinkedAssetsModalOpen, open: openLinkedAssetsModal } = useModal()
 const { isOpen: isStatusConfirmModalOpen, open: openStatusConfirmModal } = useModal()
 const { isOpen: isShareGoalModalOpen, open: openShareGoalModal } = useModal()
+const {
+  isOpen: isGoalAchievementModalOpen,
+  open: openGoalAchievementModal,
+  close: closeGoalAchievementModal,
+} = useModal()
 
 const {
   selectedDepositTarget,
@@ -169,6 +187,8 @@ const {
   retryHistories,
 } = usePacemakerDeposit()
 const statusConfirmMode = ref('pause')
+const achievementErrorMessage = ref('')
+const previousProgressRate = ref(null)
 
 const isGoalPaused = computed(() => goalStore.currentGoal?.status === 'PAUSE')
 const dashboardErrorMessage = computed(() =>
@@ -206,10 +226,56 @@ function handleOpenDeposit(goal) {
 
 // 입금 모달의 "입금하기" 클릭: 실제 입금 처리 후 완료 모달로 전환
 function handleDeposit(payload) {
-  submitDeposit(payload, () => {
+  submitDeposit(payload, async () => {
     isPacemakerDepositModalOpen.value = false
     openPacemakerDepositSuccessModal()
+    await goalStore.fetchDashboardData(goalStore.currentGoal.goalId).catch(() => undefined)
   })
+}
+
+const ACHIEVEMENT_SEEN_KEY_PREFIX = 'miraero:goal-achievement-seen:'
+
+function achievementSeenKey(goalId) {
+  return `${ACHIEVEMENT_SEEN_KEY_PREFIX}${goalId}`
+}
+
+function hasSeenAchievement(goalId) {
+  return localStorage.getItem(achievementSeenKey(goalId)) === 'true'
+}
+
+function markAchievementSeen(goalId) {
+  localStorage.setItem(achievementSeenKey(goalId), 'true')
+}
+
+function showAchievementOnce(goal) {
+  if (!goal?.goalId || Number(goal.progressRate) < 100 || hasSeenAchievement(goal.goalId)) return
+  achievementErrorMessage.value = ''
+  markAchievementSeen(goal.goalId)
+  openGoalAchievementModal()
+}
+
+function handleAchievementLater() {
+  closeGoalAchievementModal()
+}
+
+async function handleAddToCollection() {
+  const goalId = goalStore.currentGoal?.goalId
+  if (!goalId || collectionStore.isAdding) return
+
+  achievementErrorMessage.value = ''
+  try {
+    await collectionStore.addAchievedGoal(goalId)
+    closeGoalAchievementModal()
+    await router.push({ name: ROUTE_NAMES.COLLECTION })
+  } catch (error) {
+    if (error?.response?.status === 409) {
+      closeGoalAchievementModal()
+      await router.push({ name: ROUTE_NAMES.COLLECTION })
+      return
+    }
+    achievementErrorMessage.value =
+      error?.message ?? '컬렉션에 담지 못했어요. 잠시 후 다시 시도해 주세요.'
+  }
 }
 
 // 잔액 모달의 "전체 자동 저축 내역 보기" 클릭: 필요할 때만 조회
@@ -238,9 +304,13 @@ async function handleStatusConfirm() {
 
 // 목표 상세(대시보드 데이터+마일스톤)를 불러오고 사이드바 로드맵 목록과 선택 상태를 맞춤
 async function loadGoalDashboard(goalId) {
+  previousProgressRate.value = null
   goalStore.selectGoal(goalId)
   await goalStore.fetchDashboardData(goalId)
   await roadmapStore.fetchMilestones(goalId)
+  const goal = goalStore.currentGoal
+  previousProgressRate.value = Number(goal?.progressRate) || 0
+  showAchievementOnce(goal)
 }
 
 onMounted(async () => {
@@ -270,6 +340,20 @@ watch(
   (newGoalId, oldGoalId) => {
     if (!newGoalId || newGoalId === oldGoalId) return
     loadGoalDashboard(Number(newGoalId))
+  }
+)
+
+watch(
+  () => goalStore.currentGoal?.progressRate,
+  (progressRate, oldProgressRate) => {
+    const current = Number(progressRate) || 0
+    const previous =
+      oldProgressRate == null ? previousProgressRate.value : Number(oldProgressRate) || 0
+
+    if (previous < 100 && current >= 100) {
+      showAchievementOnce(goalStore.currentGoal)
+    }
+    previousProgressRate.value = current
   }
 )
 </script>
