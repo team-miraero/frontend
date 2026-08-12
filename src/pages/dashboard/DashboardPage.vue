@@ -106,7 +106,7 @@
     />
     <ShareGoalModal
       v-model="isShareGoalModalOpen"
-      :goal="sharePreviewGoal"
+      :goal="goalStore.currentGoal"
       :milestones="roadmapStore.milestones"
     />
   </div>
@@ -171,21 +171,6 @@ const {
 const statusConfirmMode = ref('pause')
 
 const isGoalPaused = computed(() => goalStore.currentGoal?.status === 'PAUSE')
-const previewProgress = computed(() => {
-  if (!import.meta.env.DEV) return null
-
-  const value = Number(route.query.previewProgress)
-  return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : null
-})
-const sharePreviewGoal = computed(() => {
-  if (!goalStore.currentGoal || previewProgress.value === null) return goalStore.currentGoal
-
-  return {
-    ...goalStore.currentGoal,
-    progressRate: previewProgress.value,
-    currentAmount: Math.round((goalStore.currentGoal.goalAmount * previewProgress.value) / 100),
-  }
-})
 const dashboardErrorMessage = computed(() =>
   pacemakerStore.dashboardError ? '정보를 불러오지 못했어요' : ''
 )
@@ -265,11 +250,6 @@ onMounted(async () => {
   if (!goalId) return
 
   await loadGoalDashboard(goalId)
-
-  if (previewProgress.value !== null) {
-    openShareGoalModal()
-  }
-
   await pacemakerStore.fetchPacemakerStatus()
 
   const pacemakerRequests = [pacemakerStore.fetchDepositTargets()]
