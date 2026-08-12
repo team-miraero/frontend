@@ -89,21 +89,16 @@ export async function getAccounts(params) {
 /**
  * @typedef {Object} MoneyBoxPayload
  * @property {'GOAL' | 'SAVING'} type
- * @property {string} name
+ * @property {number} accountId
  * @property {number} amount 자동이체 금액
  * @property {number} transferDay 자동이체 날짜
- * @property {number} withdrawalAccountId 출금 계좌 ID
  */
 
 /**
  * @typedef {Object} MoneyBoxResponse
  * @property {number} moneyBoxId
- * @property {number} userId
- * @property {string} type
- * @property {number} balance
- * @property {string} maskedAccountNumber
- * @property {string} createdAt
- * @property {'MONEY_BOX'} assetType
+ * @property {number} accountId
+ * @property {'GOAL' | 'SAVING'} moneyBoxType
  */
 
 /**
@@ -112,9 +107,9 @@ export async function getAccounts(params) {
  */
 export async function createMoneyBox(payload) {
   const { data: responseBody } = await client.post('/money-boxes', {
+    accountId: payload.accountId,
     moneyBoxType: payload.type,
     autoTransfer: {
-      withdrawalAccountId: payload.withdrawalAccountId,
       amount: payload.amount,
       transferDay: payload.transferDay,
     },

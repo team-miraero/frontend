@@ -188,8 +188,8 @@
                   :sublabel="
                     account.accountId === checkingAccounts[0]?.accountId ? '급여 계좌' : ''
                   "
-                  :selected="selectedWithdrawalAccountId === account.accountId"
-                  @select="selectedWithdrawalAccountId = account.accountId"
+                  :selected="selectedAccountId === account.accountId"
+                  @select="selectedAccountId = account.accountId"
                 />
               </div>
               <p v-if="selectedWithdrawalAccount" class="mt-2 text-xs text-gray-400">
@@ -338,7 +338,7 @@ function handleTransferAmountInput(event) {
   const digitsOnly = event.target.value.replace(/[^0-9]/g, '')
   transferAmount.value = digitsOnly ? Number(digitsOnly) : 0
 }
-const selectedWithdrawalAccountId = ref(null)
+const selectedAccountId = ref(null)
 const selectedExistingAccountIds = ref([])
 
 const checkingAccounts = computed(() =>
@@ -348,7 +348,7 @@ const savingAccounts = computed(() =>
   accounts.value.filter((account) => account.accountType !== 'CHECKING')
 )
 const selectedWithdrawalAccount = computed(() =>
-  checkingAccounts.value.find((account) => account.accountId === selectedWithdrawalAccountId.value)
+  checkingAccounts.value.find((account) => account.accountId === selectedAccountId.value)
 )
 
 function toggleExistingAccount(accountId) {
@@ -360,7 +360,7 @@ function toggleExistingAccount(accountId) {
 async function loadAccounts() {
   try {
     const { accounts: fetchedAccounts } = await goalStore.fetchAccounts()
-    selectedWithdrawalAccountId.value =
+    selectedAccountId.value =
       fetchedAccounts.find((account) => account.accountType === 'CHECKING')?.accountId ?? null
     const firstSavingAccountId = fetchedAccounts.find(
       (account) => account.accountType !== 'CHECKING'
@@ -395,7 +395,7 @@ const ctaLabel = computed(() => {
 const ctaDisabled = computed(() => {
   if (isSubmitting.value) return true
   return mode.value === 'moneybox'
-    ? !selectedWithdrawalAccountId.value || !transferAmount.value || transferAmount.value <= 0
+    ? !selectedAccountId.value || !transferAmount.value || transferAmount.value <= 0
     : selectedExistingAccountIds.value.length === 0
 })
 
@@ -417,10 +417,9 @@ async function handleSubmit() {
         mode.value === 'moneybox'
           ? {
               type: 'GOAL',
-              name: `${selectedGoal.value?.title ?? '목표'} 저금통`,
               amount: transferAmount.value,
               transferDay: transferDay.value,
-              withdrawalAccountId: selectedWithdrawalAccountId.value,
+              accountId: selectedAccountId.value,
             }
           : null,
       existingAccountIds: mode.value === 'account' ? selectedExistingAccountIds.value : [],

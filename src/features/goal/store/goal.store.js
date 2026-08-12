@@ -215,11 +215,6 @@ export const useGoalStore = defineStore('feature-goal', () => {
     const createdGoalId = newGoalResult?.goalId ?? 1
     selectedGoalId.value = createdGoalId
 
-    // 신규 목표 생성 후 자산 연결 API (POST /goals/{goalId}/assets) 호출
-    if (assets.length > 0 && createdGoalId) {
-      await goalApi.linkAssetsToGoal(createdGoalId, assets)
-    }
-
     // 신규 목표를 local goals 목록에도 추가해 로드맵 셀렉터/사이드바에 즉시 노출되도록 함
     const newGoalItem = {
       goalId: createdGoalId,
