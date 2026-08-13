@@ -50,6 +50,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
   const isLoading = ref(false)
   const dashboardError = ref(null)
   const dashboardSupplementaryErrors = ref({})
+  const isSupplementaryLoading = ref(false)
   let dashboardRequestId = 0
 
   /**
@@ -235,6 +236,41 @@ export const useGoalStore = defineStore('feature-goal', () => {
   }
 
   /**
+   * 대시보드 부가 정보(자산·여유자금)만 조회한다.
+   * 목표 상세와 달리 셋 중 하나가 실패해도 나머지는 채우고, 실패한 항목만 에러로 남긴다.
+   * 목표 상세(currentGoal)는 건드리지 않으므로 화면을 비우지 않고 제자리에서 다시 채울 수 있다.
+   * @param {number} goalId
+   * @param {number} [requestId] fetchDashboardData가 넘긴 요청 식별자 (단독 호출 시 현재 값 사용)
+   */
+  async function fetchSupplementaryDashboardData(goalId, requestId = dashboardRequestId) {
+    isSupplementaryLoading.value = true
+
+    try {
+      const [assetsResult, monthlyResult, dailyResult] = await Promise.allSettled([
+        goalApi.getGoalAssets(goalId),
+        goalApi.getMonthlyAvailableMoney(goalId),
+        goalApi.getDailyAvailableMoney(goalId),
+      ])
+      if (requestId !== dashboardRequestId) return
+
+      const supplementaryErrors = {}
+
+      if (assetsResult.status === 'fulfilled') assets.value = assetsResult.value
+      else supplementaryErrors.assets = assetsResult.reason
+
+      if (monthlyResult.status === 'fulfilled') monthlyAvailableMoney.value = monthlyResult.value
+      else supplementaryErrors.monthlyAvailableMoney = monthlyResult.reason
+
+      if (dailyResult.status === 'fulfilled') dailyAvailableMoney.value = dailyResult.value
+      else supplementaryErrors.dailyAvailableMoney = dailyResult.reason
+
+      dashboardSupplementaryErrors.value = supplementaryErrors
+    } finally {
+      if (requestId === dashboardRequestId) isSupplementaryLoading.value = false
+    }
+  }
+
+  /**
    * @param {number} goalId
    */
   async function fetchDashboardData(goalId) {
@@ -256,26 +292,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
 
       // 목표 상세가 도착하면 대시보드를 먼저 노출하고 부가 정보는 뒤에서 채운다.
       // 부가 API 하나가 느리거나 실패해도 대시보드 본문 렌더링을 막지 않는다.
-      Promise.allSettled([
-        goalApi.getGoalAssets(goalId),
-        goalApi.getMonthlyAvailableMoney(goalId),
-        goalApi.getDailyAvailableMoney(goalId),
-      ]).then(([assetsResult, monthlyResult, dailyResult]) => {
-        if (requestId !== dashboardRequestId) return
-
-        const supplementaryErrors = {}
-
-        if (assetsResult.status === 'fulfilled') assets.value = assetsResult.value
-        else supplementaryErrors.assets = assetsResult.reason
-
-        if (monthlyResult.status === 'fulfilled') monthlyAvailableMoney.value = monthlyResult.value
-        else supplementaryErrors.monthlyAvailableMoney = monthlyResult.reason
-
-        if (dailyResult.status === 'fulfilled') dailyAvailableMoney.value = dailyResult.value
-        else supplementaryErrors.dailyAvailableMoney = dailyResult.reason
-
-        dashboardSupplementaryErrors.value = supplementaryErrors
-      })
+      fetchSupplementaryDashboardData(goalId, requestId)
 
       return goal
     } catch (caughtError) {
@@ -353,12 +370,14 @@ export const useGoalStore = defineStore('feature-goal', () => {
     isLoading,
     dashboardError,
     dashboardSupplementaryErrors,
+    isSupplementaryLoading,
     selectGoal,
     selectGoalPreset,
     moveToNextStep,
     resetGoalStore,
     fetchGoals,
     fetchDashboardData,
+    fetchSupplementaryDashboardData,
     updateGoal,
     updateCurrentGoalStatus,
     fetchFeasibility,

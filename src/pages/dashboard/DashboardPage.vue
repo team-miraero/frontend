@@ -13,8 +13,13 @@
         role="status"
       >
         <p class="text-xs font-bold text-amber-700">일부 부가 정보를 불러오지 못했어요.</p>
-        <button type="button" class="text-xs font-black text-amber-800" @click="retryGoalDashboard">
-          다시 시도
+        <button
+          type="button"
+          class="text-xs font-black text-amber-800 disabled:opacity-50"
+          :disabled="goalStore.isSupplementaryLoading"
+          @click="retrySupplementaryData"
+        >
+          {{ goalStore.isSupplementaryLoading ? '불러오는 중…' : '다시 시도' }}
         </button>
       </div>
       <GoalPausedBanner v-if="isGoalPaused" class="mb-3" @resume-click="openResumeConfirm" />
@@ -391,10 +396,23 @@ async function loadGoalDashboard(goalId) {
   return true
 }
 
+// 전체 실패 화면의 "다시 시도": 목표 목록부터 대시보드 전체를 다시 불러온다.
 async function retryGoalDashboard() {
   if (goalStore.goalsError) await goalStore.fetchGoals(true)
   const goalId = route.params.goalId ? Number(route.params.goalId) : goalStore.selectedGoalId
   if (goalId) await loadGoalDashboard(goalId)
+}
+
+// 부가 정보 배너의 "다시 시도": 실패한 부가 정보만 제자리에서 다시 채운다.
+// 멀쩡히 떠 있는 목표 상세까지 비우면 화면이 통째로 로딩 스피너로 바뀌므로 전체 재조회는 하지 않는다.
+async function retrySupplementaryData() {
+  const goalId = goalStore.selectedGoalId
+  if (!goalId) return
+
+  await Promise.all([
+    goalStore.fetchSupplementaryDashboardData(goalId).catch(() => undefined),
+    roadmapStore.error ? roadmapStore.fetchMilestones(goalId).catch(() => undefined) : null,
+  ])
 }
 
 onMounted(async () => {
