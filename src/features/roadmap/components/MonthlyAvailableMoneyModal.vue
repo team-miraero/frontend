@@ -54,16 +54,14 @@
         <div class="flex items-center justify-between">
           <p class="text-xs font-bold text-slate-400">이번 달 진행률</p>
           <p class="text-xs font-bold text-slate-500">
-            {{ progress.month }}월 {{ progress.day }}일 기준 ({{ progress.day }}/{{
-              progress.daysInMonth
-            }}일)
+            {{ monthly.elapsedDays }}/{{ monthly.periodDays }}일
           </p>
         </div>
         <div class="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-200">
           <div class="h-2 rounded-full bg-primary" :style="{ width: `${progress.percent}%` }" />
         </div>
         <p class="pt-1.5 text-xs leading-[19.5px] text-slate-400">
-          남은 {{ progress.remainingDays }}일 동안 이 페이스를 유지하면 목표 저축이 지켜져요.
+          남은 {{ monthly.remainingDays }}일 동안 이 페이스를 유지하면 목표 저축이 지켜져요.
         </p>
       </div>
     </div>
@@ -119,22 +117,17 @@ const rows = computed(() => [
   },
 ])
 
-// 이번 달 진행률: 캘린더 상 날짜 정보라 API 응답과 무관하게 클라이언트에서 계산
 const progress = computed(() => {
-  const today = new Date()
-  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
-  const day = today.getDate()
-
+  if (!props.monthly.periodDays) return { percent: 0 }
   return {
-    month: today.getMonth() + 1,
-    day,
-    daysInMonth,
-    remainingDays: daysInMonth - day,
-    percent: Math.min(100, Math.round((day / daysInMonth) * 100)),
+    percent: Math.min(
+      100,
+      Math.round((props.monthly.elapsedDays / props.monthly.periodDays) * 100)
+    ),
   }
 })
 
 function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
+  return `${Number(amount ?? 0).toLocaleString()}원`
 }
 </script>

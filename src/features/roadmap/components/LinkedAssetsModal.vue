@@ -54,7 +54,10 @@
 
         <p class="text-xs text-slate-500">{{ row.caption }}</p>
 
-        <div v-if="row.assetDetail" class="flex flex-col gap-1.5 border-t border-[#dbeafe] pt-2">
+        <div
+          v-if="row.assetDetail && row.countdown"
+          class="flex flex-col gap-1.5 border-t border-[#dbeafe] pt-2"
+        >
           <p class="text-xs text-slate-400">
             만료일 {{ formatDate(row.assetDetail.maturityDate) }}
           </p>
@@ -130,7 +133,9 @@ const rows = computed(() =>
       highlighted,
       icon: asset.assetType === 'MONEY_BOX' ? moneyBoxIcon : bankAccountIcon,
       caption: CAPTION_BY_TYPE[asset.assetType] ?? '목표적금 · 만기 시 자동 해지',
-      countdown: hasDetail ? computeMaturityCountdown(asset.assetDetail.maturityDate) : null,
+      countdown: asset.assetDetail?.maturityDate
+        ? computeMaturityCountdown(asset.assetDetail.maturityDate)
+        : null,
     }
   })
 )
@@ -156,13 +161,13 @@ function computeMaturityCountdown(maturityDate) {
 }
 
 function formatDate(yyyyMMdd) {
-  return yyyyMMdd.replaceAll('-', '.')
+  return String(yyyyMMdd ?? '').replaceAll('-', '.')
 }
 
 function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
+  return `${Number(amount ?? 0).toLocaleString()}원`
 }
 function formatManwon(amount) {
-  return `${Math.round(amount / 10000).toLocaleString()}만원`
+  return `${Math.round(Number(amount ?? 0) / 10000).toLocaleString()}만원`
 }
 </script>

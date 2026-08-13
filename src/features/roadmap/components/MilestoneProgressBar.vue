@@ -29,7 +29,7 @@
             class="text-[8px] font-bold sm:text-[11px]"
             :class="milestone.status === 'COMPLETED' ? 'text-primary/70' : 'text-slate-400'"
           >
-            {{ milestonePercent(milestone) }}%
+            {{ milestone.percentage }}%
           </span>
           <span
             v-if="isLastMilestone(milestone)"
@@ -150,7 +150,7 @@ function toTrackPercent(ratio) {
 }
 
 function milestonePosition(milestone) {
-  return toTrackPercent(milestone.targetAmount / props.goal.goalAmount)
+  return toTrackPercent(milestone.percentage / 100)
 }
 
 function isLastMilestone(milestone) {
@@ -163,10 +163,6 @@ function formatManwon(amount) {
 
 function formatEndDate(yyyyMM) {
   return yyyyMM.replace('-', '.')
-}
-
-function milestonePercent(milestone) {
-  return Math.round((milestone.targetAmount / props.goal.goalAmount) * 100)
 }
 
 // 캐릭터 전용 앵커 좌표 (도로 아스팔트 표면에 발이 닿아 달리는 위치)

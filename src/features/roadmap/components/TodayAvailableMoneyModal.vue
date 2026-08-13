@@ -9,7 +9,7 @@
       <div>
         <p class="text-xs font-bold text-slate-400">☀️ 오늘의 여유자금</p>
         <p class="pt-1 text-2xl font-black tracking-[-0.72px] text-primary">
-          {{ formatWon(daily.availableMoney) }}
+          {{ formatWon(daily.todayAvailableMoney) }}
         </p>
       </div>
       <button
@@ -23,7 +23,7 @@
     </div>
 
     <div class="flex flex-col gap-4 px-7 py-5">
-      <p class="text-xs font-bold uppercase tracking-[1.2px] text-slate-400">어떻게 계산됐나요?</p>
+      <p class="text-xs font-bold uppercase tracking-[1.2px] text-slate-400">오늘의 자금 현황</p>
 
       <div class="flex flex-col">
         <div v-for="(row, index) in rows" :key="row.label">
@@ -32,11 +32,8 @@
               <p class="text-sm font-bold text-[#0a192f]">{{ row.label }}</p>
               <p class="pt-0.5 text-xs text-slate-400">{{ row.caption }}</p>
             </div>
-            <p
-              class="shrink-0 whitespace-nowrap text-sm font-black"
-              :class="row.sign === '+' ? 'text-emerald-600' : 'text-rose-500'"
-            >
-              {{ row.sign }} {{ formatWon(row.amount) }}
+            <p class="shrink-0 whitespace-nowrap text-sm font-black" :class="row.colorClass">
+              {{ formatWon(row.amount) }}
             </p>
           </div>
           <div v-if="index < rows.length - 1" class="my-3 h-px w-full bg-slate-100" />
@@ -47,7 +44,7 @@
         class="flex items-center justify-between rounded-2xl border border-primary/20 bg-[#eaf2ff] px-5 py-4"
       >
         <p class="text-sm font-bold text-[#0a192f]">오늘의 여유자금</p>
-        <p class="text-lg font-black text-primary">= {{ formatWon(daily.availableMoney) }}</p>
+        <p class="text-lg font-black text-primary">{{ formatWon(daily.todayAvailableMoney) }}</p>
       </div>
 
       <p class="text-xs leading-[19.5px] text-slate-400">
@@ -68,35 +65,27 @@ const props = defineProps({
   },
   daily: {
     type: Object,
-    required: true, // { income, fixedExpense, targetGoalAutoTransfer, otherGoalAutoTransfer, variableExpense, availableMoney }
+    required: true, // { todayAvailableMoney, todayExpense, remainingAvailableMoney }
   },
 })
 defineEmits(['update:modelValue'])
 
 const rows = computed(() => [
-  { label: '오늘 수입', caption: '마이데이터 연동 기준', amount: props.daily.income, sign: '+' },
   {
-    label: '목표 저축',
-    caption: '이 목표 자동이체',
-    amount: props.daily.targetGoalAutoTransfer,
-    sign: '−',
+    label: '오늘 지출',
+    caption: '오늘 발생한 실제 지출',
+    amount: props.daily.todayExpense,
+    colorClass: 'text-rose-500',
   },
   {
-    label: '다른 목표 저축',
-    caption: '다른 목표 자동이체',
-    amount: props.daily.otherGoalAutoTransfer,
-    sign: '−',
-  },
-  { label: '고정지출', caption: '월세·통신·구독 등', amount: props.daily.fixedExpense, sign: '−' },
-  {
-    label: '오늘 실제 소비',
-    caption: '카드·현금 지출',
-    amount: props.daily.variableExpense,
-    sign: '−',
+    label: '이번 기간 남은 가용금액',
+    caption: '현재 기간에 앞으로 사용할 수 있는 금액',
+    amount: props.daily.remainingAvailableMoney,
+    colorClass: 'text-emerald-600',
   },
 ])
 
 function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
+  return `${Number(amount ?? 0).toLocaleString()}원`
 }
 </script>
