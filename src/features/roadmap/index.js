@@ -18,3 +18,4 @@ export { default as GoalStatusConfirmModal } from '@/features/roadmap/components
 export { default as ShareWithFriendsCard } from '@/features/roadmap/components/ShareWithFriendsCard.vue'
 export { default as RaceRecordSummary } from '@/features/roadmap/components/RaceRecordSummary.vue'
 export { default as ShareGoalModal } from '@/features/roadmap/components/ShareGoalModal.vue'
+export { default as GoalAchievementModal } from '@/features/roadmap/components/GoalAchievementModal.vue'
