@@ -7,7 +7,7 @@
       <ProgressBar :current-step="2" :total-steps="3" />
 
       <span
-        v-if="selectedGoal"
+        v-if="false"
         class="mt-4 inline-flex items-center gap-1.5 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
       >
         <svg
@@ -18,7 +18,11 @@
           stroke="currentColor"
           stroke-width="2"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+          />
         </svg>
         <svg
           v-else-if="selectedGoalPresetId === 'EMERGENCY'"
@@ -28,7 +32,11 @@
           stroke="currentColor"
           stroke-width="2"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+          />
         </svg>
         <svg
           v-else-if="selectedGoalPresetId === 'MARRIAGE'"
@@ -38,7 +46,11 @@
           stroke="currentColor"
           stroke-width="2"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+          />
         </svg>
         <svg
           v-else-if="selectedGoalPresetId === 'STUDENT_LOAN'"
@@ -49,7 +61,11 @@
           stroke-width="2"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+          />
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 14v6.5" />
         </svg>
         <span>{{ selectedGoal.title }}</span>
@@ -65,7 +81,9 @@
       <template v-if="isStudentLoan">
         <div class="mt-6 space-y-4">
           <!-- 카드 1: 남은 대출 잔액 (원금) -->
-          <div class="rounded-3xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm">
+          <div
+            class="rounded-3xl border border-gray-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm sm:p-6"
+          >
             <div class="flex items-center justify-between">
               <label class="text-sm font-bold text-gray-900">남은 대출 잔액 (원금)</label>
               <span
@@ -110,7 +128,7 @@
 
           <!-- 카드 3: 이자 포함 상환 계획 카드 -->
           <div
-            class="rounded-3xl border border-blue-200/80 bg-white/90 p-6 shadow-sm backdrop-blur-sm animate-fade-in-up"
+            class="rounded-3xl border border-blue-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm animate-fade-in-up sm:p-6"
             style="animation-delay: 150ms"
           >
             <div class="flex items-center justify-between border-b border-gray-100 pb-4">
@@ -159,9 +177,14 @@
                 <span>원금 (남은 대출)</span>
                 <span class="font-bold text-gray-900">{{ formatKRWCompact(amount) }}</span>
               </div>
-              <div class="flex justify-between items-center text-gray-600">
-                <span>이자 총액 (연 1.7% · 원리금균등상환)</span>
-                <span class="font-bold text-orange-500"
+              <div
+                class="flex flex-col gap-1 text-gray-600 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+              >
+                <span class="whitespace-nowrap text-xs sm:text-sm"
+                  >이자 총액 (연 1.7% · 원리금균등상환)</span
+                >
+                <span
+                  class="self-end whitespace-nowrap text-sm font-bold text-orange-500 sm:shrink-0 sm:self-auto"
                   >+ {{ loanResult.totalInterest.toLocaleString() }}원</span
                 >
               </div>
@@ -188,7 +211,7 @@
 
           <!-- 카드 4: 추가 상환 여력 -->
           <div
-            class="rounded-3xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm animate-fade-in-up"
+            class="rounded-3xl border border-gray-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm animate-fade-in-up sm:p-6"
             style="animation-delay: 200ms"
           >
             <div>
@@ -353,23 +376,35 @@ const { selectedGoalPresetId, goalParams } = storeToRefs(goalStore)
 
 const isStudentLoan = computed(() => selectedGoalPresetId.value === GOAL_PRESET_IDS.STUDENT_LOAN)
 
-const selectedGoal = computed(() => GOAL_PRESETS.find((preset) => preset.id === selectedGoalPresetId.value))
+const selectedGoal = computed(() =>
+  GOAL_PRESETS.find((preset) => preset.id === selectedGoalPresetId.value)
+)
 const config = computed(
   () => GOAL_DETAIL_CONFIG[selectedGoalPresetId.value] ?? DEFAULT_GOAL_DETAIL_CONFIG
 )
 
 // goalParams에 이전에 입력했던 저장값이 있다면 복원, 없으면 기본값 적용
 const amount = ref(goalParams.value?.amount ?? config.value.defaultAmount)
-const months = ref(goalParams.value?.months ?? config.value.periodDefault)
+const initialMonths = goalParams.value?.months ?? config.value.periodDefault
+const months = ref(
+  Math.min(config.value.periodMax, Math.max(config.value.periodMin, initialMonths))
+)
 const startAmount = ref(goalParams.value?.startAmount ?? 0)
 const extraPayment = ref(goalParams.value?.extraPayment ?? 0) // 학자금 대출용 추가 상환 여력
 
 onMounted(() => {
   if (goalParams.value) {
     if (typeof goalParams.value.amount === 'number') amount.value = goalParams.value.amount
-    if (typeof goalParams.value.months === 'number') months.value = goalParams.value.months
-    if (typeof goalParams.value.startAmount === 'number') startAmount.value = goalParams.value.startAmount
-    if (typeof goalParams.value.extraPayment === 'number') extraPayment.value = goalParams.value.extraPayment
+    if (typeof goalParams.value.months === 'number') {
+      months.value = Math.min(
+        config.value.periodMax,
+        Math.max(config.value.periodMin, goalParams.value.months)
+      )
+    }
+    if (typeof goalParams.value.startAmount === 'number')
+      startAmount.value = goalParams.value.startAmount
+    if (typeof goalParams.value.extraPayment === 'number')
+      extraPayment.value = goalParams.value.extraPayment
   }
 })
 
@@ -409,9 +444,7 @@ const targetDateLabel = computed(() => {
   target.setMonth(target.getMonth() + months.value)
   return `목표 달성 예정일: ${target.getFullYear()}년 ${target.getMonth() + 1}월`
 })
-const periodFormulaLabel = computed(
-  () => `${formatKRWCompact(amount.value)} ÷ ${months.value}개월`
-)
+const periodFormulaLabel = computed(() => `${formatKRWCompact(amount.value)} ÷ ${months.value}개월`)
 const ctaDisabled = computed(
   () => !amount.value || amount.value <= 0 || startAmount.value > amount.value
 )
@@ -421,6 +454,10 @@ function handleBack() {
 }
 
 function handleNext() {
+  // 상세 화면에서 값을 다시 확정하면 이전 실현가능성 페이지의 조정 초안은 더 이상 유효하지 않다.
+  goalStore.feasibilityAdjustment = null
+  goalStore.recalculatedFeasibility = null
+
   goalStore.goalParams = {
     amount: amount.value,
     months: months.value,

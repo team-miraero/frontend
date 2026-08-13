@@ -9,7 +9,29 @@
 
       <div class="mt-3">
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">{{ availableLabel }}</span>
+          <span class="relative inline-flex items-center gap-1.5 text-gray-500">
+            <span>{{ availableLabel }}</span>
+            <button
+              v-if="availableHelp"
+              type="button"
+              class="flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[10px] font-bold leading-none text-gray-400 transition-colors hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              aria-label="월 가능 저축액 계산 기준 보기"
+              :aria-expanded="isAvailableHelpOpen"
+              aria-describedby="available-saving-help"
+              @click="isAvailableHelpOpen = !isAvailableHelpOpen"
+            >
+              i
+            </button>
+            <span
+              v-if="isAvailableHelpOpen"
+              id="available-saving-help"
+              role="tooltip"
+              class="absolute left-0 top-6 z-20 w-[280px] rounded-xl border border-gray-200 bg-white p-3 text-xs leading-relaxed text-gray-600 shadow-lg"
+            >
+              <strong class="mb-1 block text-gray-900">어떻게 계산했나요?</strong>
+              {{ availableHelp }}
+            </span>
+          </span>
           <span class="font-bold text-gray-900">{{ availableValueLabel }}</span>
         </div>
         <div class="mt-1.5 h-1.5 w-full rounded-full bg-gray-100">
@@ -86,34 +108,16 @@
     </div>
 
     <div
-      v-if="status === 'success'"
+      v-if="!showAdjustment"
       class="mt-4 animate-fade-in-up rounded-2xl border border-gray-200 bg-white p-6"
       style="animation-delay: 175ms"
     >
-      <div class="flex items-center gap-2">
-        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-light text-primary">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="h-4 w-4"
-          >
-            <path d="m3 17 6-6 4 4 8-8" />
-            <path d="M17 7h4v4" />
-          </svg>
+      <p class="text-base font-bold leading-relaxed text-gray-900">
+        매달 <span class="text-primary">{{ monthlyLabel }}</span
+        >이면<br class="sm:hidden" />
+        <span class="break-keep">
+          <span class="text-primary">{{ periodLabel }}</span> 뒤 {{ goalLabel }} 가능해요
         </span>
-        <div>
-          <p class="text-xs text-gray-400">{{ forecastLabel }}</p>
-          <p class="text-sm font-bold text-gray-900">{{ forecastMessage }}</p>
-        </div>
-      </div>
-
-      <p class="mt-4 text-lg font-bold leading-snug text-gray-900">
-        매달 <span class="text-primary">{{ monthlyLabel }}</span>이면<br />
-        <span class="text-primary">{{ periodLabel }}</span> 뒤 {{ goalLabel }} 가능해요
       </p>
 
       <div class="mt-4 grid grid-cols-3 gap-2">
@@ -122,6 +126,15 @@
           <p class="mt-1 text-sm font-bold text-gray-900">{{ stat.value }}</p>
         </div>
       </div>
+
+      <button
+        v-if="canAdjust"
+        type="button"
+        class="mt-4 w-full rounded-xl border border-primary/25 bg-white px-4 py-3 text-sm font-bold text-primary transition-colors hover:bg-accent-light"
+        @click="emit('request-adjustment')"
+      >
+        계획 여유롭게 조정하기
+      </button>
     </div>
 
     <div
@@ -129,129 +142,93 @@
       class="mt-4 animate-fade-in-up rounded-2xl border border-gray-200 bg-white p-6"
       style="animation-delay: 175ms"
     >
-      <div class="flex items-center gap-2">
-        <span
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-          :class="adjustIconClass"
+      <div class="flex items-center justify-between gap-3">
+        <p class="text-xs text-gray-400">계획 조정</p>
+        <button
+          v-if="canCloseAdjustment"
+          type="button"
+          class="text-xs font-bold text-gray-500 underline decoration-gray-300 underline-offset-4 transition-colors hover:text-primary"
+          @click="emit('close-adjustment')"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="h-4 w-4"
-          >
-            <circle cx="12" cy="12" r="9" />
-            <path d="M12 11v5" />
-            <path d="M12 8h.01" />
-          </svg>
-        </span>
-        <p class="text-sm font-bold text-gray-900">{{ adjustTitle }}</p>
+          조정하지 않고 돌아가기
+        </button>
       </div>
-      <p class="mt-2 text-xs leading-relaxed text-gray-500">{{ adjustMessage }}</p>
+      <p class="mt-0.5 text-sm font-bold text-gray-900">{{ adjustTitle }}</p>
+      <p class="mt-1 text-xs leading-relaxed text-gray-500">{{ adjustMessage }}</p>
 
-      <div class="mt-4 space-y-2">
+      <div class="mt-4 space-y-3">
         <label
           v-for="alt in alternatives"
           :key="alt.key"
-          class="flex cursor-pointer items-center justify-between rounded-xl border p-3 transition-colors"
+          class="block cursor-pointer rounded-xl border p-4 transition-colors"
           :class="[
             selectedAlternative === alt.key
               ? 'border-primary bg-accent-light'
               : 'border-gray-200 bg-white hover:bg-gray-50',
-            isRecalculating ? 'pointer-events-none opacity-60' : '',
           ]"
-          @click.prevent="!isRecalculating && emit('update:selectedAlternative', alt.key)"
+          @click="emit('update:selectedAlternative', alt.key)"
         >
-          <span class="flex items-center gap-2">
-            <span class="flex h-5 w-5 shrink-0 items-center justify-center text-gray-400">
-              <svg
-                v-if="alt.key === 'period'"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="h-4 w-4"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7v5l3 3" />
-              </svg>
-              <svg
-                v-else
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="h-4 w-4"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M8 12h8" />
-              </svg>
-            </span>
-            <span>
-              <span class="block text-sm font-medium text-gray-900">{{ alt.label }}</span>
-              <span class="block text-xs text-gray-400">{{ alt.sublabel }}</span>
-            </span>
+          <span class="flex items-end justify-between gap-3">
+            <span class="text-sm font-medium text-gray-900">{{ alt.label }}</span>
+            <span class="text-xs font-bold text-primary">{{ alternativeValueLabel(alt.key) }}</span>
           </span>
-          <span
-            v-if="selectedAlternative === alt.key && isRecalculating"
-            class="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-300 border-t-primary"
-          />
-          <span
-            v-else-if="selectedAlternative === alt.key"
-            class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-white"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-3 w-3"
-            >
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
+
+          <span class="mt-4 block" @click.stop>
+            <span class="relative block h-2 w-full">
+              <span class="absolute inset-0 rounded-full bg-gray-200" />
+              <span
+                class="absolute inset-y-0 left-0 rounded-full bg-primary"
+                :style="{ width: alternativePercent(alt) + '%' }"
+              />
+              <input
+                :value="alternativeValue(alt.key)"
+                type="range"
+                :min="alt.min"
+                :max="alt.max"
+                :step="alt.step"
+                class="absolute inset-0 h-2 w-full cursor-pointer appearance-none bg-transparent [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:shadow [&::-moz-range-track]:bg-transparent [&::-webkit-slider-runnable-track]:bg-transparent [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow"
+                :aria-label="alt.label"
+                @input="handleAlternativeInput(alt.key, $event)"
+              />
+            </span>
+            <span class="mt-1 flex justify-between text-[11px] text-gray-400">
+              <span>{{ alt.minLabel }}</span>
+              <span>{{ alt.maxLabel }}</span>
+            </span>
           </span>
         </label>
       </div>
 
       <div
-        v-if="isRecalculating"
-        class="mt-4 flex items-center gap-2 rounded-xl bg-gray-50 p-4"
-      >
-        <span class="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-300 border-t-primary" />
-        <span class="text-xs text-gray-500">다시 계산하고 있어요...</span>
-      </div>
-
-      <div
-        v-else-if="recalculated"
-        class="mt-4 flex items-center justify-between rounded-xl p-4"
+        v-if="selectedAlternative"
+        class="relative mt-4 flex min-h-[82px] items-center justify-between rounded-xl p-4"
         :class="recalculatedBoxClass.bg"
       >
         <div>
-          <p class="text-xs text-gray-500">{{ recalculated.label }}</p>
+          <p class="mb-1 text-xs font-bold" :class="recalculatedBoxClass.value">
+            {{ recalculatedStatusMessage }}
+          </p>
+          <p class="text-xs text-gray-500">{{ recalculated?.label ?? '조정 결과' }}</p>
           <p class="mt-0.5 text-lg font-bold" :class="recalculatedBoxClass.value">
-            {{ recalculated.value }}
+            {{ recalculated?.value ?? '계산 중' }}
           </p>
         </div>
-        <div class="text-right">
+        <div v-if="recalculated" class="text-right">
           <p class="text-xs text-gray-500">{{ recalculated.sublabel }}</p>
           <p class="mt-0.5 text-sm font-bold text-gray-900">{{ recalculated.subvalue }}</p>
         </div>
+        <span
+          v-if="isRecalculating"
+          class="absolute right-4 top-4 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-primary"
+          aria-label="다시 계산하고 있어요"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { formatKRWCompact } from '@/shared/lib/money'
 
 /**
@@ -269,6 +246,7 @@ import { formatKRWCompact } from '@/shared/lib/money'
 
 const props = defineProps({
   availableLabel: { type: String, required: true },
+  availableHelp: { type: String, default: '' },
   availableAmount: { type: Number, required: true },
   requiredLabel: { type: String, required: true },
   requiredAmount: { type: Number, required: true },
@@ -276,11 +254,10 @@ const props = defineProps({
   statusTitle: { type: String, required: true },
   statusMessage: { type: String, default: '' },
 
-  forecastLabel: { type: String, default: '' },
-  forecastMessage: { type: String, default: '' },
   monthlyLabel: { type: String, default: '' },
   periodLabel: { type: String, default: '' },
   goalLabel: { type: String, default: '' },
+
   /** @type {import('vue').PropType<FeasibilityStat[]>} */
   stats: { type: Array, default: () => [] },
 
@@ -290,9 +267,44 @@ const props = defineProps({
   alternatives: { type: Array, default: () => [] },
   selectedAlternative: { type: String, default: '' },
   recalculated: { type: Object, default: null },
+  recalculatedStatus: { type: String, default: 'danger' },
   isRecalculating: { type: Boolean, default: false },
+  showAdjustment: { type: Boolean, default: false },
+  canAdjust: { type: Boolean, default: false },
+  canCloseAdjustment: { type: Boolean, default: false },
+  periodExtension: { type: Number, default: 12 },
+  amountReduction: { type: Number, default: 20 },
 })
-const emit = defineEmits(['update:selectedAlternative'])
+const isAvailableHelpOpen = ref(false)
+const emit = defineEmits([
+  'update:selectedAlternative',
+  'update:periodExtension',
+  'update:amountReduction',
+  'request-adjustment',
+  'close-adjustment',
+])
+
+function alternativeValue(key) {
+  return key === 'period' ? props.periodExtension : props.amountReduction
+}
+
+function alternativeValueLabel(key) {
+  if (key === 'period') return `+${props.periodExtension}개월`
+  if (key === 'extra_capacity') return `+${props.amountReduction}만원`
+  return `-${props.amountReduction}%`
+}
+
+function alternativePercent(alternative) {
+  const range = alternative.max - alternative.min
+  if (range <= 0) return 0
+  return ((alternativeValue(alternative.key) - alternative.min) / range) * 100
+}
+
+function handleAlternativeInput(key, event) {
+  const value = Number(event.target.value)
+  emit('update:selectedAlternative', key)
+  emit(key === 'period' ? 'update:periodExtension' : 'update:amountReduction', value)
+}
 
 const STATUS_CLASS = {
   success: {
@@ -321,19 +333,19 @@ const statusBarClass = computed(() => statusClass.value.bar)
 const statusBadgeBgClass = computed(() => statusClass.value.badgeBg)
 const statusIconBgClass = computed(() => statusClass.value.iconBg)
 
-const ADJUST_ICON_CLASS = {
-  warning: 'bg-amber-50 text-amber-500',
-  danger: 'bg-red-50 text-red-500',
-}
-const adjustIconClass = computed(() => ADJUST_ICON_CLASS[props.status] ?? ADJUST_ICON_CLASS.danger)
-
 const RECALCULATED_BOX_CLASS = {
+  success: { bg: 'bg-accent-light', value: 'text-primary' },
   warning: { bg: 'bg-amber-50', value: 'text-amber-600' },
   danger: { bg: 'bg-red-50', value: 'text-red-600' },
 }
 const recalculatedBoxClass = computed(
-  () => RECALCULATED_BOX_CLASS[props.status] ?? RECALCULATED_BOX_CLASS.danger
+  () => RECALCULATED_BOX_CLASS[props.recalculatedStatus] ?? RECALCULATED_BOX_CLASS.danger
 )
+const recalculatedStatusMessage = computed(() => {
+  if (props.recalculatedStatus === 'success') return '이 계획이면 달성 가능해요'
+  if (props.recalculatedStatus === 'warning') return '조금 빠듯하지만 진행할 수 있어요'
+  return '조금 더 조정해 주세요'
+})
 
 const availableValueLabel = computed(() => formatKRWCompact(props.availableAmount))
 const requiredValueLabel = computed(() => formatKRWCompact(props.requiredAmount))
