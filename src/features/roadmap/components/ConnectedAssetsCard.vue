@@ -21,13 +21,15 @@
             {{ asset.bankName }} {{ asset.accountNumberMasked }}
           </p>
         </div>
-        <p class="shrink-0 text-xs font-bold text-[#0a192f]">{{ formatManwon(asset.balance) }}</p>
+        <p class="shrink-0 text-xs font-bold text-[#0a192f]">
+          {{ formatKRWCompact(asset.balance) }}
+        </p>
       </div>
     </div>
 
     <div class="mt-2 flex items-center justify-between border-t border-slate-100 pt-2.5">
       <span class="text-xs text-slate-500">합계 잔액</span>
-      <span class="text-xs font-black text-[#0a192f]">{{ formatManwon(totalBalance) }}</span>
+      <span class="text-xs font-black text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</span>
     </div>
   </button>
 
@@ -52,7 +54,7 @@
 
     <div class="mt-2 flex flex-col gap-0.5 border-t border-slate-100 pt-2">
       <span class="text-[11px] text-slate-500">합계 잔액</span>
-      <span class="text-lg font-black text-[#0a192f]">{{ formatManwon(totalBalance) }}</span>
+      <span class="text-lg font-black text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</span>
     </div>
   </button>
 </template>
@@ -61,6 +63,7 @@
 import { computed } from 'vue'
 import moneyBoxIcon from '@/assets/icons/money-box.svg'
 import bankAccountIcon from '@/assets/icons/bank-account.svg'
+import { formatKRWCompact } from '@/shared/lib/money'
 
 const props = defineProps({
   assets: {
@@ -81,10 +84,6 @@ const totalBalance = computed(() =>
 
 function assetIcon(assetType) {
   return assetType === 'MONEY_BOX' ? moneyBoxIcon : bankAccountIcon
-}
-
-function formatManwon(amount) {
-  return `${Math.round(amount / 10000).toLocaleString()}만원`
 }
 
 // 모바일 축약형: 자산명이 길어 글씨가 깨지는 것을 막기 위해 첫 단어 그룹만 노출

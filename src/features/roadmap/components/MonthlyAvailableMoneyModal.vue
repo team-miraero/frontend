@@ -9,7 +9,7 @@
       <div>
         <p class="text-xs font-bold text-slate-400">📅 이번 달 여유자금</p>
         <p class="pt-1 text-2xl font-black tracking-[-0.72px] text-[#0a192f]">
-          {{ formatWon(monthly.availableMoney) }}
+          {{ formatKRW(monthly.availableMoney) }}
         </p>
       </div>
       <button
@@ -36,7 +36,7 @@
               class="shrink-0 whitespace-nowrap text-sm font-black"
               :class="row.sign === '+' ? 'text-emerald-600' : 'text-rose-500'"
             >
-              {{ row.sign }} {{ formatWon(row.amount) }}
+              {{ row.sign }} {{ formatKRW(row.amount) }}
             </p>
           </div>
           <div v-if="index < rows.length - 1" class="my-3 h-px w-full bg-slate-100" />
@@ -47,7 +47,7 @@
         class="flex items-center justify-between rounded-2xl border border-slate-200 bg-[#f4f8ff] px-5 py-4"
       >
         <p class="text-sm font-bold text-[#0a192f]">이번 달 여유자금</p>
-        <p class="text-lg font-black text-[#0a192f]">= {{ formatWon(monthly.availableMoney) }}</p>
+        <p class="text-lg font-black text-[#0a192f]">= {{ formatKRW(monthly.availableMoney) }}</p>
       </div>
 
       <div>
@@ -71,6 +71,7 @@
 <script setup>
 import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import { formatKRW } from '@/shared/lib/money'
 
 const props = defineProps({
   modelValue: {
@@ -126,8 +127,4 @@ const progress = computed(() => {
     ),
   }
 })
-
-function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
-}
 </script>

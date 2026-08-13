@@ -84,7 +84,7 @@
         >
           <span class="text-[11px] font-black text-primary">오늘</span>
           <span class="pt-1 text-base font-black text-[#0a192f]">
-            {{ formatWon(dailyAvailableMoney.todayAvailableMoney) }}
+            {{ formatKRW(dailyAvailableMoney.todayAvailableMoney) }}
           </span>
         </button>
         <button
@@ -95,7 +95,7 @@
         >
           <span class="text-[11px] font-black text-primary">이번 달</span>
           <span class="pt-1 text-base font-black text-[#0a192f]">
-            {{ formatWon(monthlyAvailableMoney.availableMoney) }}
+            {{ formatKRW(monthlyAvailableMoney.availableMoney) }}
           </span>
         </button>
       </div>
@@ -129,6 +129,7 @@
 <script setup>
 import { computed } from 'vue'
 import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
+import { formatKRW } from '@/shared/lib/money'
 
 const props = defineProps({
   pace: {
@@ -172,8 +173,5 @@ const ringOffset = computed(() => ringCircumference * (1 - props.progressRate / 
 
 function formatManwon(amount) {
   return Math.round(amount / 10000).toLocaleString()
-}
-function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
 }
 </script>

@@ -9,7 +9,7 @@
       <div>
         <p class="text-xs font-bold text-slate-400">☀️ 오늘의 여유자금</p>
         <p class="pt-1 text-2xl font-black tracking-[-0.72px] text-primary">
-          {{ formatWon(daily.todayAvailableMoney) }}
+          {{ formatKRW(daily.todayAvailableMoney) }}
         </p>
       </div>
       <button
@@ -33,7 +33,7 @@
               <p class="pt-0.5 text-xs text-slate-400">{{ row.caption }}</p>
             </div>
             <p class="shrink-0 whitespace-nowrap text-sm font-black" :class="row.colorClass">
-              {{ formatWon(row.amount) }}
+              {{ formatKRW(row.amount) }}
             </p>
           </div>
           <div v-if="index < rows.length - 1" class="my-3 h-px w-full bg-slate-100" />
@@ -44,7 +44,7 @@
         class="flex items-center justify-between rounded-2xl border border-primary/20 bg-[#eaf2ff] px-5 py-4"
       >
         <p class="text-sm font-bold text-[#0a192f]">오늘의 여유자금</p>
-        <p class="text-lg font-black text-primary">{{ formatWon(daily.todayAvailableMoney) }}</p>
+        <p class="text-lg font-black text-primary">{{ formatKRW(daily.todayAvailableMoney) }}</p>
       </div>
 
       <p class="text-xs leading-[19.5px] text-slate-400">
@@ -57,6 +57,7 @@
 <script setup>
 import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import { formatKRW } from '@/shared/lib/money'
 
 const props = defineProps({
   modelValue: {
@@ -84,8 +85,4 @@ const rows = computed(() => [
     colorClass: 'text-emerald-600',
   },
 ])
-
-function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
-}
 </script>

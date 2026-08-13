@@ -41,13 +41,13 @@
           </div>
           <div class="text-right">
             <p v-if="row.balance != null" class="text-sm font-black text-[#0a192f]">
-              {{ formatManwon(row.balance) }}
+              {{ formatKRWCompact(row.balance) }}
             </p>
             <p
               class="pt-0.5 text-xs font-bold"
               :class="row.isLoan ? 'text-rose-500' : 'text-primary'"
             >
-              월 {{ formatWon(row.autoTransfer.amount) }}
+              월 {{ formatKRW(row.autoTransfer.amount) }}
             </p>
           </div>
         </div>
@@ -84,11 +84,11 @@
     <div class="flex items-center justify-between border-t border-slate-100 bg-[#f8fbff] px-7 py-4">
       <div>
         <p class="text-xs text-slate-500">합계 잔액</p>
-        <p class="pt-0.5 text-sm font-black text-[#0a192f]">{{ formatManwon(totalBalance) }}</p>
+        <p class="pt-0.5 text-sm font-black text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</p>
       </div>
       <div class="text-right">
         <p class="text-xs text-slate-500">월 자동이체 합계</p>
-        <p class="pt-0.5 text-sm font-black text-primary">{{ formatWon(totalAutoTransfer) }}</p>
+        <p class="pt-0.5 text-sm font-black text-primary">{{ formatKRW(totalAutoTransfer) }}</p>
       </div>
     </div>
   </BaseModal>
@@ -99,6 +99,7 @@ import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
 import moneyBoxIcon from '@/assets/icons/money-box.svg'
 import bankAccountIcon from '@/assets/icons/bank-account.svg'
+import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
 
 const props = defineProps({
   modelValue: {
@@ -162,12 +163,5 @@ function computeMaturityCountdown(maturityDate) {
 
 function formatDate(yyyyMMdd) {
   return yyyyMMdd.replaceAll('-', '.')
-}
-
-function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
-}
-function formatManwon(amount) {
-  return `${Math.round(amount / 10000).toLocaleString()}만원`
 }
 </script>

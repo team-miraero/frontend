@@ -20,7 +20,7 @@
           <p
             class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap"
           >
-            {{ formatWon(daily.todayAvailableMoney) }}
+            {{ formatKRW(daily.todayAvailableMoney) }}
           </p>
         </div>
         <p class="pt-1 text-[10px] leading-tight text-slate-400 sm:text-xs">
@@ -43,7 +43,7 @@
           <p
             class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap"
           >
-            {{ formatWon(monthly.availableMoney) }}
+            {{ formatKRW(monthly.availableMoney) }}
           </p>
         </div>
         <p class="pt-1 text-[10px] leading-tight text-slate-400 sm:text-xs">
@@ -55,6 +55,7 @@
 </template>
 
 <script setup>
+import { formatKRW } from '@/shared/lib/money'
 defineProps({
   monthly: {
     type: Object,
@@ -66,8 +67,4 @@ defineProps({
   },
 })
 defineEmits(['open-today', 'open-month'])
-
-function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
-}
 </script>
