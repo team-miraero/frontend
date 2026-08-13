@@ -5,6 +5,9 @@ import * as roadmapApi from '@/features/roadmap/api/roadmap.api'
 
 export const useRoadmapStore = defineStore('feature-roadmap', () => {
   const milestones = ref([])
+  const isLoading = ref(false)
+  const error = ref(null)
+  let milestonesRequestId = 0
 
   const nextMilestone = computed(
     () => milestones.value.find((milestone) => milestone.status === 'IN_PROGRESS') ?? null
@@ -22,8 +25,25 @@ export const useRoadmapStore = defineStore('feature-roadmap', () => {
    * @param {number} goalId
    */
   async function fetchMilestones(goalId) {
-    milestones.value = await roadmapApi.getMilestones(goalId)
+    const requestId = ++milestonesRequestId
+    isLoading.value = true
+    error.value = null
+    milestones.value = []
+    try {
+      const fetchedMilestones = await roadmapApi.getMilestones(goalId)
+      if (requestId !== milestonesRequestId) return null
+
+      milestones.value = fetchedMilestones
+      return fetchedMilestones
+    } catch (caughtError) {
+      if (requestId !== milestonesRequestId) return null
+
+      error.value = caughtError
+      throw caughtError
+    } finally {
+      if (requestId === milestonesRequestId) isLoading.value = false
+    }
   }
 
-  return { milestones, nextMilestone, previousMilestone, fetchMilestones }
+  return { milestones, nextMilestone, previousMilestone, isLoading, error, fetchMilestones }
 })
