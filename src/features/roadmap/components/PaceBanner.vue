@@ -1,10 +1,16 @@
 <!-- 페이스 히어로 배너: 배지 + 헤드라인 + 페이스 3항목 + CTA / 오늘·이번달 여유자금 + 우측 원형 달성률 게이지 -->
 <template>
-  <div class="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+  <div
+    class="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+  >
     <div class="flex flex-1 flex-col gap-2.5">
       <span
         class="inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold"
-        :style="{ backgroundColor: theme.badgeBg, borderColor: theme.badgeBorder, color: theme.badgeText }"
+        :style="{
+          backgroundColor: theme.badgeBg,
+          borderColor: theme.badgeBorder,
+          color: theme.badgeText,
+        }"
       >
         오늘의 페이스
       </span>
@@ -17,23 +23,29 @@
         {{ paceStatusLabel }}!
       </p>
 
-      <div class="flex w-fit flex-wrap divide-x divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+      <div
+        class="flex w-fit flex-wrap divide-x divide-slate-200 rounded-2xl border border-slate-200 bg-white"
+      >
         <div class="flex flex-col gap-0.5 px-4 py-2">
           <span class="text-[11px] font-bold text-slate-400">현재 페이스</span>
           <span class="text-base font-black tracking-[-0.36px] text-[#0a192f]">
-            {{ formatManwon(currentAmount) }}<span class="text-xs font-bold text-slate-400">만원</span>
+            {{ formatManwon(currentAmount)
+            }}<span class="text-xs font-bold text-slate-400">만원</span>
           </span>
         </div>
         <div class="flex flex-col gap-0.5 px-4 py-2">
           <span class="text-[11px] font-bold text-slate-400">목표 페이스</span>
           <span class="text-base font-black tracking-[-0.36px] text-[#0a192f]">
-            {{ formatManwon(pace.expectedAmount) }}<span class="text-xs font-bold text-slate-400">만원</span>
+            {{ formatManwon(pace.expectedAmount)
+            }}<span class="text-xs font-bold text-slate-400">만원</span>
           </span>
         </div>
         <div class="flex flex-col gap-0.5 px-4 py-2">
           <span class="text-[11px] font-bold text-slate-400">페이스 차이</span>
           <span class="text-base font-black tracking-[-0.36px]" :style="{ color: theme.badgeText }">
-            {{ pace.paceStatus === 'BEHIND' ? '-' : '+' }}{{ formatManwon(Math.abs(pace.differenceAmount)) }}<span class="text-xs font-bold text-slate-400">만원</span>
+            {{ pace.paceStatus === 'BEHIND' ? '-' : '+'
+            }}{{ formatManwon(Math.abs(pace.differenceAmount))
+            }}<span class="text-xs font-bold text-slate-400">만원</span>
           </span>
         </div>
       </div>
@@ -72,7 +84,7 @@
         >
           <span class="text-[11px] font-black text-primary">오늘</span>
           <span class="pt-1 text-base font-black text-[#0a192f]">
-            {{ formatWon(dailyAvailableMoney.availableMoney) }}
+            {{ formatKRW(dailyAvailableMoney.todayAvailableMoney) }}
           </span>
         </button>
         <button
@@ -83,7 +95,7 @@
         >
           <span class="text-[11px] font-black text-primary">이번 달</span>
           <span class="pt-1 text-base font-black text-[#0a192f]">
-            {{ formatWon(monthlyAvailableMoney.availableMoney) }}
+            {{ formatKRW(monthlyAvailableMoney.availableMoney) }}
           </span>
         </button>
       </div>
@@ -104,7 +116,9 @@
           />
         </svg>
         <div class="absolute flex flex-col items-center">
-          <span class="text-xl font-black tracking-[-0.5px] text-[#0a192f]">{{ progressRate }}%</span>
+          <span class="text-xl font-black tracking-[-0.5px] text-[#0a192f]"
+            >{{ progressRate }}%</span
+          >
           <span class="text-[10px] text-slate-400">전체 달성률</span>
         </div>
       </div>
@@ -115,6 +129,7 @@
 <script setup>
 import { computed } from 'vue'
 import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
+import { formatKRW } from '@/shared/lib/money'
 
 const props = defineProps({
   pace: {
@@ -135,7 +150,7 @@ const props = defineProps({
   },
   dailyAvailableMoney: {
     type: Object,
-    default: null, // { availableMoney }
+    default: null, // { todayAvailableMoney, todayExpense, remainingAvailableMoney }
   },
   monthlyAvailableMoney: {
     type: Object,
@@ -158,8 +173,5 @@ const ringOffset = computed(() => ringCircumference * (1 - props.progressRate / 
 
 function formatManwon(amount) {
   return Math.round(amount / 10000).toLocaleString()
-}
-function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
 }
 </script>

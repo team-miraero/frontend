@@ -12,11 +12,15 @@ export function formatKoreanNumber(value) {
 
 /**
  * 숫자를 "1,234,000원" 형태의 원화 문자열로 변환한다.
+ * formatKRWCompact과 동일하게 값이 비어 있으면 '0원'을 반환한다. (기존에는 'NaN원'이 노출됐음)
  * @param {number} amount
  * @returns {string}
  */
 export function formatKRW(amount) {
-  return `${formatKoreanNumber(amount)}원`
+  if (amount === undefined || amount === null || Number.isNaN(Number(amount))) {
+    return '0원'
+  }
+  return `${formatKoreanNumber(Number(amount))}원`
 }
 
 /**
@@ -39,7 +43,12 @@ export function formatKRWCompact(amount) {
  * @returns {string}
  */
 export function formatKRWReadable(amount) {
-  if (amount === undefined || amount === null || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
+  if (
+    amount === undefined ||
+    amount === null ||
+    Number.isNaN(Number(amount)) ||
+    Number(amount) <= 0
+  ) {
     return '0원'
   }
 

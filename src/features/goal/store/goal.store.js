@@ -48,6 +48,10 @@ export const useGoalStore = defineStore('feature-goal', () => {
   const monthlyAvailableMoney = ref(null)
   const dailyAvailableMoney = ref(null)
   const isLoading = ref(false)
+  const dashboardError = ref(null)
+  const dashboardSupplementaryErrors = ref({})
+  const isSupplementaryLoading = ref(false)
+  let dashboardRequestId = 0
 
   /**
    * 사용자가 선택한 목표 ID를 설정합니다.
@@ -232,23 +236,72 @@ export const useGoalStore = defineStore('feature-goal', () => {
   }
 
   /**
+   * 대시보드 부가 정보(자산·여유자금)만 조회한다.
+   * 목표 상세와 달리 셋 중 하나가 실패해도 나머지는 채우고, 실패한 항목만 에러로 남긴다.
+   * 목표 상세(currentGoal)는 건드리지 않으므로 화면을 비우지 않고 제자리에서 다시 채울 수 있다.
    * @param {number} goalId
+   * @param {number} [requestId] fetchDashboardData가 넘긴 요청 식별자 (단독 호출 시 현재 값 사용)
    */
-  async function fetchDashboardData(goalId) {
-    isLoading.value = true
+  async function fetchSupplementaryDashboardData(goalId, requestId = dashboardRequestId) {
+    isSupplementaryLoading.value = true
+
     try {
-      const [goal, goalAssets, monthlyMoney, dailyMoney] = await Promise.all([
-        goalApi.getGoalDetail(goalId),
+      const [assetsResult, monthlyResult, dailyResult] = await Promise.allSettled([
         goalApi.getGoalAssets(goalId),
         goalApi.getMonthlyAvailableMoney(goalId),
         goalApi.getDailyAvailableMoney(goalId),
       ])
-      currentGoal.value = goal
-      assets.value = goalAssets
-      monthlyAvailableMoney.value = monthlyMoney
-      dailyAvailableMoney.value = dailyMoney
+      if (requestId !== dashboardRequestId) return
+
+      const supplementaryErrors = {}
+
+      if (assetsResult.status === 'fulfilled') assets.value = assetsResult.value
+      else supplementaryErrors.assets = assetsResult.reason
+
+      if (monthlyResult.status === 'fulfilled') monthlyAvailableMoney.value = monthlyResult.value
+      else supplementaryErrors.monthlyAvailableMoney = monthlyResult.reason
+
+      if (dailyResult.status === 'fulfilled') dailyAvailableMoney.value = dailyResult.value
+      else supplementaryErrors.dailyAvailableMoney = dailyResult.reason
+
+      dashboardSupplementaryErrors.value = supplementaryErrors
     } finally {
+      if (requestId === dashboardRequestId) isSupplementaryLoading.value = false
+    }
+  }
+
+  /**
+   * @param {number} goalId
+   */
+  async function fetchDashboardData(goalId) {
+    const requestId = ++dashboardRequestId
+    isLoading.value = true
+    dashboardError.value = null
+    dashboardSupplementaryErrors.value = {}
+    currentGoal.value = null
+    assets.value = []
+    monthlyAvailableMoney.value = null
+    dailyAvailableMoney.value = null
+
+    try {
+      const goal = await goalApi.getGoalDetail(goalId)
+      if (requestId !== dashboardRequestId) return null
+
+      currentGoal.value = goal
       isLoading.value = false
+
+      // 목표 상세가 도착하면 대시보드를 먼저 노출하고 부가 정보는 뒤에서 채운다.
+      // 부가 API 하나가 느리거나 실패해도 대시보드 본문 렌더링을 막지 않는다.
+      fetchSupplementaryDashboardData(goalId, requestId)
+
+      return goal
+    } catch (caughtError) {
+      if (requestId !== dashboardRequestId) return null
+
+      dashboardError.value = caughtError
+      throw caughtError
+    } finally {
+      if (requestId === dashboardRequestId) isLoading.value = false
     }
   }
 
@@ -269,19 +322,16 @@ export const useGoalStore = defineStore('feature-goal', () => {
   }
 
   /**
-   * @param {'ACTIVE' | 'PAUSE'} status
+   * @param {'ACTIVE' | 'PAUSED'} status
    */
   async function updateCurrentGoalStatus(status) {
     if (!currentGoal.value) return
-    const result = await goalApi.updateGoalStatus(currentGoal.value.goalId, status)
-    if (currentGoal.value) {
-      currentGoal.value.status = result.status
-    }
-    const targetGoal = goals.value.find(
-      (g) => String(g.goalId) === String(currentGoal.value.goalId)
-    )
+    const goalId = currentGoal.value.goalId
+    await goalApi.updateGoalStatus(goalId, status)
+    currentGoal.value.status = status
+    const targetGoal = goals.value.find((g) => String(g.goalId) === String(goalId))
     if (targetGoal) {
-      targetGoal.status = result.status
+      targetGoal.status = status
     }
   }
 
@@ -318,12 +368,16 @@ export const useGoalStore = defineStore('feature-goal', () => {
     monthlyAvailableMoney,
     dailyAvailableMoney,
     isLoading,
+    dashboardError,
+    dashboardSupplementaryErrors,
+    isSupplementaryLoading,
     selectGoal,
     selectGoalPreset,
     moveToNextStep,
     resetGoalStore,
     fetchGoals,
     fetchDashboardData,
+    fetchSupplementaryDashboardData,
     updateGoal,
     updateCurrentGoalStatus,
     fetchFeasibility,

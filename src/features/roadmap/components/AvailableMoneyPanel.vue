@@ -12,10 +12,15 @@
       >
         <div>
           <div class="flex items-center justify-between">
-            <span class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap">☀️ 오늘</span>
+            <span
+              class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap"
+              >☀️ 오늘</span
+            >
           </div>
-          <p class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap">
-            {{ formatWon(daily.availableMoney) }}
+          <p
+            class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap"
+          >
+            {{ formatKRW(daily.todayAvailableMoney) }}
           </p>
         </div>
         <p class="pt-1 text-[10px] leading-tight text-slate-400 sm:text-xs">
@@ -30,10 +35,15 @@
       >
         <div>
           <div class="flex items-center justify-between">
-            <span class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap">📅 이번 달</span>
+            <span
+              class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap"
+              >📅 이번 달</span
+            >
           </div>
-          <p class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap">
-            {{ formatWon(monthly.availableMoney) }}
+          <p
+            class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap"
+          >
+            {{ formatKRW(monthly.availableMoney) }}
           </p>
         </div>
         <p class="pt-1 text-[10px] leading-tight text-slate-400 sm:text-xs">
@@ -45,6 +55,7 @@
 </template>
 
 <script setup>
+import { formatKRW } from '@/shared/lib/money'
 defineProps({
   monthly: {
     type: Object,
@@ -56,8 +67,4 @@ defineProps({
   },
 })
 defineEmits(['open-today', 'open-month'])
-
-function formatWon(amount) {
-  return `${amount.toLocaleString()}원`
-}
 </script>

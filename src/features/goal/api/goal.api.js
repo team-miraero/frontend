@@ -147,7 +147,7 @@ export async function getGoals() {
  * @property {number} startAmount
  * @property {number} progressRate
  * @property {{ goalMonths: number, startDate: string, endDate: string, remainMonths: number }} period
- * @property {'ACTIVE' | 'PAUSE' | 'PAUSED' | 'COMPLETED'} status
+ * @property {'ACTIVE' | 'PAUSED' | 'COMPLETED'} status
  * @property {{ expectedAmount: number, differenceAmount: number, paceStatus: 'AHEAD' | 'ON_TRACK' | 'BEHIND' }} pace
  */
 
@@ -157,7 +157,26 @@ export async function getGoals() {
  */
 export async function getGoalDetail(goalId) {
   const { data: responseBody } = await client.get(`/goals/${goalId}`)
-  return unwrapApiData(responseBody)
+  const goal = unwrapApiData(responseBody)
+
+  return {
+    ...goal,
+    goalAmount: Number(goal.goalAmount ?? 0),
+    currentAmount: Number(goal.currentAmount ?? 0),
+    startAmount: Number(goal.startAmount ?? 0),
+    progressRate: Number(goal.progressRate ?? 0),
+    period: {
+      goalMonths: Number(goal.period?.goalMonths ?? 0),
+      startDate: goal.period?.startDate ?? '',
+      endDate: goal.period?.endDate ?? '',
+      remainMonths: Number(goal.period?.remainMonths ?? 0),
+    },
+    pace: {
+      expectedAmount: Number(goal.pace?.expectedAmount ?? 0),
+      differenceAmount: Number(goal.pace?.differenceAmount ?? 0),
+      paceStatus: goal.pace?.paceStatus ?? 'ON_TRACK',
+    },
+  }
 }
 
 /**
@@ -209,7 +228,37 @@ export async function linkAssetsToGoal(goalId, assets) {
 export async function getGoalAssets(goalId) {
   const { data: responseBody } = await client.get(`/goals/${goalId}/assets`)
   const unwrapped = unwrapApiData(responseBody)
-  return unwrapped?.assets ?? (Array.isArray(unwrapped) ? unwrapped : [])
+  const assets = unwrapped?.assets ?? (Array.isArray(unwrapped) ? unwrapped : [])
+
+  return assets.map((asset) => {
+    const fallbackName =
+      asset.assetType === 'MONEY_BOX'
+        ? '미래로 저금통'
+        : asset.assetType === 'LOAN'
+          ? '대출 계좌'
+          : '연결 계좌'
+
+    return {
+      ...asset,
+      assetName: asset.assetName?.trim() || fallbackName,
+      bankName: asset.bankName?.trim() || '',
+      accountNumberMasked: asset.accountNumberMasked?.trim() || '',
+      balance: Number(asset.balance ?? 0),
+      // 객체 자체뿐 아니라 내부 필드까지 채워야 화면에서 별도 방어 없이 그대로 쓸 수 있다.
+      assetDetail: asset.assetDetail
+        ? {
+            ...asset.assetDetail,
+            interestRate: Number(asset.assetDetail.interestRate ?? 0),
+            maturityDate: asset.assetDetail.maturityDate ?? null,
+          }
+        : null,
+      autoTransfer: {
+        amount: Number(asset.autoTransfer?.amount ?? 0),
+        transferDay: asset.autoTransfer?.transferDay ?? null,
+        withdrawalAccount: asset.autoTransfer?.withdrawalAccount ?? null,
+      },
+    }
+  })
 }
 
 /**
@@ -259,41 +308,60 @@ export async function getGoalLinkedAssets(goalId) {
 }
 
 /**
- * @typedef {Object} AvailableMoneyBreakdown
+ * @typedef {Object} MonthlyAvailableMoneyView
  * @property {number} income
  * @property {number} fixedExpense
  * @property {number} targetGoalAutoTransfer
  * @property {number} otherGoalAutoTransfer
  * @property {number} variableExpense
  * @property {number} availableMoney
+ * @property {number} elapsedDays
+ * @property {number} remainingDays
+ * @property {number} periodDays
  */
 
 // 월 여유자금 조회 API
 /**
  * @param {number} goalId
- * @returns {Promise<AvailableMoneyBreakdown>}
+ * @returns {Promise<MonthlyAvailableMoneyView>}
  */
 export async function getMonthlyAvailableMoney(goalId) {
-  const { data: responseBody } = await client.get(`/goals/${goalId}/monthly-available`)
+  const { data: responseBody } = await client.get(`/goals/${goalId}/available-money/monthly`)
   const data = unwrapApiData(responseBody)
-  return data?.monthly ?? data
+
+  return {
+    income: Number(data.monthlyIncome ?? 0),
+    fixedExpense: Number(data.fixedExpense ?? 0),
+    variableExpense: Number(data.variableExpense ?? 0),
+    targetGoalAutoTransfer: Number(data.targetGoalAutoTransfer ?? 0),
+    otherGoalAutoTransfer: Number(data.otherGoalAutoTransfer ?? 0),
+    availableMoney: Number(data.monthlyAvailableMoney ?? 0),
+    elapsedDays: Number(data.elapsedDays ?? 0),
+    remainingDays: Number(data.remainingDays ?? 0),
+    periodDays: Number(data.periodDays ?? 0),
+  }
 }
 
 // 일 여유자금 조회 API
 /**
  * @param {number} goalId
- * @returns {Promise<AvailableMoneyBreakdown>}
+ * @returns {Promise<{ todayAvailableMoney: number, todayExpense: number, remainingAvailableMoney: number }>}
  */
 export async function getDailyAvailableMoney(goalId) {
-  const { data: responseBody } = await client.get(`/goals/${goalId}/daily-available`)
+  const { data: responseBody } = await client.get(`/goals/${goalId}/available-money/daily`)
   const data = unwrapApiData(responseBody)
-  return data?.daily ?? data
+
+  return {
+    todayAvailableMoney: Number(data.todayAvailableMoney ?? 0),
+    todayExpense: Number(data.todayExpense ?? 0),
+    remainingAvailableMoney: Number(data.remainingAvailableMoney ?? 0),
+  }
 }
 
 /**
  * @param {number} goalId
- * @param {'ACTIVE' | 'PAUSE'} status
- * @returns {Promise<{ goalId: number, status: string, changedAt: string }>}
+ * @param {'ACTIVE' | 'PAUSED'} status
+ * @returns {Promise<void>}
  */
 export async function updateGoalStatus(goalId, status) {
   const { data: responseBody } = await client.patch(`/goals/${goalId}/status`, { status })

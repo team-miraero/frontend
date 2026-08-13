@@ -58,7 +58,11 @@
 
           <p
             class="pt-2 text-sm font-black tracking-[-0.3px]"
-            :class="milestone.status === 'COMPLETED' || milestone.status === 'IN_PROGRESS' ? 'text-primary' : 'text-slate-400'"
+            :class="
+              milestone.status === 'COMPLETED' || milestone.status === 'IN_PROGRESS'
+                ? 'text-primary'
+                : 'text-slate-400'
+            "
           >
             {{ formatManwon(milestone.targetAmount) }}원
           </p>
@@ -91,19 +95,25 @@
               />
             </div>
             <p class="pt-1 text-[10px] font-bold text-primary">
-              현재 {{ formatManwon(goal.currentAmount) }}원 ({{ segmentProgress(milestone, index) }}%)
+              현재 {{ formatManwon(goal.currentAmount) }}원 ({{
+                segmentProgress(milestone, index)
+              }}%)
             </p>
-            <p class="text-[10px] text-primary/70">{{ formatManwon(remainingToNext(milestone)) }} 남음</p>
+            <p class="text-[10px] text-primary/70">
+              {{ formatManwon(remainingToNext(milestone)) }} 남음
+            </p>
           </div>
 
           <p
             class="pt-2 text-[10px]"
             :class="milestone.status === 'COMPLETED' ? 'text-primary/60' : 'text-slate-400'"
           >
-            {{ milestone.status === 'COMPLETED' ? '기록 ' : '' }}{{ milestone.targetDate }}
+            <template v-if="milestone.targetDate">달성 {{ milestone.targetDate }}</template>
+            <template v-else>{{ milestone.percentage }}% 체크포인트</template>
           </p>
 
           <p
+            v-if="milestone.title"
             class="pt-1 text-[11px] font-bold"
             :class="milestone.status === 'COMPLETED' ? 'text-slate-700' : 'text-slate-400'"
           >
