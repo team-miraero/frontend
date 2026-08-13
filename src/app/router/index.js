@@ -9,6 +9,14 @@ const PUBLIC_ROUTE_NAMES = new Set([ROUTE_NAMES.ONBOARDING, ROUTE_NAMES.LOGIN, R
 export const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    // 목표 선택에서 구체화 화면으로 진입할 때는 이전 화면의 스크롤 위치를 이어받지 않는다.
+    if (from.name === ROUTE_NAMES.GOAL_SELECT && to.name === ROUTE_NAMES.GOAL_DETAIL) {
+      return { left: 0, top: 0 }
+    }
+
+    return savedPosition ?? { left: 0, top: 0 }
+  },
 })
 
 if (typeof window !== 'undefined') {

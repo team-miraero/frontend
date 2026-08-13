@@ -1,6 +1,6 @@
 <!-- 목표설정 퍼널(GOAL-02) 공용 금액 입력 카드: 큰 숫자 입력 + 단위 + 선택적 배지/설명/프리셋 칩 -->
 <template>
-  <div class="w-full rounded-3xl border border-accent/50 bg-accent-light/70 p-8 shadow-sm">
+  <div class="w-full rounded-3xl border border-accent/50 bg-accent-light/70 p-5 shadow-sm sm:p-8">
     <div class="flex items-center justify-between">
       <p class="text-base font-bold text-gray-900">{{ label }}</p>
       <span
@@ -21,19 +21,25 @@
         :value="formattedValue"
         @input="handleInput"
       />
-      <span class="absolute inset-y-0 right-5 flex items-center text-base font-medium text-gray-400">
+      <span
+        class="absolute inset-y-0 right-5 flex items-center text-base font-medium text-gray-400"
+      >
         {{ unit }}
       </span>
     </div>
 
     <p v-if="caption" class="mt-2 text-xs font-semibold text-primary">{{ caption }}</p>
 
-    <div v-if="presets.length" class="mt-4 flex w-full gap-2">
+    <div
+      v-if="presets.length"
+      class="mt-4 grid w-full gap-1.5 sm:gap-2"
+      :style="{ gridTemplateColumns: `repeat(${presets.length}, minmax(0, 1fr))` }"
+    >
       <button
         v-for="preset in presets"
         :key="preset.value"
         type="button"
-        class="inline-flex min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full border px-1.5 py-2.5 text-center text-xs font-semibold transition-all shadow-sm"
+        class="inline-flex min-w-0 items-center justify-center whitespace-nowrap rounded-full border px-1 py-2.5 text-center text-[11px] font-semibold shadow-sm transition-all sm:px-1.5 sm:text-xs"
         :class="
           modelValue === preset.value
             ? 'border-primary bg-primary text-white'

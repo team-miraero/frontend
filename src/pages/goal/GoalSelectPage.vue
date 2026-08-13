@@ -19,10 +19,10 @@
 
       <p class="mt-4 text-xs font-bold text-primary">STEP 1 — 목표 선택</p>
 
-      <h1 class="mt-4 text-[30px] font-bold leading-tight text-gray-900">
+      <h1 class="mt-4 break-keep text-[30px] font-bold leading-tight text-gray-900">
         어떤 목표를 향해 달릴까요?
       </h1>
-      <p class="mt-2 text-sm font-medium text-gray-500">
+      <p class="mt-2 break-keep text-sm font-medium text-gray-500">
         지금 가장 집중하고 싶은 목표를 하나 선택해 주세요.
       </p>
 
@@ -38,12 +38,7 @@
       </div>
     </div>
 
-    <BottomCTA
-      :label="buttonText"
-      :disabled="!selectedGoal"
-      caption="나중에 목표를 추가하거나 변경할 수 있어요"
-      @click="handleNext"
-    />
+    <BottomCTA :label="buttonText" :disabled="!selectedGoal" @click="handleNext" />
   </HeroBackground>
 </template>
 
