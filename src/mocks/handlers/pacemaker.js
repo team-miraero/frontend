@@ -110,19 +110,30 @@ export const pacemakerHandlers = [
     return HttpResponse.json({ goals: mockGoals })
   }),
 
-  http.post('*/api/money-boxes', async ({ request }) => {
-    const { moneyBoxType, autoTransfer } = await request.json()
+  http.post('*/api/pace-maker', async ({ request }) => {
+    const { accountId, maxAmount } = await request.json()
 
-    if (moneyBoxType !== 'SAVING' || autoTransfer !== null) {
-      return HttpResponse.json({ message: '잘못된 저금통 개설 요청입니다.' }, { status: 400 })
+    if (!accountId || !maxAmount) {
+      return HttpResponse.json(
+        { success: false, data: null, error: { message: '연동 계좌와 상한선을 확인해 주세요.' } },
+        { status: 400 }
+      )
     }
 
     mockRegistered = true
     mockPacemakerStatus = 'ACTIVE'
+    mockMaxAmount = maxAmount
 
     return HttpResponse.json({
-      moneyBoxId: 31,
-      moneyBoxType: 'SAVING',
+      success: true,
+      data: {
+        autoSavingId: 21,
+        moneyBoxId: 31,
+        accountId,
+        maxAmount,
+        autoSavingStatus: 'ACTIVE',
+      },
+      error: null,
     })
   }),
 

@@ -70,30 +70,29 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   }
 
   /**
-   * SAVING 저금통 개설과 상한액 설정을 순서대로 처리합니다.
-   * 재시도 시 현재 상태를 먼저 조회해 이미 생성된 저금통을 중복 생성하지 않습니다.
+   * 페이스메이커 전용 저금통을 개설합니다. (연동 계좌·상한액·활성화까지 한 번에 처리)
+   * 이미 개설된 상태라면 중복 생성하지 않고 alreadyRegistered로 알린다.
    * @param {number} maxAmount
+   * @param {number} accountId
+   * @returns {Promise<{ status: object, maxAmount: number, alreadyRegistered: boolean }>}
    */
-  async function setupPacemaker(maxAmount) {
-    let status = await fetchPacemakerStatus()
+  async function setupPacemaker(maxAmount, accountId) {
+    const currentStatus = await fetchPacemakerStatus()
 
-    if (!status.registered) {
-      await pacemakerApi.createPacemakerMoneyBox()
+    if (currentStatus.registered) {
+      return { status: currentStatus, maxAmount, alreadyRegistered: true }
     }
 
-    const maxAmountResult = await pacemakerApi.updatePacemakerMaxAmount(maxAmount)
-    status = await fetchPacemakerStatus()
-
-    if (!status.registered || !status.autoSavingId) {
-      throw new Error('페이스메이커 개설 상태를 확인할 수 없습니다.')
+    const created = await pacemakerApi.createPacemaker({ accountId, maxAmount })
+    const status = {
+      autoSavingId: created.autoSavingId,
+      registered: true,
+      status: created.autoSavingStatus,
+      enabled: created.autoSavingStatus === 'ACTIVE',
     }
+    pacemakerStatus.value = status
 
-    if (status.status !== 'ACTIVE') {
-      status = await pacemakerApi.updatePacemakerStatus(status.autoSavingId, 'ACTIVE')
-      pacemakerStatus.value = status
-    }
-
-    return { status, maxAmount: maxAmountResult }
+    return { status, maxAmount: created.maxAmount, alreadyRegistered: false }
   }
 
   async function fetchPacemakerDashboard() {
