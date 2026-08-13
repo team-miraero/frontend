@@ -120,14 +120,21 @@ export async function getPacemakerDashboard() {
 }
 
 /**
- * SAVING 저금통을 개설해 페이스메이커 설정을 생성합니다.
- * @returns {Promise<unknown>}
+ * @typedef {Object} PacemakerCreateResult
+ * @property {number} autoSavingId
+ * @property {number} moneyBoxId
+ * @property {number} accountId
+ * @property {number} maxAmount
+ * @property {'ACTIVE' | 'PAUSED'} autoSavingStatus
  */
-export async function createPacemakerMoneyBox() {
-  const { data } = await client.post('/money-boxes', {
-    moneyBoxType: 'SAVING',
-    autoTransfer: null,
-  })
+
+/**
+ * 페이스메이커 전용 저금통을 개설합니다. (연동 계좌·상한선 설정과 활성화까지 함께 처리됩니다)
+ * @param {{ accountId: number, maxAmount: number }} payload
+ * @returns {Promise<PacemakerCreateResult>}
+ */
+export async function createPacemaker({ accountId, maxAmount }) {
+  const { data } = await client.post('/pace-maker', { accountId, maxAmount })
   return unwrapApiResponse(data)
 }
 

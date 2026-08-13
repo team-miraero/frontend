@@ -27,6 +27,7 @@
       <PacemakerLimitStep
         v-else-if="currentStep === 'limit'"
         v-model="maxAmount"
+        v-model:selected-account-id="selectedAccountId"
         :is-submitting="isSubmitting"
         :error-message="submitError"
         :is-edit-mode="isEditMode"
@@ -55,6 +56,8 @@ const pacemakerStore = usePacemakerStore()
 const isEditMode = computed(() => route.query.mode === 'max-amount')
 const currentStep = ref(isEditMode.value ? 'limit' : 'money-box')
 const maxAmount = ref(10000)
+// 페이스메이커용 저금통과 연동할 주 입출금계좌 id
+const selectedAccountId = ref(null)
 const isSubmitting = ref(false)
 const submitError = ref('')
 
@@ -116,6 +119,11 @@ async function completeSetup() {
     return
   }
 
+  if (!isEditMode.value && !selectedAccountId.value) {
+    submitError.value = '연동할 입출금계좌를 선택해 주세요.'
+    return
+  }
+
   isSubmitting.value = true
   submitError.value = ''
 
@@ -126,7 +134,17 @@ async function completeSetup() {
       return
     }
 
-    await pacemakerStore.setupPacemaker(maxAmount.value)
+    const { alreadyRegistered } = await pacemakerStore.setupPacemaker(
+      maxAmount.value,
+      selectedAccountId.value
+    )
+
+    // 이미 개설된 상태로 들어온 경우엔 새로 만들지 않고 대시보드로 안내한다.
+    if (alreadyRegistered) {
+      goToDashboard()
+      return
+    }
+
     currentStep.value = 'complete'
   } catch (error) {
     submitError.value =
