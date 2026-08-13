@@ -1,7 +1,22 @@
 <!-- 로드맵 메인 대시보드 -->
 <template>
-  <div v-if="goalStore.currentGoal" class="flex justify-center bg-[#f8fbff] pb-8">
+  <LoadingSpinner
+    v-if="isPageLoading || goalStore.areGoalsLoading || goalStore.isLoading"
+    message="로드맵을 불러오는 중이에요"
+  />
+
+  <div v-else-if="goalStore.currentGoal" class="flex justify-center bg-[#f8fbff] pb-8">
     <div class="w-full max-w-[1440px] px-8 py-3">
+      <div
+        v-if="hasSupplementaryError"
+        class="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"
+        role="status"
+      >
+        <p class="text-xs font-bold text-amber-700">일부 부가 정보를 불러오지 못했어요.</p>
+        <button type="button" class="text-xs font-black text-amber-800" @click="retryGoalDashboard">
+          다시 시도
+        </button>
+      </div>
       <GoalPausedBanner v-if="isGoalPaused" class="mb-3" @resume-click="openResumeConfirm" />
       <PaceBanner
         :pace="goalStore.currentGoal.pace"
@@ -12,8 +27,8 @@
         :monthly-available-money="goalStore.monthlyAvailableMoney"
         @cta-click="handlePacemakerCtaClick"
         @pause="openPauseConfirm"
-        @open-today="openTodayAvailableMoneyModal"
-        @open-month="openMonthlyAvailableMoneyModal"
+        @open-today="handleOpenTodayAvailableMoneyModal"
+        @open-month="handleOpenMonthlyAvailableMoneyModal"
       />
       <!-- 목표가 일시정지 상태면 아래 액션 영역 전체를 흐리게 하고 클릭이 통하지 않도록 막음 -->
       <div :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''">
@@ -89,14 +104,12 @@
       :amount="depositedAmount"
     />
     <TodayAvailableMoneyModal
-      v-if="goalStore.dailyAvailableMoney"
       v-model="isTodayAvailableMoneyModalOpen"
-      :daily="goalStore.dailyAvailableMoney"
+      :daily="goalStore.dailyAvailableMoney ?? EMPTY_DAILY_AVAILABLE_MONEY"
     />
     <MonthlyAvailableMoneyModal
-      v-if="goalStore.monthlyAvailableMoney"
       v-model="isMonthlyAvailableMoneyModalOpen"
-      :monthly="goalStore.monthlyAvailableMoney"
+      :monthly="goalStore.monthlyAvailableMoney ?? EMPTY_MONTHLY_AVAILABLE_MONEY"
     />
     <LinkedAssetsModal v-model="isLinkedAssetsModalOpen" :assets="goalStore.assets" />
     <GoalStatusConfirmModal
@@ -118,6 +131,30 @@
       @later="handleAchievementLater"
     />
   </div>
+
+  <div
+    v-else-if="goalStore.dashboardError || goalStore.goalsError"
+    class="flex min-h-[420px] items-center justify-center px-6"
+  >
+    <div class="text-center" role="alert">
+      <p class="text-base font-black text-[#0a192f]">로드맵을 불러오지 못했어요</p>
+      <p class="pt-2 text-sm text-slate-500">잠시 후 다시 시도해주세요.</p>
+      <button
+        type="button"
+        class="mt-5 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white"
+        @click="retryGoalDashboard"
+      >
+        다시 시도
+      </button>
+    </div>
+  </div>
+
+  <div v-else class="flex min-h-[420px] items-center justify-center px-6 text-center">
+    <div>
+      <p class="text-base font-black text-[#0a192f]">표시할 목표가 없어요</p>
+      <p class="pt-2 text-sm text-slate-500">목표를 만들면 로드맵이 여기에 표시돼요.</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -125,6 +162,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
 import { useCollectionStore } from '@/features/collection'
+import { GOAL_STATUS } from '@/features/goal/constants/goal.constants'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import {
   useRoadmapStore,
   PaceBanner,
@@ -158,15 +197,15 @@ const goalStore = useGoalStore()
 const roadmapStore = useRoadmapStore()
 const pacemakerStore = usePacemakerStore()
 const collectionStore = useCollectionStore()
+const isPageLoading = ref(true)
 const { isOpen: isPacemakerModalOpen, open: openPacemakerModal } = useModal()
 const { isOpen: isPacemakerBalanceModalOpen, open: openPacemakerBalanceModal } = useModal()
 const { isOpen: isPacemakerDepositModalOpen, open: openPacemakerDepositModal } = useModal()
 const { isOpen: isPacemakerHistoryModalOpen, open: openPacemakerHistoryModal } = useModal()
 const { isOpen: isPacemakerDepositSuccessModalOpen, open: openPacemakerDepositSuccessModal } =
   useModal()
-const { isOpen: isTodayAvailableMoneyModalOpen, open: openTodayAvailableMoneyModal } = useModal()
-const { isOpen: isMonthlyAvailableMoneyModalOpen, open: openMonthlyAvailableMoneyModal } =
-  useModal()
+const { isOpen: isTodayAvailableMoneyModalOpen } = useModal()
+const { isOpen: isMonthlyAvailableMoneyModalOpen } = useModal()
 const { isOpen: isLinkedAssetsModalOpen, open: openLinkedAssetsModal } = useModal()
 const { isOpen: isStatusConfirmModalOpen, open: openStatusConfirmModal } = useModal()
 const { isOpen: isShareGoalModalOpen, open: openShareGoalModal } = useModal()
@@ -190,10 +229,39 @@ const statusConfirmMode = ref('pause')
 const achievementErrorMessage = ref('')
 const previousProgressRate = ref(null)
 
-const isGoalPaused = computed(() => goalStore.currentGoal?.status === 'PAUSE')
+const EMPTY_DAILY_AVAILABLE_MONEY = Object.freeze({
+  todayAvailableMoney: 0,
+  todayExpense: 0,
+  remainingAvailableMoney: 0,
+})
+const EMPTY_MONTHLY_AVAILABLE_MONEY = Object.freeze({
+  income: 0,
+  fixedExpense: 0,
+  targetGoalAutoTransfer: 0,
+  otherGoalAutoTransfer: 0,
+  variableExpense: 0,
+  availableMoney: 0,
+  elapsedDays: 0,
+  remainingDays: 0,
+  periodDays: 0,
+})
+
+const isGoalPaused = computed(() => goalStore.currentGoal?.status === GOAL_STATUS.PAUSED)
+const hasSupplementaryError = computed(
+  () =>
+    Object.keys(goalStore.dashboardSupplementaryErrors).length > 0 || Boolean(roadmapStore.error)
+)
 const dashboardErrorMessage = computed(() =>
   pacemakerStore.dashboardError ? '정보를 불러오지 못했어요' : ''
 )
+
+function handleOpenTodayAvailableMoneyModal() {
+  isTodayAvailableMoneyModalOpen.value = true
+}
+
+function handleOpenMonthlyAvailableMoneyModal() {
+  isMonthlyAvailableMoneyModalOpen.value = true
+}
 
 // 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
 function handlePacemakerToggle() {
@@ -298,7 +366,9 @@ function openResumeConfirm() {
 
 // 확인 모달의 "확인" 클릭: 실제 상태 변경
 async function handleStatusConfirm() {
-  await goalStore.updateCurrentGoalStatus(statusConfirmMode.value === 'pause' ? 'PAUSE' : 'ACTIVE')
+  await goalStore.updateCurrentGoalStatus(
+    statusConfirmMode.value === 'pause' ? GOAL_STATUS.PAUSED : GOAL_STATUS.ACTIVE
+  )
   isStatusConfirmModalOpen.value = false
 }
 
@@ -306,31 +376,53 @@ async function handleStatusConfirm() {
 async function loadGoalDashboard(goalId) {
   previousProgressRate.value = null
   goalStore.selectGoal(goalId)
-  await goalStore.fetchDashboardData(goalId)
-  await roadmapStore.fetchMilestones(goalId)
-  const goal = goalStore.currentGoal
+  let goal
+  try {
+    goal = await goalStore.fetchDashboardData(goalId)
+  } catch {
+    return false
+  }
+
+  if (!goal || String(goalStore.selectedGoalId) !== String(goalId)) return false
+
+  roadmapStore.fetchMilestones(goalId).catch(() => undefined)
   previousProgressRate.value = Number(goal?.progressRate) || 0
   showAchievementOnce(goal)
+  return true
+}
+
+async function retryGoalDashboard() {
+  if (goalStore.goalsError) await goalStore.fetchGoals(true)
+  const goalId = route.params.goalId ? Number(route.params.goalId) : goalStore.selectedGoalId
+  if (goalId) await loadGoalDashboard(goalId)
 }
 
 onMounted(async () => {
-  await goalStore.fetchGoals()
+  try {
+    await goalStore.fetchGoals()
 
-  const goalId = route.params.goalId ? Number(route.params.goalId) : goalStore.selectedGoalId
-  if (!goalId) return
+    const goalId = route.params.goalId ? Number(route.params.goalId) : goalStore.selectedGoalId
+    if (!goalId) return
 
-  await loadGoalDashboard(goalId)
-  await pacemakerStore.fetchPacemakerStatus()
+    const hasGoal = await loadGoalDashboard(goalId)
+    if (!hasGoal) return
+    isPageLoading.value = false
 
-  const pacemakerRequests = [pacemakerStore.fetchDepositTargets()]
-  if (pacemakerStore.pacemakerStatus?.registered) {
-    pacemakerRequests.push(
-      pacemakerStore.fetchPacemakerDashboard(),
-      pacemakerStore.fetchHistories({ page: 0, size: 31 })
-    )
+    await pacemakerStore.fetchPacemakerStatus().catch(() => undefined)
+
+    const pacemakerRequests = []
+    if (pacemakerStore.pacemakerStatus?.registered) {
+      pacemakerRequests.push(
+        pacemakerStore.fetchDepositTargets(),
+        pacemakerStore.fetchPacemakerDashboard(),
+        pacemakerStore.fetchHistories({ page: 0, size: 31 })
+      )
+    }
+
+    await Promise.all(pacemakerRequests.map((request) => request.catch(() => undefined)))
+  } finally {
+    isPageLoading.value = false
   }
-
-  await Promise.all(pacemakerRequests.map((request) => request.catch(() => undefined)))
 })
 
 // 사이드바 로드맵 목록에서 다른 목표를 클릭하면 라우트 파라미터만 바뀌고
