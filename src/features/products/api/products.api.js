@@ -1,4 +1,5 @@
 import { client } from '@/shared/api/client'
+import { unwrapApiData } from '@/shared/api/unwrapApiData'
 
 function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -11,17 +12,16 @@ function isValidProduct(product, productIdKey) {
     typeof product.productName === 'string' &&
     product.productName.trim().length > 0 &&
     product.maximumInterestRate != null &&
-    Number.isFinite(Number(product.maximumInterestRate)) &&
-    Array.isArray(product.options)
+    Number.isFinite(Number(product.maximumInterestRate))
   )
 }
 
-function validateProductListResponse(data, listKey, productIdKey) {
-  if (!isRecord(data) || !Array.isArray(data[listKey])) {
+function validateProductListResponse(data, productIdKey) {
+  if (!isRecord(data) || !Array.isArray(data.products)) {
     throw new TypeError('상품 목록 API 응답 형식이 올바르지 않습니다.')
   }
 
-  if (!data[listKey].every((product) => isValidProduct(product, productIdKey))) {
+  if (!data.products.every((product) => isValidProduct(product, productIdKey))) {
     throw new TypeError('상품 목록에 필수 정보가 누락되었습니다.')
   }
 
@@ -29,31 +29,73 @@ function validateProductListResponse(data, listKey, productIdKey) {
 }
 
 function validateProductDetailResponse(data, productIdKey) {
-  if (!isValidProduct(data, productIdKey)) {
+  if (!isValidProduct(data, productIdKey) || !Array.isArray(data.options)) {
     throw new TypeError('상품 상세 API 응답 형식이 올바르지 않습니다.')
   }
 
   return data
 }
 
+function mapDepositListProduct(product) {
+  return {
+    ...product,
+    institutionName: product.financialInstitutionName,
+    maximumInterestRate: product.maxInterestRate,
+    options: [],
+  }
+}
+
+function mapSavingListProduct(product) {
+  return {
+    ...product,
+    institutionName: product.financialInstitutionName,
+    maximumInterestRate: product.highestInterestRate,
+    options: [],
+  }
+}
+
+function mapProductDetail(product) {
+  const maximumInterestRate = Math.max(
+    0,
+    ...(product.options ?? []).map((option) => Number(option.maxInterestRate ?? 0))
+  )
+  return {
+    ...product,
+    institutionName: product.financialInstitutionName,
+    maximumInterestRate,
+  }
+}
+
 export async function getDepositProducts(params = {}) {
-  const { data } = await client.get('/deposits', { params })
-  return validateProductListResponse(data, 'deposits', 'depositProductId')
+  const { data: responseBody } = await client.get('/deposits', { params })
+  const data = unwrapApiData(responseBody)
+  const mapped = { products: data.products.map(mapDepositListProduct) }
+  validateProductListResponse(mapped, 'depositProductId')
+  return { deposits: mapped.products }
 }
 
 export async function getDepositProductDetail(depositProductId) {
-  const { data } = await client.get(`/deposits/${depositProductId}`)
-  return validateProductDetailResponse(data, 'depositProductId')
+  const { data: responseBody } = await client.get(`/deposits/${depositProductId}`)
+  return validateProductDetailResponse(
+    mapProductDetail(unwrapApiData(responseBody)),
+    'depositProductId'
+  )
 }
 
 export async function getSavingProducts(params = {}) {
-  const { data } = await client.get('/savings', { params })
-  return validateProductListResponse(data, 'savings', 'savingProductId')
+  const { data: responseBody } = await client.get('/savings', { params })
+  const data = unwrapApiData(responseBody)
+  const mapped = { products: data.products.map(mapSavingListProduct) }
+  validateProductListResponse(mapped, 'savingProductId')
+  return { savings: mapped.products }
 }
 
 export async function getSavingProductDetail(savingProductId) {
-  const { data } = await client.get(`/savings/${savingProductId}`)
-  return validateProductDetailResponse(data, 'savingProductId')
+  const { data: responseBody } = await client.get(`/savings/${savingProductId}`)
+  return validateProductDetailResponse(
+    mapProductDetail(unwrapApiData(responseBody)),
+    'savingProductId'
+  )
 }
 
 const productApiByType = {

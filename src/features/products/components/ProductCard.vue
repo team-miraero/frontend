@@ -117,7 +117,12 @@ const props = defineProps({
 defineEmits(['view-detail'])
 
 const terms = computed(() =>
-  [...new Set((props.product.options ?? []).map((option) => option.saveTerm))].sort((a, b) => a - b)
+  [
+    ...new Set([
+      ...(props.product.saveTerms ?? []),
+      ...(props.product.options ?? []).map((option) => option.saveTerm),
+    ]),
+  ].sort((a, b) => a - b)
 )
 
 const termLabel = computed(() => {
@@ -173,6 +178,15 @@ const impactDescription = computed(() => {
 const tags = computed(() => {
   const values = new Set()
 
+  props.product.reserveTypes?.forEach((reserveType) => {
+    if (reserveType === 'F' || reserveType === 'FLEXIBLE' || reserveType === '자유적립식') {
+      values.add('자유 납입')
+    }
+    if (reserveType === 'S' || reserveType === 'FIXED' || reserveType === '정액적립식') {
+      values.add('정액 납입')
+    }
+  })
+
   props.product.options?.forEach((option) => {
     if (props.productType !== 'saving') return
 
@@ -185,7 +199,9 @@ const tags = computed(() => {
   })
 
   if (/인터넷|스마트폰/.test(props.product.joinMethod ?? '')) values.add('비대면 가입')
-  if (props.product.joinRestriction === '1') values.add('가입 제한 없음')
+  if (props.product.hasJoinRestriction === false || props.product.joinRestriction === '1') {
+    values.add('가입 제한 없음')
+  }
 
   return [...values].slice(0, 3)
 })
