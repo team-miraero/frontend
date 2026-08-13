@@ -217,23 +217,45 @@ function toDetail(product, productType) {
 
 export const productsHandlers = [
   http.get('*/api/deposits', () => {
-    return HttpResponse.json({ deposits, totalCount: deposits.length })
+    return HttpResponse.json({
+      success: true,
+      data: {
+        products: deposits.map((product) => ({
+          ...product,
+          financialInstitutionName: product.institutionName,
+          maxInterestRate: product.maximumInterestRate,
+          saveTerms: product.options.map((option) => option.saveTerm),
+        })),
+      },
+      error: null,
+    })
   }),
   http.get('*/api/deposits/:depositProductId', ({ params }) => {
     const product = deposits.find(
       (item) => item.depositProductId === Number(params.depositProductId)
     )
     return product
-      ? HttpResponse.json(toDetail(product, 'deposit'))
+      ? HttpResponse.json({ success: true, data: toDetail(product, 'deposit'), error: null })
       : HttpResponse.json({ message: '상품을 찾을 수 없습니다.' }, { status: 404 })
   }),
   http.get('*/api/savings', () => {
-    return HttpResponse.json({ savings, totalCount: savings.length })
+    return HttpResponse.json({
+      success: true,
+      data: {
+        products: savings.map((product) => ({
+          ...product,
+          financialInstitutionName: product.institutionName,
+          highestInterestRate: product.maximumInterestRate,
+          saveTerms: product.options.map((option) => option.saveTerm),
+        })),
+      },
+      error: null,
+    })
   }),
   http.get('*/api/savings/:savingProductId', ({ params }) => {
     const product = savings.find((item) => item.savingProductId === Number(params.savingProductId))
     return product
-      ? HttpResponse.json(toDetail(product, 'saving'))
+      ? HttpResponse.json({ success: true, data: toDetail(product, 'saving'), error: null })
       : HttpResponse.json({ message: '상품을 찾을 수 없습니다.' }, { status: 404 })
   }),
 ]
