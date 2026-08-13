@@ -10,6 +10,7 @@ function redirectToLogin() {
 /**
  * @typedef {Object} NormalizedError
  * @property {number} status
+ * @property {string} [code]
  * @property {string} message
  * @property {unknown} [cause]
  */
@@ -43,6 +44,7 @@ export function attachResponseInterceptor(instance) {
       /** @type {NormalizedError} */
       const normalized = {
         status: error.response?.status ?? 0,
+        code: error.response?.data?.error?.code ?? error.response?.data?.code,
         message:
           error.response?.data?.error?.message ??
           error.response?.data?.message ??
