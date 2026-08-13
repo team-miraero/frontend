@@ -7,23 +7,29 @@
 
 export const POLICY_CATEGORY_IDS = Object.freeze({
   ALL: 'ALL',
-  JOB: 'JOB',
-  HOUSING: 'HOUSING',
-  FINANCE: 'FINANCE',
-  WELFARE: 'WELFARE',
-  EDUCATION: 'EDUCATION',
-  CULTURE: 'CULTURE',
+  LOAN: 'LOAN',
+  SUBSIDY: 'SUBSIDY',
+  VOUCHER: 'VOUCHER',
+  INTEREST_BENEFIT: 'INTEREST_BENEFIT',
+  CREDIT_RECOVERY: 'CREDIT_RECOVERY',
+  PUBLIC_RENTAL_HOUSING: 'PUBLIC_RENTAL_HOUSING',
+  HOUSING_SUPPORT: 'HOUSING_SUPPORT',
 })
 
 /** @type {ReadonlyArray<PolicyCategory>} */
 export const POLICY_CATEGORIES = Object.freeze([
   { id: POLICY_CATEGORY_IDS.ALL, label: '전체', keyword: '' },
-  { id: POLICY_CATEGORY_IDS.JOB, label: '일자리', keyword: '일자리' },
-  { id: POLICY_CATEGORY_IDS.HOUSING, label: '주거', keyword: '주거지원' },
-  { id: POLICY_CATEGORY_IDS.FINANCE, label: '금융', keyword: '금융' },
-  { id: POLICY_CATEGORY_IDS.WELFARE, label: '복지', keyword: '복지' },
-  { id: POLICY_CATEGORY_IDS.EDUCATION, label: '교육', keyword: '교육' },
-  { id: POLICY_CATEGORY_IDS.CULTURE, label: '문화', keyword: '문화' },
+  { id: POLICY_CATEGORY_IDS.LOAN, label: '대출', keyword: '대출' },
+  { id: POLICY_CATEGORY_IDS.SUBSIDY, label: '보조금', keyword: '보조금' },
+  { id: POLICY_CATEGORY_IDS.VOUCHER, label: '바우처', keyword: '바우처' },
+  { id: POLICY_CATEGORY_IDS.INTEREST_BENEFIT, label: '금리혜택', keyword: '금리혜택' },
+  { id: POLICY_CATEGORY_IDS.CREDIT_RECOVERY, label: '신용회복', keyword: '신용회복' },
+  {
+    id: POLICY_CATEGORY_IDS.PUBLIC_RENTAL_HOUSING,
+    label: '공공임대주택',
+    keyword: '공공임대주택',
+  },
+  { id: POLICY_CATEGORY_IDS.HOUSING_SUPPORT, label: '주거지원', keyword: '주거지원' },
 ])
 
 export const DEFAULT_PAGE_SIZE = 10
