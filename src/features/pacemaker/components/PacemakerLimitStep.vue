@@ -74,6 +74,106 @@
       >
         {{ errorMessage }}
       </p>
+
+      <div v-if="!isEditMode" class="flex flex-col gap-3">
+        <p class="text-xs font-bold text-slate-400">연동할 입출금계좌 선택</p>
+
+        <p
+          v-if="isAccountsLoading"
+          class="rounded-2xl border border-slate-200 bg-white px-4 py-6 text-center text-xs font-semibold text-slate-400"
+        >
+          계좌 정보를 불러오는 중이에요...
+        </p>
+
+        <div
+          v-else-if="accountsError"
+          class="rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center"
+        >
+          <p class="text-xs font-semibold text-slate-500">계좌 정보를 불러오지 못했어요.</p>
+          <button
+            type="button"
+            class="mt-2 text-xs font-bold text-primary underline underline-offset-2"
+            @click="loadAccounts"
+          >
+            다시 시도
+          </button>
+        </div>
+
+        <p
+          v-else-if="checkingAccounts.length === 0"
+          class="rounded-2xl border border-slate-200 bg-white px-4 py-6 text-center text-xs font-semibold text-slate-400"
+        >
+          연동 가능한 입출금계좌가 없어요.
+        </p>
+
+        <ul v-else class="flex flex-col gap-2.5">
+          <li v-for="account in checkingAccounts" :key="account.accountId">
+            <button
+              type="button"
+              class="flex w-full items-center justify-between gap-3 rounded-2xl border-[1.5px] px-4 py-3.5 text-left transition disabled:cursor-not-allowed disabled:opacity-60"
+              :class="
+                selectedAccountId === account.accountId
+                  ? 'border-primary bg-accent-light'
+                  : 'border-slate-200 bg-white hover:bg-slate-50'
+              "
+              :aria-pressed="selectedAccountId === account.accountId"
+              :disabled="isSubmitting"
+              @click="selectAccount(account.accountId)"
+            >
+              <span class="min-w-0">
+                <span class="block text-[11px] font-bold text-slate-400">
+                  {{ account.institutionName }}
+                </span>
+                <span class="mt-0.5 block truncate text-sm font-black text-[#0a192f]">
+                  {{ account.accountName }}
+                </span>
+                <span class="mt-0.5 block text-xs text-slate-400">
+                  {{ account.maskedAccountNumber }}
+                </span>
+              </span>
+
+              <span class="flex shrink-0 flex-col items-end gap-1.5">
+                <span class="text-sm font-black text-[#0a192f]">
+                  {{ formatNumber(account.balance)
+                  }}<span class="ml-0.5 text-xs font-semibold text-slate-400">원</span>
+                </span>
+                <span
+                  class="flex size-5 items-center justify-center rounded-full border-2 transition"
+                  :class="
+                    selectedAccountId === account.accountId
+                      ? 'border-primary bg-primary'
+                      : 'border-slate-300 bg-white'
+                  "
+                >
+                  <svg
+                    v-if="selectedAccountId === account.accountId"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="size-2.5 text-white"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </span>
+              </span>
+            </button>
+          </li>
+        </ul>
+
+        <div class="rounded-[14px] border border-slate-200 bg-[#f8fbff] px-4 py-3.5">
+          <p class="flex items-start gap-1.5 text-xs leading-5 text-slate-500">
+            <span
+              class="mt-0.5 shrink-0 rounded-full bg-accent-light px-1.5 py-0.5 text-[10px] font-bold text-primary"
+            >
+              Tip
+            </span>
+            <span>페이스메이커는 주 입출금통장과 연동하는 것이 바람직해요.</span>
+          </p>
+        </div>
+      </div>
     </div>
 
     <div class="flex flex-col gap-3 px-5 pb-7 sm:px-8">
@@ -106,7 +206,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useGoalStore } from '@/features/goal'
 
 const MIN_DAILY_LIMIT = 1000
 const MAX_DAILY_LIMIT = 50000
@@ -129,9 +231,43 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  selectedAccountId: {
+    type: Number,
+    default: null,
+  },
 })
 
-const emit = defineEmits(['update:modelValue', 'complete', 'back'])
+const emit = defineEmits(['update:modelValue', 'update:selectedAccountId', 'complete', 'back'])
+
+// 페이스메이커용 저금통과 연동할 주 입출금계좌 선택: 기존 목표 설정(GOAL-04)에서 쓰는
+// 계좌 조회 스토어·API를 그대로 재사용한다.
+const goalStore = useGoalStore()
+const { accounts, areAccountsLoading: isAccountsLoading, accountsError } = storeToRefs(goalStore)
+
+const checkingAccounts = computed(() =>
+  accounts.value.filter((account) => account.accountType === 'CHECKING')
+)
+
+async function loadAccounts() {
+  try {
+    await goalStore.fetchAccounts('CHECKING')
+    // 화면에 실제로 보이는 목록에서 골라야 선택 상태와 표시가 어긋나지 않는다.
+    const [firstAccount] = checkingAccounts.value
+    if (props.selectedAccountId == null && firstAccount) {
+      emit('update:selectedAccountId', firstAccount.accountId)
+    }
+  } catch {
+    // accountsError는 store에서 세팅됨. 화면은 위 재시도 블록으로 안내.
+  }
+}
+
+function selectAccount(accountId) {
+  emit('update:selectedAccountId', accountId)
+}
+
+onMounted(() => {
+  if (!props.isEditMode) loadAccounts()
+})
 
 const limitPresets = [1000, 10000, 20000, 30000, 50000]
 
