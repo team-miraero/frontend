@@ -15,7 +15,7 @@
         <input
           v-model="searchInput"
           type="text"
-          placeholder="정책명 검색 (예: 월세, 창업, 면접정장)"
+          placeholder="정책명 검색 (예: 취업, 대출, 월세)"
           class="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-9 text-sm outline-none focus:border-primary"
           @keydown.enter="applySearch"
           @blur="applySearch"
