@@ -24,6 +24,8 @@ export const useGoalStore = defineStore('feature-goal', () => {
   const isFeasibilityLoading = ref(false)
   const feasibilityError = ref(null)
   const recalculatedFeasibility = ref(null)
+  // 계좌 연결 페이지에서 돌아왔을 때 사용자가 조정하던 계획을 그대로 복원하기 위한 초안
+  const feasibilityAdjustment = ref(null)
 
   // 계좌·저금통 연결(GOAL-04) 상태
   const accounts = ref([])
@@ -36,10 +38,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
   const areGoalsLoading = ref(false)
 
   const selectedGoal = computed(
-    () =>
-      goals.value.find(
-        (goal) => String(goal.goalId) === String(selectedGoalId.value)
-      ) ?? null
+    () => goals.value.find((goal) => String(goal.goalId) === String(selectedGoalId.value)) ?? null
   )
 
   // 메인 대시보드 관련 목표 상태
@@ -66,6 +65,12 @@ export const useGoalStore = defineStore('feature-goal', () => {
    * @param {string | null} id - GOAL_PRESET_IDS 값 또는 null
    */
   function selectGoalPreset(id) {
+    if (selectedGoalPresetId.value !== id) {
+      goalParams.value = null
+      feasibility.value = null
+      recalculatedFeasibility.value = null
+      feasibilityAdjustment.value = null
+    }
     selectedGoalPresetId.value = id
   }
 
@@ -85,6 +90,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
     selectedGoalPresetId.value = null
     goalParams.value = { amount: 0, period: 0, seedMoney: 0 }
     feasibilityResult.value = null
+    feasibilityAdjustment.value = null
     linkedAccountIds.value = []
   }
 
@@ -356,6 +362,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
     isFeasibilityLoading,
     feasibilityError,
     recalculatedFeasibility,
+    feasibilityAdjustment,
     accounts,
     areAccountsLoading,
     accountsError,

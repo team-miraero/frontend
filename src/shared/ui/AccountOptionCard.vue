@@ -1,18 +1,24 @@
 <!-- 계좌·저금통 선택 카드: 선택 가능한 방식(예: 새로 만들기 / 기존 것 연결)을 나열할 때 공용 사용 -->
 <template>
   <div
-    class="cursor-pointer rounded-2xl border-2 p-5 transition-colors"
-    :class="selected ? 'border-primary bg-white shadow-sm' : 'border-gray-100 bg-white hover:bg-gray-50'"
+    class="cursor-pointer rounded-2xl border-2 p-4 transition-colors sm:p-5"
+    :class="
+      selected ? 'border-primary bg-white shadow-sm' : 'border-gray-100 bg-white hover:bg-gray-50'
+    "
     @click="emit('select')"
   >
-    <div class="flex items-start gap-3">
-      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-light text-primary">
+    <div class="flex items-start gap-2.5 sm:gap-3">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-light text-primary sm:h-10 sm:w-10"
+      >
         <slot name="icon" />
       </span>
 
       <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2">
-          <p class="text-sm font-bold text-gray-900">{{ title }}</p>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <p class="whitespace-nowrap text-[13px] font-bold text-gray-900 sm:text-sm">
+            {{ title }}
+          </p>
           <span
             v-if="recommended"
             class="rounded-full bg-accent-light px-2 py-0.5 text-[11px] font-semibold text-primary"
@@ -20,7 +26,9 @@
             추천
           </span>
         </div>
-        <p class="mt-1 text-xs leading-relaxed text-gray-500">{{ description }}</p>
+        <p class="mt-1 break-keep text-[11px] leading-relaxed text-gray-500 sm:text-xs">
+          {{ description }}
+        </p>
 
         <div v-if="tags.length" class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
           <span

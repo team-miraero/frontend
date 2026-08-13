@@ -13,7 +13,7 @@
       />
 
       <!-- 메인 타이틀 (헤더 바로 아래 배치) -->
-      <h1 class="text-2xl font-bold text-gray-900 whitespace-pre-line mt-2 mb-6">
+      <h1 class="mt-2 mb-6 break-keep whitespace-pre-line text-xl font-bold text-gray-900 sm:text-2xl">
         빚 없는 출발, 언제까지 완납할까요?
       </h1>
     </header>

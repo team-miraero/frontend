@@ -1,6 +1,6 @@
 <!-- GOAL-02 금액 프리셋 카드: 이름표 있는 프리셋 버튼(예: 스몰 웨딩/일반) + 직접입력 -->
 <template>
-  <div class="w-full rounded-3xl border border-accent/50 bg-accent-light/70 p-8 shadow-sm">
+  <div class="w-full rounded-3xl border border-accent/50 bg-accent-light/70 p-5 shadow-sm sm:p-8">
     <p class="text-base font-bold text-gray-900">{{ label }}</p>
 
     <div class="mt-4 grid grid-cols-3 gap-2">
@@ -49,7 +49,9 @@
         :value="formattedValue"
         @input="handleInput"
       />
-      <span class="absolute inset-y-0 right-5 flex items-center text-base font-medium text-gray-400">
+      <span
+        class="absolute inset-y-0 right-5 flex items-center text-base font-medium text-gray-400"
+      >
         원
       </span>
     </div>
@@ -78,7 +80,9 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue'])
 
-const mode = ref(props.presets.some((preset) => preset.value === props.modelValue) ? 'preset' : 'custom')
+const mode = ref(
+  props.presets.some((preset) => preset.value === props.modelValue) ? 'preset' : 'custom'
+)
 
 function selectPreset(preset) {
   mode.value = 'preset'
