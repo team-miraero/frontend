@@ -17,6 +17,12 @@ export const GOAL_PRESET_IDS = Object.freeze({
   STUDENT_LOAN: 'STUDENT_LOAN',
 })
 
+export const GOAL_STATUS = Object.freeze({
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+})
+
 /**
  * 4가지 목표 프리셋 데이터 상수
  * @type {ReadonlyArray<GoalPreset>}
