@@ -1,4 +1,3 @@
-<!-- 페이스메이커 진입 페이지: 상태에 따라 소개/기존 화면을 분기 -->
 <template>
   <div class="min-h-full bg-[#f8fbff]">
     <section
