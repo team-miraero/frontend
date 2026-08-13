@@ -244,11 +244,18 @@ export async function getGoalAssets(goalId) {
       bankName: asset.bankName?.trim() || '',
       accountNumberMasked: asset.accountNumberMasked?.trim() || '',
       balance: Number(asset.balance ?? 0),
-      assetDetail: asset.assetDetail ?? null,
-      autoTransfer: asset.autoTransfer ?? {
-        amount: 0,
-        transferDay: null,
-        withdrawalAccount: null,
+      // 객체 자체뿐 아니라 내부 필드까지 채워야 화면에서 별도 방어 없이 그대로 쓸 수 있다.
+      assetDetail: asset.assetDetail
+        ? {
+            ...asset.assetDetail,
+            interestRate: Number(asset.assetDetail.interestRate ?? 0),
+            maturityDate: asset.assetDetail.maturityDate ?? null,
+          }
+        : null,
+      autoTransfer: {
+        amount: Number(asset.autoTransfer?.amount ?? 0),
+        transferDay: asset.autoTransfer?.transferDay ?? null,
+        withdrawalAccount: asset.autoTransfer?.withdrawalAccount ?? null,
       },
     }
   })

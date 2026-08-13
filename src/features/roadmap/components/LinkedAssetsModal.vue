@@ -161,13 +161,13 @@ function computeMaturityCountdown(maturityDate) {
 }
 
 function formatDate(yyyyMMdd) {
-  return String(yyyyMMdd ?? '').replaceAll('-', '.')
+  return yyyyMMdd.replaceAll('-', '.')
 }
 
 function formatWon(amount) {
-  return `${Number(amount ?? 0).toLocaleString()}원`
+  return `${amount.toLocaleString()}원`
 }
 function formatManwon(amount) {
-  return `${Math.round(Number(amount ?? 0) / 10000).toLocaleString()}만원`
+  return `${Math.round(amount / 10000).toLocaleString()}만원`
 }
 </script>

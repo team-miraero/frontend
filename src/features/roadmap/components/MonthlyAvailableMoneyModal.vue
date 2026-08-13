@@ -128,6 +128,6 @@ const progress = computed(() => {
 })
 
 function formatWon(amount) {
-  return `${Number(amount ?? 0).toLocaleString()}원`
+  return `${amount.toLocaleString()}원`
 }
 </script>
