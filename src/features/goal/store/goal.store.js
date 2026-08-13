@@ -48,6 +48,9 @@ export const useGoalStore = defineStore('feature-goal', () => {
   const monthlyAvailableMoney = ref(null)
   const dailyAvailableMoney = ref(null)
   const isLoading = ref(false)
+  const dashboardError = ref(null)
+  const dashboardSupplementaryErrors = ref({})
+  let dashboardRequestId = 0
 
   /**
    * 사용자가 선택한 목표 ID를 설정합니다.
@@ -235,20 +238,53 @@ export const useGoalStore = defineStore('feature-goal', () => {
    * @param {number} goalId
    */
   async function fetchDashboardData(goalId) {
+    const requestId = ++dashboardRequestId
     isLoading.value = true
+    dashboardError.value = null
+    dashboardSupplementaryErrors.value = {}
+    currentGoal.value = null
+    assets.value = []
+    monthlyAvailableMoney.value = null
+    dailyAvailableMoney.value = null
+
     try {
-      const [goal, goalAssets, monthlyMoney, dailyMoney] = await Promise.all([
-        goalApi.getGoalDetail(goalId),
+      const goal = await goalApi.getGoalDetail(goalId)
+      if (requestId !== dashboardRequestId) return null
+
+      currentGoal.value = goal
+      isLoading.value = false
+
+      // 목표 상세가 도착하면 대시보드를 먼저 노출하고 부가 정보는 뒤에서 채운다.
+      // 부가 API 하나가 느리거나 실패해도 대시보드 본문 렌더링을 막지 않는다.
+      Promise.allSettled([
         goalApi.getGoalAssets(goalId),
         goalApi.getMonthlyAvailableMoney(goalId),
         goalApi.getDailyAvailableMoney(goalId),
-      ])
-      currentGoal.value = goal
-      assets.value = goalAssets
-      monthlyAvailableMoney.value = monthlyMoney
-      dailyAvailableMoney.value = dailyMoney
+      ]).then(([assetsResult, monthlyResult, dailyResult]) => {
+        if (requestId !== dashboardRequestId) return
+
+        const supplementaryErrors = {}
+
+        if (assetsResult.status === 'fulfilled') assets.value = assetsResult.value
+        else supplementaryErrors.assets = assetsResult.reason
+
+        if (monthlyResult.status === 'fulfilled') monthlyAvailableMoney.value = monthlyResult.value
+        else supplementaryErrors.monthlyAvailableMoney = monthlyResult.reason
+
+        if (dailyResult.status === 'fulfilled') dailyAvailableMoney.value = dailyResult.value
+        else supplementaryErrors.dailyAvailableMoney = dailyResult.reason
+
+        dashboardSupplementaryErrors.value = supplementaryErrors
+      })
+
+      return goal
+    } catch (caughtError) {
+      if (requestId !== dashboardRequestId) return null
+
+      dashboardError.value = caughtError
+      throw caughtError
     } finally {
-      isLoading.value = false
+      if (requestId === dashboardRequestId) isLoading.value = false
     }
   }
 
@@ -269,19 +305,16 @@ export const useGoalStore = defineStore('feature-goal', () => {
   }
 
   /**
-   * @param {'ACTIVE' | 'PAUSE'} status
+   * @param {'ACTIVE' | 'PAUSED'} status
    */
   async function updateCurrentGoalStatus(status) {
     if (!currentGoal.value) return
-    const result = await goalApi.updateGoalStatus(currentGoal.value.goalId, status)
-    if (currentGoal.value) {
-      currentGoal.value.status = result.status
-    }
-    const targetGoal = goals.value.find(
-      (g) => String(g.goalId) === String(currentGoal.value.goalId)
-    )
+    const goalId = currentGoal.value.goalId
+    await goalApi.updateGoalStatus(goalId, status)
+    currentGoal.value.status = status
+    const targetGoal = goals.value.find((g) => String(g.goalId) === String(goalId))
     if (targetGoal) {
-      targetGoal.status = result.status
+      targetGoal.status = status
     }
   }
 
@@ -318,6 +351,8 @@ export const useGoalStore = defineStore('feature-goal', () => {
     monthlyAvailableMoney,
     dailyAvailableMoney,
     isLoading,
+    dashboardError,
+    dashboardSupplementaryErrors,
     selectGoal,
     selectGoalPreset,
     moveToNextStep,
