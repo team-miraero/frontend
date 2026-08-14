@@ -60,14 +60,13 @@ function mapCategoryAmounts(items, amountField) {
  * Swagger DTO를 기존 Spending 화면 모델로 변환한다.
  * Swagger 금액은 원, 현재 화면 금액은 만원 단위다.
  */
-export function mapSpendingSummary({ dashboard, peerAverage, goal, availableMoney }) {
+export function mapSpendingSummary({ dashboard, goal, availableMoney }) {
   const monthChanges = Array.isArray(dashboard?.categoryMonthChanges)
     ? dashboard.categoryMonthChanges
     : []
   const threeMonthAverages = Array.isArray(dashboard?.categoryThreeMonthAverages?.categories)
     ? dashboard.categoryThreeMonthAverages.categories
     : []
-  const peerAverages = Array.isArray(peerAverage?.categories) ? peerAverage.categories : []
 
   const currentMonthTotal = monthChanges.reduce(
     (total, category) => total + toFiniteNumber(category?.currentMonthAmount),
@@ -99,7 +98,6 @@ export function mapSpendingSummary({ dashboard, peerAverage, goal, availableMone
     categorySpending: mapCategoryAmounts(monthChanges, 'currentMonthAmount'),
     previousMonthCategorySpending: mapCategoryAmounts(monthChanges, 'previousMonthAmount'),
     recentThreeMonthAverageSpending: mapCategoryAmounts(threeMonthAverages, 'averageMonthlyAmount'),
-    peerCategorySpending: mapCategoryAmounts(peerAverages, 'peerAverageAmount'),
     // TODO: Swagger에 마이데이터 연동 여부 필드 없음
     myDataLinked: null,
   }
@@ -112,18 +110,16 @@ export function mapSpendingSummary({ dashboard, peerAverage, goal, availableMone
  */
 export async function getSpendingSummary(goalId) {
   const numericGoalId = requireNumericGoalId(goalId)
-  const [dashboardResponse, peerResponse, goalResponse, availableMoneyResponse] = await Promise.all(
-    [
-      client.get('/expense-analysis/dashboard'),
-      client.get('/expense-analysis/peer-average'),
-      client.get(`/goals/${numericGoalId}`),
-      client.get(`/goals/${numericGoalId}/available-money/monthly`),
-    ]
-  )
+  // 또래/소득구간별 비교 데이터는 백엔드가 아직 연령대·소득 조건 조회를 지원하지 않아
+  // constants.js의 PEER_SPENDING_BY_BASIS 하드코딩 값을 사용한다 (useSpendingComparisons.js 참고).
+  const [dashboardResponse, goalResponse, availableMoneyResponse] = await Promise.all([
+    client.get('/expense-analysis/dashboard'),
+    client.get(`/goals/${numericGoalId}`),
+    client.get(`/goals/${numericGoalId}/available-money/monthly`),
+  ])
 
   return mapSpendingSummary({
     dashboard: unwrapApiData(dashboardResponse.data),
-    peerAverage: unwrapApiData(peerResponse.data),
     goal: unwrapApiData(goalResponse.data),
     // 현재 Swagger는 이 endpoint를 공통 wrapper 없이 직접 DTO로 정의한다.
     // 런타임 응답이 wrapper인 환경도 공통 유틸이 함께 처리한다.
@@ -152,14 +148,18 @@ function mapTransaction(transaction) {
 
 /**
  * Swagger PageResponse<TransactionResponse>를 화면용 거래 페이지로 변환한다.
- * 백엔드가 반환한 content는 transactionType으로 재필터링하지 않는다.
+ * EXPENSE 필터링은 요청 파라미터(transactionType)로 백엔드에 위임하고,
+ * 여기서는 최근 거래가 먼저 보이도록 transactedAt 내림차순으로만 정렬한다.
+ * page는 요청과 동일하게 1부터 시작하는 것으로 취급한다 (requestedPage는 응답에 page가 없을 때의 폴백).
  */
-export function mapTransactionPage(page, { year, month }) {
+export function mapTransactionPage(page, { year, month, requestedPage = 1 }) {
   const content = Array.isArray(page?.content) ? page.content : []
-  const transactions = content.map(mapTransaction)
+  const transactions = content
+    .map(mapTransaction)
+    .sort((left, right) => right.transactedAt.localeCompare(left.transactedAt))
   const totalElements = Math.max(0, Math.trunc(toFiniteNumber(page?.totalElements, content.length)))
   const totalPages = Math.max(0, Math.trunc(toFiniteNumber(page?.totalPages)))
-  const currentPage = Math.max(0, Math.trunc(toFiniteNumber(page?.page)))
+  const currentPage = Math.max(1, Math.trunc(toFiniteNumber(page?.page, requestedPage)))
   const size = Math.max(0, Math.trunc(toFiniteNumber(page?.size, content.length)))
 
   return {
@@ -169,8 +169,8 @@ export function mapTransactionPage(page, { year, month }) {
     size,
     totalElements,
     totalPages,
-    first: page?.first ?? currentPage === 0,
-    last: page?.last ?? (totalPages === 0 || currentPage >= totalPages - 1),
+    first: page?.first ?? currentPage <= 1,
+    last: page?.last ?? (totalPages === 0 || currentPage >= totalPages),
   }
 }
 
@@ -181,15 +181,17 @@ export function mapTransactionPage(page, { year, month }) {
 export async function getTransactions(params) {
   const year = Number(params?.year)
   const month = Number(params?.month)
+  const requestedPage = params?.page ?? 1
   const { data: responseBody } = await client.get('/transactions', {
     params: {
       year,
       month,
-      page: params?.page ?? 1,
+      transactionType: 'EXPENSE',
+      page: requestedPage,
       size: params?.size ?? 100,
     },
   })
   const page = unwrapApiData(responseBody)
 
-  return mapTransactionPage(page, { year, month })
+  return mapTransactionPage(page, { year, month, requestedPage })
 }

@@ -10,6 +10,7 @@ export const useSpendingStore = defineStore('spending', () => {
   const areTransactionsLoading = ref(false)
   const transactionsError = ref(null)
   let spendingRequestId = 0
+  let transactionsRequestId = 0
 
   async function loadSpendingData(goalId) {
     const requestId = ++spendingRequestId
@@ -28,16 +29,18 @@ export const useSpendingStore = defineStore('spending', () => {
   }
 
   async function loadTransactions(params) {
+    const requestId = ++transactionsRequestId
     areTransactionsLoading.value = true
     transactionsError.value = null
     transactionHistory.value = null
 
     try {
-      transactionHistory.value = await getTransactions(params)
+      const history = await getTransactions(params)
+      if (requestId === transactionsRequestId) transactionHistory.value = history
     } catch (caughtError) {
-      transactionsError.value = caughtError
+      if (requestId === transactionsRequestId) transactionsError.value = caughtError
     } finally {
-      areTransactionsLoading.value = false
+      if (requestId === transactionsRequestId) areTransactionsLoading.value = false
     }
   }
 

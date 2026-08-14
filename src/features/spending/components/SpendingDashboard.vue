@@ -32,6 +32,7 @@
       <template v-else-if="spendingSummary">
         <SpendingSummarySection
           :total-spending="spendingSummary.totalSpending"
+          :previous-month-spending="spendingSummary.previousMonthSpending"
           :saving-capacity="spendingSummary.savingCapacity"
           :remaining-months="spendingSummary.remainingMonths"
           :monthly-difference="spendingSummary.monthlyDifference"
@@ -51,7 +52,7 @@
       v-model="isTransactionHistoryOpen"
       :transactions="transactionHistory?.transactions ?? []"
       :total-count="transactionHistory?.totalElements ?? 0"
-      :total-expense="(spendingSummary?.totalSpending ?? 0) * 10000"
+      :total-expense="loadedTransactionsTotal"
       :loading="areTransactionsLoading"
       :error="transactionsError"
       @retry="loadTransactionHistory"
@@ -115,13 +116,27 @@ const myDataStatusText = computed(() => {
   return Number.isInteger(month) && month > 0 ? `${month}월 기준` : ''
 })
 
+// 지출 분석 응답에 기준 월이 없어도 모달('이번 달 지출 내역')이 조회 없이 빈 화면으로
+// 남지 않도록 오늘 날짜 기준 연/월로 폴백한다.
 const referenceDate = computed(() => {
   const [year, month] = (spendingSummary.value?.referenceMonth ?? '').split('-').map(Number)
-  return Number.isInteger(year) && Number.isInteger(month) ? { year, month } : null
+
+  if (Number.isInteger(year) && Number.isInteger(month)) return { year, month }
+
+  const today = new Date()
+  return { year: today.getFullYear(), month: today.getMonth() + 1 }
 })
 
+// 모달 총액은 목록과 같은 /transactions 응답에서 계산한다.
+// 지출 분석 API 합계를 쓰면 목록에 없는 항목까지 포함돼 금액과 내역이 어긋난다.
+const loadedTransactionsTotal = computed(() =>
+  (transactionHistory.value?.transactions ?? []).reduce(
+    (total, transaction) => total + Math.abs(Number(transaction.amount) || 0),
+    0
+  )
+)
+
 function loadTransactionHistory() {
-  if (!referenceDate.value) return Promise.resolve()
   return spendingStore.loadTransactions(referenceDate.value)
 }
 
