@@ -198,17 +198,6 @@ export const SPENDING_CATEGORIES = [
   },
 ]
 
-// 절감 시뮬레이터는 이번 API 연동 범위에서 제외되어 기존 로컬 기준값을 유지한다.
-export const RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY = {
-  food: 34,
-  cafe: 14,
-  transportation: 10,
-  shopping: 24,
-  culture: 8,
-  medical: 5,
-  other: 3,
-}
-
 // [맞춤 지출 비교] 비교군별 카테고리 지출 평균(만원). 백엔드가 연령대/소득구간별 조회를 지원하지 않아
 // MVP 범위에서는 25~29세(=25-29) 평균을 기준값으로 두고 비교군별 배율을 곱해 하드코딩한다.
 const BASELINE_PEER_SPENDING = {
