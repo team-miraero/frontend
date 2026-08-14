@@ -1,56 +1,46 @@
-// spending 도메인 상태 store
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import {
-  getSpendingSummary,
-  getTransactions,
-  getTransactionSummary,
-} from '@/features/spending/api/spending.api'
+import { getSpendingSummary, getTransactions } from '@/features/spending/api/spending.api'
 
 export const useSpendingStore = defineStore('spending', () => {
   const spendingSummary = ref(null)
   const isLoading = ref(false)
   const error = ref(null)
   const transactionHistory = ref(null)
-  const transactionSummary = ref(null)
   const areTransactionsLoading = ref(false)
   const transactionsError = ref(null)
+  let spendingRequestId = 0
+  let transactionsRequestId = 0
 
-  async function loadSpendingData(params) {
+  async function loadSpendingData(goalId) {
+    const requestId = ++spendingRequestId
     isLoading.value = true
     error.value = null
+    spendingSummary.value = null
 
     try {
-      spendingSummary.value = await getSpendingSummary(params)
+      const summary = await getSpendingSummary(goalId)
+      if (requestId === spendingRequestId) spendingSummary.value = summary
     } catch (caughtError) {
-      error.value = caughtError
+      if (requestId === spendingRequestId) error.value = caughtError
     } finally {
-      isLoading.value = false
+      if (requestId === spendingRequestId) isLoading.value = false
     }
   }
 
   async function loadTransactions(params) {
+    const requestId = ++transactionsRequestId
     areTransactionsLoading.value = true
     transactionsError.value = null
     transactionHistory.value = null
-    transactionSummary.value = null
 
     try {
-      const [history, summary] = await Promise.all([
-        getTransactions(params),
-        getTransactionSummary(params),
-      ])
-
-      if (history.yearMonth !== summary.yearMonth) {
-        throw new TypeError('거래 내역과 요약의 기준 월이 일치하지 않습니다.')
-      }
-
-      transactionHistory.value = history
-      transactionSummary.value = summary
+      const history = await getTransactions(params)
+      if (requestId === transactionsRequestId) transactionHistory.value = history
     } catch (caughtError) {
-      transactionsError.value = caughtError
+      if (requestId === transactionsRequestId) transactionsError.value = caughtError
     } finally {
-      areTransactionsLoading.value = false
+      if (requestId === transactionsRequestId) areTransactionsLoading.value = false
     }
   }
 
@@ -59,7 +49,6 @@ export const useSpendingStore = defineStore('spending', () => {
     isLoading,
     error,
     transactionHistory,
-    transactionSummary,
     areTransactionsLoading,
     transactionsError,
     loadSpendingData,
