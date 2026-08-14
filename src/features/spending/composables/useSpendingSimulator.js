@@ -49,22 +49,37 @@ export function formatShortenedPeriod(months) {
 export function useSpendingSimulator(summary) {
   const categoryTargets = ref({})
   const categorySpending = computed(() => summary?.value?.categorySpending ?? {})
+  // 내 지출 응답에 없는 카테고리는 상수의 목 금액(category.current)으로 되돌리지 않는다.
+  // 비교 탭은 같은 카테고리를 0으로 보여주는데 여기만 지어낸 금액을 쓰면 화면끼리 어긋난다.
   const categories = computed(() =>
     SPENDING_CATEGORIES.filter(
       (category) =>
-        category.type === SPENDING_CATEGORY_TYPES.VARIABLE && category.id !== 'transportation'
+        category.type === SPENDING_CATEGORY_TYPES.VARIABLE &&
+        category.id !== 'transportation' &&
+        Object.hasOwn(categorySpending.value, category.id)
     ).map((category) => ({
       ...category,
-      current: categorySpending.value[category.id] ?? category.current,
+      current: categorySpending.value[category.id] ?? 0,
       target: categoryTargets.value[category.id] ?? null,
       recentThreeMonthAverage:
         RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY[category.id] ??
         categorySpending.value[category.id] ??
-        category.current,
+        0,
     }))
   )
-  // SPENDING_CATEGORIES는 정적 상수라 categories의 카테고리 구성(6개)은 항상 고정된다.
-  const selectedCategoryId = ref(categories.value[0]?.id ?? null)
+  // categories 구성은 API 응답에 따라 달라지므로, 고른 카테고리가 목록에서 빠지면
+  // 첫 번째 카테고리로 되돌려 selectedCategory가 undefined가 되지 않게 한다.
+  const rawSelectedCategoryId = ref(categories.value[0]?.id ?? null)
+
+  const selectedCategoryId = computed({
+    get: () =>
+      categories.value.some((category) => category.id === rawSelectedCategoryId.value)
+        ? rawSelectedCategoryId.value
+        : (categories.value[0]?.id ?? null),
+    set: (value) => {
+      rawSelectedCategoryId.value = value
+    },
+  })
 
   const selectedCategoryIndex = computed(() =>
     categories.value.findIndex((category) => category.id === selectedCategoryId.value)
