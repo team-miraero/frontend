@@ -1,7 +1,7 @@
 <!-- 목표 컬렉션 (Goal Collection) 페이지 (COLL-01~02) -->
 <template>
   <div class="flex justify-center bg-[#f8fbff] min-h-[calc(100vh-80px)] pb-12">
-    <div class="w-full max-w-[1440px] px-8 py-3">
+    <div class="page-container py-3">
       <!-- 로딩 중일 때 스피너 표시 -->
       <div v-if="collectionStore.isLoading" class="flex h-96 items-center justify-center">
         <LoadingSpinner message="달성한 목표 컬렉션을 불러오고 있어요" />

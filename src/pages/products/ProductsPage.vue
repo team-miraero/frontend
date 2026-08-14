@@ -8,7 +8,7 @@
       @update:selected-goal-id="goalStore.selectGoal"
     />
 
-    <div class="mx-auto w-full max-w-[1660px] px-4 pb-8 pt-5 sm:px-6 md:px-8 lg:px-10">
+    <div class="page-container pb-8 pt-5">
       <section
         class="flex flex-col gap-4 rounded-[20px] border border-[#b9d9ff] bg-[#f1f7ff] px-5 py-5 sm:flex-row sm:items-center sm:px-6"
         aria-labelledby="recommendation-summary-title"

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-full bg-[#f7f9fc]">
-    <div class="mx-auto w-full max-w-[1200px] px-4 pb-10 pt-3 sm:px-6 md:px-8">
+    <div class="page-container pb-10 pt-3">
       <YouthPolicyFilters @category-applied="scrollToPolicyListOnMobile" />
       <RecommendedPoliciesSection @view-detail="openDetail" />
       <PolicyListSection ref="policyListSectionRef" @view-detail="openDetail" />

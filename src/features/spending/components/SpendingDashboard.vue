@@ -9,9 +9,7 @@
       @update:selected-goal-id="$emit('select-goal', $event)"
     />
 
-    <div
-      class="mx-auto w-full max-w-[1660px] px-4 pb-24 pt-3 sm:px-6 md:px-8 md:pb-12 md:pt-4 lg:px-10"
-    >
+    <div class="page-container pb-24 pt-3 md:pb-12 md:pt-4">
       <LoadingSpinner v-if="isLoading" message="지출 정보를 불러오고 있어요" />
 
       <p
