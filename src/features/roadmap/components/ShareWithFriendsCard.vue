@@ -1,35 +1,36 @@
-<!-- 사이드 "여유자금" 영역 하단 및 모바일: 친구에게 목표 달성 현황 자랑하기 카드 -->
+<!-- 목표 달성 현황 친구 공유하기 배너 카드 -->
 <template>
   <button
     type="button"
-    class="group relative flex min-h-[104px] w-full items-center justify-between overflow-hidden rounded-[20px] border px-5 py-4 text-left shadow-[0_2px_8px_rgba(0,102,255,0.06)] transition-all hover:shadow-md sm:min-h-[112px] sm:px-7"
-    :style="{ borderColor: theme.cardBorder, backgroundImage: theme.cardGradient }"
+    class="group relative flex min-h-[108px] w-full items-center justify-between overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-[#edf5ff] via-[#f7faff] to-white p-5 text-left shadow-[0_4px_20px_rgba(0,102,255,0.04)] transition-all hover:shadow-[0_6px_24px_rgba(0,102,255,0.08)] sm:p-6"
     @click="$emit('open')"
   >
-    <div class="relative z-10 min-w-0 pr-24 sm:pr-52">
-      <h3 class="whitespace-nowrap text-sm font-bold text-[#0a192f] sm:text-base">
-        친구에게 공유하기
+    <div class="relative z-10 min-w-0 pr-28 sm:pr-56">
+      <h3 class="pt-1.5 text-sm font-black tracking-tight text-[#0a192f] sm:text-base">
+        친구에게 나의 로드맵 자랑하기
       </h3>
-      <p class="pt-1 text-left text-[11px] leading-tight text-slate-500 sm:text-xs">
-        목표 달성 현황을 친구들에게 자랑해 보세요!
+      <p class="pt-1 text-left text-[11px] font-medium leading-tight text-slate-500 sm:text-xs">
+        목표 달성 현황 카드 이미지를 친구들에게 공유하고 함께 달려보세요!
       </p>
-      <span class="mt-2 inline-flex text-xs font-bold text-primary sm:text-sm">공유하기 →</span>
+      <div
+        class="mt-2.5 flex items-center gap-1.5 text-xs font-black text-primary group-hover:translate-x-1 transition-transform"
+      >
+        <span>지금 공유하기</span>
+        <span>→</span>
+      </div>
     </div>
 
-    <!-- 우측 대형 friends.png 캐릭터 일러스트 -->
+    <!-- 우측 친구들 일러스트 -->
     <img
       :src="friendsImage"
       alt="친구들"
-      class="absolute -bottom-3 right-3 h-24 w-auto object-contain drop-shadow-md transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:right-8 sm:h-32"
+      class="absolute -bottom-2 right-2 h-24 w-auto object-contain drop-shadow-md transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105 sm:right-6 sm:h-30"
     />
   </button>
 </template>
 
 <script setup>
-import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
 import friendsImage from '@/assets/images/friends.png'
 
 defineEmits(['open'])
-
-const theme = PACE_THEME.AHEAD
 </script>

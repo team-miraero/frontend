@@ -1,11 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2172 592" fill="none">
-  <path d="M-40 346 C150 374 278 278 462 300 C642 321 723 374 890 342 C1060 310 1158 278 1340 320 C1515 361 1604 382 1772 345 C1940 309 2054 316 2212 350" stroke="#e3e7ef" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M-40 346 C150 374 278 278 462 300 C642 321 723 374 890 342 C1060 310 1158 278 1340 320 C1515 361 1604 382 1772 345 C1940 309 2054 316 2212 350" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M-40 346 C150 374 278 278 462 300 C642 321 723 374 890 342 C1060 310 1158 278 1340 320 C1515 361 1604 382 1772 345 C1940 309 2054 316 2212 350" stroke="#d8dde7" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M-40 346 C150 374 278 278 462 300 C642 321 723 374 890 342 C1060 310 1158 278 1340 320 C1515 361 1604 382 1772 345 C1940 309 2054 316 2212 350" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="20 15" />
-  <g transform="translate(1923 250)">
-    <path d="M0 0v136" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
-    <path d="M4 4c34-17 51 10 80-2v48c-29 12-46-15-80 2z" fill="#0066ff" />
-    <circle cy="136" r="10" fill="#0066ff" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2172 460" fill="none">
+  <defs>
+    <!-- 청량한 소프트 스카이블루 도로 트랙 그라데이션 -->
+    <linearGradient id="trackGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e2effe" />
+      <stop offset="50%" stop-color="#d6e8fe" />
+      <stop offset="100%" stop-color="#e2effe" />
+    </linearGradient>
+  </defs>
+
+  <!-- 소프트 스카이블루 프리미엄 도로 트랙 (선명하고 또렷한 도로감) -->
+  <!-- 레이어 1: 앰비언트 글로우 베이스 (연하늘빛 도로 그림자) -->
+  <path
+    d="M-40 255 C150 280 278 190 462 210 C642 230 723 280 890 250 C1060 220 1158 190 1340 230 C1515 270 1604 290 1772 255 C1940 220 2054 230 2212 260"
+    stroke="#cce1fd"
+    stroke-width="50"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.9"
+  />
+
+  <!-- 레이어 2: 맑은 화이트 레일 테두리 -->
+  <path
+    d="M-40 255 C150 280 278 190 462 210 C642 230 723 280 890 250 C1060 220 1158 190 1340 230 C1515 270 1604 290 1772 255 C1940 220 2054 230 2212 260"
+    stroke="#ffffff"
+    stroke-width="38"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- 레이어 3: 청량하고 또렷한 파스텔 스카이블루 트랙 바닥 -->
+  <path
+    d="M-40 255 C150 280 278 190 462 210 C642 230 723 280 890 250 C1060 220 1158 190 1340 230 C1515 270 1604 290 1772 255 C1940 220 2054 230 2212 260"
+    stroke="url(#trackGrad)"
+    stroke-width="26"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- 레이어 4: 또렷하고 세련된 중앙 레인 점선 -->
+  <path
+    d="M-40 255 C150 280 278 190 462 210 C642 230 723 280 890 250 C1060 220 1158 190 1340 230 C1515 270 1604 290 1772 255 C1940 220 2054 230 2212 260"
+    stroke="#93c5fd"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-dasharray="16 12"
+  />
 </svg>

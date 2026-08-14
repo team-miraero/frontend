@@ -1,146 +1,124 @@
 <!-- 전체 마일스톤 리스트 (러닝 스플릿 기록판 스타일 · 가로 카드 + 커넥터) -->
 <template>
-  <div
-    class="rounded-3xl border border-slate-200 bg-white p-[25px] shadow-[0_2px_7px_rgba(0,102,255,0.06)]"
-  >
-    <div class="flex items-center gap-1.5 pb-5">
-      <span class="text-xs">🏁</span>
-      <p class="text-xs font-bold uppercase tracking-[1.2px] text-slate-400">스플릿 기록</p>
+  <div class="w-full">
+    <!-- 헤더 (상단 알아서 모으기 / 다음달 자금마련과 동일한 원형 뱃지 벡터 아이콘 스타일) -->
+    <div class="flex items-center justify-between pb-3.5 sm:pb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-sm ring-1 ring-primary/20">
+          <svg
+            class="size-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="13" r="8" />
+            <path d="M12 9v4l2.5 1.5" />
+            <path d="M10 2h4" />
+            <path d="M18 5l1.5 1.5" />
+          </svg>
+        </span>
+        <div>
+          <h3 class="text-sm font-black tracking-tight text-[#0a192f] sm:text-base">
+            스플릿 기록
+          </h3>
+          <p class="text-xs font-bold text-slate-400">
+            구간별 목표 달성 현황과 페이스 기록이에요
+          </p>
+        </div>
+      </div>
+      <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-500">
+        전체 {{ milestones.length }}스플릿
+      </span>
     </div>
 
-    <div ref="scrollContainer" class="flex items-start gap-0 overflow-x-auto pb-1">
+    <!-- 가로 스크롤 스플릿 카드 리스트 -->
+    <div ref="scrollContainer" class="no-scrollbar flex items-stretch gap-3 overflow-x-auto pb-1">
       <template v-for="(milestone, index) in milestones" :key="milestone.milestoneId">
         <div
           :data-in-progress="milestone.status === 'IN_PROGRESS' ? 'true' : null"
-          class="flex min-w-[140px] flex-1 flex-col rounded-2xl border p-3"
+          class="flex min-w-[155px] flex-1 flex-col justify-between rounded-2xl border p-3.5 transition-all"
           :class="[
             milestone.status === 'COMPLETED'
-              ? 'border-primary/15 bg-primary/[0.02]'
+              ? 'border-primary/20 bg-[#f8fbff]'
               : milestone.status === 'IN_PROGRESS'
-                ? 'border-primary/30 bg-white shadow-[0_4px_14px_rgba(0,102,255,0.1)]'
-                : 'border-slate-200 bg-slate-50',
+                ? 'border-primary bg-white shadow-[0_4px_18px_rgba(0,102,255,0.1)] ring-2 ring-primary/15'
+                : 'border-slate-100 bg-slate-50/60 opacity-80',
           ]"
         >
-          <div class="flex items-center gap-1.5">
-            <span
-              class="flex size-5 shrink-0 items-center justify-center rounded-full border-2"
-              :class="
-                milestone.status === 'COMPLETED'
-                  ? 'border-primary bg-primary'
-                  : milestone.status === 'IN_PROGRESS'
-                    ? 'border-primary bg-white'
-                    : 'border-slate-300 bg-white'
-              "
-            >
-              <img
-                v-if="milestone.status === 'COMPLETED'"
-                src="@/assets/icons/milestone-dot-check.svg"
-                alt=""
-                class="size-2.5 brightness-0 invert"
-              />
+          <div>
+            <!-- 상단 뱃지 & 단계 -->
+            <div class="flex items-center justify-between gap-1.5">
               <span
-                v-else
-                class="size-1.5 rounded-full"
-                :class="milestone.status === 'IN_PROGRESS' ? 'bg-primary' : 'bg-slate-300'"
-              />
-            </span>
-            <span
-              class="whitespace-nowrap rounded-full px-1.5 py-0.5 text-[9px] font-black tracking-[-0.2px]"
-              :class="
-                milestone.status === 'COMPLETED'
-                  ? 'bg-primary/[0.09] text-primary'
-                  : 'bg-slate-100 text-slate-400'
-              "
-            >
-              SPLIT {{ index + 1 }}
-            </span>
-          </div>
+                class="rounded-full px-2 py-0.5 text-[10px] font-black tracking-tight"
+                :class="
+                  milestone.status === 'COMPLETED'
+                    ? 'bg-primary/10 text-primary'
+                    : milestone.status === 'IN_PROGRESS'
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-slate-200/80 text-slate-500'
+                "
+              >
+                SPLIT {{ index + 1 }}
+              </span>
 
-          <p
-            class="pt-2 text-sm font-black tracking-[-0.3px]"
-            :class="
-              milestone.status === 'COMPLETED' || milestone.status === 'IN_PROGRESS'
-                ? 'text-primary'
-                : 'text-slate-400'
-            "
-          >
-            {{ formatManwon(milestone.targetAmount) }}원
-          </p>
-
-          <span
-            class="mt-1 w-fit whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-bold"
-            :class="
-              milestone.status === 'COMPLETED'
-                ? 'bg-primary/[0.09] text-primary'
-                : milestone.status === 'IN_PROGRESS'
-                  ? 'bg-primary text-white'
-                  : 'bg-slate-100 text-slate-400'
-            "
-          >
-            {{
-              milestone.status === 'COMPLETED'
-                ? '완료 ✓'
-                : milestone.status === 'IN_PROGRESS'
-                  ? '진행 중'
-                  : '예정'
-            }}
-          </span>
-
-          <!-- 진행 중인 구간: NextMilestoneCard와 동일한 계산식(segmentProgress/remainingToNext) -->
-          <div v-if="milestone.status === 'IN_PROGRESS' && goal" class="pt-2">
-            <div class="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
-              <div
-                class="h-1.5 rounded-full bg-primary"
-                :style="{ width: `${segmentProgress(milestone, index)}%` }"
-              />
+              <span
+                class="flex items-center gap-1 text-[10px] font-bold"
+                :class="milestone.status === 'COMPLETED' ? 'text-primary' : 'text-slate-400'"
+              >
+                <span v-if="milestone.status === 'COMPLETED'" class="text-xs font-black">✓</span>
+                {{ milestone.percentage }}%
+              </span>
             </div>
-            <p class="pt-1 text-[10px] font-bold text-primary">
-              현재 {{ formatManwon(goal.currentAmount) }}원 ({{
-                segmentProgress(milestone, index)
-              }}%)
+
+            <!-- 목표 금액 -->
+            <p
+              class="pt-2 text-base font-black tracking-tight"
+              :class="
+                milestone.status === 'COMPLETED' || milestone.status === 'IN_PROGRESS'
+                  ? 'text-[#0a192f]'
+                  : 'text-slate-400'
+              "
+            >
+              {{ formatManwon(milestone.targetAmount) }}원
             </p>
-            <p class="text-[10px] text-primary/70">
-              {{ formatManwon(remainingToNext(milestone)) }} 남음
+
+            <p
+              v-if="milestone.title"
+              class="pt-0.5 text-[11px] font-bold text-slate-500"
+            >
+              {{ milestone.title }}
             </p>
           </div>
 
-          <p
-            class="pt-2 text-[10px]"
-            :class="milestone.status === 'COMPLETED' ? 'text-primary/60' : 'text-slate-400'"
-          >
-            <template v-if="milestone.targetDate">달성 {{ milestone.targetDate }}</template>
-            <template v-else>{{ milestone.percentage }}% 체크포인트</template>
-          </p>
+          <!-- 하단 상태 및 진행률 바 -->
+          <div class="pt-3">
+            <!-- 진행 중인 구간 게이지 -->
+            <div v-if="milestone.status === 'IN_PROGRESS' && goal" class="space-y-1.5">
+              <div class="h-1.5 w-full overflow-hidden rounded-full bg-primary/15">
+                <div
+                  class="h-1.5 rounded-full bg-primary transition-all duration-500"
+                  :style="{ width: `${segmentProgress(milestone, index)}%` }"
+                />
+              </div>
+              <div class="flex items-center justify-between text-[10px] font-bold">
+                <span class="text-primary">{{ segmentProgress(milestone, index) }}% 달성</span>
+                <span class="text-slate-400">{{ formatManwon(remainingToNext(milestone)) }}원 남음</span>
+              </div>
+            </div>
 
-          <p
-            v-if="milestone.title"
-            class="pt-1 text-[11px] font-bold"
-            :class="milestone.status === 'COMPLETED' ? 'text-slate-700' : 'text-slate-400'"
-          >
-            {{ milestone.title }}
-          </p>
-
-          <div v-if="milestone.tags?.length" class="flex flex-wrap gap-1 pt-1.5">
-            <span
-              v-for="tag in milestone.tags"
-              :key="tag"
-              class="rounded-full px-1.5 py-0.5 text-[9px] font-bold"
-              :class="
-                milestone.status === 'COMPLETED'
-                  ? 'bg-primary/[0.07] text-primary'
-                  : 'bg-slate-100 text-slate-400'
-              "
-            >
-              {{ tag }}
-            </span>
+            <!-- 완료/예정 상태 텍스트 -->
+            <div v-else class="flex items-center justify-between text-[10px] font-medium text-slate-400">
+              <span v-if="milestone.status === 'COMPLETED'" class="font-bold text-primary">
+                달성 완료 🎉
+              </span>
+              <span v-else>도전 대기 중</span>
+              <span v-if="milestone.targetDate">{{ milestone.targetDate }}</span>
+            </div>
           </div>
         </div>
-
-        <div
-          v-if="index < milestones.length - 1"
-          class="mt-[22px] h-px w-3 shrink-0 self-start"
-          :class="milestone.status === 'COMPLETED' ? 'bg-primary/25' : 'bg-slate-200'"
-        />
       </template>
     </div>
   </div>
@@ -158,14 +136,12 @@ const props = defineProps({
   },
   goal: {
     type: Object,
-    default: null, // NextMilestoneCard와 동일하게 currentAmount만 사용
+    default: null,
   },
 })
 
 let hasScrolledToInProgress = false
 
-// 진행 중인 카드가 보이도록 가로 스크롤만 이동한다.
-// scrollIntoView는 상위 페이지의 세로 스크롤까지 움직여 새로고침 시 화면이 중간에서 시작되는 문제가 있다.
 watch(
   () => props.milestones,
   (milestones) => {
@@ -186,14 +162,14 @@ function formatManwon(amount) {
   return `${Math.round(amount / 10000).toLocaleString()}만`
 }
 
-// NextMilestoneCard.vue의 segmentProgress/remainingToNext와 동일한 계산식
 function segmentProgress(milestone, index) {
   const from = props.milestones[index - 1]?.targetAmount ?? 0
   const to = milestone.targetAmount
-  return Math.min(100, Math.round(((props.goal.currentAmount - from) / (to - from)) * 100))
+  if (to <= from) return 100
+  return Math.min(100, Math.max(0, Math.round(((props.goal.currentAmount - from) / (to - from)) * 100)))
 }
 
 function remainingToNext(milestone) {
-  return Math.max(0, milestone.targetAmount - props.goal.currentAmount)
+  return Math.max(0, milestone.targetAmount - (props.goal?.currentAmount ?? 0))
 }
 </script>
