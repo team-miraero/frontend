@@ -26,17 +26,18 @@ function selectGoal(goalId) {
 onMounted(async () => {
   await goalStore.fetchGoals()
 
+  // 목표 조회가 실패하면 goals가 비어 있다. 이때 selection을 건드리면
+  // 대시보드·로드맵과 공유하는 selectedGoalId까지 날아가므로 그대로 둔다.
+  if (goals.value.length === 0) return
+
   const numericGoalId = Number(selectedGoalId.value)
   const hasSelectedGoal =
     Number.isInteger(numericGoalId) &&
     goals.value.some((goal) => Number(goal.goalId) === numericGoalId)
 
-  if (hasSelectedGoal) {
-    goalStore.selectGoal(numericGoalId)
-    return
-  }
+  if (hasSelectedGoal) return
 
   const firstGoalId = Number(goals.value[0]?.goalId)
-  goalStore.selectGoal(Number.isInteger(firstGoalId) && firstGoalId > 0 ? firstGoalId : null)
+  if (Number.isInteger(firstGoalId) && firstGoalId > 0) goalStore.selectGoal(firstGoalId)
 })
 </script>
