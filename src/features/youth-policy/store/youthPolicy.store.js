@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import * as youthPolicyApi from '@/features/youth-policy/api/youthPolicy.api'
-import { useMypageStore } from '@/features/mypage'
-import { getEligibilityChecklist } from '@/features/youth-policy/composables/useEligibilityCheck'
 import {
   DEFAULT_PAGE_SIZE,
   POLICY_CATEGORIES,
@@ -90,19 +88,15 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
     isRecommendedLoading.value = true
     recommendedError.value = null
     try {
-      const mypageStore = useMypageStore()
-      const [profile, response] = await Promise.all([
-        mypageStore.profile ?? mypageStore.fetchProfile(),
-        youthPolicyApi.getRecommendedYouthPolicies(),
-      ])
+      const response = await youthPolicyApi.getRecommendedYouthPolicies()
 
-      const details = await Promise.all(
+      const detailResults = await Promise.allSettled(
         response.content.map((item) => youthPolicyApi.getYouthPolicyDetail(item.youthPolicyId))
       )
-      const eligible = details.filter((policy) =>
-        getEligibilityChecklist(policy, profile).every((item) => item.matched)
-      )
-      recommendedPolicies.value = eligible
+      recommendedPolicies.value = response.content.map((item, index) => {
+        const detailResult = detailResults[index]
+        return detailResult.status === 'fulfilled' ? detailResult.value : item
+      })
     } catch (caughtError) {
       recommendedError.value = caughtError
     } finally {

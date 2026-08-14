@@ -16,8 +16,8 @@ import { client } from '@/shared/api/client'
  * @returns {Promise<Profile>}
  */
 export async function getProfile() {
-  const { data } = await client.get('/users/profile')
-  return data
+  const { data: responseBody } = await client.get('/users/profile')
+  return responseBody?.data ?? responseBody
 }
 
 /**
