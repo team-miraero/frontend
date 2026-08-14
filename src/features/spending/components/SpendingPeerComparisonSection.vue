@@ -64,7 +64,10 @@
         </label>
       </div>
 
-      <div class="mt-4 rounded-xl bg-[#F4F8FF] px-4 py-3">
+      <div
+        v-if="comparisonAvailable && comparisonItems.length > 0"
+        class="mt-4 rounded-xl bg-[#F4F8FF] px-4 py-3"
+      >
         <p class="text-sm font-semibold text-[#0A192F]">
           {{ selectedPeerGroupLabel }} {{ peerComparisonLabel }}보다
 
@@ -79,7 +82,10 @@
         </p>
       </div>
 
-      <ul class="mt-2 divide-y divide-[#EEF2F7]">
+      <ul
+        v-if="comparisonAvailable && comparisonItems.length > 0"
+        class="mt-2 divide-y divide-[#EEF2F7]"
+      >
         <li
           v-for="category in comparisonItems"
           :key="category.id"
@@ -141,6 +147,20 @@
           </span>
         </li>
       </ul>
+
+      <p
+        v-if="comparisonAvailable && comparisonItems.length === 0"
+        class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
+      >
+        비교할 또래 지출 데이터가 없어요.
+      </p>
+
+      <p
+        v-if="!comparisonAvailable"
+        class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
+      >
+        {{ unavailableMessage }}
+      </p>
     </article>
   </section>
 </template>
@@ -173,6 +193,8 @@ const {
   selectedPeerGroupId,
   selectedPeerGroupLabel,
   peerGroupOptions,
+  comparisonAvailable,
+  unavailableMessage,
   comparisonItems,
   totalDifference,
   absoluteTotalDifference,

@@ -62,6 +62,13 @@
           </span>
         </li>
       </ul>
+
+      <p
+        v-if="monthlyComparisonItems.length === 0"
+        class="rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
+      >
+        비교할 지출 데이터가 없어요.
+      </p>
     </article>
   </section>
 </template>

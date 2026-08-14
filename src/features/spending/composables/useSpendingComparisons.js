@@ -2,8 +2,6 @@ import { computed, ref } from 'vue'
 import {
   DEFAULT_SPENDING_AGE_GROUP_ID,
   DEFAULT_SPENDING_INCOME_GROUP_ID,
-  PEER_SPENDING_BY_BASIS,
-  PREVIOUS_MONTH_SPENDING_BY_CATEGORY,
   SPENDING_AGE_GROUPS,
   SPENDING_CATEGORY_TYPES,
   SPENDING_CATEGORIES,
@@ -111,17 +109,37 @@ export function usePeerSpendingComparison(summary) {
       peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
   )
 
-  const peerSpending = computed(
-    () => PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value]
+  const comparisonAvailable = computed(
+    () =>
+      selectedComparisonBasis.value === 'AGE' &&
+      selectedCategoryType.value === SPENDING_CATEGORY_TYPES.VARIABLE
+  )
+  const unavailableMessage = computed(() => {
+    if (selectedComparisonBasis.value === 'INCOME') {
+      return '월소득 구간별 평균 데이터는 현재 Swagger에서 제공하지 않아요.'
+    }
+
+    return '고정지출 또래 평균 데이터는 현재 Swagger에서 제공하지 않아요.'
+  })
+
+  const peerSpending = computed(() =>
+    comparisonAvailable.value ? (summary.value.peerCategorySpending ?? {}) : {}
   )
 
   const categorySpending = computed(() => summary.value.categorySpending ?? {})
 
-  const comparisonItems = computed(() =>
-    SPENDING_CATEGORIES.filter((category) => category.type === selectedCategoryType.value)
+  const comparisonItems = computed(() => {
+    if (!comparisonAvailable.value) return []
+
+    return SPENDING_CATEGORIES.filter(
+      (category) =>
+        category.type === selectedCategoryType.value &&
+        (Object.hasOwn(categorySpending.value, category.id) ||
+          Object.hasOwn(peerSpending.value, category.id))
+    )
       .map((category) => ({
         ...category,
-        current: categorySpending.value[category.id] ?? category.current,
+        current: categorySpending.value[category.id] ?? 0,
       }))
       .sort((firstCategory, secondCategory) => secondCategory.current - firstCategory.current)
       .map((category) => {
@@ -136,7 +154,7 @@ export function usePeerSpendingComparison(summary) {
           peerWidth: (peerAmount / maximumAmount) * 100,
         }
       })
-  )
+  })
 
   const currentTotalSpending = computed(() =>
     comparisonItems.value.reduce((total, category) => total + category.current, 0)
@@ -178,6 +196,8 @@ export function usePeerSpendingComparison(summary) {
     selectedPeerGroupId,
     selectedPeerGroupLabel,
     peerGroupOptions,
+    comparisonAvailable,
+    unavailableMessage,
     comparisonItems,
     totalDifference,
     absoluteTotalDifference,
@@ -201,12 +221,16 @@ function joinKoreanNames(names) {
 
 export function useMonthlySpendingComparison(summary) {
   const categorySpending = computed(() => summary.value.categorySpending ?? {})
+  const previousMonthSpending = computed(() => summary.value.previousMonthCategorySpending ?? {})
   const monthlyComparisonItems = computed(() =>
     SPENDING_CATEGORIES.filter(
-      (category) => category.type === SPENDING_CATEGORY_TYPES.VARIABLE
+      (category) =>
+        category.type === SPENDING_CATEGORY_TYPES.VARIABLE &&
+        (Object.hasOwn(categorySpending.value, category.id) ||
+          Object.hasOwn(previousMonthSpending.value, category.id))
     ).map((category) => {
-      const current = categorySpending.value[category.id] ?? category.current
-      const previousAmount = PREVIOUS_MONTH_SPENDING_BY_CATEGORY[category.id] ?? current
+      const current = categorySpending.value[category.id] ?? 0
+      const previousAmount = previousMonthSpending.value[category.id] ?? 0
 
       return {
         ...category,
