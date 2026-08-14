@@ -1,6 +1,6 @@
 <!-- 회원가입 약관 동의 카드: 전체 동의 + 개별 약관 체크 + 약관 보기 모달 -->
 <template>
-  <div class="rounded-2xl border border-gray-200 bg-gray-50/40 p-5">
+  <div class="rounded-2xl border border-gray-200 bg-gray-50/40 p-4 sm:p-5">
     <p class="text-sm leading-relaxed text-gray-500">
       미래로는 KB Pay 마이데이터를 통해 회원님의 자산·소득·지출 정보를 불러와 로드맵 설계와 변화
       대응에 활용해요. 아래 항목에 동의해 주세요.
@@ -37,9 +37,13 @@
     </label>
 
     <ul class="mt-2 divide-y divide-gray-100">
-      <li v-for="term in terms" :key="term.id" class="flex items-start justify-between gap-3 py-3">
+      <li
+        v-for="term in terms"
+        :key="term.id"
+        class="flex items-start justify-between gap-1.5 py-3 sm:gap-2"
+      >
         <label
-          class="flex flex-1 cursor-pointer items-start gap-3"
+          class="flex min-w-0 flex-1 cursor-pointer items-start gap-2 sm:gap-3"
           @click.prevent="toggle(term.id)"
         >
           <input
@@ -65,24 +69,31 @@
               <path d="M20 6 9 17l-5-5" />
             </svg>
           </span>
-          <span class="flex flex-col">
-            <span class="flex items-center gap-1.5">
+          <span class="flex min-w-0 flex-1 flex-col">
+            <span class="flex min-w-0 flex-nowrap items-center gap-1 sm:gap-1.5">
               <span
-                class="rounded px-1.5 py-0.5 text-[11px] font-semibold"
+                class="shrink-0 whitespace-nowrap rounded px-1 py-0.5 text-[10px] font-semibold sm:px-1.5 sm:text-[11px]"
                 :class="term.required ? 'bg-blue-50 text-primary' : 'bg-gray-100 text-gray-400'"
               >
                 {{ term.required ? '필수' : '선택' }}
               </span>
-              <span class="text-sm font-medium text-gray-900">{{ term.label }}</span>
+              <span
+                class="min-w-0 whitespace-nowrap text-[11px] font-medium tracking-[-0.02em] text-gray-900 sm:text-sm sm:tracking-normal"
+              >
+                {{ term.label }}
+              </span>
             </span>
-            <span v-if="term.description" class="mt-0.5 text-xs text-gray-400">
+            <span
+              v-if="term.description"
+              class="mt-0.5 text-xs text-gray-400 [word-break:keep-all]"
+            >
               {{ term.description }}
             </span>
           </span>
         </label>
         <button
           type="button"
-          class="shrink-0 self-start pt-0.5 text-xs text-gray-400 transition-colors hover:text-gray-600"
+          class="shrink-0 self-start whitespace-nowrap pt-0.5 text-[11px] text-gray-400 transition-colors hover:text-gray-600 sm:text-xs"
           @click="openTerm(term)"
         >
           보기

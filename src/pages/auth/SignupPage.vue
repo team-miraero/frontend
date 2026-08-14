@@ -1,7 +1,7 @@
 <!-- 회원가입 페이지 (AUTH-01) -->
 <template>
   <HeroBackground>
-    <StepHeader back-label="로그인으로" @back="router.push({ name: ROUTE_NAMES.LOGIN })" />
+    <StepHeader back-label="이전" @back="handleBack" />
 
     <main class="flex justify-center px-4 pb-16 pt-8">
       <div class="w-full max-w-[380px]">
@@ -174,6 +174,15 @@ async function handleSubmit() {
   } catch {
     // signupError는 store에서 관리
   }
+}
+
+function handleBack() {
+  if (window.history.state?.back) {
+    router.back()
+    return
+  }
+
+  router.push({ name: ROUTE_NAMES.LOGIN })
 }
 
 function handleGoToLogin() {
