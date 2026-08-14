@@ -2,9 +2,11 @@
 <template>
   <div class="flex h-screen w-full flex-col overflow-hidden bg-[#fbfdff]">
     <DashboardHeader v-if="!route.meta.hideHeader" />
-    <main class="flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+    <DashboardSidebar v-if="!route.meta.hideHeader" />
+    <main class="flex-1 overflow-y-auto max-md:pb-[calc(80px+env(safe-area-inset-bottom))] [scrollbar-gutter:stable]">
       <RouterView />
     </main>
+    <DashboardBottomNav v-if="!route.meta.hideHeader" />
   </div>
 </template>
 
@@ -12,6 +14,8 @@
 import { useRoute } from 'vue-router'
 import { RouterView } from 'vue-router'
 import DashboardHeader from '@/app/layouts/components/DashboardHeader.vue'
+import DashboardSidebar from '@/app/layouts/components/DashboardSidebar.vue'
+import DashboardBottomNav from '@/app/layouts/components/DashboardBottomNav.vue'
 
 const route = useRoute()
 </script>
