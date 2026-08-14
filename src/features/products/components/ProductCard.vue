@@ -111,6 +111,7 @@ const props = defineProps({
   productType: { type: String, required: true },
   isHighestRate: { type: Boolean, default: false },
   goalName: { type: String, default: '선택한 목표' },
+  eligibleMaturityTerms: { type: Array, default: () => [] },
   recommendationImpact: { type: Object, default: null },
 })
 
@@ -139,6 +140,13 @@ const impactTitle = computed(() => {
   const impact = props.recommendationImpact
   const status = impact?.calculationStatus
 
+  if (
+    props.eligibleMaturityTerms.length > 0 &&
+    (status === CALCULATION_STATUS.NOT_APPLICABLE || status === CALCULATION_STATUS.INSUFFICIENT_DATA)
+  ) {
+    return '목표 기간 내 만기 가능한 옵션이 있어요'
+  }
+
   if (status === CALCULATION_STATUS.CALCULATED) {
     return `이 상품 활용 시 목표 ${impact.estimatedMonthsSaved}개월 단축`
   }
@@ -160,6 +168,13 @@ const impactTitle = computed(() => {
 
 const impactDescription = computed(() => {
   const impact = props.recommendationImpact
+  if (
+    props.eligibleMaturityTerms.length > 0 &&
+    (impact?.calculationStatus === CALCULATION_STATUS.NOT_APPLICABLE ||
+      impact?.calculationStatus === CALCULATION_STATUS.INSUFFICIENT_DATA)
+  ) {
+    return `${props.eligibleMaturityTerms.join(' · ')}개월 옵션으로 목표 기간 안에 만기돼요`
+  }
   if (
     impact?.calculationStatus === CALCULATION_STATUS.CALCULATED ||
     impact?.calculationStatus === CALCULATION_STATUS.NO_IMPROVEMENT

@@ -193,6 +193,22 @@ function getEligibleOptions(product, productType, remainMonths, interestRateBasi
     )
 }
 
+export function getMaturityEligibleTerms(product, remainMonths) {
+  const normalizedRemainMonths = toFiniteNumber(remainMonths)
+  if (normalizedRemainMonths === null || normalizedRemainMonths <= 0) {
+    return []
+  }
+
+  const terms = [
+    ...(product?.saveTerms ?? []),
+    ...(product?.options ?? []).map((option) => option.saveTerm),
+  ]
+
+  return [...new Set(terms.map(toFiniteNumber))]
+    .filter((saveTerm) => saveTerm !== null && saveTerm > 0 && saveTerm <= normalizedRemainMonths)
+    .sort((firstTerm, secondTerm) => firstTerm - secondTerm)
+}
+
 function createEmptyResult(calculationStatus, interestRateBasis) {
   return {
     optionId: null,

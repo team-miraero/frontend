@@ -22,7 +22,8 @@ function isOfficialKbUrl(value) {
 }
 
 export function getOfficialProductLink(product) {
-  const urlCandidate = product?.officialUrl ?? OFFICIAL_PRODUCT_URLS[product?.productCode]
+  const urlCandidate =
+    product?.productPageUrl ?? product?.officialUrl ?? OFFICIAL_PRODUCT_URLS[product?.productCode]
   const directUrl = isOfficialKbUrl(urlCandidate) ? urlCandidate : null
   const officialUrlLabel = product?.officialUrlLabel?.trim()
 

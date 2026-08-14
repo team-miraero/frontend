@@ -14,5 +14,6 @@ export {
   CALCULATION_STATUS,
   INTEREST_RATE_BASIS,
   calculateRecommendationImpact,
+  getMaturityEligibleTerms,
   calculateWeightedInterestRate,
 } from '@/features/products/lib/recommendation-impact'
