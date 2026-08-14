@@ -22,6 +22,13 @@
         지출 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
       </p>
 
+      <p
+        v-else-if="!hasNumericGoalId && !areGoalsLoading"
+        class="rounded-2xl border border-[#E2E8F0] bg-white px-5 py-8 text-center text-sm text-[#64748B]"
+      >
+        지출관리에 사용할 목표를 먼저 만들어 주세요.
+      </p>
+
       <template v-else-if="spendingSummary">
         <SpendingSummarySection
           :total-spending="spendingSummary.totalSpending"
@@ -43,8 +50,8 @@
     <SpendingHistoryModal
       v-model="isTransactionHistoryOpen"
       :transactions="transactionHistory?.transactions ?? []"
-      :total-count="transactionHistory?.totalCount ?? 0"
-      :total-expense="transactionSummary?.totalExpense ?? 0"
+      :total-count="transactionHistory?.totalElements ?? 0"
+      :total-expense="(spendingSummary?.totalSpending ?? 0) * 10000"
       :loading="areTransactionsLoading"
       :error="transactionsError"
       @retry="loadTransactionHistory"
@@ -53,7 +60,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import SpendingContentTabs from '@/features/spending/components/SpendingContentTabs.vue'
 import SpendingHistoryModal from '@/features/spending/components/SpendingHistoryModal.vue'
@@ -68,7 +75,6 @@ const {
   isLoading,
   error,
   transactionHistory,
-  transactionSummary,
   areTransactionsLoading,
   transactionsError,
 } = storeToRefs(spendingStore)
@@ -96,24 +102,27 @@ const props = defineProps({
 defineEmits(['select-goal'])
 
 const roadmapHelperText = computed(() =>
-  props.selectedGoal
-    ? `이 페이지의 모든 단축 효과는 ${props.selectedGoal} 로드맵 기준으로 계산돼요`
-    : ''
+  props.selectedGoal ? `저축 여력과 목표 현황은 ${props.selectedGoal} 로드맵 기준으로 계산돼요` : ''
 )
 
-const myDataStatusText = computed(() => {
-  if (!spendingSummary.value?.myDataLinked) return ''
-
-  const month = Number(spendingSummary.value.referenceMonth?.split('-')[1])
-  return Number.isInteger(month) && month > 0
-    ? `마이데이터 연동 · ${month}월 기준`
-    : '마이데이터 연동'
+const hasNumericGoalId = computed(() => {
+  const goalId = Number(props.selectedGoalId)
+  return Number.isInteger(goalId) && goalId > 0
 })
 
-const referenceMonth = computed(() => spendingSummary.value?.referenceMonth ?? '2026-07')
+const myDataStatusText = computed(() => {
+  const month = Number(spendingSummary.value?.referenceMonth?.split('-')[1])
+  return Number.isInteger(month) && month > 0 ? `${month}월 기준` : ''
+})
+
+const referenceDate = computed(() => {
+  const [year, month] = (spendingSummary.value?.referenceMonth ?? '').split('-').map(Number)
+  return Number.isInteger(year) && Number.isInteger(month) ? { year, month } : null
+})
 
 function loadTransactionHistory() {
-  return spendingStore.loadTransactions({ yearMonth: referenceMonth.value })
+  if (!referenceDate.value) return Promise.resolve()
+  return spendingStore.loadTransactions(referenceDate.value)
 }
 
 function openTransactionHistory() {
@@ -121,10 +130,14 @@ function openTransactionHistory() {
   loadTransactionHistory()
 }
 
-onMounted(() => {
-  spendingStore.loadSpendingData({
-    from: '2026-07-01',
-    to: '2026-07-31',
-  })
-})
+watch(
+  () => props.selectedGoalId,
+  (goalId) => {
+    const numericGoalId = Number(goalId)
+    if (Number.isInteger(numericGoalId) && numericGoalId > 0) {
+      spendingStore.loadSpendingData(numericGoalId)
+    }
+  },
+  { immediate: true }
+)
 </script>
