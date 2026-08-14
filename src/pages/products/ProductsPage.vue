@@ -198,6 +198,7 @@
               :product-type="product.productType"
               :is-highest-rate="Number(product.maximumInterestRate) === bestRate"
               :goal-name="selectedGoalName"
+              :eligible-maturity-terms="product.eligibleMaturityTerms"
               :recommendation-impact="product.recommendationImpact"
               @view-detail="openProductDetail"
             />
@@ -243,6 +244,7 @@ import {
   ProductCard,
   ProductDetailModal,
   calculateRecommendationImpact,
+  getMaturityEligibleTerms,
   calculateWeightedInterestRate,
   formatRate,
   formatRateCompact,
@@ -299,6 +301,10 @@ const recommendationProducts = computed(() =>
     .filter((product) => !isLinkedProduct(product, product.productType, linkedAccounts.value))
     .map((product) => ({
       ...product,
+      eligibleMaturityTerms: getMaturityEligibleTerms(
+        product,
+        appliedGoalDetail.value?.period?.remainMonths
+      ),
       recommendationImpact: calculateRecommendationImpact({
         goal: appliedGoalDetail.value,
         linkedAssets: linkedAssets.value,
