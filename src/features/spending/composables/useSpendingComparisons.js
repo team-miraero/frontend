@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import {
   DEFAULT_SPENDING_AGE_GROUP_ID,
   DEFAULT_SPENDING_INCOME_GROUP_ID,
+  PEER_SPENDING_BY_BASIS,
   SPENDING_AGE_GROUPS,
   SPENDING_CATEGORY_TYPES,
   SPENDING_CATEGORIES,
@@ -14,7 +15,7 @@ export function useSpendingSummaryComparison(props) {
   const formattedSavingCapacity = computed(() => formatKoreanNumber(props.savingCapacity))
   const formattedRemainingMonths = computed(() => formatKoreanNumber(props.remainingMonths))
   const normalizedGoalProgress = computed(() => Math.min(Math.max(props.goalProgress, 0), 100))
-  const previousMonthSpending = computed(() => props.totalSpending - props.monthlyDifference)
+  const previousMonthSpending = computed(() => props.previousMonthSpending)
 
   const monthlyDifferenceRate = computed(() => {
     if (previousMonthSpending.value <= 0) {
@@ -109,33 +110,20 @@ export function usePeerSpendingComparison(summary) {
       peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
   )
 
-  const comparisonAvailable = computed(
-    () =>
-      selectedComparisonBasis.value === 'AGE' &&
-      selectedCategoryType.value === SPENDING_CATEGORY_TYPES.VARIABLE
-  )
-  const unavailableMessage = computed(() => {
-    if (selectedComparisonBasis.value === 'INCOME') {
-      return '월소득 구간별 평균 데이터는 현재 Swagger에서 제공하지 않아요.'
-    }
-
-    return '고정지출 또래 평균 데이터는 현재 Swagger에서 제공하지 않아요.'
-  })
-
-  const peerSpending = computed(() =>
-    comparisonAvailable.value ? (summary.value.peerCategorySpending ?? {}) : {}
+  const peerSpending = computed(
+    () => PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value] ?? {}
   )
 
   const categorySpending = computed(() => summary.value.categorySpending ?? {})
 
+  // 또래 평균은 하드코딩이라 모든 카테고리를 갖고 있다. 여기서 peerSpending까지 조건에 넣으면
+  // 내 지출 데이터가 없는 카테고리도 0원으로 비교돼 "또래보다 훨씬 덜 쓴다"는 거짓 결과가 나온다.
+  // 그래서 내 지출 응답에 실제로 존재하는 카테고리만 비교 대상으로 삼는다.
   const comparisonItems = computed(() => {
-    if (!comparisonAvailable.value) return []
-
     return SPENDING_CATEGORIES.filter(
       (category) =>
         category.type === selectedCategoryType.value &&
-        (Object.hasOwn(categorySpending.value, category.id) ||
-          Object.hasOwn(peerSpending.value, category.id))
+        Object.hasOwn(categorySpending.value, category.id)
     )
       .map((category) => ({
         ...category,
@@ -196,8 +184,6 @@ export function usePeerSpendingComparison(summary) {
     selectedPeerGroupId,
     selectedPeerGroupLabel,
     peerGroupOptions,
-    comparisonAvailable,
-    unavailableMessage,
     comparisonItems,
     totalDifference,
     absoluteTotalDifference,

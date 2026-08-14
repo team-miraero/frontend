@@ -126,6 +126,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  previousMonthSpending: {
+    type: Number,
+    required: true,
+  },
   savingCapacity: {
     type: Number,
     required: true,

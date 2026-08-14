@@ -12,7 +12,11 @@ export const SPENDING_COMPARISON_BASES = [
   { id: 'INCOME', label: '월소득 기준' },
 ]
 
-export const SPENDING_AGE_GROUPS = [{ id: 'my-age-group', label: '내 연령대' }]
+export const SPENDING_AGE_GROUPS = [
+  { id: '20-24', label: '20~24세' },
+  { id: '25-29', label: '25~29세' },
+  { id: '30-34', label: '30~34세' },
+]
 
 export const SPENDING_INCOME_GROUPS = [
   { id: 'under-250', label: '250만원 미만' },
@@ -21,7 +25,7 @@ export const SPENDING_INCOME_GROUPS = [
   { id: 'over-500', label: '500만원 이상' },
 ]
 
-export const DEFAULT_SPENDING_AGE_GROUP_ID = 'my-age-group'
+export const DEFAULT_SPENDING_AGE_GROUP_ID = '25-29'
 export const DEFAULT_SPENDING_INCOME_GROUP_ID = '250-350'
 
 // 카테고리와 타입, 표시 순서, 스타일을 하나의 메타데이터로 관리한다.
@@ -203,4 +207,45 @@ export const RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY = {
   culture: 8,
   medical: 5,
   other: 3,
+}
+
+// [맞춤 지출 비교] 비교군별 카테고리 지출 평균(만원). 백엔드가 연령대/소득구간별 조회를 지원하지 않아
+// MVP 범위에서는 25~29세(=25-29) 평균을 기준값으로 두고 비교군별 배율을 곱해 하드코딩한다.
+const BASELINE_PEER_SPENDING = {
+  housing: 40,
+  telecommunication: 6,
+  insurance: 11,
+  subscription: 7,
+  loanRepayment: 12,
+  savings: 18,
+  investment: 8,
+  food: 30,
+  cafe: 12,
+  transportation: 10,
+  shopping: 20,
+  culture: 6,
+  medical: 4,
+  other: 4,
+}
+
+const scaleSpending = (spending, factor) =>
+  Object.fromEntries(
+    Object.entries(spending).map(([categoryId, amount]) => [
+      categoryId,
+      Math.round(amount * factor),
+    ])
+  )
+
+export const PEER_SPENDING_BY_BASIS = {
+  AGE: {
+    '20-24': scaleSpending(BASELINE_PEER_SPENDING, 0.86),
+    '25-29': BASELINE_PEER_SPENDING,
+    '30-34': scaleSpending(BASELINE_PEER_SPENDING, 1.12),
+  },
+  INCOME: {
+    'under-250': scaleSpending(BASELINE_PEER_SPENDING, 0.78),
+    '250-350': scaleSpending(BASELINE_PEER_SPENDING, 0.98),
+    '350-500': scaleSpending(BASELINE_PEER_SPENDING, 1.18),
+    'over-500': scaleSpending(BASELINE_PEER_SPENDING, 1.42),
+  },
 }
