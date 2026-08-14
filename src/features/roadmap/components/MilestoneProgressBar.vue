@@ -3,6 +3,17 @@
   <div class="relative w-full" style="aspect-ratio: 2172 / 592">
     <div class="absolute top-0 left-0 w-full" style="aspect-ratio: 2172 / 592">
       <img :src="roadmapImage" alt="" class="absolute inset-0 size-full object-contain" />
+      <svg class="absolute inset-0 size-full" viewBox="0 0 2172 592" fill="none" aria-hidden="true">
+        <path
+          d="M-40 346 C150 374 278 278 462 300 C642 321 723 374 890 342 C1060 310 1158 278 1340 320 C1515 361 1604 382 1772 345 C1940 309 2054 316 2212 350"
+          pathLength="100"
+          stroke="#0066ff"
+          stroke-width="16"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          :stroke-dasharray="`${roadProgress} 100`"
+        />
+      </svg>
 
       <!-- 마일스톤 라벨 + 마커: 도로 곡선 위 지점(pointOnRoad)에 배치 -->
       <div
@@ -126,6 +137,7 @@ const GOAL_TYPE_CHARACTER = {
 }
 
 const goalCharacterImage = computed(() => GOAL_TYPE_CHARACTER[props.goal.goalType] ?? rabbitImage)
+const roadProgress = computed(() => Math.min(100, Math.max(0, props.goal.progressRate)))
 
 // 각 PNG의 아래쪽 투명 여백만큼 이미지를 내려 실제 발끝이 공통 기준선에 닿도록 보정
 const GOAL_TYPE_FOOT_OFFSET = {

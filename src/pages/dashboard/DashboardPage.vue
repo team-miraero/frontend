@@ -28,16 +28,21 @@
         :progress-rate="goalStore.currentGoal.progressRate"
         :disabled="isGoalPaused"
         :current-amount="goalStore.currentGoal.currentAmount"
+        :goal-amount="goalStore.currentGoal.goalAmount"
+        :end-date="goalStore.currentGoal.period.endDate"
         :daily-available-money="goalStore.dailyAvailableMoney"
         :monthly-available-money="goalStore.monthlyAvailableMoney"
+        :pacemaker="pacemakerStore.pacemakerView"
+        :is-toggling="pacemakerStore.isToggling"
         @cta-click="handlePacemakerCtaClick"
+        @toggle="handlePacemakerToggle"
         @pause="openPauseConfirm"
         @open-today="handleOpenTodayAvailableMoneyModal"
         @open-month="handleOpenMonthlyAvailableMoneyModal"
       />
       <!-- 목표가 일시정지 상태면 아래 액션 영역 전체를 흐리게 하고 클릭이 통하지 않도록 막음 -->
       <div :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''">
-        <div class="mt-2 sm:mt-3">
+        <div class="mt-1 sm:mt-2">
           <MilestoneProgressBar
             :goal="goalStore.currentGoal"
             :milestones="roadmapStore.milestones"

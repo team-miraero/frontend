@@ -164,15 +164,19 @@ const props = defineProps({
 
 let hasScrolledToInProgress = false
 
-// 가로 스크롤 목록이라 "진행 중" 카드가 화면 밖에 있을 수 있어서, milestones 데이터가 실제로 도착하면
-// (컴포넌트 마운트 시점엔 아직 빈 배열이라 onMounted로는 타이밍이 안 맞음) 그 카드가 보이도록 한 번만 스크롤
+// 진행 중인 카드가 보이도록 가로 스크롤만 이동한다.
+// scrollIntoView는 상위 페이지의 세로 스크롤까지 움직여 새로고침 시 화면이 중간에서 시작되는 문제가 있다.
 watch(
   () => props.milestones,
   (milestones) => {
     if (hasScrolledToInProgress || !milestones?.length) return
-    const inProgressCardEl = scrollContainer.value?.querySelector('[data-in-progress="true"]')
-    if (!inProgressCardEl) return
-    inProgressCardEl.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' })
+    const container = scrollContainer.value
+    const inProgressCardEl = container?.querySelector('[data-in-progress="true"]')
+    if (!container || !inProgressCardEl) return
+
+    const centeredLeft =
+      inProgressCardEl.offsetLeft - (container.clientWidth - inProgressCardEl.clientWidth) / 2
+    container.scrollLeft = Math.max(0, centeredLeft)
     hasScrolledToInProgress = true
   },
   { immediate: true, flush: 'post' }
