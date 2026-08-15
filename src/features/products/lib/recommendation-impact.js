@@ -213,7 +213,7 @@ function createEmptyResult(calculationStatus, interestRateBasis) {
   return {
     optionId: null,
     estimatedMonthsSaved: 0,
-    estimatedAdditionalInterest: 0,
+    estimatedAdditionalAmount: 0,
     calculationStatus,
     interestRateBasis,
     assumedInterestRate: null,
@@ -309,7 +309,7 @@ export function calculateRecommendationImpact({
     currentCompletionMonths !== null && estimatedCompletionMonths !== null
       ? Math.max(0, currentCompletionMonths - estimatedCompletionMonths)
       : 0
-  const estimatedAdditionalInterest = Math.max(
+  const estimatedAdditionalAmount = Math.max(
     0,
     Math.round(selectedOption.endingBalance - currentPlan.endingBalance)
   )
@@ -317,9 +317,11 @@ export function calculateRecommendationImpact({
   return {
     optionId: selectedOption.optionId,
     estimatedMonthsSaved,
-    estimatedAdditionalInterest,
+    estimatedAdditionalAmount,
     calculationStatus:
-      estimatedMonthsSaved > 0 ? CALCULATION_STATUS.CALCULATED : CALCULATION_STATUS.NO_IMPROVEMENT,
+      estimatedMonthsSaved > 0 || estimatedAdditionalAmount > 0
+        ? CALCULATION_STATUS.CALCULATED
+        : CALCULATION_STATUS.NO_IMPROVEMENT,
     interestRateBasis,
     assumedInterestRate: selectedOption.interestRate,
     optionTerm: selectedOption.saveTerm,

@@ -29,7 +29,10 @@
               id="recommendation-summary-title"
               class="text-base font-black tracking-[-0.25px] text-[#10233f]"
             >
-              <template v-if="hasOnlyMoneyBox">
+              <template v-if="hasNoMaturityEligibleProducts">
+                목표 기간 내 만기 가능한 상품이 없어
+              </template>
+              <template v-else-if="hasOnlyMoneyBox">
                 <strong class="font-black text-primary">‘{{ selectedGoalName }}’</strong>
                 목표 자금을 지금 저금통(이자 없음)에 모으고 있어요
               </template>
@@ -40,7 +43,13 @@
               <template v-else> 현재 로드맵 연결 자산을 확인하지 못했어요 </template>
             </h2>
             <p
-              v-if="hasOnlyMoneyBox && bestProduct"
+              v-if="hasNoMaturityEligibleProducts"
+              class="mt-1 text-[13px] leading-relaxed text-slate-500"
+            >
+              기간을 조정했을 때 이용할 수 있는 상품도 함께 보여드려요
+            </p>
+            <p
+              v-else-if="hasOnlyMoneyBox && bestProduct"
               class="mt-1 text-[13px] leading-relaxed text-slate-500"
             >
               {{ bestProduct.productName }}은 우대조건 충족 시 최고
@@ -200,6 +209,9 @@
               :goal-name="selectedGoalName"
               :eligible-maturity-terms="product.eligibleMaturityTerms"
               :recommendation-impact="product.recommendationImpact"
+              :has-linked-assets="linkedAssets.length > 0"
+              :has-only-money-box="hasOnlyMoneyBox"
+              :current-interest-rate="currentInterestRate"
               @view-detail="openProductDetail"
             />
           </div>
@@ -313,6 +325,16 @@ const recommendationProducts = computed(() =>
       }),
     }))
 )
+
+const hasNoMaturityEligibleProducts = computed(() => {
+  const remainMonths = Number(appliedGoalDetail.value?.period?.remainMonths)
+  return (
+    Number.isFinite(remainMonths) &&
+    remainMonths > 0 &&
+    recommendationProducts.value.length > 0 &&
+    recommendationProducts.value.every((product) => product.eligibleMaturityTerms.length === 0)
+  )
+})
 
 const filteredProducts = computed(() => {
   if (activeFilter.value === 'all') return recommendationProducts.value
@@ -448,6 +470,12 @@ async function openProductDetail(product) {
   selectedProductType.value = product.productType
   detailProductId.value = getProductId(product)
   isDetailOpen.value = true
+
+  if (product.isDetailLoaded) {
+    productsStore.selectProduct(product)
+    return
+  }
+
   await productsStore.fetchProductDetail(selectedProductType.value, detailProductId.value)
 }
 
