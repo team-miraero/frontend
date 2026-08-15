@@ -2,7 +2,7 @@
 <template>
   <button
     type="button"
-    class="group flex flex-col justify-between rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 text-left transition-all hover:bg-[#f2f7ff]"
+    class="group flex flex-col justify-between rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 text-left transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-[0_6px_20px_rgba(0,102,255,0.08)] active:scale-[0.98] cursor-pointer break-keep"
     @click="$emit('open-detail')"
   >
     <div>
@@ -28,7 +28,7 @@
               {{ asset.bankName }} {{ asset.accountNumberMasked }}
             </p>
           </div>
-          <p class="shrink-0 text-xs font-black text-[#0a192f]">
+          <p class="shrink-0 text-xs font-black tabular-nums text-[#0a192f]">
             {{ formatKRWCompact(asset.balance) }}
           </p>
         </div>
@@ -37,7 +37,7 @@
 
     <div class="mt-3 flex items-center justify-between border-t border-slate-200/60 pt-2.5">
       <span class="text-xs font-bold text-slate-500">합계 잔액</span>
-      <span class="text-sm font-black text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</span>
+      <span class="text-sm font-black tabular-nums text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</span>
     </div>
   </button>
 </template>

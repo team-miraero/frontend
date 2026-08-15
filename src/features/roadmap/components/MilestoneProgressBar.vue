@@ -132,16 +132,16 @@
             :style="goalCharacterFootStyle"
           />
           <div class="relative ml-0.5 flex items-end">
-            <!-- 모바일 콜리 스마트 말풍선 (콜리 머리 위에 넉넉하게 위치) -->
-            <div class="absolute -top-11 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center">
-              <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-black text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.1)] whitespace-nowrap">
+            <!-- 모바일 콜리 스마트 말풍선 (우측 오프셋 + 적정 높이로 안정적 안착) -->
+            <div class="absolute -top-9 left-1/2 z-30 flex w-max -translate-x-[20%] flex-col items-start">
+              <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-black text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap">
                 {{ paceMessage }}
-                <!-- 말풍선 꼬리 (아래쪽 화살표) -->
+                <!-- 말풍선 꼬리 (콜리 머리 방향인 좌측 하단) -->
                 <div
-                  class="absolute -bottom-1 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[4px] border-t-[5px] border-x-transparent border-t-white"
+                  class="absolute -bottom-1 left-2.5 h-0 w-0 border-x-[4px] border-t-[5px] border-x-transparent border-t-white"
                 ></div>
                 <div
-                  class="absolute -bottom-[5px] left-1/2 -z-10 h-0 w-0 -translate-x-1/2 border-x-[4px] border-t-[5px] border-x-transparent border-t-slate-200"
+                  class="absolute -bottom-[5px] left-2.5 -z-10 h-0 w-0 border-x-[4px] border-t-[5px] border-x-transparent border-t-slate-200"
                 ></div>
               </div>
             </div>
@@ -176,8 +176,8 @@
             :style="{ left: `${Math.max(12, Math.min(74, mobileColiPosition))}%` }"
           >
             <div class="relative flex flex-col items-center">
-              <div class="absolute -top-11 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center">
-                <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-black text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.1)] whitespace-nowrap">
+              <div class="absolute -top-9 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center">
+                <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-black text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap">
                   {{ paceMessage }}
                   <!-- 말풍선 꼬리 (아래쪽 화살표) -->
                   <div
@@ -200,17 +200,17 @@
 
       <!-- 2. 하단 스마트 서머리 카드 -->
       <div class="mt-2.5 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-sm">
-        <div class="flex items-center justify-between gap-3">
-          <div class="min-w-0">
-            <p class="text-[11px] font-bold text-slate-400">
+        <div class="flex items-center justify-between gap-2.5">
+          <div class="min-w-0 flex-1">
+            <p class="text-[11px] font-bold text-slate-400 truncate">
               {{ activeMilestone.title || `다음 ${activeMilestoneIndex + 1}차 마일스톤` }}까지
             </p>
-            <p class="mt-0.5 text-sm font-black text-[#0a192f]">
-              <span class="text-primary">{{ formatManwon(remainingToActiveMilestone) }}원</span>
+            <p class="mt-0.5 text-sm font-black text-[#0a192f] whitespace-nowrap">
+              <span class="text-primary tabular-nums">{{ formatManwon(remainingToActiveMilestone) }}원</span>
               남았어요
             </p>
           </div>
-          <span class="shrink-0 rounded-full bg-primary/5 px-2.5 py-1 text-[10px] font-bold text-primary">
+          <span class="shrink-0 rounded-full bg-primary/5 px-2.5 py-1 text-[10px] font-bold text-primary whitespace-nowrap">
             {{ activeMilestone.targetDate || formatEndDate(goal.period.endDate) }} 도착 예정
           </span>
         </div>
@@ -339,27 +339,27 @@
 
           <!-- 2. 페이스메이커 콜리 (나란히 어깨 맞댐: 간격 없이 밀착) -->
           <div class="relative ml-0.5 sm:ml-1 flex items-end">
-            <!-- 브로콜리 스마트 말풍선 -->
+            <!-- 브로콜리 스마트 말풍선 (우측 오프셋 + 자연스러운 높이 안착) -->
             <div
-              class="absolute -top-7 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center sm:-top-13 lg:-top-15"
+              class="absolute -top-7 left-1/2 z-30 flex w-max -translate-x-[20%] flex-col items-start sm:-top-11 md:-top-13 lg:-top-15"
             >
               <div
-                class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-black text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.12)] whitespace-nowrap"
+                class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-black text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.1)] whitespace-nowrap"
               >
                 {{ paceMessage }}
-                <!-- 말풍선 꼬리 (아래쪽 화살표) -->
+                <!-- 말풍선 꼬리 (콜리 머리 방향인 좌측 하단) -->
                 <div
-                  class="absolute -bottom-1.5 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[5px] border-t-[6px] border-x-transparent border-t-white sm:-bottom-2 sm:border-x-[6px] sm:border-t-[7px]"
+                  class="absolute -bottom-1.5 left-3.5 h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-white sm:-bottom-2 sm:border-x-[6px] sm:border-t-[7px]"
                 ></div>
                 <div
-                  class="absolute -bottom-[7px] left-1/2 -z-10 h-0 w-0 -translate-x-1/2 border-x-[5px] border-t-[6px] border-x-transparent border-t-slate-200 sm:-bottom-[9px] sm:border-x-[6px] sm:border-t-[7px]"
+                  class="absolute -bottom-[7px] left-3.5 -z-10 h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-slate-200 sm:-bottom-[9px] sm:border-x-[6px] sm:border-t-[7px]"
                 ></div>
               </div>
             </div>
             <img
               :src="coliBottomImage"
               alt="페이스메이커 콜리"
-              class="h-6 w-auto drop-shadow-md sm:h-12 md:h-14 lg:h-16 xl:h-20 transition-transform hover:scale-105"
+              class="h-6 w-auto drop-shadow-md sm:h-14 md:h-17 lg:h-20 xl:h-24 transition-transform hover:scale-105"
             />
           </div>
         </div>
@@ -387,12 +387,12 @@
             :style="characterMarkerStyle(coliProgress)"
           >
             <div class="relative flex flex-col items-center">
-              <!-- 브로콜리 스마트 말풍선 -->
+              <!-- 브로콜리 스마트 말풍선 (자연스러운 높이) -->
               <div
-                class="absolute -top-7 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center sm:-top-13 lg:-top-15"
+                class="absolute -top-7 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center sm:-top-11 md:-top-13 lg:-top-15"
               >
                 <div
-                  class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-black text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.12)] whitespace-nowrap"
+                  class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-black text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.1)] whitespace-nowrap"
                 >
                   {{ paceMessage }}
                   <!-- 말풍선 꼬리 (아래쪽 화살표) -->
@@ -407,7 +407,7 @@
               <img
                 :src="coliBottomImage"
                 alt="페이스메이커 콜리"
-                class="h-6 w-auto drop-shadow-md sm:h-12 md:h-14 lg:h-16 xl:h-20 transition-transform hover:scale-105"
+                class="h-6 w-auto drop-shadow-md sm:h-14 md:h-17 lg:h-20 xl:h-24 transition-transform hover:scale-105"
               />
             </div>
           </div>
@@ -420,10 +420,10 @@
 <script setup>
 import { computed } from 'vue'
 import rabbitImage from '@/assets/images/rabbit_new.png'
-import lamaImage from '@/assets/images/lama.png'
-import bearImage from '@/assets/images/bear.png'
-import duckImage from '@/assets/images/duck.png'
-import coliBottomImage from '@/assets/images/coli8-thick.png'
+import lamaImage from '@/assets/images/lama_new.png'
+import bearImage from '@/assets/images/bear_new.png'
+import duckImage from '@/assets/images/duck_new.png'
+import coliBottomImage from '@/assets/images/coli_new.png'
 
 const props = defineProps({
   goal: {

@@ -1,16 +1,16 @@
 <!-- "모인 금액 / 목표" 카드 -->
 <template>
   <div
-    class="flex flex-col justify-between rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 transition-all hover:bg-[#f2f7ff]"
+    class="flex flex-col justify-between rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 transition-all duration-200 ease-out hover:border-slate-200 hover:bg-white hover:shadow-[0_4px_16px_rgba(15,23,42,0.04)] break-keep"
   >
     <div>
       <p class="text-xs font-bold text-slate-400">모인 금액 / 목표</p>
 
       <div class="flex items-baseline gap-1.5 pt-2">
-        <span class="text-xl font-black tracking-tight text-[#0a192f] sm:text-2xl">
+        <span class="text-xl font-black tracking-tight tabular-nums text-[#0a192f] sm:text-2xl">
           {{ formatManwon(goal.currentAmount) }}
         </span>
-        <span class="text-xs font-bold text-slate-400">/ {{ formatWon(goal.goalAmount) }}</span>
+        <span class="text-xs font-bold tabular-nums text-slate-400">/ {{ formatWon(goal.goalAmount) }}</span>
       </div>
 
       <div class="pt-3">
@@ -21,15 +21,15 @@
           />
         </div>
         <div class="flex items-center justify-between pt-1.5 text-xs font-bold">
-          <span class="text-primary">{{ goal.progressRate }}% 달성</span>
+          <span class="text-primary tabular-nums">{{ goal.progressRate }}% 달성</span>
           <span class="text-slate-400">{{ formatEndDate(goal.period.endDate) }} 목표</span>
         </div>
       </div>
     </div>
 
     <div class="mt-3 flex items-center gap-1.5 border-t border-slate-200/60 pt-2.5">
-      <span class="size-2 rounded-full" :class="paceDotClass" />
-      <span class="text-xs font-black" :class="paceTextClass">{{ paceLabel }}</span>
+      <span class="size-2 shrink-0 rounded-full" :class="paceDotClass" />
+      <span class="text-xs font-black tabular-nums whitespace-nowrap" :class="paceTextClass">{{ paceLabel }}</span>
     </div>
   </div>
 </template>
@@ -52,8 +52,8 @@ const paceTextClass = computed(() =>
 )
 const paceLabel = computed(() => {
   const amount = formatManwon(Math.abs(props.goal.pace?.differenceAmount ?? 0))
-  if (props.goal.pace?.paceStatus === 'BEHIND') return `예정보다 ${amount}원 뒤처짐`
-  if (props.goal.pace?.paceStatus === 'AHEAD') return `예정보다 ${amount}원 앞섬`
+  if (props.goal.pace?.paceStatus === 'BEHIND') return `예정보다 ${amount}원 뒤처져 달리는 중`
+  if (props.goal.pace?.paceStatus === 'AHEAD') return `예정보다 ${amount}원 앞서 달리는 중`
   return '예정대로 순항 중'
 })
 

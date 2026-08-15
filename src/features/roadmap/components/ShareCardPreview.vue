@@ -151,11 +151,11 @@ import lamaFriendImage from '@/assets/images/lama_friend.png'
 import bearFriendImage from '@/assets/images/bear_friend.png'
 import rabbitFriendImage from '@/assets/images/rabbit_friend.png'
 import coliFriendImage from '@/assets/images/coli_friend.png'
-import duckRunningImage from '@/assets/images/duck.png'
-import lamaRunningImage from '@/assets/images/lama.png'
-import bearRunningImage from '@/assets/images/bear.png'
+import duckRunningImage from '@/assets/images/duck_new.png'
+import lamaRunningImage from '@/assets/images/lama_new.png'
+import bearRunningImage from '@/assets/images/bear_new.png'
 import rabbitRunningImage from '@/assets/images/rabbit_new.png'
-import coliRunningImage from '@/assets/images/coli8-thick.png'
+import coliRunningImage from '@/assets/images/coli_new.png'
 
 const props = defineProps({
   goal: { type: Object, required: true },

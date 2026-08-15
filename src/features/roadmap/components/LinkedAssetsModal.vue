@@ -44,6 +44,7 @@
               {{ formatKRWCompact(row.balance) }}
             </p>
             <p
+              v-if="row.autoTransfer?.amount != null"
               class="pt-0.5 text-xs font-bold"
               :class="row.isLoan ? 'text-rose-500' : 'text-primary'"
             >
@@ -78,6 +79,10 @@
             </span>
           </div>
         </div>
+      </div>
+
+      <div v-if="rows.length === 0" class="py-8 text-center text-xs text-slate-400">
+        연동된 자산 정보가 없습니다.
       </div>
     </div>
 
@@ -122,7 +127,7 @@ const CAPTION_BY_TYPE = {
 }
 
 const rows = computed(() =>
-  props.assets.map((asset) => {
+  (props.assets ?? []).map((asset) => {
     const hasDetail = !!asset.assetDetail
     const isLoan = asset.assetType === 'LOAN'
     // 이자율·만기 정보가 있는 목표적금류만 강조(하이라이트) 카드로 표시. 대출은 부채라 강조하지 않음.
@@ -142,10 +147,10 @@ const rows = computed(() =>
 )
 
 const totalBalance = computed(() =>
-  props.assets.reduce((sum, asset) => sum + (asset.balance ?? 0), 0)
+  (props.assets ?? []).reduce((sum, asset) => sum + (asset.balance ?? 0), 0)
 )
 const totalAutoTransfer = computed(() =>
-  props.assets.reduce((sum, asset) => sum + (asset.autoTransfer?.amount ?? 0), 0)
+  (props.assets ?? []).reduce((sum, asset) => sum + (asset.autoTransfer?.amount ?? 0), 0)
 )
 
 // 남은 개월수·일수: API가 만기일만 주고 가입일은 안 주기 때문에, Figma의 '가입일~만료일 진행바'는
