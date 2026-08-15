@@ -2,6 +2,39 @@ import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 import * as productsApi from '@/features/products/api/products.api'
 
+const PRODUCT_DETAIL_CONCURRENCY = 5
+
+function getProductId(product, productType) {
+  return productType === 'deposit' ? product.depositProductId : product.savingProductId
+}
+
+async function hydrateProductDetails(products, productType) {
+  const hydratedProducts = [...products]
+  let nextProductIndex = 0
+
+  async function hydrateNextProduct() {
+    while (nextProductIndex < products.length) {
+      const productIndex = nextProductIndex
+      nextProductIndex += 1
+      const product = products[productIndex]
+
+      try {
+        const detail = await productsApi.getProductDetail(
+          productType,
+          getProductId(product, productType)
+        )
+        hydratedProducts[productIndex] = { ...product, ...detail, isDetailLoaded: true }
+      } catch {
+        // 일부 상세 조회가 실패해도 목록에서 받은 상품 정보는 그대로 노출한다.
+      }
+    }
+  }
+
+  const workerCount = Math.min(PRODUCT_DETAIL_CONCURRENCY, products.length)
+  await Promise.all(Array.from({ length: workerCount }, () => hydrateNextProduct()))
+  return hydratedProducts
+}
+
 export const useProductsStore = defineStore('feature-products', () => {
   const productsByType = reactive({ deposit: [], saving: [] })
   const loadedTypes = reactive({ deposit: false, saving: false })
@@ -31,7 +64,11 @@ export const useProductsStore = defineStore('feature-products', () => {
       if (requestId !== listRequestIds[productType]) return
 
       const responseKey = productType === 'deposit' ? 'deposits' : 'savings'
-      productsByType[productType] = response[responseKey] ?? []
+      const products = response[responseKey] ?? []
+      const hydratedProducts = await hydrateProductDetails(products, productType)
+      if (requestId !== listRequestIds[productType]) return
+
+      productsByType[productType] = hydratedProducts
       loadedTypes[productType] = true
     } catch (caughtError) {
       if (requestId === listRequestIds[productType]) {
@@ -65,6 +102,13 @@ export const useProductsStore = defineStore('feature-products', () => {
     }
   }
 
+  function selectProduct(product) {
+    detailRequestId += 1
+    selectedProduct.value = product
+    isDetailLoading.value = false
+    detailError.value = null
+  }
+
   function clearSelectedProduct() {
     detailRequestId += 1
     selectedProduct.value = null
@@ -81,6 +125,7 @@ export const useProductsStore = defineStore('feature-products', () => {
     detailError,
     fetchProducts,
     fetchProductDetail,
+    selectProduct,
     clearSelectedProduct,
   }
 })
