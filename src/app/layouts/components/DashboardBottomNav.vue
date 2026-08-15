@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-30 overflow-hidden rounded-t-[24px] border-t border-slate-200/80 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(15,35,70,0.08)] backdrop-blur-xl md:hidden"
+    class="fixed inset-x-0 bottom-0 z-30 overflow-hidden rounded-t-[20px] border-t border-slate-200/50 bg-white/80 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_24px_rgba(15,35,70,0.05)] backdrop-blur-2xl md:hidden"
     aria-label="모바일 주요 메뉴"
   >
     <div class="grid h-[66px] grid-cols-5 px-1.5">
@@ -8,27 +8,27 @@
         v-for="item in primaryItems"
         :key="item.routeName"
         :to="{ name: item.routeName }"
-        class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] font-bold transition duration-200"
-        :class="isActive(item.routeName) ? 'text-primary' : 'text-slate-400'"
+        class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] font-bold transition duration-200 active:scale-95"
+        :class="isActive(item.routeName) ? 'text-primary' : 'text-slate-400 hover:text-slate-600'"
       >
         <span
-          class="flex size-8 items-center justify-center rounded-xl transition-colors"
-          :class="isActive(item.routeName) ? 'bg-primary/10' : ''"
+          class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
+          :class="isActive(item.routeName) ? 'bg-primary/10 shadow-xs ring-1 ring-primary/10' : ''"
         >
-          <img :src="item.icon" alt="" class="size-5" :class="isActive(item.routeName) ? '' : 'opacity-50 grayscale'" />
+          <img :src="item.icon" alt="" class="size-5 transition-transform duration-200" :class="isActive(item.routeName) ? 'scale-105' : 'opacity-50 grayscale'" />
         </span>
-        <span class="max-w-full truncate">{{ item.label }}</span>
+        <span class="max-w-full truncate">{{ getNavLabel(item) }}</span>
       </RouterLink>
 
       <button
         type="button"
-        class="flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] font-bold transition duration-200"
-        :class="isMoreActive || isMoreOpen ? 'text-primary' : 'text-slate-400'"
+        class="flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] font-bold transition duration-200 active:scale-95"
+        :class="isMoreActive || isMoreOpen ? 'text-primary' : 'text-slate-400 hover:text-slate-600'"
         :aria-expanded="isMoreOpen"
         aria-controls="mobile-more-menu"
         @click="isMoreOpen = true"
       >
-        <span class="flex size-8 items-center justify-center rounded-xl" :class="isMoreActive || isMoreOpen ? 'bg-primary/10' : ''">
+        <span class="flex size-8 items-center justify-center rounded-xl transition-all duration-200" :class="isMoreActive || isMoreOpen ? 'bg-primary/10 shadow-xs ring-1 ring-primary/10' : ''">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="size-5" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16" />
           </svg>
@@ -93,6 +93,17 @@ import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const route = useRoute()
 const isMoreOpen = ref(false)
+
+const BOTTOM_NAV_LABELS = {
+  [ROUTE_NAMES.DASHBOARD]: '로드맵',
+  [ROUTE_NAMES.SPENDING]: '지출',
+  [ROUTE_NAMES.PACEMAKER]: '페이스',
+  [ROUTE_NAMES.COACH]: 'AI 코치',
+}
+
+function getNavLabel(item) {
+  return BOTTOM_NAV_LABELS[item.routeName] ?? item.label
+}
 
 const primaryRouteNames = [
   ROUTE_NAMES.DASHBOARD,

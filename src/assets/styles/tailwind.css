@@ -6,10 +6,16 @@
   html {
     scrollbar-gutter: stable;
     overflow-y: scroll;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
   }
   html,
   body {
     font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 

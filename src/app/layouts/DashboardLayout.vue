@@ -1,10 +1,11 @@
 <!-- 좌측 사이드바 + 헤더 + 컨텐츠 영역 레이아웃 -->
 <template>
-  <div class="flex h-screen w-full flex-col overflow-hidden bg-[#fbfdff]">
+  <div class="flex h-screen w-full flex-col overflow-hidden bg-[#f8fbff]">
     <DashboardHeader v-if="!route.meta.hideHeader" />
     <DashboardSidebar v-if="!route.meta.hideHeader" />
     <main class="flex-1 overflow-y-auto max-md:pb-[calc(80px+env(safe-area-inset-bottom))] [scrollbar-gutter:stable]">
       <RouterView />
+      <DashboardFooter v-if="!route.meta.hideHeader" />
     </main>
     <DashboardBottomNav v-if="!route.meta.hideHeader" />
   </div>
@@ -16,6 +17,7 @@ import { RouterView } from 'vue-router'
 import DashboardHeader from '@/app/layouts/components/DashboardHeader.vue'
 import DashboardSidebar from '@/app/layouts/components/DashboardSidebar.vue'
 import DashboardBottomNav from '@/app/layouts/components/DashboardBottomNav.vue'
+import DashboardFooter from '@/app/layouts/components/DashboardFooter.vue'
 
 const route = useRoute()
 </script>

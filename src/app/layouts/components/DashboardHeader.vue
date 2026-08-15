@@ -1,6 +1,6 @@
 <template>
   <header
-    class="z-30 shrink-0 border-b border-slate-200 bg-white shadow-[0_2px_10px_rgba(15,35,70,0.05)]"
+    class="z-30 shrink-0 border-b border-slate-200/80 bg-white/95 shadow-[0_2px_12px_rgba(15,35,70,0.04)] backdrop-blur-xl max-lg:border-b-0 max-lg:bg-[#f8fbff] max-lg:shadow-none"
   >
     <!-- 모바일/태블릿 헤더 (lg:hidden) -->
     <div class="page-container flex h-16 items-center justify-between gap-3 lg:hidden">
@@ -20,10 +20,10 @@
 
         <RouterLink
           :to="{ name: ROUTE_NAMES.DASHBOARD }"
-          class="flex shrink-0 items-center gap-2 text-primary"
+          class="flex shrink-0 items-center gap-2"
         >
           <img src="@/assets/images/logo.png" alt="미래로 로고" class="size-7 object-contain" />
-          <strong class="text-lg font-black tracking-[-0.6px] text-primary">미래로</strong>
+          <strong class="text-lg font-black tracking-[-0.6px] text-[#0a192f]">미래로</strong>
         </RouterLink>
       </div>
 
@@ -33,7 +33,7 @@
         <div ref="mobileDropdownRef" class="relative">
           <button
             type="button"
-            class="relative flex size-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 focus:outline-none"
+            class="relative flex size-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-600 shadow-xs transition hover:bg-white focus:outline-none"
             aria-label="알림 센터 열기"
             @click="toggleDropdown"
           >
@@ -50,13 +50,11 @@
               <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
             </svg>
 
-            <!-- 읽지 않은 알림 빨간 뱃지 -->
-            <span v-if="hasUnread" class="absolute top-1 right-1 flex size-2.5">
-              <span
-                class="absolute inline-flex size-full animate-ping rounded-full bg-red-400 opacity-75"
-              />
-              <span class="relative inline-flex size-2.5 rounded-full bg-red-500" />
-            </span>
+            <!-- 읽지 않은 알림 빨간 뱃지 (단정한 솔리드 레드 닷) -->
+            <span
+              v-if="hasUnread"
+              class="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 ring-2 ring-white"
+            />
           </button>
 
           <!-- 모바일 알림 센터 드롭다운 메뉴 -->
@@ -163,10 +161,10 @@
     <div class="page-container hidden h-20 items-center gap-5 lg:flex">
       <RouterLink
         :to="{ name: ROUTE_NAMES.DASHBOARD }"
-        class="mr-4 flex shrink-0 items-center gap-2 text-primary"
+        class="mr-4 flex shrink-0 items-center gap-2"
       >
         <img src="@/assets/images/logo.png" alt="미래로 로고" class="size-8 object-contain" />
-        <strong class="text-xl tracking-[-0.8px]">미래로</strong>
+        <strong class="text-xl font-black tracking-[-0.8px] text-[#0a192f]">미래로</strong>
       </RouterLink>
 
       <nav class="flex min-w-0 flex-1 items-stretch justify-center gap-5 self-stretch xl:gap-8">
@@ -301,13 +299,11 @@
               <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
             </svg>
 
-            <!-- 읽지 않은 알림 빨간 뱃지 (Pulsing Red Dot) -->
-            <span v-if="hasUnread" class="absolute top-1.5 right-1.5 flex size-2.5">
-              <span
-                class="absolute inline-flex size-full animate-ping rounded-full bg-red-400 opacity-75"
-              />
-              <span class="relative inline-flex size-2.5 rounded-full bg-red-500" />
-            </span>
+            <!-- 읽지 않은 알림 빨간 뱃지 (단정한 솔리드 레드 닷) -->
+            <span
+              v-if="hasUnread"
+              class="absolute top-2 right-2 size-2.5 rounded-full bg-red-500 ring-2 ring-white"
+            />
           </button>
 
           <!-- 알림 센터 드롭다운 메뉴 (헤더 우측 경계선에 짝! 맞춤) -->
@@ -321,7 +317,7 @@
           >
             <div
               v-if="isDropdownOpen"
-              class="absolute -right-12 sm:-right-12 mt-3 z-50 w-[320px] sm:w-[380px] rounded-2xl border border-slate-100 bg-white/95 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
+              class="absolute right-0 mt-3 z-50 w-[320px] sm:w-[380px] rounded-2xl border border-slate-100 bg-white/95 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl"
             >
               <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
@@ -414,7 +410,7 @@
 
         <RouterLink
           :to="{ name: ROUTE_NAMES.MYPAGE }"
-          class="flex size-9 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-white transition hover:ring-2 hover:ring-primary/25"
+          class="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#66b2ff] text-sm font-bold text-white shadow-sm ring-1 ring-primary/20 transition hover:ring-2 hover:ring-primary/40"
           aria-label="마이페이지로 이동"
         >
           {{ userInitial }}
@@ -453,6 +449,7 @@ const dropdownRef = ref(null)
 const mobileDropdownRef = ref(null)
 const isRoadmapDropdownOpen = ref(false)
 const roadmapDropdownRef = ref(null)
+const isScrolled = ref(false)
 
 const userName = computed(() => authStore.user?.name ?? '')
 const userInitial = computed(() => userName.value.charAt(0))
@@ -512,12 +509,29 @@ function handleClickOutside(event) {
   }
 }
 
+function handleScroll(event) {
+  const target = event?.target ?? document.querySelector('main')
+  const scrollTop = target?.scrollTop ?? window.scrollY ?? 0
+  isScrolled.value = scrollTop > 10
+}
+
 onMounted(() => {
   goalStore.fetchGoals()
   document.addEventListener('click', handleClickOutside)
+
+  const mainEl = document.querySelector('main')
+  if (mainEl) {
+    mainEl.addEventListener('scroll', handleScroll, { passive: true })
+  }
+  window.addEventListener('scroll', handleScroll, { passive: true })
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  const mainEl = document.querySelector('main')
+  if (mainEl) {
+    mainEl.removeEventListener('scroll', handleScroll)
+  }
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>
