@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full bg-[#f7f9fc]">
+  <div class="min-h-full bg-[#f8fbff]">
     <RoadmapSelector
       :goals="goals"
       :selected-goal-id="selectedGoalId"
@@ -10,7 +10,7 @@
 
     <div class="page-container pb-8 pt-5">
       <section
-        class="flex flex-col gap-4 rounded-[20px] border border-[#b9d9ff] bg-[#f1f7ff] px-5 py-5 sm:flex-row sm:items-center sm:px-6"
+        class="flex flex-col gap-4 rounded-[20px] border border-[#b9d9ff] bg-[#f1f7ff] px-5 py-5 sm:flex-row sm:items-center sm:px-6 shadow-[0_4px_20px_rgba(0,102,255,0.04)]"
         aria-labelledby="recommendation-summary-title"
       >
         <div
@@ -44,7 +44,7 @@
               class="mt-1 text-[13px] leading-relaxed text-slate-500"
             >
               {{ bestProduct.productName }}은 우대조건 충족 시 최고
-              <strong class="font-black text-primary">
+              <strong class="font-black text-primary tabular-nums">
                 연 {{ formatRateCompact(bestRate) }}%
               </strong>
               금리를 제공해요. 이자가 없는 저금통과 가입 조건을 비교해 보세요.
@@ -54,21 +54,21 @@
               class="mt-1 text-[13px] leading-relaxed text-slate-500"
             >
               현재 연결 자산의 잔액 가중평균 금리는
-              <strong class="font-black text-[#10233f]">
+              <strong class="font-black text-[#10233f] tabular-nums">
                 연 {{ formatRate(currentInterestRate) }}%
               </strong>
               이고, 추천 상품 중 우대조건 충족 시 최고 금리는
-              <strong class="font-black text-primary">연 {{ formatRate(bestRate) }}%</strong>
+              <strong class="font-black text-primary tabular-nums">연 {{ formatRate(bestRate) }}%</strong>
               입니다.
               <template v-if="rateDifference > 0">
                 현재 금리보다
-                <strong class="font-black text-primary">{{ formatRate(rateDifference) }}%p</strong>
+                <strong class="font-black text-primary tabular-nums">{{ formatRate(rateDifference) }}%p</strong>
                 높아요.
               </template>
               <template v-else-if="rateDifference === 0"> 현재 상품과 같은 수준이에요. </template>
               <template v-else>
                 현재 상품이
-                <strong class="font-black text-primary">{{ formatRate(-rateDifference) }}%p</strong>
+                <strong class="font-black text-primary tabular-nums">{{ formatRate(-rateDifference) }}%p</strong>
                 더 높아요.
               </template>
             </p>
@@ -79,10 +79,10 @@
               <template v-if="appliedGoalDetail">
                 {{ selectedGoalName }}
                 <template v-if="appliedGoalDetail.goalAmount">
-                  · 목표금액 {{ formatKRWCompact(appliedGoalDetail.goalAmount) }}
+                  · 목표금액 <span class="tabular-nums">{{ formatKRWCompact(appliedGoalDetail.goalAmount) }}</span>
                 </template>
                 <template v-if="estimatedMonthlyContribution > 0">
-                  · 월 {{ formatKRWCompact(estimatedMonthlyContribution) }} 목표 저축액
+                  · 월 <span class="tabular-nums">{{ formatKRWCompact(estimatedMonthlyContribution) }}</span> 목표 저축액
                 </template>
                 · 기본금리 기준 예상
               </template>
@@ -95,7 +95,7 @@
       <section class="mt-5" aria-labelledby="product-list-title">
         <div class="flex items-end justify-between gap-4">
           <div
-            class="flex min-w-0 items-center gap-2 overflow-x-auto pb-1"
+            class="no-scrollbar -my-1.5 flex min-w-0 items-center gap-2 overflow-x-auto py-1.5 px-0.5"
             role="tablist"
             aria-label="상품 종류"
           >
@@ -105,11 +105,11 @@
               :key="tab.value"
               type="button"
               role="tab"
-              class="shrink-0 rounded-full border px-4 py-2 text-[13px] font-bold transition"
+              class="shrink-0 cursor-pointer rounded-full border px-4 py-2 text-[13px] font-bold transition-all duration-200 ease-out hover:-translate-y-0.5 select-none"
               :class="
                 activeFilter === tab.value
-                  ? 'border-primary bg-primary text-white shadow-[0_4px_10px_rgba(0,102,255,0.18)]'
-                  : 'border-[#e0e7f0] bg-white text-slate-500 hover:border-primary/30 hover:text-primary'
+                  ? 'border-primary bg-primary text-white shadow-[0_4px_12px_rgba(0,102,255,0.22)]'
+                  : 'border-[#e0e7f0] bg-white text-slate-500 hover:border-primary/40 hover:bg-[#f4f8ff] hover:text-primary'
               "
               :aria-selected="activeFilter === tab.value"
               :aria-controls="`${tab.value}-panel`"
@@ -120,7 +120,7 @@
               {{ tab.label }}
             </button>
           </div>
-          <p class="mb-2 shrink-0 text-xs font-medium text-slate-400">
+          <p class="mb-2 shrink-0 text-xs font-medium tabular-nums text-slate-400">
             {{ sortedProducts.length }}개 상품
           </p>
         </div>

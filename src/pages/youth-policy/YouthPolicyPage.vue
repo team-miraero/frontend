@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full bg-[#f7f9fc]">
+  <div class="min-h-full bg-[#f8fbff]">
     <div class="page-container pb-10 pt-3">
       <YouthPolicyFilters @category-applied="scrollToPolicyListOnMobile" />
       <RecommendedPoliciesSection @view-detail="openDetail" />
@@ -9,7 +9,7 @@
     <button
       v-if="showScrollTop"
       type="button"
-      class="fixed bottom-8 right-8 z-30 flex size-11 items-center justify-center rounded-full bg-white text-primary shadow-[0_4px_16px_rgba(10,25,47,0.16)] hover:bg-accent-light"
+      class="fixed bottom-8 right-8 z-30 flex size-11 items-center justify-center rounded-full bg-white text-primary shadow-[0_4px_16px_rgba(10,25,47,0.16)] transition-all duration-200 ease-out hover:-translate-y-1 hover:bg-[#eaf2ff] hover:shadow-[0_8px_20px_rgba(0,102,255,0.2)]"
       aria-label="맨 위로"
       @click="scrollToTop"
     >

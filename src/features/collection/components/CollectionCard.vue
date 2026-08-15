@@ -81,9 +81,9 @@
 <script setup>
 import { computed } from 'vue'
 import { formatKRWCompact } from '@/shared/lib/money'
-import duckImage from '@/assets/images/duck.png'
-import lamaImage from '@/assets/images/lama.png'
-import bearImage from '@/assets/images/bear.png'
+import duckImage from '@/assets/images/duck_new.png'
+import lamaImage from '@/assets/images/lama_new.png'
+import bearImage from '@/assets/images/bear_new.png'
 import rabbitImage from '@/assets/images/rabbit_new.png'
 
 const props = defineProps({
