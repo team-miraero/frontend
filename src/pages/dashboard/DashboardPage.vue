@@ -298,11 +298,11 @@ function handleOpenMonthlyAvailableMoneyModal() {
 }
 
 function handleOpenLinkedAssets() {
-  isLinkedAssetsModalOpen.value = true
+  openLinkedAssetsModal()
 }
 
 function handleOpenShareGoal() {
-  isShareGoalModalOpen.value = true
+  openShareGoalModal()
 }
 
 // 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
