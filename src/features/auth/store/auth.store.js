@@ -80,6 +80,10 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
     loginError.value = null
   }
 
+  function resetSignupError() {
+    signupError.value = null
+  }
+
   async function submitLogin(credentials) {
     if (loginRequest) return loginRequest
 
@@ -240,6 +244,7 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
     mydataSyncError,
     initializeMydata,
     retryMydataInitialization,
+    resetSignupError,
     signupError,
     isSubmittingSignup,
     submitSignup,

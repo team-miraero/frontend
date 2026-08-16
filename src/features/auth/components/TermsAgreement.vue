@@ -1,13 +1,34 @@
 <!-- 회원가입 약관 동의 카드: 전체 동의 + 개별 약관 체크 + 약관 보기 모달 -->
 <template>
-  <div class="rounded-2xl border border-gray-200 bg-gray-50/40 p-4 sm:p-5">
-    <p class="text-sm leading-relaxed text-gray-500">
-      미래로는 KB Pay 마이데이터를 통해 회원님의 자산·소득·지출 정보를 불러와 로드맵 설계와 변화
-      대응에 활용해요. 아래 항목에 동의해 주세요.
-    </p>
+  <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div class="flex items-start gap-2.5">
+      <div class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-50 text-primary">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-3 w-3"
+        >
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      </div>
+      <p class="text-xs leading-relaxed text-slate-500 sm:text-sm">
+        미래로는 회원님이 연결한 금융기관의 자산·거래 정보를 바탕으로 맞춤 로드맵과 지출 분석을
+        제공해요.
+      </p>
+    </div>
 
     <label
-      class="mt-4 flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 px-4 py-3"
+      class="mt-4 flex cursor-pointer items-center gap-2.5 rounded-xl border p-3 transition-all"
+      :class="
+        allAgreed
+          ? 'border-blue-200 bg-[#f0f6ff]'
+          : 'border-slate-200 bg-slate-50/70 hover:border-slate-300'
+      "
       @click.prevent="toggleAll"
     >
       <input
@@ -17,33 +38,35 @@
         @keydown.space.prevent="toggleAll"
       />
       <span
-        class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors"
-        :class="allAgreed ? 'border-primary bg-primary text-white' : 'border-gray-300'"
+        class="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] transition-colors"
+        :class="allAgreed ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'"
       >
         <svg
           v-if="allAgreed"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2.5"
+          stroke-width="3"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="h-3.5 w-3.5"
+          class="h-2.5 w-2.5"
         >
           <path d="M20 6 9 17l-5-5" />
         </svg>
       </span>
-      <span class="font-bold text-gray-900">전체 동의</span>
+      <span class="text-sm font-bold" :class="allAgreed ? 'text-primary' : 'text-[#0a192f]'">
+        약관 전체 동의
+      </span>
     </label>
 
-    <ul class="mt-2 divide-y divide-gray-100">
+    <ul class="mt-2 divide-y divide-slate-100">
       <li
         v-for="term in terms"
         :key="term.id"
-        class="flex items-start justify-between gap-1.5 py-3 sm:gap-2"
+        class="flex items-start justify-between gap-1.5 py-2.5 sm:gap-2"
       >
         <label
-          class="flex min-w-0 flex-1 cursor-pointer items-start gap-2 sm:gap-3"
+          class="flex min-w-0 flex-1 cursor-pointer items-start gap-2 sm:gap-2.5"
           @click.prevent="toggle(term.id)"
         >
           <input
@@ -53,18 +76,18 @@
             @keydown.space.prevent="toggle(term.id)"
           />
           <span
-            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors"
-            :class="isAgreed(term.id) ? 'border-primary bg-primary text-white' : 'border-gray-300'"
+            class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border-[1.5px] transition-colors"
+            :class="isAgreed(term.id) ? 'border-primary bg-primary text-white' : 'border-slate-300 bg-white'"
           >
             <svg
               v-if="isAgreed(term.id)"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="3"
+              stroke-width="3.5"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="h-3 w-3"
+              class="h-2.5 w-2.5"
             >
               <path d="M20 6 9 17l-5-5" />
             </svg>
@@ -72,20 +95,20 @@
           <span class="flex min-w-0 flex-1 flex-col">
             <span class="flex min-w-0 flex-nowrap items-center gap-1 sm:gap-1.5">
               <span
-                class="shrink-0 whitespace-nowrap rounded px-1 py-0.5 text-[10px] font-semibold sm:px-1.5 sm:text-[11px]"
-                :class="term.required ? 'bg-blue-50 text-primary' : 'bg-gray-100 text-gray-400'"
+                class="shrink-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-bold sm:text-[11px]"
+                :class="term.required ? 'bg-blue-50 text-primary' : 'bg-slate-100 text-slate-400'"
               >
                 {{ term.required ? '필수' : '선택' }}
               </span>
               <span
-                class="min-w-0 whitespace-nowrap text-[11px] font-medium tracking-[-0.02em] text-gray-900 sm:text-sm sm:tracking-normal"
+                class="min-w-0 whitespace-nowrap text-[11px] font-medium tracking-[-0.02em] text-[#0a192f] sm:text-sm sm:tracking-normal"
               >
                 {{ term.label }}
               </span>
             </span>
             <span
               v-if="term.description"
-              class="mt-0.5 text-xs text-gray-400 [word-break:keep-all]"
+              class="mt-0.5 text-xs text-slate-400 [word-break:keep-all]"
             >
               {{ term.description }}
             </span>
@@ -93,7 +116,7 @@
         </label>
         <button
           type="button"
-          class="shrink-0 self-start whitespace-nowrap pt-0.5 text-[11px] text-gray-400 transition-colors hover:text-gray-600 sm:text-xs"
+          class="shrink-0 self-start whitespace-nowrap pt-0.5 text-[11px] font-semibold text-slate-400 transition-colors hover:text-slate-700 sm:text-xs"
           @click="openTerm(term)"
         >
           보기
