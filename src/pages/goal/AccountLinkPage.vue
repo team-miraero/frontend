@@ -3,7 +3,10 @@
   <HeroBackground class="font-['Noto_Sans_KR',sans-serif]">
     <StepHeader @back="handleBack" />
 
-    <div class="relative z-10 mx-auto w-full max-w-[650px] animate-fade-in-up px-4 pb-40 pt-2">
+    <div
+      class="relative z-10 mx-auto w-full max-w-[650px] animate-fade-in-up px-4 pb-40 pt-1 md:pb-6"
+    >
+      <ProgressBar :current-step="4" :total-steps="4" />
       <span
         v-if="false"
         class="inline-flex items-center gap-1.5 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
@@ -69,10 +72,10 @@
         <span>{{ selectedGoal?.title }}</span>
       </span>
 
-      <h1 class="mt-4 text-[30px] font-bold leading-tight text-gray-900">
-        이 목표, 어디에<br />모을까요?
+      <h1 class="mt-3 text-2xl font-black leading-tight text-gray-900 sm:text-[28px] break-keep">
+        이 목표, 어디에<br class="sm:hidden" /> 모을까요?
       </h1>
-      <p class="mt-2 break-keep text-[11px] text-gray-500 sm:text-sm">
+      <p class="mt-2 sm:mt-2.5 break-keep text-xs sm:text-sm font-medium text-slate-500">
         목표 전용 공간을 정해야 진행률을 정확하게 추적할 수 있어요.
       </p>
 
@@ -138,63 +141,54 @@
             </template>
 
             <div>
-              <div class="flex items-center justify-between">
-                <p class="text-sm font-semibold text-gray-900">자동이체 설정</p>
-                <span class="text-xs text-gray-400">설정해두면 매달 자동으로 저축돼요</span>
-              </div>
-
-              <div class="mt-3">
-                <div class="flex items-center justify-between">
-                  <label for="transfer-amount" class="text-xs font-medium text-gray-500"
-                    >월 이체 금액</label
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="transfer-amount" class="text-xs font-medium text-gray-500">
+                    월 이체 금액
+                  </label>
+                  <div
+                    class="mt-1.5 flex items-center rounded-xl border border-gray-200 px-4 py-2.5"
                   >
-                  <span
-                    class="rounded-full bg-accent-light px-2 py-0.5 text-[11px] font-semibold text-primary"
-                  >
-                    실현가능성 기준 자동입력
-                  </span>
+                    <input
+                      id="transfer-amount"
+                      type="text"
+                      inputmode="numeric"
+                      :value="formattedTransferAmount"
+                      class="w-full bg-transparent text-base font-bold text-gray-900 outline-none"
+                      @input="handleTransferAmountInput"
+                    />
+                    <span class="shrink-0 text-sm text-gray-400">원</span>
+                  </div>
+                  <p class="mt-1 text-[11px] text-primary">실현 가능성 분석값을 반영했어요.</p>
                 </div>
-                <div class="mt-1.5 flex items-center rounded-xl border border-gray-200 px-4 py-3">
-                  <input
-                    id="transfer-amount"
-                    type="text"
-                    inputmode="numeric"
-                    :value="formattedTransferAmount"
-                    class="w-full bg-transparent text-lg font-bold text-gray-900 outline-none"
-                    @input="handleTransferAmountInput"
-                  />
-                  <span class="shrink-0 text-sm text-gray-400">원</span>
-                </div>
-                <p v-if="transferAmount > 0" class="mt-1 text-xs text-primary">
-                  = {{ formatKRWCompact(transferAmount) }}/월
-                </p>
-              </div>
 
-              <div class="mt-4">
-                <div class="flex items-center justify-between">
+                <div>
                   <span class="text-xs font-medium text-gray-500">이체 날짜</span>
-                  <span class="text-xs text-gray-400">급여일 다음 날 추천</span>
-                </div>
-                <div class="mt-1.5 grid grid-cols-5 gap-2">
-                  <button
-                    v-for="day in TRANSFER_DAYS"
-                    :key="day"
-                    type="button"
-                    class="rounded-xl border py-2 text-sm font-medium transition-colors"
-                    :class="
-                      transferDay === day
-                        ? 'border-primary bg-primary text-white'
-                        : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                    "
-                    @click="transferDay = day"
-                  >
-                    {{ day }}일
-                  </button>
+                  <div class="mt-1.5 grid grid-cols-5 gap-1.5">
+                    <button
+                      v-for="day in TRANSFER_DAYS"
+                      :key="day"
+                      type="button"
+                      class="min-h-10 rounded-xl border px-1 text-xs font-medium transition-colors"
+                      :class="
+                        transferDay === day
+                          ? 'border-primary bg-primary text-white'
+                          : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                      "
+                      @click="transferDay = day"
+                    >
+                      {{ day }}일
+                    </button>
+                  </div>
+                  <p class="mt-1 text-[11px] text-gray-400">급여일 다음 날을 추천해요.</p>
                 </div>
               </div>
 
-              <div class="mt-4">
-                <span class="text-xs font-medium text-gray-500">출금 계좌</span>
+              <div class="mt-4 border-t border-gray-100 pt-4">
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-xs font-medium text-gray-500">출금 계좌</span>
+                  <span class="text-[11px] text-gray-400">급여 계좌를 선택해 주세요.</span>
+                </div>
                 <div class="mt-1.5 space-y-2">
                   <AccountListItem
                     v-for="account in checkingAccounts"
@@ -207,10 +201,6 @@
                     @select="selectedAccountId = account.accountId"
                   />
                 </div>
-                <p v-if="selectedWithdrawalAccount" class="mt-2 text-xs text-gray-400">
-                  매달 {{ transferDay }}일에 {{ selectedWithdrawalAccount.accountName }}
-                  {{ selectedWithdrawalAccount.maskedAccountNumber }}에서 출금돼요
-                </p>
               </div>
             </div>
           </AccountOptionCard>
@@ -282,6 +272,7 @@
       v-if="!areAccountsLoading && !accountsError"
       :label="ctaLabel"
       :disabled="ctaDisabled"
+      desktop-static
       @click="handleSubmit"
     />
 
@@ -344,6 +335,7 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import StepHeader from '@/shared/ui/StepHeader.vue'
+import ProgressBar from '@/shared/ui/ProgressBar.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
 import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
@@ -391,10 +383,6 @@ const checkingAccounts = computed(() =>
 const savingAccounts = computed(() =>
   accounts.value.filter((account) => account.accountType !== 'CHECKING')
 )
-const selectedWithdrawalAccount = computed(() =>
-  checkingAccounts.value.find((account) => account.accountId === selectedAccountId.value)
-)
-
 function toggleExistingAccount(accountId) {
   selectedExistingAccountIds.value = selectedExistingAccountIds.value.includes(accountId)
     ? selectedExistingAccountIds.value.filter((id) => id !== accountId)
