@@ -9,6 +9,7 @@
     :error="error"
     @update:model-value="emit('update:modelValue', $event)"
     @blur="emit('blur', $event)"
+    @input="emit('input', $event)"
   >
     <template v-if="$slots.action" #action>
       <slot name="action" />
@@ -65,7 +66,7 @@ defineProps({
   placeholder: { type: String, default: '' },
   error: { type: String, default: '' },
 })
-const emit = defineEmits(['update:modelValue', 'blur'])
+const emit = defineEmits(['update:modelValue', 'blur', 'input'])
 
 const showPassword = ref(false)
 

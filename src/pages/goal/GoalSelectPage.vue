@@ -1,18 +1,6 @@
 <template>
   <HeroBackground class="font-['Noto_Sans_KR',sans-serif]">
-    <div
-      class="sticky top-0 z-20 mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 py-6 backdrop-blur-md md:px-8 lg:px-[80px]"
-    >
-      <BrandHeader />
-      <button
-        type="button"
-        class="flex items-center gap-1 py-3 text-sm text-gray-500 transition-colors hover:text-gray-900"
-        @click="handleBack"
-      >
-        <span aria-hidden="true">‹</span>
-        <span>이전</span>
-      </button>
-    </div>
+    <StepHeader @back="handleBack" />
 
     <div class="relative z-10 mx-auto w-full max-w-[650px] animate-fade-in-up px-4 pb-40 pt-2">
       <ProgressBar :current-step="1" :total-steps="3" />
@@ -46,7 +34,7 @@
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
-import BrandHeader from '@/shared/ui/BrandHeader.vue'
+import StepHeader from '@/shared/ui/StepHeader.vue'
 import ProgressBar from '@/shared/ui/ProgressBar.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
 import GoalCard from '@/features/goal/components/GoalCard.vue'

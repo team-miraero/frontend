@@ -49,7 +49,7 @@
         />
 
         <p class="pb-4 text-center text-xs text-[#c5dcff]">
-          미래로 v1.0.0 · KB페이 마이데이터 파트너
+          미래로 v1.0.0 · 목표 기반 금융생활 관리 서비스
         </p>
       </div>
     </main>

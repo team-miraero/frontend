@@ -18,6 +18,8 @@ const MYDATA_PHASE_SYNCED = 'synced'
 const MYDATA_SYNC_ERROR_MESSAGE = '마이데이터 연동에 실패했어요. 잠시 후 다시 시도해 주세요.'
 const MYDATA_INTERRUPTED_ERROR_MESSAGE =
   '새로고침으로 이전 요청의 처리 상태를 확인할 수 없어요. 다시 시도해 주세요.'
+const DUPLICATE_EMAIL_ERROR_MESSAGE = '이미 가입된 이메일이에요'
+const SIGNUP_ERROR_MESSAGE = '회원가입에 실패했어요. 잠시 후 다시 시도해 주세요.'
 
 // 컴포넌트가 재마운트되어도 같은 사용자의 진행 중 요청을 공유한다.
 const mydataSyncRequests = new Map()
@@ -76,6 +78,10 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
 
   function resetLoginError() {
     loginError.value = null
+  }
+
+  function resetSignupError() {
+    signupError.value = null
   }
 
   async function submitLogin(credentials) {
@@ -205,7 +211,8 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
     try {
       return await signupApi(payload)
     } catch (error) {
-      signupError.value = '회원가입에 실패했어요. 잠시 후 다시 시도해 주세요.'
+      signupError.value =
+        error?.status === 409 ? DUPLICATE_EMAIL_ERROR_MESSAGE : SIGNUP_ERROR_MESSAGE
       throw error
     } finally {
       isSubmittingSignup.value = false
@@ -237,6 +244,7 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
     mydataSyncError,
     initializeMydata,
     retryMydataInitialization,
+    resetSignupError,
     signupError,
     isSubmittingSignup,
     submitSignup,

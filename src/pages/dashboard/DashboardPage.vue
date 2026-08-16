@@ -186,16 +186,27 @@
   </div>
 
   <div v-else class="flex min-h-[420px] items-center justify-center px-6 text-center">
-    <div>
-      <p class="text-base font-black text-[#0a192f]">표시할 목표가 없어요</p>
-      <p class="pt-2 text-sm text-slate-500">목표를 만들면 로드맵이 여기에 표시돼요.</p>
+    <div class="max-w-[320px]">
+      <div class="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-6">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </div>
+      <p class="text-base font-black text-[#0a192f]">아직 등록된 목표가 없어요</p>
+      <p class="pt-1.5 text-sm text-slate-500">첫 번째 목표를 설정하고 맞춤 로드맵을 시작해보세요.</p>
+      <RouterLink
+        :to="{ name: ROUTE_NAMES.GOAL_SELECT }"
+        class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-xs transition hover:opacity-90"
+      >
+        새 목표 만들기
+      </RouterLink>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
 import { useCollectionStore } from '@/features/collection'
 import { GOAL_STATUS } from '@/features/goal/constants/goal.constants'
