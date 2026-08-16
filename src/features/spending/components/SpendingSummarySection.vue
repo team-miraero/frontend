@@ -19,7 +19,7 @@
       </div>
 
       <div class="mt-2 flex items-end gap-1 whitespace-nowrap">
-        <strong class="text-[32px] font-bold leading-none tracking-[-0.04em] text-[#0A192F]">
+        <strong class="text-[32px] font-bold leading-none tracking-[-0.04em] tabular-nums text-[#0A192F]">
           {{ formattedTotalSpending }}
         </strong>
 
@@ -29,11 +29,11 @@
           <p class="text-[11px] text-[#64748B]">
             <span>전월 대비 </span>
 
-            <strong class="font-semibold" :class="monthlyDifferenceColorClass">
+            <strong class="font-semibold tabular-nums" :class="monthlyDifferenceColorClass">
               {{ desktopMonthlyDifferenceHighlightText }}
             </strong>
 
-            <span v-if="monthlyDifference !== 0"> · {{ monthlyDifferenceRate }}% </span>
+            <span v-if="monthlyDifference !== 0" class="tabular-nums"> · {{ monthlyDifferenceRate }}% </span>
           </p>
         </div>
       </div>
@@ -45,7 +45,7 @@
           <p class="text-xs text-[#64748B]">이번 달 저축 여력</p>
 
           <p class="mt-1.5">
-            <strong class="text-xl font-bold text-[#0A192F]">
+            <strong class="text-xl font-bold tabular-nums text-[#0A192F]">
               {{ formattedSavingCapacity }}
             </strong>
 
@@ -57,7 +57,7 @@
           <p class="text-xs text-[#64748B]">목표 달성까지</p>
 
           <p class="mt-1.5">
-            <strong class="text-xl font-bold text-[#0A192F]">
+            <strong class="text-xl font-bold tabular-nums text-[#0A192F]">
               {{ formattedRemainingMonths }}
             </strong>
 

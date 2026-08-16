@@ -6,6 +6,5 @@ export const coachRoutes = [
     path: '/coach',
     name: ROUTE_NAMES.COACH,
     component: () => import('@/pages/coach/CoachPage.vue'),
-    meta: { hideHeader: true },
   },
 ]

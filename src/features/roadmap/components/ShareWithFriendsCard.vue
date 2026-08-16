@@ -1,42 +1,39 @@
-<!-- 사이드 "여유자금" 영역 하단 및 모바일: 친구에게 목표 달성 현황 자랑하기 카드 -->
+<!-- 목표 달성 현황 친구 공유하기 배너 카드 -->
 <template>
   <button
     type="button"
-    class="group relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[20px] border p-3.5 sm:p-4 text-left transition-all hover:shadow-md shadow-[0_2px_8px_rgba(0,102,255,0.06)]"
-    :style="{ borderColor: theme.cardBorder, backgroundImage: theme.cardGradient }"
+    class="group relative flex min-h-[112px] w-full cursor-pointer items-center justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-r from-white via-[#f8fbff] to-[#ebf4ff] p-5 text-left shadow-[0_4px_24px_rgba(15,35,70,0.03)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(0,102,255,0.08)] active:scale-[0.98] sm:p-6 break-keep"
     @click="$emit('open')"
   >
-    <div class="relative z-10 flex items-start justify-between gap-2 pr-20 sm:pr-24">
-      <div>
-        <h3 class="text-[11px] sm:text-xs font-bold text-[#0a192f] whitespace-nowrap">
-          친구에게 공유하기
-        </h3>
-        <p class="pt-1 text-[10px] leading-tight text-slate-500 sm:text-xs text-left">
-          목표 달성 현황을 친구들에게 자랑해 보세요!
-        </p>
+    <div class="relative z-10 min-w-0 pr-24 sm:pr-48">
+      <!-- 메인 타이틀 -->
+      <h3 class="text-sm font-black tracking-tight text-[#0a192f] sm:text-base">
+        친구에게 나의 로드맵 자랑하기
+      </h3>
+
+      <!-- 설명 문구 (~에요 톤앤매너) -->
+      <p class="mt-1 text-[11px] font-bold text-slate-400 sm:text-xs">
+        목표 달성 현황 카드를 공유하고 함께 달려보세요!
+      </p>
+
+      <!-- 하단 인터랙티브 공유 CTA -->
+      <div class="mt-2.5 flex items-center gap-1.5 text-xs font-bold text-primary">
+        <span class="font-black">지금 공유하기</span>
+        <span class="transition-transform duration-200 group-hover:translate-x-1">→</span>
       </div>
     </div>
 
-    <!-- 우측 대형 friends.png 캐릭터 일러스트 -->
+    <!-- 우측 스타프렌즈 일러스트 (모바일 밸런스 최적화 및 앰비언트 그림자) -->
     <img
       :src="friendsImage"
-      alt="친구들"
-      class="absolute -bottom-1 right-2 sm:right-3 h-20 sm:h-24 w-auto object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5"
+      alt="스타프렌즈 친구들"
+      class="absolute -bottom-1.5 right-1 h-[86px] w-auto object-contain drop-shadow-[0_6px_14px_rgba(0,102,255,0.12)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105 sm:right-5 sm:h-28"
     />
-
-    <div class="relative z-10 flex items-center justify-start pt-2">
-      <span class="text-[11px] sm:text-xs font-bold text-primary whitespace-nowrap">
-        공유하기 →
-      </span>
-    </div>
   </button>
 </template>
 
 <script setup>
-import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
 import friendsImage from '@/assets/images/friends.png'
 
 defineEmits(['open'])
-
-const theme = PACE_THEME.AHEAD
 </script>

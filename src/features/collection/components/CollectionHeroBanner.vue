@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import coliImage from '@/assets/images/coli8-thick.png'
+import coliImage from '@/assets/images/coli_new.png'
 
 defineProps({
   totalCount: {

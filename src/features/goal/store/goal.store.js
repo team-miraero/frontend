@@ -290,16 +290,13 @@ export const useGoalStore = defineStore('feature-goal', () => {
     dailyAvailableMoney.value = null
 
     try {
-      const goal = await goalApi.getGoalDetail(goalId)
+      const [goal] = await Promise.all([
+        goalApi.getGoalDetail(goalId),
+        fetchSupplementaryDashboardData(goalId, requestId).catch(() => undefined),
+      ])
       if (requestId !== dashboardRequestId) return null
 
       currentGoal.value = goal
-      isLoading.value = false
-
-      // 목표 상세가 도착하면 대시보드를 먼저 노출하고 부가 정보는 뒤에서 채운다.
-      // 부가 API 하나가 느리거나 실패해도 대시보드 본문 렌더링을 막지 않는다.
-      fetchSupplementaryDashboardData(goalId, requestId)
-
       return goal
     } catch (caughtError) {
       if (requestId !== dashboardRequestId) return null
