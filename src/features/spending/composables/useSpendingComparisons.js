@@ -3,7 +3,6 @@ import {
   DEFAULT_SPENDING_AGE_GROUP_ID,
   DEFAULT_SPENDING_INCOME_GROUP_ID,
   PEER_SPENDING_BY_BASIS,
-  PREVIOUS_MONTH_SPENDING_BY_CATEGORY,
   SPENDING_AGE_GROUPS,
   SPENDING_CATEGORY_TYPES,
   SPENDING_CATEGORIES,
@@ -16,7 +15,7 @@ export function useSpendingSummaryComparison(props) {
   const formattedSavingCapacity = computed(() => formatKoreanNumber(props.savingCapacity))
   const formattedRemainingMonths = computed(() => formatKoreanNumber(props.remainingMonths))
   const normalizedGoalProgress = computed(() => Math.min(Math.max(props.goalProgress, 0), 100))
-  const previousMonthSpending = computed(() => props.totalSpending - props.monthlyDifference)
+  const previousMonthSpending = computed(() => props.previousMonthSpending)
 
   const monthlyDifferenceRate = computed(() => {
     if (previousMonthSpending.value <= 0) {
@@ -112,16 +111,23 @@ export function usePeerSpendingComparison(summary) {
   )
 
   const peerSpending = computed(
-    () => PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value]
+    () => PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value] ?? {}
   )
 
   const categorySpending = computed(() => summary.value.categorySpending ?? {})
 
-  const comparisonItems = computed(() =>
-    SPENDING_CATEGORIES.filter((category) => category.type === selectedCategoryType.value)
+  // 또래 평균은 하드코딩이라 모든 카테고리를 갖고 있다. 여기서 peerSpending까지 조건에 넣으면
+  // 내 지출 데이터가 없는 카테고리도 0원으로 비교돼 "또래보다 훨씬 덜 쓴다"는 거짓 결과가 나온다.
+  // 그래서 내 지출 응답에 실제로 존재하는 카테고리만 비교 대상으로 삼는다.
+  const comparisonItems = computed(() => {
+    return SPENDING_CATEGORIES.filter(
+      (category) =>
+        category.type === selectedCategoryType.value &&
+        Object.hasOwn(categorySpending.value, category.id)
+    )
       .map((category) => ({
         ...category,
-        current: categorySpending.value[category.id] ?? category.current,
+        current: categorySpending.value[category.id] ?? 0,
       }))
       .sort((firstCategory, secondCategory) => secondCategory.current - firstCategory.current)
       .map((category) => {
@@ -136,7 +142,7 @@ export function usePeerSpendingComparison(summary) {
           peerWidth: (peerAmount / maximumAmount) * 100,
         }
       })
-  )
+  })
 
   const currentTotalSpending = computed(() =>
     comparisonItems.value.reduce((total, category) => total + category.current, 0)
@@ -201,12 +207,16 @@ function joinKoreanNames(names) {
 
 export function useMonthlySpendingComparison(summary) {
   const categorySpending = computed(() => summary.value.categorySpending ?? {})
+  const previousMonthSpending = computed(() => summary.value.previousMonthCategorySpending ?? {})
   const monthlyComparisonItems = computed(() =>
     SPENDING_CATEGORIES.filter(
-      (category) => category.type === SPENDING_CATEGORY_TYPES.VARIABLE
+      (category) =>
+        category.type === SPENDING_CATEGORY_TYPES.VARIABLE &&
+        (Object.hasOwn(categorySpending.value, category.id) ||
+          Object.hasOwn(previousMonthSpending.value, category.id))
     ).map((category) => {
-      const current = categorySpending.value[category.id] ?? category.current
-      const previousAmount = PREVIOUS_MONTH_SPENDING_BY_CATEGORY[category.id] ?? current
+      const current = categorySpending.value[category.id] ?? 0
+      const previousAmount = previousMonthSpending.value[category.id] ?? 0
 
       return {
         ...category,

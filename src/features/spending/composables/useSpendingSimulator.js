@@ -1,7 +1,6 @@
 import { computed, ref } from 'vue'
 import {
   MONTHS_SHORTENED_PER_SAVING_UNIT,
-  RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY,
   SPENDING_CATEGORY_TYPES,
   SPENDING_CATEGORIES,
 } from '@/features/spending/constants/spending.constants'
@@ -49,22 +48,51 @@ export function formatShortenedPeriod(months) {
 export function useSpendingSimulator(summary) {
   const categoryTargets = ref({})
   const categorySpending = computed(() => summary?.value?.categorySpending ?? {})
+  const recentThreeMonthAverageSpending = computed(
+    () => summary?.value?.recentThreeMonthAverageSpending ?? {}
+  )
+  // 내 지출 응답에 없는 카테고리는 상수의 목 금액(category.current)으로 되돌리지 않는다.
+  // 비교 탭은 같은 카테고리를 0으로 보여주는데 여기만 지어낸 금액을 쓰면 화면끼리 어긋난다.
   const categories = computed(() =>
     SPENDING_CATEGORIES.filter(
       (category) =>
-        category.type === SPENDING_CATEGORY_TYPES.VARIABLE && category.id !== 'transportation'
-    ).map((category) => ({
-      ...category,
-      current: categorySpending.value[category.id] ?? category.current,
-      target: categoryTargets.value[category.id] ?? null,
-      recentThreeMonthAverage:
-        RECENT_THREE_MONTH_AVERAGE_SPENDING_BY_CATEGORY[category.id] ??
-        categorySpending.value[category.id] ??
-        category.current,
-    }))
+        category.type === SPENDING_CATEGORY_TYPES.VARIABLE &&
+        category.id !== 'transportation' &&
+        Object.hasOwn(categorySpending.value, category.id)
+    )
+      .map((category) => ({
+        ...category,
+        current: categorySpending.value[category.id] ?? 0,
+        target: categoryTargets.value[category.id] ?? null,
+        // 기준 지출 = 최근 3개월 평균 소비. API가 해당 카테고리의 평균을 안 주면
+        // 이번 달 지출로, 그마저 없으면 0으로 대체한다.
+        // 슬라이더의 step은 1(만원)인데 이 값에 소수(예: 14.3)가 섞이면, 건드리지 않은 상태의
+        // value(=이 값)가 브라우저의 step 스냅 규칙에 의해 max보다 작은 정수로 스냅되어
+        // thumb이 카테고리마다 제각각 오른쪽 끝에서 살짝씩 어긋나 보인다. 정수로 반올림해 맞춘다.
+        recentThreeMonthAverage: Math.round(
+          recentThreeMonthAverageSpending.value[category.id] ??
+            categorySpending.value[category.id] ??
+            0
+        ),
+      }))
+      // 기준 지출이 min과 같으면(대부분 0) 슬라이더의 min===max가 되어 조절할 범위가 없다.
+      // 이 경우 네이티브 range input이 브라우저마다 thumb 위치를 다르게 그려서
+      // 카테고리마다 슬라이더 위치가 제각각으로 보이는 버그가 생기므로 아예 목록에서 뺀다.
+      .filter((category) => category.recentThreeMonthAverage > category.min)
   )
-  // SPENDING_CATEGORIES는 정적 상수라 categories의 카테고리 구성(6개)은 항상 고정된다.
-  const selectedCategoryId = ref(categories.value[0]?.id ?? null)
+  // categories 구성은 API 응답에 따라 달라지므로, 고른 카테고리가 목록에서 빠지면
+  // 첫 번째 카테고리로 되돌려 selectedCategory가 undefined가 되지 않게 한다.
+  const rawSelectedCategoryId = ref(categories.value[0]?.id ?? null)
+
+  const selectedCategoryId = computed({
+    get: () =>
+      categories.value.some((category) => category.id === rawSelectedCategoryId.value)
+        ? rawSelectedCategoryId.value
+        : (categories.value[0]?.id ?? null),
+    set: (value) => {
+      rawSelectedCategoryId.value = value
+    },
+  })
 
   const selectedCategoryIndex = computed(() =>
     categories.value.findIndex((category) => category.id === selectedCategoryId.value)

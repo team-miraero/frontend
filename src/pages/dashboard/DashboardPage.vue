@@ -5,11 +5,11 @@
     message="로드맵을 불러오는 중이에요"
   />
 
-  <div v-else-if="goalStore.currentGoal" class="flex justify-center bg-[#f8fbff] pb-8">
-    <div class="w-full max-w-[1440px] px-8 py-3">
+  <div v-else-if="goalStore.currentGoal" class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fbff] pb-6">
+    <div class="page-container py-4 sm:py-6 space-y-4 sm:space-y-6">
       <div
         v-if="hasSupplementaryError"
-        class="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"
+        class="flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"
         role="status"
       >
         <p class="text-xs font-bold text-amber-700">일부 부가 정보를 불러오지 못했어요.</p>
@@ -22,58 +22,89 @@
           {{ goalStore.isSupplementaryLoading ? '불러오는 중…' : '다시 시도' }}
         </button>
       </div>
-      <GoalPausedBanner v-if="isGoalPaused" class="mb-3" @resume-click="openResumeConfirm" />
-      <PaceBanner
-        :pace="goalStore.currentGoal.pace"
-        :progress-rate="goalStore.currentGoal.progressRate"
-        :disabled="isGoalPaused"
-        :current-amount="goalStore.currentGoal.currentAmount"
-        :daily-available-money="goalStore.dailyAvailableMoney"
-        :monthly-available-money="goalStore.monthlyAvailableMoney"
-        @cta-click="handlePacemakerCtaClick"
-        @pause="openPauseConfirm"
-        @open-today="handleOpenTodayAvailableMoneyModal"
-        @open-month="handleOpenMonthlyAvailableMoneyModal"
-      />
-      <!-- 목표가 일시정지 상태면 아래 액션 영역 전체를 흐리게 하고 클릭이 통하지 않도록 막음 -->
-      <div :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''">
-        <div class="mt-2 sm:mt-3">
-          <MilestoneProgressBar
-            :goal="goalStore.currentGoal"
-            :milestones="roadmapStore.milestones"
-          />
 
-          <!-- 스플릿 기록: 예전엔 토글로 접어뒀는데 굳이 숨길 필요 없어서 항상 노출 -->
-          <div class="mt-3 flex flex-col gap-3">
-            <!-- NextMilestoneCard: SPLIT 2(진행 중) 카드 안에 동일한 진행률 정보가 이미 있어 중복이라 잠시 주석 처리.
-                 나중에 다시 쓸 수도 있어서 삭제하지 않고 남겨둠. -->
-            <!--
-            <NextMilestoneCard
-              :goal="goalStore.currentGoal"
-              :milestones="roadmapStore.milestones"
-            />
-            -->
-            <MilestoneList :milestones="roadmapStore.milestones" :goal="goalStore.currentGoal" />
+      <!-- 1. 상단 통합 현황 카드 (PaceBanner: 진행 중/일시정지 상태 및 재개 토글 내장) -->
+      <div class="animate-stagger-1">
+        <PaceBanner
+          :pace="goalStore.currentGoal.pace"
+          :progress-rate="goalStore.currentGoal.progressRate"
+          :disabled="isGoalPaused"
+          :current-amount="goalStore.currentGoal.currentAmount"
+          :goal-amount="goalStore.currentGoal.goalAmount"
+          :end-date="goalStore.currentGoal.period.endDate"
+          :daily-available-money="goalStore.dailyAvailableMoney"
+          :monthly-available-money="goalStore.monthlyAvailableMoney"
+          :pacemaker="pacemakerStore.pacemakerView"
+          :is-toggling="pacemakerStore.isToggling"
+          @cta-click="handlePacemakerCtaClick"
+          @toggle="handlePacemakerToggle"
+          @pause="openPauseConfirm"
+          @resume="openResumeConfirm"
+          @open-today="handleOpenTodayAvailableMoneyModal"
+          @open-month="handleOpenMonthlyAvailableMoneyModal"
+        />
+      </div>
+
+      <!-- 2. 목표 진행 로드맵 카드 (MilestoneProgressBar + MilestoneList) -->
+      <section
+        class="animate-stagger-2 overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-7 md:p-8"
+        :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''"
+      >
+        <div class="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex min-w-0 items-center gap-2.5">
+            <span class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm ring-1 ring-primary/20">
+              <svg
+                class="size-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                <line x1="4" y1="22" x2="4" y2="15" />
+              </svg>
+            </span>
+            <div class="min-w-0 flex-1">
+              <h2 class="text-base font-black tracking-tight text-[#0a192f] sm:text-lg">나의 로드맵 여정</h2>
+              <p class="text-xs font-bold text-slate-400">목표 지점까지 달성한 마일스톤과 주행 현황이에요</p>
+            </div>
           </div>
         </div>
 
-        <!-- 요약 통계 그룹: 도로/스플릿과 이어지는 하나의 카드로 묶음 -->
-        <div class="pt-1">
-          <RaceRecordSummary
-            :goal="goalStore.currentGoal"
-            :assets="goalStore.assets"
-            :pacemaker="pacemakerStore.pacemakerView"
-            :is-toggling="pacemakerStore.isToggling"
-            :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
-            :dashboard-error-message="dashboardErrorMessage"
-            @open-detail="openLinkedAssetsModal"
-            @toggle="handlePacemakerToggle"
-            @open="openShareGoalModal"
-            @retry-dashboard="retryPacemakerDashboard"
-          />
+        <MilestoneProgressBar
+          :goal="goalStore.currentGoal"
+          :milestones="roadmapStore.milestones"
+        />
+
+        <!-- 스플릿 기록 -->
+        <div class="mt-3.5 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:mt-4 sm:pt-5">
+          <MilestoneList :milestones="roadmapStore.milestones" :goal="goalStore.currentGoal" />
         </div>
+      </section>
+
+      <!-- 3. 요약 통계 그룹 (자산 현황 카드) -->
+      <div
+        class="animate-stagger-3"
+        :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''"
+      >
+        <RaceRecordSummary
+          :goal="goalStore.currentGoal"
+          :assets="goalStore.assets"
+          :pacemaker="pacemakerStore.pacemakerView"
+          :is-toggling="pacemakerStore.isToggling"
+          :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
+          :dashboard-error-message="dashboardErrorMessage"
+          @open-detail="handleOpenLinkedAssets"
+          @toggle="handlePacemakerToggle"
+          @open="handleOpenShareGoal"
+          @retry-dashboard="retryPacemakerDashboard"
+        />
       </div>
     </div>
+
+    <!-- 모달 컴포넌트들 -->
     <PacemakerSetupModal v-model="isPacemakerModalOpen" />
     <PacemakerBalanceModal
       v-model="isPacemakerBalanceModalOpen"
@@ -184,12 +215,10 @@ import {
   useRoadmapStore,
   PaceBanner,
   MilestoneProgressBar,
-  // NextMilestoneCard, // 템플릿에서 주석 처리한 것과 짝 — 나중에 다시 쓰면 여기도 같이 복원
   MilestoneList,
   TodayAvailableMoneyModal,
   MonthlyAvailableMoneyModal,
   LinkedAssetsModal,
-  GoalPausedBanner,
   GoalStatusConfirmModal,
   RaceRecordSummary,
   ShareGoalModal,
@@ -279,6 +308,14 @@ function handleOpenMonthlyAvailableMoneyModal() {
   isMonthlyAvailableMoneyModalOpen.value = true
 }
 
+function handleOpenLinkedAssets() {
+  openLinkedAssetsModal()
+}
+
+function handleOpenShareGoal() {
+  openShareGoalModal()
+}
+
 // 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
 function handlePacemakerToggle() {
   if (pacemakerStore.pacemakerStatus?.registered) {
@@ -293,9 +330,9 @@ async function retryPacemakerDashboard() {
   await pacemakerStore.fetchPacemakerDashboard().catch(() => undefined)
 }
 
-// 페이스메이커 CTA, 아직 전용 저금통이 있으면 개설 안내 모달, 있으면 토글 동작
+// 페이스메이커 CTA, 토글이 ON(enabled)이면 잔액 모달, OFF 또는 미개설이면 '여유자금이 아직 없어요' 안내 모달 오픈
 function handlePacemakerCtaClick() {
-  if (pacemakerStore.pacemakerStatus?.registered) {
+  if (pacemakerStore.pacemakerView?.enabled) {
     openPacemakerBalanceModal()
   } else {
     openPacemakerModal()
@@ -478,3 +515,44 @@ watch(
   }
 )
 </script>
+
+<style scoped>
+@keyframes dashboardStaggerUp {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-stagger-1 {
+  animation: dashboardStaggerUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 40ms;
+  will-change: transform, opacity;
+}
+
+.animate-stagger-2 {
+  animation: dashboardStaggerUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 160ms;
+  will-change: transform, opacity;
+}
+
+.animate-stagger-3 {
+  animation: dashboardStaggerUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 280ms;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-stagger-1,
+  .animate-stagger-2,
+  .animate-stagger-3 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+</style>

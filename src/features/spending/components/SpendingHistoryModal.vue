@@ -59,16 +59,16 @@
           >
             <button
               v-for="category in categoryFilters"
-              :key="category.code"
+              :key="category.value"
               type="button"
               class="shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0066FF]/30"
               :class="
-                selectedCategory === category.code
+                selectedCategory === category.value
                   ? 'border-[#0066FF] bg-[#0066FF] text-white'
                   : 'border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#B9D4FF] hover:text-[#0066FF]'
               "
-              :aria-pressed="selectedCategory === category.code"
-              @click="selectedCategory = category.code"
+              :aria-pressed="selectedCategory === category.value"
+              @click="selectedCategory = category.value"
             >
               {{ category.name }}
             </button>
@@ -116,10 +116,10 @@
                 >
                   <span
                     class="flex size-10 shrink-0 items-center justify-center rounded-full text-lg"
-                    :style="{ backgroundColor: categoryMeta(transaction.categoryCode).softColor }"
+                    :style="{ backgroundColor: categoryMeta(transaction.categoryName).softColor }"
                     aria-hidden="true"
                   >
-                    {{ categoryMeta(transaction.categoryCode).icon }}
+                    {{ categoryMeta(transaction.categoryName).icon }}
                   </span>
 
                   <div class="min-w-0 flex-1">
@@ -207,12 +207,18 @@ let previousAppAriaHidden = null
 const formattedTotalExpense = computed(() => formatKRWCompact(Math.abs(props.totalExpense)))
 
 const categoryFilters = computed(() => {
-  const presentCodes = new Set(props.transactions.map((transaction) => transaction.categoryCode))
-  const presentCategories = SPENDING_CATEGORIES.filter((category) =>
-    presentCodes.has(category.code)
-  ).map(({ code, name }) => ({ code, name }))
+  const presentCategoryNames = new Set(
+    props.transactions.map((transaction) => transaction.categoryName ?? '기타')
+  )
+  const knownCategories = SPENDING_CATEGORIES.filter((category) =>
+    presentCategoryNames.has(category.name)
+  ).map(({ name }) => ({ value: name, name }))
+  const knownCategoryNames = new Set(knownCategories.map((category) => category.name))
+  const additionalCategories = [...presentCategoryNames]
+    .filter((categoryName) => !knownCategoryNames.has(categoryName))
+    .map((categoryName) => ({ value: categoryName, name: categoryName }))
 
-  return [{ code: 'ALL', name: '전체' }, ...presentCategories]
+  return [{ value: 'ALL', name: '전체' }, ...knownCategories, ...additionalCategories]
 })
 
 const filteredTransactions = computed(() => {
@@ -221,13 +227,13 @@ const filteredTransactions = computed(() => {
   }
 
   return props.transactions.filter(
-    (transaction) => transaction.categoryCode === selectedCategory.value
+    (transaction) => (transaction.categoryName ?? '기타') === selectedCategory.value
   )
 })
 
 const selectedCategoryName = computed(
   () =>
-    categoryFilters.value.find((category) => category.code === selectedCategory.value)?.name ?? ''
+    categoryFilters.value.find((category) => category.value === selectedCategory.value)?.name ?? ''
 )
 
 const footerText = computed(() => {
@@ -242,7 +248,10 @@ const groupedTransactions = computed(() => {
   const groups = new Map()
 
   filteredTransactions.value.forEach((transaction) => {
-    const date = transaction.transactedAt.slice(0, 10)
+    const date =
+      typeof transaction.transactedAt === 'string'
+        ? transaction.transactedAt.slice(0, 10) || 'UNKNOWN'
+        : 'UNKNOWN'
 
     if (!groups.has(date)) {
       groups.set(date, [])
@@ -332,9 +341,9 @@ function trapFocus(event) {
   }
 }
 
-function categoryMeta(categoryCode) {
+function categoryMeta(categoryName) {
   return (
-    SPENDING_CATEGORIES.find((category) => category.code === categoryCode) ?? DEFAULT_CATEGORY_META
+    SPENDING_CATEGORIES.find((category) => category.name === categoryName) ?? DEFAULT_CATEGORY_META
   )
 }
 
@@ -343,10 +352,12 @@ function formatAmount(amount) {
 }
 
 function formatTime(transactedAt) {
-  return transactedAt.slice(11, 16)
+  return typeof transactedAt === 'string' ? transactedAt.slice(11, 16) || '--:--' : '--:--'
 }
 
 function formatDateLabel(date) {
+  if (typeof date !== 'string' || date === 'UNKNOWN') return '날짜 정보 없음'
+
   const [year, month, day] = date.split('-').map(Number)
   const dayName = DAY_NAMES[new Date(year, month - 1, day).getDay()]
 

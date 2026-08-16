@@ -86,17 +86,16 @@ const ageLabel = computed(() => {
 })
 
 const deadlineBadge = computed(() => {
-  if (!props.policy.applicationEndDate) {
+  const applicationEndDate = toLocalDate(props.policy.applicationEndDate)
+  if (!applicationEndDate) {
     return props.policy.applicationPeriod?.includes('상시')
       ? { label: '상시 모집', className: 'bg-gray-100 text-gray-600' }
       : { label: '기간 확인', className: 'bg-gray-100 text-gray-500' }
   }
 
-  const [year, month, day] = props.policy.applicationEndDate.split('-').map(Number)
-  const endDate = new Date(year, month - 1, day)
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const daysLeft = Math.ceil((endDate.getTime() - today.getTime()) / 86400000)
+  const daysLeft = Math.ceil((applicationEndDate.getTime() - today.getTime()) / 86400000)
 
   if (daysLeft < 0) return { label: '마감', className: 'bg-gray-100 text-gray-400' }
   if (daysLeft === 0) return { label: '오늘 마감', className: 'bg-red-50 text-red-600' }
@@ -104,4 +103,21 @@ const deadlineBadge = computed(() => {
     return { label: `마감 D-${daysLeft}`, className: 'bg-orange-50 text-orange-600' }
   return { label: `마감 D-${daysLeft}`, className: 'bg-gray-100 text-gray-600' }
 })
+
+function toLocalDate(value) {
+  const dateParts =
+    typeof value === 'string'
+      ? value.split('-').map(Number)
+      : Array.isArray(value)
+        ? value.map(Number)
+        : []
+
+  const [year, month, day] = dateParts
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
+    return null
+  }
+
+  const date = new Date(year, month - 1, day)
+  return Number.isNaN(date.getTime()) ? null : date
+}
 </script>

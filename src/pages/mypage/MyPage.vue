@@ -4,14 +4,6 @@
       class="flex min-h-[78px] items-center border-b border-slate-200 bg-white px-5 py-4 lg:min-h-[86px] lg:px-10 lg:py-5"
     >
       <div class="flex items-center gap-3">
-        <button
-          type="button"
-          class="flex size-9 flex-col items-center justify-center gap-1 rounded-[10px] text-slate-500 lg:hidden"
-          aria-label="사이드바 메뉴 열기"
-          @click="uiStore.toggleSidebar()"
-        >
-          <span v-for="line in 3" :key="line" class="h-[1.5px] w-[17px] rounded-full bg-current" />
-        </button>
         <div>
           <p class="text-xs text-slate-500">계정 · 설정</p>
           <h1 class="mt-0.5 text-[22px] font-black tracking-[-0.02em]">마이페이지</h1>
@@ -19,8 +11,8 @@
       </div>
     </header>
 
-    <main class="px-4 pb-12 pt-5 sm:px-6 lg:px-10 lg:pb-16 lg:pt-8">
-      <div class="mx-auto flex w-full max-w-[860px] flex-col gap-5 lg:mx-0">
+    <main class="page-container pb-12 pt-5 lg:pb-16 lg:pt-8">
+      <div class="mx-auto flex w-full max-w-[860px] flex-col gap-5">
         <ProfileSection
           :profile="profile"
           :profile-image-url="displayProfileImageUrl"
@@ -115,12 +107,10 @@ import {
 } from '@/features/mypage'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/stores/auth.store'
-import { useUiStore } from '@/stores/ui.store'
 import '@/features/mypage/styles/mypage.css'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const uiStore = useUiStore()
 const mypageStore = useMypageStore()
 const {
   profile,

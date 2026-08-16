@@ -88,25 +88,57 @@ export function usePacemakerToast() {
     const streak = viewData?.currentStreak || 52
     const moneyBoxBalance = viewData?.moneyBoxBalance || 270000
 
-    // 첫 번째 알림: 오늘의 여유자금 (💰 큼직한 돈주머니 뱃지)
-    addToast({
-      type: 'SAVING',
-      badgeIcon: '💰',
-      title: `오늘의 여유자금: ${formatWon(todayAmount)}`,
-      body: `이번달 여유자금 ${formatWon(monthlyRemaining)} 남았어요!`,
-      duration: 7000,
-    })
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
+    const initialDelay = 1200 // 페이지 로드 후 실제 알림이 도착하듯 1.2초 뒤 첫 알림 팝업
 
-    // 두 번째 알림: 연속 모으기 (🔥 큼직한 불꽃 뱃지) (1.2초 후 등장)
-    setTimeout(() => {
-      addToast({
-        type: 'STREAK',
-        badgeIcon: '🔥',
-        title: `연속 ${streak}일째 모으는중 !`,
-        body: `페이스메이커가 ${formatWon(moneyBoxBalance)} 확보했어요!`,
-        duration: 8500,
-      })
-    }, 1200)
+    if (isMobile) {
+      // 📱 모바일: 첫 번째 알림이 뜨고 사라진 후, 두 번째 알림이 순차적으로 등장 (진짜 스마트폰 푸시 알림 형태)
+      const firstDuration = 3500
+      const transitionGap = 400
+
+      // 1. 첫 번째 알림: 페이지 진입 1.2초 후 도착
+      setTimeout(() => {
+        addToast({
+          type: 'SAVING',
+          badgeIcon: '💰',
+          title: `오늘의 여유자금: ${formatWon(todayAmount)}`,
+          body: `이번달 여유자금 ${formatWon(monthlyRemaining)} 남았어요!`,
+          duration: firstDuration,
+        })
+      }, initialDelay)
+
+      // 2. 두 번째 알림: 첫 번째 알림이 완전히 퇴장한 후 등장
+      setTimeout(() => {
+        addToast({
+          type: 'STREAK',
+          badgeIcon: '🔥',
+          title: `연속 ${streak}일째 모으는중 !`,
+          body: `페이스메이커가 ${formatWon(moneyBoxBalance)} 확보했어요!`,
+          duration: 4000,
+        })
+      }, initialDelay + firstDuration + transitionGap)
+    } else {
+      // 💻 데스크톱: 페이지 진입 1.2초 후 1번 알림 ➔ 1.2초 뒤 2번 알림 스택
+      setTimeout(() => {
+        addToast({
+          type: 'SAVING',
+          badgeIcon: '💰',
+          title: `오늘의 여유자금: ${formatWon(todayAmount)}`,
+          body: `이번달 여유자금 ${formatWon(monthlyRemaining)} 남았어요!`,
+          duration: 7000,
+        })
+      }, initialDelay)
+
+      setTimeout(() => {
+        addToast({
+          type: 'STREAK',
+          badgeIcon: '🔥',
+          title: `연속 ${streak}일째 모으는중 !`,
+          body: `페이스메이커가 ${formatWon(moneyBoxBalance)} 확보했어요!`,
+          duration: 8500,
+        })
+      }, initialDelay + 1200)
+    }
   }
 
   return {

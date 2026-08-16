@@ -1,7 +1,13 @@
 <template>
   <article
-    class="group flex h-full min-h-[310px] flex-col overflow-hidden rounded-[18px] border bg-white shadow-[0_5px_16px_rgba(30,64,109,0.05)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(30,64,109,0.1)]"
+    class="group flex h-full min-h-[310px] cursor-pointer flex-col overflow-hidden rounded-[18px] border bg-white shadow-[0_5px_16px_rgba(30,64,109,0.05)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(30,64,109,0.1)] focus:outline-none focus:ring-2 focus:ring-primary/30"
     :class="isHighestRate ? 'border-primary ring-1 ring-primary/70' : 'border-[#e1e8f1]'"
+    role="button"
+    tabindex="0"
+    :aria-label="`${product.productName} 상품 상세 정보 보기`"
+    @click="openDetail"
+    @keydown.enter="openDetail"
+    @keydown.space.prevent="openDetail"
   >
     <div class="flex flex-1 flex-col p-5">
       <div class="flex items-start justify-between gap-3">
@@ -43,7 +49,9 @@
       <dl class="mt-4 grid grid-cols-2 gap-2">
         <div class="rounded-xl bg-[#f5f8fc] px-3 py-2.5">
           <dt class="text-[11px] font-medium text-slate-400">납입 기간</dt>
-          <dd class="mt-1 text-[13px] font-black text-slate-700">{{ termLabel }}</dd>
+          <dd class="mt-1 text-[13px] font-black text-slate-700" :title="fullTermLabel">
+            {{ termLabel }}
+          </dd>
         </div>
         <div class="rounded-xl bg-[#f5f8fc] px-3 py-2.5">
           <dt class="text-[11px] font-medium text-slate-400">한도</dt>
@@ -83,20 +91,18 @@
       </div>
     </div>
 
-    <button
-      type="button"
-      class="flex w-full items-center justify-between rounded-b-[17px] border-t border-[#e8edf4] px-5 py-3 text-xs font-bold text-slate-600 transition hover:bg-[#f8fbff] hover:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary/20"
-      :aria-label="`${product.productName} 상세 비교 정보 보기`"
-      @click="$emit('view-detail', product)"
+    <div
+      class="flex w-full items-center justify-between rounded-b-[17px] border-t border-[#e8edf4] px-5 py-3 text-xs font-bold text-slate-600 transition group-hover:bg-[#f8fbff] group-hover:text-primary"
+      aria-hidden="true"
     >
-      상세 비교 정보
+      상품 상세 정보
       <span
         class="text-base text-slate-400 transition-transform group-hover:translate-x-0.5"
         aria-hidden="true"
       >
         ›
       </span>
-    </button>
+    </div>
   </article>
 </template>
 
@@ -104,17 +110,26 @@
 import { computed } from 'vue'
 import { formatProductLimit, formatRateCompact } from '@/features/products/lib/product-formatters'
 import { CALCULATION_STATUS } from '@/features/products/lib/recommendation-impact'
-import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
+
+const SIMILAR_RATE_THRESHOLD = 0.1
 
 const props = defineProps({
   product: { type: Object, required: true },
   productType: { type: String, required: true },
   isHighestRate: { type: Boolean, default: false },
   goalName: { type: String, default: '선택한 목표' },
+  eligibleMaturityTerms: { type: Array, default: () => [] },
   recommendationImpact: { type: Object, default: null },
+  hasLinkedAssets: { type: Boolean, default: false },
+  hasOnlyMoneyBox: { type: Boolean, default: false },
+  currentInterestRate: { type: Number, default: null },
 })
 
-defineEmits(['view-detail'])
+const emit = defineEmits(['view-detail'])
+
+function openDetail() {
+  emit('view-detail', props.product)
+}
 
 const terms = computed(() =>
   [
@@ -128,6 +143,14 @@ const terms = computed(() =>
 const termLabel = computed(() => {
   if (terms.value.length === 0) return '상품별 확인'
   if (terms.value.length === 1) return `${terms.value[0]}개월`
+  if (terms.value.length >= 4) {
+    return `${terms.value.slice(0, 3).join(' · ')}개월 외 ${terms.value.length - 3}개`
+  }
+  return `${terms.value.join(' · ')}개월`
+})
+
+const fullTermLabel = computed(() => {
+  if (terms.value.length === 0) return '상품별 확인'
   return `${terms.value.join(' · ')}개월`
 })
 
@@ -135,20 +158,79 @@ const maximumRateLabel = computed(() => formatRateCompact(props.product.maximumI
 
 const limitLabel = computed(() => formatProductLimit(props.product.maxLimit, props.productType))
 
+const productInterestRate = computed(() => Number(props.product.maximumInterestRate))
+
+const hasComparableInterestRates = computed(
+  () =>
+    props.hasLinkedAssets &&
+    Number.isFinite(props.currentInterestRate) &&
+    Number.isFinite(productInterestRate.value)
+)
+
+const interestRateDifference = computed(() =>
+  hasComparableInterestRates.value ? productInterestRate.value - props.currentInterestRate : null
+)
+
+const interestRateComparisonDescription = computed(() =>
+  `현재 연 ${formatRateCompact(props.currentInterestRate)}% · 이 상품 최고 연 ${formatRateCompact(
+    productInterestRate.value
+  )}%`
+)
+
 const impactTitle = computed(() => {
   const impact = props.recommendationImpact
   const status = impact?.calculationStatus
 
   if (status === CALCULATION_STATUS.CALCULATED) {
-    return `이 상품 활용 시 목표 ${impact.estimatedMonthsSaved}개월 단축`
+    if (impact.estimatedMonthsSaved > 0) {
+      return `이 상품 활용 시 목표 ${impact.estimatedMonthsSaved}개월 단축`
+    }
+
+    if (impact.estimatedAdditionalAmount > 0) {
+      return `이 상품 활용 시 ${impact.estimatedAdditionalAmount.toLocaleString()}원 더 모을 수 있어요`
+    }
   }
-  if (status === CALCULATION_STATUS.NO_IMPROVEMENT && impact.estimatedAdditionalInterest > 0) {
-    const interestLabel =
-      impact.estimatedAdditionalInterest >= 10000
-        ? formatKRWCompact(impact.estimatedAdditionalInterest)
-        : formatKRW(impact.estimatedAdditionalInterest)
-    return `예상 이자 약 ${interestLabel} 증가`
+
+  if (
+    status === CALCULATION_STATUS.NOT_APPLICABLE &&
+    props.eligibleMaturityTerms.length === 0 &&
+    terms.value.length > 0
+  ) {
+    return '기간을 늘리면 이용할 수 있는 상품이에요'
   }
+
+  if (
+    hasComparableInterestRates.value &&
+    interestRateDifference.value <= -SIMILAR_RATE_THRESHOLD
+  ) {
+    return '현재 계획을 유지하는 편이 유리해요'
+  }
+
+  if (props.hasOnlyMoneyBox && productInterestRate.value > 0) {
+    return `저금통보다 최대 ${formatRateCompact(productInterestRate.value)}%p 높은 금리예요`
+  }
+
+  if (
+    hasComparableInterestRates.value &&
+    interestRateDifference.value >= SIMILAR_RATE_THRESHOLD
+  ) {
+    return `현재보다 최대 ${formatRateCompact(interestRateDifference.value)}%p 높은 금리예요`
+  }
+
+  if (
+    hasComparableInterestRates.value &&
+    Math.abs(interestRateDifference.value) < SIMILAR_RATE_THRESHOLD
+  ) {
+    return '현재 상품과 예상 효과가 비슷해요'
+  }
+
+  if (
+    props.eligibleMaturityTerms.length > 0 &&
+    (status === CALCULATION_STATUS.NOT_APPLICABLE || status === CALCULATION_STATUS.INSUFFICIENT_DATA)
+  ) {
+    return '가입 가능한 기간 옵션이 있어요'
+  }
+
   if (status === CALCULATION_STATUS.NO_IMPROVEMENT) {
     return '현재 계획과 예상 효과가 비슷해요'
   }
@@ -160,17 +242,51 @@ const impactTitle = computed(() => {
 
 const impactDescription = computed(() => {
   const impact = props.recommendationImpact
-  if (
-    impact?.calculationStatus === CALCULATION_STATUS.CALCULATED ||
-    impact?.calculationStatus === CALCULATION_STATUS.NO_IMPROVEMENT
-  ) {
+
+  if (impact?.calculationStatus === CALCULATION_STATUS.CALCULATED) {
     const rateBasis = impact.interestRateBasis === 'MAX' ? '최고금리' : '기본금리'
     return `${impact.optionTerm}개월 · ${rateBasis} 연 ${formatRateCompact(
       impact.assumedInterestRate
     )}% 기준 예상`
   }
+
+  if (
+    impact?.calculationStatus === CALCULATION_STATUS.NOT_APPLICABLE &&
+    props.eligibleMaturityTerms.length === 0 &&
+    terms.value.length > 0
+  ) {
+    return `최단 ${terms.value[0]}개월 · 최고 연 ${formatRateCompact(
+      productInterestRate.value
+    )}%`
+  }
+
+  if (
+    hasComparableInterestRates.value &&
+    interestRateDifference.value <= -SIMILAR_RATE_THRESHOLD
+  ) {
+    return interestRateComparisonDescription.value
+  }
+
+  if (props.hasOnlyMoneyBox && productInterestRate.value > 0) {
+    return `현재 저금통 0% · 이 상품 최고 연 ${formatRateCompact(productInterestRate.value)}%`
+  }
+
+  if (hasComparableInterestRates.value) {
+    return interestRateComparisonDescription.value
+  }
+
+  if (
+    props.eligibleMaturityTerms.length > 0 &&
+    (impact?.calculationStatus === CALCULATION_STATUS.NOT_APPLICABLE ||
+      impact?.calculationStatus === CALCULATION_STATUS.INSUFFICIENT_DATA)
+  ) {
+    return `${props.eligibleMaturityTerms.join(' · ')}개월 옵션으로 목표 기간 안에 만기돼요`
+  }
   if (impact?.calculationStatus === CALCULATION_STATUS.NOT_APPLICABLE) {
     return `${props.goalName}의 남은 기간보다 상품 가입 기간이 길어요`
+  }
+  if (impact?.calculationStatus === CALCULATION_STATUS.NO_IMPROVEMENT) {
+    return '상품 적용 전후 예상 금액 차이가 크지 않아요'
   }
   return '목표와 연결 자산 정보를 확인해 주세요'
 })

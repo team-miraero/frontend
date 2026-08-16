@@ -1,166 +1,197 @@
-// spending 도메인 API 함수 골격 (EXP-01~04)
 import { client } from '@/shared/api/client'
+import { unwrapApiData } from '@/shared/api/unwrapApiData'
 import { SPENDING_CATEGORIES } from '@/features/spending/constants/spending.constants'
 
-const MOCK_SPENDING_SUMMARY = {
-  totalSpending: 202,
-  savingCapacity: 35,
-  remainingMonths: 53,
-  monthlyDifference: 4,
-  goalProgress: 62,
-  myDataLinked: true,
-  referenceMonth: '2026-07',
-  categorySpending: Object.fromEntries(
-    SPENDING_CATEGORIES.map((category) => [category.id, category.current])
-  ),
+const CATEGORY_META_BY_NAME = new Map(
+  SPENDING_CATEGORIES.map((category) => [category.name, category])
+)
+
+function toFiniteNumber(value, fallback = 0) {
+  const number = Number(value)
+  return Number.isFinite(number) ? number : fallback
 }
 
-/**
- * @typedef {Object} SpendingSummary
- * @property {number} totalSpending 만원 단위
- * @property {number} savingCapacity 만원 단위
- * @property {number} remainingMonths
- * @property {number} monthlyDifference 만원 단위
- * @property {number} goalProgress
- * @property {boolean} myDataLinked 마이데이터 연동 여부
- * @property {string | null} referenceMonth 데이터 기준 월 (YYYY-MM)
- * @property {Record<string, number>} categorySpending 카테고리별 이번 달 지출 (만원 단위)
- */
+function normalizeDateTime(value) {
+  if (typeof value === 'string') return value
 
-/**
- * @param {{ from: string, to: string }} params
- * @returns {Promise<SpendingSummary>}
- */
-export async function getSpendingSummary(params) {
-  // TODO: 실제 API 연동 시 client.get('/spending/summary', { params })로 교체
-  return { ...MOCK_SPENDING_SUMMARY }
-}
+  if (Array.isArray(value)) {
+    const [year, month, day, hour = 0, minute = 0, second = 0] = value.map(Number)
+    const isValidDateTime =
+      Number.isInteger(year) &&
+      Number.isInteger(month) &&
+      Number.isInteger(day) &&
+      Number.isInteger(hour) &&
+      Number.isInteger(minute) &&
+      Number.isInteger(second)
 
-/**
- * @typedef {Object} Transaction
- * @property {number} transactionId
- * @property {string} transactionName
- * @property {'EXPENSE' | 'INCOME'} transactionType
- * @property {number} amount 원 단위
- * @property {number} categoryId
- * @property {string} categoryCode
- * @property {string} categoryName
- * @property {string} transactedAt
- */
-
-/**
- * @typedef {Object} TransactionHistory
- * @property {string} yearMonth
- * @property {Transaction[]} transactions
- * @property {number} totalCount
- */
-
-/**
- * @typedef {Object} TransactionSummary
- * @property {string} yearMonth
- * @property {number} totalExpense 원 단위
- * @property {number} previousMonthExpense 원 단위
- * @property {number} expenseDifference 원 단위
- * @property {'INCREASE' | 'DECREASE' | 'UNCHANGED'} expenseChangeType
- */
-
-const EXPENSE_CHANGE_TYPES = ['INCREASE', 'DECREASE', 'UNCHANGED']
-
-function unwrapApiData(responseBody) {
-  if (
-    responseBody &&
-    typeof responseBody === 'object' &&
-    Object.hasOwn(responseBody, 'success') &&
-    Object.hasOwn(responseBody, 'data')
-  ) {
-    if (!responseBody.success) {
-      throw new Error(responseBody.error?.message ?? 'API 요청에 실패했습니다.')
+    if (isValidDateTime) {
+      return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(
+        hour
+      ).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`
     }
-
-    return responseBody.data
   }
 
-  return responseBody
+  return ''
 }
 
-function normalizeTransaction(transaction) {
-  if (transaction.categoryCode !== 'DELIVERY') {
-    return transaction
+function wonToTenThousands(value) {
+  return Math.round((toFiniteNumber(value) / 10000) * 10) / 10
+}
+
+function requireNumericGoalId(goalId) {
+  const numericGoalId = Number(goalId)
+
+  if (!Number.isInteger(numericGoalId) || numericGoalId <= 0) {
+    throw new TypeError('지출관리 조회에는 생성된 목표의 숫자형 goalId가 필요합니다.')
   }
+
+  return numericGoalId
+}
+
+function mapCategoryAmounts(items, amountField) {
+  return (Array.isArray(items) ? items : []).reduce((mapped, item) => {
+    const category = CATEGORY_META_BY_NAME.get(item?.categoryName)
+    if (category) mapped[category.id] = wonToTenThousands(item?.[amountField])
+    return mapped
+  }, {})
+}
+
+/**
+ * Swagger DTO를 기존 Spending 화면 모델로 변환한다.
+ * Swagger 금액은 원, 현재 화면 금액은 만원 단위다.
+ */
+export function mapSpendingSummary({ dashboard, goal, availableMoney }) {
+  const monthChanges = Array.isArray(dashboard?.categoryMonthChanges)
+    ? dashboard.categoryMonthChanges
+    : []
+  const threeMonthAverages = Array.isArray(dashboard?.categoryThreeMonthAverages?.categories)
+    ? dashboard.categoryThreeMonthAverages.categories
+    : []
+
+  const currentMonthTotal = monthChanges.reduce(
+    (total, category) => total + toFiniteNumber(category?.currentMonthAmount),
+    0
+  )
+  const previousMonthTotal = monthChanges.reduce(
+    (total, category) => total + toFiniteNumber(category?.previousMonthAmount),
+    0
+  )
+  const year = Number(dashboard?.year)
+  const month = Number(dashboard?.month)
+  const hasReferenceMonth =
+    Number.isInteger(year) && Number.isInteger(month) && month >= 1 && month <= 12
 
   return {
-    ...transaction,
-    categoryCode: 'FOOD',
-    categoryName: '식비',
+    totalSpending: wonToTenThousands(currentMonthTotal),
+    previousMonthSpending: wonToTenThousands(previousMonthTotal),
+    monthlyDifference: wonToTenThousands(currentMonthTotal - previousMonthTotal),
+    savingCapacity: wonToTenThousands(availableMoney?.monthlyAvailableMoney),
+    fixedSpending: wonToTenThousands(availableMoney?.fixedExpense),
+    variableSpending: wonToTenThousands(availableMoney?.variableExpense),
+    remainingMonths: Math.max(0, Math.trunc(toFiniteNumber(goal?.period?.remainMonths))),
+    goalProgress: Math.min(100, Math.max(0, toFiniteNumber(goal?.progressRate))),
+    goalRemainingAmount: Math.max(
+      0,
+      toFiniteNumber(goal?.goalAmount) - toFiniteNumber(goal?.currentAmount)
+    ),
+    referenceMonth: hasReferenceMonth ? `${year}-${String(month).padStart(2, '0')}` : null,
+    categorySpending: mapCategoryAmounts(monthChanges, 'currentMonthAmount'),
+    previousMonthCategorySpending: mapCategoryAmounts(monthChanges, 'previousMonthAmount'),
+    recentThreeMonthAverageSpending: mapCategoryAmounts(threeMonthAverages, 'averageMonthlyAmount'),
+    // TODO: Swagger에 마이데이터 연동 여부 필드 없음
+    myDataLinked: null,
   }
 }
 
-function isValidTransaction(transaction) {
-  return (
-    transaction &&
-    typeof transaction === 'object' &&
-    Number.isInteger(transaction.transactionId) &&
-    typeof transaction.transactionName === 'string' &&
-    ['EXPENSE', 'INCOME'].includes(transaction.transactionType) &&
-    Number.isFinite(transaction.amount) &&
-    Number.isInteger(transaction.categoryId) &&
-    typeof transaction.categoryCode === 'string' &&
-    typeof transaction.categoryName === 'string' &&
-    typeof transaction.transactedAt === 'string'
-  )
+/**
+ * 현재 월 지출 분석과 선택한 목표의 KPI를 조회한다.
+ * 지출 분석 API는 goalId를 받지 않고, 목표 상세/가용금액 API만 숫자형 goalId를 사용한다.
+ * @param {number} goalId
+ */
+export async function getSpendingSummary(goalId) {
+  const numericGoalId = requireNumericGoalId(goalId)
+  // 또래/소득구간별 비교 데이터는 백엔드가 아직 연령대·소득 조건 조회를 지원하지 않아
+  // constants.js의 PEER_SPENDING_BY_BASIS 하드코딩 값을 사용한다 (useSpendingComparisons.js 참고).
+  const [dashboardResponse, goalResponse, availableMoneyResponse] = await Promise.all([
+    client.get('/expense-analysis/dashboard'),
+    client.get(`/goals/${numericGoalId}`),
+    client.get(`/goals/${numericGoalId}/available-money/monthly`),
+  ])
+
+  return mapSpendingSummary({
+    dashboard: unwrapApiData(dashboardResponse.data),
+    goal: unwrapApiData(goalResponse.data),
+    // 현재 Swagger는 이 endpoint를 공통 wrapper 없이 직접 DTO로 정의한다.
+    // 런타임 응답이 wrapper인 환경도 공통 유틸이 함께 처리한다.
+    availableMoney: unwrapApiData(availableMoneyResponse.data),
+  })
+}
+
+function mapTransaction(transaction) {
+  const categoryName = transaction?.category?.categoryName ?? '기타'
+  const rawCategoryId = transaction?.category?.categoryId ?? transaction?.categoryId
+  const numericCategoryId = Number(rawCategoryId)
+
+  return {
+    transactionId: Number(transaction?.transactionId),
+    transactionName: transaction?.merchantName ?? '가맹점 정보 없음',
+    transactionType: transaction?.transactionType ?? '',
+    amount: toFiniteNumber(transaction?.amount),
+    categoryId:
+      rawCategoryId !== null && rawCategoryId !== undefined && Number.isFinite(numericCategoryId)
+        ? numericCategoryId
+        : null,
+    categoryName,
+    transactedAt: normalizeDateTime(transaction?.transactedAt),
+  }
 }
 
 /**
- * 이번 달 최근 거래 내역을 조회한다.
- *
- * @param {{ yearMonth: string }} params
- * @returns {Promise<TransactionHistory>}
+ * Swagger PageResponse<TransactionResponse>를 화면용 거래 페이지로 변환한다.
+ * EXPENSE 필터링은 요청 파라미터(transactionType)로 백엔드에 위임하고,
+ * 여기서는 최근 거래가 먼저 보이도록 transactedAt 내림차순으로만 정렬한다.
+ * page는 요청과 동일하게 1부터 시작하는 것으로 취급한다 (requestedPage는 응답에 page가 없을 때의 폴백).
+ */
+export function mapTransactionPage(page, { year, month, requestedPage = 1 }) {
+  const content = Array.isArray(page?.content) ? page.content : []
+  const transactions = content
+    .map(mapTransaction)
+    .sort((left, right) => right.transactedAt.localeCompare(left.transactedAt))
+  const totalElements = Math.max(0, Math.trunc(toFiniteNumber(page?.totalElements, content.length)))
+  const totalPages = Math.max(0, Math.trunc(toFiniteNumber(page?.totalPages)))
+  const currentPage = Math.max(1, Math.trunc(toFiniteNumber(page?.page, requestedPage)))
+  const size = Math.max(0, Math.trunc(toFiniteNumber(page?.size, content.length)))
+
+  return {
+    yearMonth: `${year}-${String(month).padStart(2, '0')}`,
+    transactions,
+    page: currentPage,
+    size,
+    totalElements,
+    totalPages,
+    first: page?.first ?? currentPage <= 1,
+    last: page?.last ?? (totalPages === 0 || currentPage >= totalPages),
+  }
+}
+
+/**
+ * Swagger PageResponse<TransactionResponse>를 거래 모달 모델로 변환한다.
+ * @param {{ year: number, month: number, page?: number, size?: number }} params
  */
 export async function getTransactions(params) {
+  const year = Number(params?.year)
+  const month = Number(params?.month)
+  const requestedPage = params?.page ?? 1
   const { data: responseBody } = await client.get('/transactions', {
-    params: { ...params, transactionType: 'EXPENSE' },
+    params: {
+      year,
+      month,
+      transactionType: 'EXPENSE',
+      page: requestedPage,
+      size: params?.size ?? 100,
+    },
   })
-  const data = unwrapApiData(responseBody)
+  const page = unwrapApiData(responseBody)
 
-  if (
-    !data ||
-    typeof data.yearMonth !== 'string' ||
-    !Array.isArray(data.transactions) ||
-    !Number.isInteger(data.totalCount) ||
-    data.totalCount < 0 ||
-    !data.transactions.every(isValidTransaction)
-  ) {
-    throw new TypeError('거래 내역 API 응답 형식이 올바르지 않습니다.')
-  }
-
-  const transactions = data.transactions
-    .filter((transaction) => transaction.transactionType === 'EXPENSE')
-    .map(normalizeTransaction)
-    .sort((left, right) => right.transactedAt.localeCompare(left.transactedAt))
-
-  return { ...data, transactions }
-}
-
-/**
- * 이번 달 거래 요약을 조회한다.
- *
- * @param {{ yearMonth: string }} params
- * @returns {Promise<TransactionSummary>}
- */
-export async function getTransactionSummary(params) {
-  const { data: responseBody } = await client.get('/transactions/summary', { params })
-  const data = unwrapApiData(responseBody)
-
-  if (
-    !data ||
-    typeof data.yearMonth !== 'string' ||
-    !Number.isFinite(data.totalExpense) ||
-    !Number.isFinite(data.previousMonthExpense) ||
-    !Number.isFinite(data.expenseDifference) ||
-    !EXPENSE_CHANGE_TYPES.includes(data.expenseChangeType)
-  ) {
-    throw new TypeError('거래 요약 API 응답 형식이 올바르지 않습니다.')
-  }
-
-  return data
+  return mapTransactionPage(page, { year, month, requestedPage })
 }
