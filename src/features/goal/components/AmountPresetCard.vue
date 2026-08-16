@@ -11,7 +11,7 @@
         class="rounded-xl border px-2 py-3 text-center shadow-sm transition-all"
         :class="
           mode === 'preset' && modelValue === preset.value
-            ? 'border-primary bg-primary text-white'
+            ? 'border-[#0066FF] bg-[#EBF3FF] text-[#0066FF] font-bold'
             : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
         "
         @click="selectPreset(preset)"

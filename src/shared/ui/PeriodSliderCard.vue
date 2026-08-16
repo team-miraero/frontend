@@ -19,7 +19,7 @@
         class="w-full whitespace-nowrap rounded-full border px-4 py-2.5 text-center text-xs font-semibold transition-all shadow-sm"
         :class="
           modelValue === preset.value
-            ? 'border-primary bg-primary text-white'
+            ? 'border-[#0066FF] bg-[#EBF3FF] text-[#0066FF] font-bold'
             : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
         "
         @click="emit('update:modelValue', preset.value)"
