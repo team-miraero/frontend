@@ -3,95 +3,31 @@
   <HeroBackground class="font-['Noto_Sans_KR',sans-serif]">
     <StepHeader @back="handleBack" />
 
+    <!-- 본문 콘텐츠 -->
     <div
       v-if="goalParams && feasibility"
-      class="relative z-10 mx-auto w-full max-w-[650px] animate-fade-in-up px-4 pb-40 pt-2"
+      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pb-28 md:pb-4 pt-1"
     >
-      <ProgressBar :current-step="3" :total-steps="3" />
+      <ProgressBar :current-step="3" :total-steps="4" />
 
-      <span
-        v-if="false"
-        class="mt-4 inline-flex items-center gap-1.5 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
+      <!-- 메인 헤드라인 & 서브 설명 -->
+      <h1
+        class="mt-3 whitespace-pre-line sm:whitespace-normal text-2xl sm:text-[28px] font-black tracking-tight leading-snug text-gray-900 break-keep"
       >
-        <svg
-          v-if="selectedGoalPresetId === 'INDEPENDENCE'"
-          class="h-3.5 w-3.5 text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-          />
-        </svg>
-        <svg
-          v-else-if="selectedGoalPresetId === 'EMERGENCY'"
-          class="h-3.5 w-3.5 text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-        <svg
-          v-else-if="selectedGoalPresetId === 'MARRIAGE'"
-          class="h-3.5 w-3.5 text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-          />
-        </svg>
-        <svg
-          v-else-if="selectedGoalPresetId === 'STUDENT_LOAN'"
-          class="h-3.5 w-3.5 text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-          />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14v6.5" />
-        </svg>
-        <span>{{ selectedGoal.title }}</span>
-      </span>
-
-      <p class="mt-4 text-xs font-bold text-primary">STEP 3 — 실현가능성 확인</p>
-
-      <h1 class="mt-4 text-[30px] font-bold leading-tight text-gray-900">
-        내 여력으로 가능한<br />목표일까요?
+        {{ initialStatusContent.pageTitle }}
       </h1>
+      <p class="mt-2 sm:mt-2.5 text-xs sm:text-sm font-medium text-slate-500">
+        현재 소득과 지출을 기준으로 분석했어요.
+      </p>
 
-      <div class="mt-6">
+      <div class="mt-4 sm:mt-5">
         <FeasibilityResult
           v-model:selected-alternative="selectedAlternative"
           available-label="월 가능 저축액"
-          :available-amount="baseAvailableMonthly"
+          :available-amount="displayAvailableMonthly"
           required-label="월 필요 저축액"
-          :required-amount="effectiveRequiredMonthly"
-          :status="effectiveStatus"
-          :status-title="initialStatusContent.title"
-          :status-message="initialStatusContent.message"
-          forecast-label="목표 달성 예측"
-          :forecast-message="forecastMessage"
+          :required-amount="displayRequiredMonthly"
+          :status="displayStatus"
           :monthly-label="formatKRWCompact(displayRequiredMonthly)"
           :period-label="formatPeriodLabel(displayMonths)"
           :goal-label="selectedGoal?.title"
@@ -115,12 +51,30 @@
       </div>
     </div>
 
-    <LoadingSpinner v-else-if="isFeasibilityLoading" message="실현가능성을 계산하고 있어요" />
+    <LoadingSpinner v-else-if="isFeasibilityLoading" message="실현 가능성을 계산하고 있어요" />
 
+    <div
+      v-else-if="fetchError"
+      class="relative z-10 mx-auto flex w-full max-w-[660px] flex-col items-center px-4 py-24 text-center"
+    >
+      <div class="flex size-12 items-center justify-center rounded-2xl bg-rose-50 text-xl">!</div>
+      <h1 class="mt-4 text-xl font-bold text-gray-900">분석 결과를 불러오지 못했어요</h1>
+      <p class="mt-2 text-sm text-gray-500">잠시 후 다시 시도해 주세요.</p>
+      <button
+        type="button"
+        class="mt-6 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700"
+        @click="fetchFeasibilityResult"
+      >
+        다시 시도
+      </button>
+    </div>
+
+    <!-- 하단 CTA 버튼 -->
     <BottomCTA
       v-if="goalParams && feasibility"
       :label="ctaLabel"
       :disabled="ctaDisabled"
+      desktop-static
       @click="handleNext"
     />
   </HeroBackground>
@@ -189,10 +143,12 @@ const ALTERNATIVES = computed(() => {
 
 const STATUS_CONTENT = {
   success: {
+    pageTitle: '충분히 달성할 수 있는\n목표예요',
     title: '현실적이에요',
     message: '충분히 가능한 목표예요',
   },
   warning: {
+    pageTitle: '조금만 조정하면\n충분히 가능해요',
     title: '살짝 빠듯해요',
     message: '더 안정적인 계획을 추천해요',
     adjustTitle: '조금만 조정하면 충분해요',
@@ -200,6 +156,7 @@ const STATUS_CONTENT = {
       '현재 월 저축 여력에 가까운 금액이에요. 아래 대안을 선택하면 더 여유 있게 달성할 수 있어요.',
   },
   danger: {
+    pageTitle: '현재 계획은\n월 여력보다 부담이 커요',
     title: '지금은 무리예요',
     message: '현재 여력에 맞는 계획을 추천해요',
     adjustTitle: '현재 여력보다 부담이 커요',
@@ -227,6 +184,7 @@ const periodExtension = ref(12)
 const amountReduction = ref(20)
 const isOptionalAdjustmentOpen = ref(false)
 const isRecalculating = ref(false)
+const fetchError = ref(false)
 const isAdjustmentVisible = computed(
   () => effectiveStatus.value === 'danger' || isOptionalAdjustmentOpen.value
 )
@@ -263,15 +221,8 @@ const effectiveStatus = computed(() => {
   return 'danger'
 })
 
-onMounted(async () => {
-  if (!goalParams.value) {
-    goalParams.value = {
-      amount: currentAmount.value,
-      months: currentMonths.value,
-      startAmount: currentStartAmount.value,
-    }
-  }
-
+async function fetchFeasibilityResult() {
+  fetchError.value = false
   try {
     await goalStore.fetchFeasibility({
       goalAmount: currentAmount.value,
@@ -280,8 +231,25 @@ onMounted(async () => {
       isStudentLoan: isStudentLoan.value,
     })
   } catch (err) {
+    fetchError.value = true
     console.error('Failed to fetch feasibility:', err)
   }
+}
+
+onMounted(async () => {
+  if (!selectedGoalPresetId.value) {
+    selectedGoalPresetId.value = GOAL_PRESET_IDS.EMERGENCY
+  }
+
+  if (!goalParams.value) {
+    goalParams.value = {
+      amount: currentAmount.value,
+      months: currentMonths.value,
+      startAmount: currentStartAmount.value,
+    }
+  }
+
+  await fetchFeasibilityResult()
 })
 
 /**
@@ -293,6 +261,10 @@ function getAdjustedGoalParams(key) {
   const baseMonths = currentMonths.value
   const baseStart = currentStartAmount.value
 
+  if (!key) {
+    return { amount: baseAmount, months: baseMonths, startAmount: baseStart }
+  }
+
   if (key === 'period') {
     return {
       amount: baseAmount,
@@ -303,9 +275,13 @@ function getAdjustedGoalParams(key) {
   if (key === 'extra_capacity') {
     return { amount: baseAmount, months: baseMonths, startAmount: baseStart }
   }
-  const adjustedAmount =
-    Math.round((baseAmount * (1 - amountReduction.value / 100)) / 10000) * 10000
-  return { amount: adjustedAmount, months: baseMonths, startAmount: baseStart }
+  if (key === 'amount') {
+    const adjustedAmount =
+      Math.round((baseAmount * (1 - amountReduction.value / 100)) / 10000) * 10000
+    return { amount: adjustedAmount, months: baseMonths, startAmount: baseStart }
+  }
+
+  return { amount: baseAmount, months: baseMonths, startAmount: baseStart }
 }
 
 const recalculatedReqMonthly = computed(() => {
@@ -358,10 +334,6 @@ const recalculatedPossible = computed(() => {
 })
 
 const initialStatusContent = computed(() => STATUS_CONTENT[effectiveStatus.value ?? 'danger'])
-
-const forecastMessage = computed(() =>
-  effectiveStatus.value === 'success' ? `충분히 달릴 수 있어요🎉` : ''
-)
 
 const stats = computed(() => {
   const adjusted = getAdjustedGoalParams(selectedAlternative.value)

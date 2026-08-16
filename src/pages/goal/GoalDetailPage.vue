@@ -3,111 +3,50 @@
   <HeroBackground class="font-['Noto_Sans_KR',sans-serif]">
     <StepHeader @back="handleBack" />
 
-    <div class="relative z-10 mx-auto w-full max-w-[650px] animate-fade-in-up px-4 pb-40 pt-2">
-      <ProgressBar :current-step="2" :total-steps="3" />
+    <div
+      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pb-36 pt-1 md:pb-8"
+    >
+      <ProgressBar :current-step="2" :total-steps="4" />
 
-      <span
-        v-if="false"
-        class="mt-4 inline-flex items-center gap-1.5 rounded-2xl bg-accent-light px-3 py-1 text-xs font-semibold text-primary"
+      <!-- 메인 헤드라인 & 서브 설명 -->
+      <h1
+        class="mt-3 whitespace-pre-line sm:whitespace-normal text-2xl sm:text-[28px] font-black tracking-tight leading-snug text-gray-900 break-keep"
       >
-        <svg
-          v-if="selectedGoalPresetId === 'INDEPENDENCE'"
-          class="h-3.5 w-3.5 text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-          />
-        </svg>
-        <svg
-          v-else-if="selectedGoalPresetId === 'EMERGENCY'"
-          class="h-3.5 w-3.5 text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-        <svg
-          v-else-if="selectedGoalPresetId === 'MARRIAGE'"
-          class="h-3.5 w-3.5 text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-          />
-        </svg>
-        <svg
-          v-else-if="selectedGoalPresetId === 'STUDENT_LOAN'"
-          class="h-3.5 w-3.5 text-primary"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-          />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14v6.5" />
-        </svg>
-        <span>{{ selectedGoal.title }}</span>
-      </span>
-
-      <p class="mt-4 text-xs font-bold text-primary">STEP 2 — 목표 구체화</p>
-
-      <h1 class="mt-4 whitespace-pre-line text-[30px] font-bold leading-tight text-gray-900">
         {{ config.title }}
       </h1>
+      <p class="mt-2 sm:mt-2.5 text-xs sm:text-sm font-medium text-slate-500">금액과 기간을 설정해 주세요.</p>
 
-      <!-- 학자금 대출 상환 전용 UI (미래로.png 와이어프레임 준수) -->
+      <!-- 1. 학자금 대출 상환 전용 UI -->
       <template v-if="isStudentLoan">
-        <div class="mt-6 space-y-4">
+        <div class="mt-4 space-y-3">
           <!-- 카드 1: 남은 대출 잔액 (원금) -->
           <div
-            class="rounded-3xl border border-gray-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm sm:p-6"
+            class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
           >
             <div class="flex items-center justify-between">
-              <label class="text-sm font-bold text-gray-900">남은 대출 잔액 (원금)</label>
+              <label class="text-sm font-black text-gray-900">남은 대출 잔액 (원금)</label>
               <span
-                class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-600"
+                class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-black text-emerald-600"
               >
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 마이데이터 자동 연동
               </span>
             </div>
             <div
-              class="mt-3 flex items-center rounded-2xl border border-gray-200 bg-white px-4 py-3.5 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+              class="mt-3 flex items-center rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/20"
             >
               <input
-                v-model.number="amount"
-                type="number"
-                min="0"
-                step="100000"
-                class="w-full bg-transparent text-xl font-extrabold text-gray-900 outline-none"
+                :value="formatInputNumber(amount)"
+                type="text"
+                inputmode="numeric"
+                class="w-full bg-transparent text-xl font-black text-gray-900 outline-none"
+                @input="handleAmountInput"
               />
-              <span class="shrink-0 text-sm font-semibold text-gray-400">원</span>
+              <span class="shrink-0 text-sm font-bold text-slate-400">원</span>
             </div>
-            <div class="mt-2 flex items-center justify-between text-xs">
-              <span class="font-semibold text-primary">{{ amountCaption }}</span>
-              <span class="text-gray-400">연 1.7% 고정금리 (정부 학자금)</span>
+            <div class="mt-2 flex items-center justify-between text-xs font-semibold">
+              <span class="text-primary">{{ amountCaption }}</span>
+              <span class="text-slate-400">연 1.7% 고정금리 (정부 학자금)</span>
             </div>
           </div>
 
@@ -115,213 +54,285 @@
           <PeriodSliderCard
             v-model="months"
             label="완납 기간"
-            caption="슬라이더를 조절하면 이자 포함 상환 계획이 자동으로 계산돼요"
+            caption="슬라이더를 조절하면 이자 포함 상환 계획이 자동으로 계산돼요."
             result-label="월 납입액 (이자 포함)"
             :result-value="`${loanResult.monthlyPayment.toLocaleString()}원`"
             result-caption="원리금균등상환 기준 · 연 1.7% 적용"
             :min="config.periodMin"
             :max="config.periodMax"
             :presets="config.periodPresets"
-            class="animate-fade-in-up"
-            style="animation-delay: 100ms"
           />
 
           <!-- 카드 3: 이자 포함 상환 계획 카드 -->
           <div
-            class="rounded-3xl border border-blue-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm animate-fade-in-up sm:p-6"
-            style="animation-delay: 150ms"
+            class="rounded-3xl border border-primary/20 bg-white p-5 sm:p-6 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
           >
-            <div class="flex items-center justify-between border-b border-gray-100 pb-4">
-              <div class="flex items-center gap-2">
-                <span class="text-lg">📊</span>
-                <h3 class="text-base font-bold text-gray-900">이자 포함 상환 계획</h3>
-              </div>
-              <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-primary">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+              <h3 class="text-base font-black text-gray-900">이자 포함 상환 계획</h3>
+              <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-primary">
                 연 1.7% 고정
               </span>
             </div>
 
             <!-- 비율 프로그레스 바 -->
-            <div class="mt-5">
-              <div class="flex items-center justify-between text-xs font-bold text-gray-500 mb-1.5">
-                <span>원금</span>
-                <span>이자</span>
+            <div class="mt-4">
+              <div
+                class="flex items-center justify-between text-xs font-bold text-slate-500 mb-1.5"
+              >
+                <span>원금 {{ loanResult.principalRatio }}%</span>
+                <span>이자 {{ loanResult.interestRatio }}%</span>
               </div>
-              <div class="h-2.5 w-full rounded-full bg-gray-100 overflow-hidden flex">
+              <div class="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden flex">
                 <div
                   class="h-full bg-primary transition-all duration-300"
                   :style="{ width: `${loanResult.principalRatio}%` }"
                 ></div>
                 <div
-                  class="h-full bg-orange-400 transition-all duration-300"
+                  class="h-full bg-amber-400 transition-all duration-300"
                   :style="{ width: `${loanResult.interestRatio}%` }"
                 ></div>
-              </div>
-              <div class="mt-2 flex items-center justify-between text-xs">
-                <div class="flex items-center gap-1.5">
-                  <span class="h-2 w-2 rounded-full bg-primary"></span>
-                  <span class="text-gray-600">원금 {{ formatKRWCompact(amount) }}</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <span class="h-2 w-2 rounded-full bg-orange-400"></span>
-                  <span class="text-gray-600"
-                    >이자 {{ loanResult.totalInterest.toLocaleString() }}원</span
-                  >
-                </div>
-              </div>
-            </div>
-
-            <!-- 상세 내역 목록 -->
-            <div class="mt-6 space-y-3 border-t border-gray-100 pt-4 text-sm">
-              <div class="flex justify-between items-center text-gray-600">
-                <span>원금 (남은 대출)</span>
-                <span class="font-bold text-gray-900">{{ formatKRWCompact(amount) }}</span>
-              </div>
-              <div
-                class="flex flex-col gap-1 text-gray-600 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
-              >
-                <span class="whitespace-nowrap text-xs sm:text-sm"
-                  >이자 총액 (연 1.7% · 원리금균등상환)</span
-                >
-                <span
-                  class="self-end whitespace-nowrap text-sm font-bold text-orange-500 sm:shrink-0 sm:self-auto"
-                  >+ {{ loanResult.totalInterest.toLocaleString() }}원</span
-                >
               </div>
             </div>
 
             <!-- 하단 총 갚아야 할 금액 박스 -->
             <div
-              class="mt-5 rounded-2xl bg-blue-50/70 border border-blue-100 p-4 flex items-center justify-between"
+              class="mt-4 rounded-2xl bg-blue-50/70 border border-blue-100 p-4 flex items-center justify-between"
             >
               <div>
-                <p class="text-xs font-bold text-gray-900">총 갚아야 할 금액</p>
-                <p class="text-[11px] text-gray-400 mt-0.5">원금 + 이자 합계</p>
+                <p class="text-xs font-black text-gray-900">총 갚아야 할 금액</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">원금 + 이자 합계</p>
               </div>
               <div class="text-right">
-                <p class="text-lg font-extrabold text-primary">
+                <p class="text-lg sm:text-xl font-black text-primary">
                   약 {{ formatKRWCompact(loanResult.totalPayment) }}
                 </p>
-                <p class="text-[11px] text-gray-400 mt-0.5">
+                <p class="text-[11px] text-slate-400 mt-0.5">
                   월 {{ loanResult.monthlyPayment.toLocaleString() }}원 × {{ months }}개월
                 </p>
               </div>
             </div>
           </div>
+        </div>
+      </template>
 
-          <!-- 카드 4: 추가 상환 여력 -->
+      <!-- 2. 일반 목표 UI (비상금 / 독립자금 / 결혼자금) -->
+      <template v-else>
+        <div class="mt-4 space-y-3">
+          <!-- 카드 1: [목표 금액 & 기간 설정 스마트 카드] -->
           <div
-            class="rounded-3xl border border-gray-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm animate-fade-in-up sm:p-6"
-            style="animation-delay: 200ms"
+            class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
+          >
+            <!-- 1) 목표 금액 -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-black text-gray-900">
+                  {{ config.amountLabel }}
+                </label>
+              </div>
+
+              <!-- 프리셋 카드 형태인 경우 (결혼자금 등) -->
+              <div v-if="config.amountFieldType === 'presetCard'" class="space-y-3">
+                <div
+                  class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/20"
+                >
+                  <input
+                    :value="formatInputNumber(amount)"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="0"
+                    class="w-full bg-transparent text-xl font-black text-gray-900 outline-none"
+                    @input="handleAmountInput"
+                  />
+                  <span class="shrink-0 text-sm font-bold text-slate-400">원</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    v-for="preset in config.amountPresets"
+                    :key="preset.key"
+                    type="button"
+                    class="flex min-h-12 flex-col items-center justify-center rounded-2xl border p-2.5 text-center transition-all"
+                    :class="
+                      amount === preset.value
+                        ? 'border-[#0066FF] bg-[#EBF3FF] text-[#0066FF] font-bold ring-1 ring-[#0066FF]/20'
+                        : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
+                    "
+                    @click="amount = preset.value"
+                  >
+                    <span
+                      class="text-[11px] font-medium"
+                      :class="amount === preset.value ? 'text-[#0066FF]/80' : 'text-slate-500'"
+                    >
+                      {{ preset.title }}
+                    </span>
+                    <span class="text-sm font-bold mt-0.5">
+                      {{ formatKRWCompact(preset.value) }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 일반 금액 입력창 (비상금, 독립자금) -->
+              <div v-else class="space-y-3">
+                <div
+                  class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/20"
+                >
+                  <input
+                    :value="formatInputNumber(amount)"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="0"
+                    class="w-full bg-transparent text-xl font-black text-gray-900 outline-none"
+                    @input="handleAmountInput"
+                  />
+                  <span class="shrink-0 text-sm font-bold text-slate-400">원</span>
+                </div>
+
+                <!-- 금액 프리셋 큼직한 그리드 버튼 -->
+                <div
+                  v-if="config.amountPresets && config.amountPresets.length"
+                  class="grid gap-2"
+                  :class="
+                    config.amountPresets.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'
+                  "
+                >
+                  <button
+                    v-for="preset in config.amountPresets"
+                    :key="preset.label"
+                    type="button"
+                    class="flex min-h-11 items-center justify-center rounded-2xl border py-2.5 text-xs font-bold transition-all sm:text-sm"
+                    :class="
+                      amount === preset.value
+                        ? 'border-[#0066FF] bg-[#EBF3FF] text-[#0066FF] ring-1 ring-[#0066FF]/20'
+                        : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
+                    "
+                    @click="amount = preset.value"
+                  >
+                    {{ preset.label }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 구분선 -->
+            <div class="my-4 border-t border-slate-100"></div>
+
+            <!-- 2) 모으는 기간 -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-black text-gray-900">
+                  {{ config.periodLabel }}
+                </label>
+                <span class="text-sm font-black text-gray-900">
+                  {{ formatPeriodHuman(months) }}
+                </span>
+              </div>
+
+              <!-- 기간 슬라이더 -->
+              <div class="py-1">
+                <input
+                  v-model.number="months"
+                  type="range"
+                  :min="config.periodMin"
+                  :max="config.periodMax"
+                  step="1"
+                  class="w-full h-2.5 rounded-lg appearance-none cursor-pointer accent-primary border border-slate-300/80 shadow-inner transition-all"
+                  :style="{
+                    background: `linear-gradient(to right, #0066FF 0%, #0066FF ${((months - config.periodMin) / (config.periodMax - config.periodMin)) * 100}%, #E2E8F0 ${((months - config.periodMin) / (config.periodMax - config.periodMin)) * 100}%, #E2E8F0 100%)`
+                  }"
+                />
+                <div class="flex justify-between text-[11px] text-slate-500 font-bold mt-1.5">
+                  <span>{{ config.periodMin }}개월</span>
+                  <span>{{ config.periodMax }}개월</span>
+                </div>
+              </div>
+
+              <!-- 기간 퀵 프리셋 큼직한 그리드 버튼 -->
+              <div
+                v-if="config.periodPresets && config.periodPresets.length"
+                class="grid gap-2 mt-3"
+                :class="config.periodPresets.length === 4 ? 'grid-cols-4' : 'grid-cols-3'"
+              >
+                <button
+                  v-for="preset in config.periodPresets"
+                  :key="preset.label"
+                  type="button"
+                  class="flex min-h-10 items-center justify-center rounded-2xl border py-2 text-xs font-bold transition-all sm:text-sm"
+                  :class="
+                    months === preset.value
+                      ? 'border-[#0066FF] bg-[#EBF3FF] text-[#0066FF] ring-1 ring-[#0066FF]/20'
+                      : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
+                  "
+                  @click="months = preset.value"
+                >
+                  {{ preset.label }}
+                </button>
+              </div>
+            </div>
+
+            <!-- 3) 이미 모아둔 돈: 결과 계산 전에 입력 -->
+            <div class="mt-4 border-t border-slate-100 pt-4">
+              <div
+                v-if="!isSeedMoneyOpen && startAmount === 0"
+                class="flex cursor-pointer items-center justify-between text-xs font-bold text-gray-500 transition-colors hover:text-primary"
+                @click="openSeedMoney"
+              >
+                <span>이미 모아둔 돈이 있나요? (선택)</span>
+                <span class="font-bold text-primary hover:underline">+ 입력하기</span>
+              </div>
+
+              <div v-else class="space-y-2 animate-fade-in">
+                <div class="flex items-center justify-between text-xs">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-gray-900">이미 모아둔 돈</span>
+                    <span v-if="startAmount > 0" class="font-bold text-primary">
+                      = {{ formatKRWReadable(startAmount) }}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    class="shrink-0 text-xs font-semibold text-gray-400 hover:text-primary transition-colors"
+                    @click="closeSeedMoney"
+                  >
+                    닫기
+                  </button>
+                </div>
+                <div
+                  class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/20"
+                >
+                  <input
+                    :value="formatInputNumber(startAmount)"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="0"
+                    class="w-full bg-transparent text-sm font-bold text-gray-900 outline-none sm:text-base"
+                    @input="handleStartAmountInput"
+                  />
+                  <span class="shrink-0 text-xs font-bold text-slate-400">원</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 카드 2: [매달 모을 돈 & 시뮬레이션 결과 카드] -->
+          <div
+            class="rounded-3xl border border-primary/25 bg-gradient-to-br from-blue-50/90 via-white to-indigo-50/40 p-4 shadow-[0_4px_24px_rgba(15,35,70,0.04)] sm:p-5"
           >
             <div>
-              <h3 class="text-sm font-bold text-gray-900">추가 상환 여력</h3>
-              <p class="mt-0.5 text-xs text-gray-400">
-                선택 사항 — 매달 더 갚으면 이자도 줄어들어요
+              <p class="text-xs font-semibold text-slate-500">월 예상 저축액</p>
+              <p class="mt-1 text-2xl font-black text-primary sm:text-[26px]">
+                매달 약 {{ monthlyAmountLabel }}
               </p>
-            </div>
-            <div
-              class="mt-3 flex items-center rounded-2xl border border-gray-200 bg-white px-4 py-3 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
-            >
-              <input
-                :value="formattedExtraPayment"
-                type="text"
-                inputmode="numeric"
-                placeholder="0"
-                class="w-full bg-transparent text-lg font-bold text-gray-900 outline-none"
-                @input="handleExtraPaymentInput"
-              />
-              <span class="shrink-0 text-sm font-semibold text-gray-400">원/월</span>
-            </div>
-            <div v-if="extraPayment > 0" class="mt-1.5 text-xs font-semibold text-primary">
-              = {{ formatKRWReadable(extraPayment) }}
-            </div>
-
-            <!-- 입력 시 노출되는 계산 파란색 카드 (추가상환여력.png 디자인 스펙 일치) -->
-            <div
-              v-if="extraPayment > 0"
-              class="mt-4 rounded-2xl bg-[#F0F6FF] border border-blue-100 p-4 animate-fade-in-up"
-            >
-              <div class="flex items-center gap-1.5 text-xs font-bold text-primary">
-                <span class="text-sm">⚡</span>
-                <span
-                  >완납 {{ extraLoanResult.reducedMonths }}개월 단축! ({{
-                    extraLoanResult.newMonths
-                  }}개월로 줄어요)</span
-                >
-              </div>
-
-              <div class="mt-3 space-y-2 border-t border-blue-100/70 pt-3 text-xs">
-                <div class="flex justify-between items-center text-gray-600">
-                  <span>월 납입액 (추가 포함)</span>
-                  <span class="font-bold text-gray-900"
-                    >{{ extraLoanResult.newMonthlyPayment.toLocaleString() }}원</span
-                  >
-                </div>
-                <div class="flex justify-between items-center text-gray-600">
-                  <span>절약되는 이자</span>
-                  <span class="font-bold text-emerald-600"
-                    >- {{ extraLoanResult.savedInterest.toLocaleString() }}원</span
-                  >
-                </div>
-                <div class="flex justify-between items-center text-gray-600 pt-1">
-                  <span>새 총 상환금액</span>
-                  <span class="font-extrabold text-primary text-sm"
-                    >약 {{ formatKRWCompact(extraLoanResult.newTotalPayment) }}</span
-                  >
-                </div>
-              </div>
+              <p class="mt-1 text-xs font-medium text-slate-400">
+                {{ formatPeriodHuman(months) }} 동안 모을 때의 예상 금액이에요.
+              </p>
             </div>
           </div>
         </div>
       </template>
 
-      <!-- 기존 일반 목표 UI -->
-      <template v-else>
-        <div class="mt-6 space-y-4">
-          <AmountPresetCard
-            v-if="config.amountFieldType === 'presetCard'"
-            v-model="amount"
-            :label="config.amountLabel"
-            :presets="config.amountPresets"
-            class="animate-fade-in-up"
-            style="animation-delay: 100ms"
-          />
-          <AmountInputCard
-            v-else
-            v-model="amount"
-            :label="config.amountLabel"
-            :caption="amountCaption"
-            :presets="config.amountPresets"
-            class="animate-fade-in-up"
-            style="animation-delay: 100ms"
-          />
-
-          <PeriodSliderCard
-            v-model="months"
-            :label="config.periodLabel"
-            :caption="config.showTargetDate ? targetDateLabel : ''"
-            result-label="월 예상 저축액"
-            :result-value="monthlyAmountLabel"
-            :result-caption="config.showPeriodFormula ? periodFormulaLabel : ''"
-            :min="config.periodMin"
-            :max="config.periodMax"
-            :presets="config.periodPresets"
-            class="animate-fade-in-up"
-            style="animation-delay: 175ms"
-          />
-
-          <AmountInputCard
-            v-model="startAmount"
-            label="이미 모아둔 금액"
-            description="없으면 0원으로 두세요"
-            class="animate-fade-in-up"
-            style="animation-delay: 250ms"
-          />
-        </div>
-      </template>
-
-      <p class="mt-4 flex items-start gap-1.5 text-xs leading-relaxed text-gray-400">
+      <!-- 하단 안내 문구 -->
+      <p class="mt-4 flex items-start gap-1.5 text-xs leading-relaxed text-slate-400 font-medium">
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -329,23 +340,22 @@
           stroke-width="1.8"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class="mt-0.5 h-3.5 w-3.5 shrink-0"
+          class="mt-0.5 size-3.5 shrink-0"
         >
           <circle cx="12" cy="12" r="9" />
           <path d="M12 11v5" />
           <path d="M12 8h.01" />
         </svg>
-        <span>
-          {{ config.infoText.prefix
-          }}<span v-if="config.infoText.highlight" class="font-semibold text-primary">{{
-            config.infoText.highlight
-          }}</span
-          >{{ config.infoText.suffix }}
-        </span>
+        <span>마이데이터를 반영해 예상 금액을 계산해요.</span>
       </p>
     </div>
 
-    <BottomCTA label="실현 가능성 확인" :disabled="ctaDisabled" @click="handleNext" />
+    <BottomCTA
+      label="실현 가능성 확인"
+      :disabled="ctaDisabled"
+      desktop-static
+      @click="handleNext"
+    />
   </HeroBackground>
 </template>
 
@@ -357,11 +367,9 @@ import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import StepHeader from '@/shared/ui/StepHeader.vue'
 import ProgressBar from '@/shared/ui/ProgressBar.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
-import AmountInputCard from '@/shared/ui/AmountInputCard.vue'
-import AmountPresetCard from '@/features/goal/components/AmountPresetCard.vue'
 import PeriodSliderCard from '@/shared/ui/PeriodSliderCard.vue'
 import { useGoalStore } from '@/features/goal'
-import { GOAL_PRESETS, GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
+import { GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
 import {
   GOAL_DETAIL_CONFIG,
   DEFAULT_GOAL_DETAIL_CONFIG,
@@ -376,9 +384,6 @@ const { selectedGoalPresetId, goalParams } = storeToRefs(goalStore)
 
 const isStudentLoan = computed(() => selectedGoalPresetId.value === GOAL_PRESET_IDS.STUDENT_LOAN)
 
-const selectedGoal = computed(() =>
-  GOAL_PRESETS.find((preset) => preset.id === selectedGoalPresetId.value)
-)
 const config = computed(
   () => GOAL_DETAIL_CONFIG[selectedGoalPresetId.value] ?? DEFAULT_GOAL_DETAIL_CONFIG
 )
@@ -390,7 +395,36 @@ const months = ref(
   Math.min(config.value.periodMax, Math.max(config.value.periodMin, initialMonths))
 )
 const startAmount = ref(goalParams.value?.startAmount ?? 0)
+const isSeedMoneyOpen = ref((goalParams.value?.startAmount ?? 0) > 0)
 const extraPayment = ref(goalParams.value?.extraPayment ?? 0) // 학자금 대출용 추가 상환 여력
+
+function openSeedMoney() {
+  isSeedMoneyOpen.value = true
+}
+
+function closeSeedMoney() {
+  isSeedMoneyOpen.value = false
+  startAmount.value = 0
+}
+
+function parseNumericInput(value) {
+  const digits = String(value).replace(/[^0-9]/g, '')
+  return digits ? Number(digits) : 0
+}
+
+function formatInputNumber(value) {
+  return value ? Number(value).toLocaleString('ko-KR') : ''
+}
+
+function handleAmountInput(event) {
+  amount.value = parseNumericInput(event.target.value)
+  event.target.value = formatInputNumber(amount.value)
+}
+
+function handleStartAmountInput(event) {
+  startAmount.value = parseNumericInput(event.target.value)
+  event.target.value = formatInputNumber(startAmount.value)
+}
 
 onMounted(() => {
   if (goalParams.value) {
@@ -407,16 +441,6 @@ onMounted(() => {
       extraPayment.value = goalParams.value.extraPayment
   }
 })
-
-const formattedExtraPayment = computed(() => {
-  if (!extraPayment.value) return ''
-  return extraPayment.value.toLocaleString()
-})
-
-function handleExtraPaymentInput(e) {
-  const rawValue = e.target.value.replace(/[^0-9]/g, '')
-  extraPayment.value = rawValue ? parseInt(rawValue, 10) : 0
-}
 
 const loanResult = computed(() =>
   calculateStudentLoan({
@@ -438,13 +462,18 @@ const extraLoanResult = computed(() =>
 const amountCaption = computed(() =>
   amount.value > 0 ? `= ${formatKRWReadable(amount.value)}` : ''
 )
-const monthlyAmountLabel = computed(() => formatKRWCompact(amount.value / months.value))
-const targetDateLabel = computed(() => {
-  const target = new Date()
-  target.setMonth(target.getMonth() + months.value)
-  return `목표 달성 예정일: ${target.getFullYear()}년 ${target.getMonth() + 1}월`
+const monthlyAmountLabel = computed(() => {
+  const netAmount = Math.max(0, (amount.value || 0) - (startAmount.value || 0))
+  return formatKRWCompact(netAmount / (months.value || 1))
 })
-const periodFormulaLabel = computed(() => `${formatKRWCompact(amount.value)} ÷ ${months.value}개월`)
+
+function formatPeriodHuman(m) {
+  if (!m) return ''
+  if (m % 12 === 0) return `${m / 12}년`
+  if (m > 12) return `${Math.floor(m / 12)}년 ${m % 12}개월`
+  return `${m}개월`
+}
+
 const ctaDisabled = computed(
   () => !amount.value || amount.value <= 0 || startAmount.value > amount.value
 )
