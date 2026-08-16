@@ -1,63 +1,69 @@
-<!-- 목표설정 퍼널(GOAL-03) 공용 실현가능성 결과 카드: 여력 비교 + 상태별(성공/주의/위험) 콘텐츠 -->
 <template>
-  <div>
-    <div
-      class="animate-fade-in-up rounded-2xl border border-gray-200 bg-white p-6"
-      style="animation-delay: 100ms"
+  <div class="space-y-3">
+    <section
+      class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
     >
       <p class="text-xs font-medium text-gray-400">마이데이터 분석 결과</p>
-
-      <div class="mt-3">
-        <div class="flex items-center justify-between text-sm">
-          <span class="relative inline-flex items-center gap-1.5 text-gray-500">
+      <dl class="mt-3 divide-y divide-gray-100">
+        <div class="flex items-center justify-between py-3 text-sm">
+          <dt class="flex items-center gap-1.5 text-gray-500">
             <span>{{ availableLabel }}</span>
-            <button
-              v-if="availableHelp"
-              type="button"
-              class="flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[10px] font-bold leading-none text-gray-400 transition-colors hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              aria-label="월 가능 저축액 계산 기준 보기"
-              :aria-expanded="isAvailableHelpOpen"
-              aria-describedby="available-saving-help"
-              @click="isAvailableHelpOpen = !isAvailableHelpOpen"
-            >
-              i
-            </button>
-            <span
-              v-if="isAvailableHelpOpen"
-              id="available-saving-help"
-              role="tooltip"
-              class="absolute left-0 top-6 z-20 w-[280px] rounded-xl border border-gray-200 bg-white p-3 text-xs leading-relaxed text-gray-600 shadow-lg"
-            >
-              <strong class="mb-1 block text-gray-900">어떻게 계산했나요?</strong>
-              {{ availableHelp }}
-            </span>
-          </span>
-          <span class="font-bold text-gray-900">{{ availableValueLabel }}</span>
+            <div class="relative inline-flex items-center">
+              <button
+                type="button"
+                class="inline-flex size-4 items-center justify-center rounded-full text-gray-400 transition-colors hover:text-[#0066FF] hover:bg-blue-50 focus:outline-none shrink-0"
+                :class="isInfoOpen ? 'text-[#0066FF] bg-blue-50' : ''"
+                title="월 가능액 산정 기준 보기"
+                @click.stop="isInfoOpen = !isInfoOpen"
+              >
+                <svg
+                  class="size-3.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+              </button>
+              <div
+                v-if="isInfoOpen"
+                class="absolute left-0 top-6 z-30 w-64 animate-fade-in-up rounded-2xl border border-blue-200 bg-white p-3.5 text-xs leading-relaxed text-gray-800 shadow-xl ring-1 ring-black/5 text-left"
+                @click.stop
+              >
+                <div class="flex items-start justify-between gap-2">
+                  <p class="text-xs font-medium leading-relaxed text-gray-700 break-keep">
+                    <span class="font-bold text-[#0066FF]">💡 월 가능액 산정 기준</span><br />
+                    최근 3개월 평균 소득에서 고정 지출을 제외한 순수 저축·상환 여력이에요.
+                  </p>
+                  <button
+                    type="button"
+                    class="shrink-0 text-gray-400 hover:text-gray-700 text-xs font-bold px-1"
+                    @click.stop="isInfoOpen = false"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            </div>
+          </dt>
+          <dd class="font-bold text-gray-900">{{ availableValueLabel }}</dd>
         </div>
-        <div class="mt-1.5 h-1.5 w-full rounded-full bg-gray-100">
-          <div class="h-1.5 w-full rounded-full bg-primary" />
+        <div class="flex items-center justify-between py-3 text-sm">
+          <dt class="text-gray-500">{{ requiredLabel }}</dt>
+          <dd class="font-bold" :class="statusTextClass">{{ requiredValueLabel }}</dd>
         </div>
-      </div>
-
-      <div class="mt-3">
-        <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">{{ requiredLabel }}</span>
-          <span class="font-bold" :class="statusTextClass">{{ requiredValueLabel }}</span>
-        </div>
-        <div class="mt-1.5 h-1.5 w-full rounded-full bg-gray-100">
-          <div
-            class="h-1.5 rounded-full transition-all"
-            :class="statusBarClass"
-            :style="{ width: requiredBarPercent + '%' }"
-          />
-        </div>
-      </div>
-
-      <div class="mt-4 flex items-center gap-3 rounded-xl p-4" :class="statusBadgeBgClass">
+      </dl>
+      <div class="mt-2 flex items-center gap-3 rounded-2xl border p-3.5" :class="statusBoxClass">
         <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-          :class="statusIconBgClass"
+          class="flex size-8 shrink-0 items-center justify-center rounded-xl text-white shadow-xs"
+          :class="statusIconClass"
         >
+          <!-- 1) 성공: 체크마크 -->
           <svg
             v-if="status === 'success'"
             viewBox="0 0 24 24"
@@ -66,149 +72,205 @@
             stroke-width="2.5"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="h-4 w-4"
+            class="size-4"
+            aria-hidden="true"
           >
-            <path d="M20 6 9 17l-5-5" />
+            <path d="m5 12 4 4L19 6" />
           </svg>
+
+          <!-- 2) 주의 (조정할 때): 경고 표지판 (삼각형 경고 아이콘) -->
           <svg
             v-else-if="status === 'warning'"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2.5"
+            stroke-width="2.2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="h-4 w-4"
+            class="size-4"
+            aria-hidden="true"
           >
-            <path d="M12 9v4" />
             <path
               d="m10.29 3.86-8.02 13.9A1.5 1.5 0 0 0 3.5 20h17a1.5 1.5 0 0 0 1.23-2.24l-8.02-13.9a1.5 1.5 0 0 0-2.44 0Z"
             />
+            <path d="M12 9v4" />
             <path d="M12 16h.01" />
           </svg>
+
+          <!-- 3) 위험 (아예 부족일 때): 느낌표 아이콘 (원형 느낌표) -->
           <svg
             v-else
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2.8"
+            stroke-width="2.2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="h-5 w-5"
+            class="size-4"
+            aria-hidden="true"
           >
-            <line x1="12" y1="6" x2="12" y2="12.5" />
-            <circle cx="12" cy="17.5" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
         </span>
         <div>
-          <p class="text-sm font-bold" :class="statusTextClass">{{ statusTitle }}</p>
-          <p class="mt-0.5 text-xs text-gray-500">{{ statusMessage }}</p>
+          <p class="text-sm font-bold" :class="statusTextClass">{{ differenceTitle }}</p>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div
+    <!-- 카드 2: 목표 달성 예측 (조정 모드가 아닐 때) -->
+    <section
       v-if="!showAdjustment"
-      class="mt-4 animate-fade-in-up rounded-2xl border border-gray-200 bg-white p-6"
-      style="animation-delay: 175ms"
+      class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-6"
     >
-      <p class="text-base font-bold leading-relaxed text-gray-900">
-        매달 <span class="text-primary">{{ monthlyLabel }}</span
-        >이면<br class="sm:hidden" />
-        <span class="break-keep">
-          <span class="text-primary">{{ periodLabel }}</span> 뒤 {{ goalLabel }} 가능해요
-        </span>
+      <p class="break-keep text-base font-bold leading-relaxed text-gray-900 sm:text-lg">
+        매달 <span class="text-primary">{{ monthlyLabel }}</span>이면 <span class="text-primary">{{ periodLabel }}</span> 뒤 {{ goalLabel }} 달성이 가능해요
       </p>
 
       <div class="mt-4 grid grid-cols-3 gap-2">
         <div v-for="stat in stats" :key="stat.label" class="rounded-xl bg-gray-50 p-3 text-center">
           <p class="text-[11px] text-gray-400">{{ stat.label }}</p>
-          <p class="mt-1 text-sm font-bold text-gray-900">{{ stat.value }}</p>
+          <p class="mt-1 whitespace-nowrap text-sm font-bold text-gray-900">{{ stat.value }}</p>
         </div>
       </div>
 
       <button
         v-if="canAdjust"
         type="button"
-        class="mt-4 w-full rounded-xl border border-primary/25 bg-white px-4 py-3 text-sm font-bold text-primary transition-colors hover:bg-accent-light"
+        class="mt-4 w-full rounded-2xl border border-[#0066FF] bg-[#EBF3FF] px-4 py-3 text-sm font-bold text-[#0066FF] transition-all hover:bg-blue-100/70"
         @click="emit('request-adjustment')"
       >
         계획 여유롭게 조정하기
       </button>
-    </div>
+    </section>
 
-    <div
+    <section
       v-else
-      class="mt-4 animate-fade-in-up rounded-2xl border border-gray-200 bg-white p-6"
-      style="animation-delay: 175ms"
+      class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
     >
       <div class="flex items-center justify-between gap-3">
-        <p class="text-xs text-gray-400">계획 조정</p>
+        <div>
+          <p class="text-xs font-medium text-gray-400">계획 조정</p>
+          <h2 class="mt-1 text-base font-bold text-gray-900">{{ adjustTitle }}</h2>
+        </div>
         <button
           v-if="canCloseAdjustment"
           type="button"
-          class="text-xs font-bold text-gray-500 underline decoration-gray-300 underline-offset-4 transition-colors hover:text-primary"
+          class="shrink-0 text-xs font-semibold text-gray-400 hover:text-primary"
           @click="emit('close-adjustment')"
         >
-          조정하지 않고 돌아가기
+          닫기
         </button>
       </div>
-      <p class="mt-0.5 text-sm font-bold text-gray-900">{{ adjustTitle }}</p>
-      <p class="mt-1 text-xs leading-relaxed text-gray-500">{{ adjustMessage }}</p>
+      <p v-if="adjustMessage" class="mt-1 text-xs leading-relaxed text-gray-500">
+        {{ adjustMessage }}
+      </p>
 
-      <div class="mt-4 space-y-3">
-        <label
-          v-for="alt in alternatives"
-          :key="alt.key"
-          class="block cursor-pointer rounded-xl border p-4 transition-colors"
+      <div class="mt-4 space-y-2.5">
+        <div
+          v-for="alternative in alternatives"
+          :key="alternative.key"
+          role="button"
+          tabindex="0"
+          class="block cursor-pointer rounded-2xl border-2 p-4 transition-all text-left"
           :class="[
-            selectedAlternative === alt.key
-              ? 'border-primary bg-accent-light'
-              : 'border-gray-200 bg-white hover:bg-gray-50',
+            selectedAlternative === alternative.key
+              ? 'border-[#0066FF] bg-[#EBF3FF] shadow-xs'
+              : 'border-transparent bg-[#F4F7FA] hover:bg-slate-100/90',
           ]"
-          @click="emit('update:selectedAlternative', alt.key)"
+          @click="emit('update:selectedAlternative', alternative.key)"
+          @keydown.space.prevent="emit('update:selectedAlternative', alternative.key)"
+          @keydown.enter.prevent="emit('update:selectedAlternative', alternative.key)"
         >
-          <span class="flex items-end justify-between gap-3">
-            <span class="text-sm font-medium text-gray-900">{{ alt.label }}</span>
-            <span class="text-xs font-bold text-primary">{{ alternativeValueLabel(alt.key) }}</span>
-          </span>
+          <!-- 상단 헤더: 라디오 동그라미 + 라벨 + 수치 뱃지 + 펼침 화살표 -->
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <!-- 라디오 체크 동그라미 -->
+              <div
+                class="size-5 rounded-full flex items-center justify-center transition-all shrink-0"
+                :class="
+                  selectedAlternative === alternative.key
+                    ? 'bg-[#0066FF] text-white shadow-xs'
+                    : 'border-2 border-slate-300 bg-white text-transparent'
+                "
+              >
+                <svg class="size-3 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
 
-          <span class="mt-4 block" @click.stop>
-            <span class="relative block h-2 w-full">
-              <span class="absolute inset-0 rounded-full bg-gray-200" />
               <span
-                class="absolute inset-y-0 left-0 rounded-full bg-primary"
-                :style="{ width: alternativePercent(alt) + '%' }"
-              />
-              <input
-                :value="alternativeValue(alt.key)"
-                type="range"
-                :min="alt.min"
-                :max="alt.max"
-                :step="alt.step"
-                class="absolute inset-0 h-2 w-full cursor-pointer appearance-none bg-transparent [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:shadow [&::-moz-range-track]:bg-transparent [&::-webkit-slider-runnable-track]:bg-transparent [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow"
-                :aria-label="alt.label"
-                @input="handleAlternativeInput(alt.key, $event)"
-              />
-            </span>
-            <span class="mt-1 flex justify-between text-[11px] text-gray-400">
-              <span>{{ alt.minLabel }}</span>
-              <span>{{ alt.maxLabel }}</span>
-            </span>
-          </span>
-        </label>
+                class="text-sm font-bold transition-colors"
+                :class="selectedAlternative === alternative.key ? 'text-[#0066FF]' : 'text-gray-900'"
+              >
+                {{ alternative.label }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span
+                class="text-xs font-bold px-2 py-0.5 rounded-full transition-colors"
+                :class="
+                  selectedAlternative === alternative.key
+                    ? 'bg-white text-primary shadow-xs'
+                    : 'text-slate-500 bg-white/70'
+                "
+              >
+                {{ alternativeValueLabel(alternative.key) }}
+              </span>
+              <!-- 화살표 아이콘 -->
+              <svg
+                class="size-4 text-slate-400 transition-transform duration-200"
+                :class="selectedAlternative === alternative.key ? 'rotate-180 text-primary' : ''"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- 아코디언 내용: 선택되었을 때만 슬라이더 펼침 -->
+          <div
+            v-if="selectedAlternative === alternative.key"
+            class="mt-3.5 pt-3 border-t border-[#0066FF]/15 animate-fade-in"
+            @click.stop
+          >
+            <input
+              :value="alternativeValue(alternative.key)"
+              type="range"
+              :min="alternative.min"
+              :max="alternative.max"
+              :step="alternative.step"
+              class="h-2.5 w-full cursor-pointer appearance-none rounded-lg accent-primary border border-slate-300/80 shadow-inner transition-all"
+              :style="{
+                background: `linear-gradient(to right, #0066FF 0%, #0066FF ${alternativePercent(alternative)}%, #E2E8F0 ${alternativePercent(alternative)}%, #E2E8F0 100%)`,
+              }"
+              :aria-label="alternative.label"
+              @input="handleAlternativeInput(alternative.key, $event)"
+            />
+            <div class="mt-1.5 flex justify-between text-[11px] font-bold text-slate-500">
+              <span>{{ alternative.minLabel }}</span>
+              <span>{{ alternative.maxLabel }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
         v-if="selectedAlternative"
-        class="relative mt-4 flex min-h-[82px] items-center justify-between rounded-xl p-4"
+        class="relative mt-4 flex min-h-[78px] items-center justify-between rounded-2xl border p-4"
         :class="recalculatedBoxClass.bg"
       >
         <div>
-          <p class="mb-1 text-xs font-bold" :class="recalculatedBoxClass.value">
+          <p class="text-xs font-bold" :class="recalculatedBoxClass.value">
             {{ recalculatedStatusMessage }}
           </p>
-          <p class="text-xs text-gray-500">{{ recalculated?.label ?? '조정 결과' }}</p>
+          <p class="mt-1 text-xs text-gray-500">{{ recalculated?.label ?? '조정 결과' }}</p>
           <p class="mt-0.5 text-lg font-bold" :class="recalculatedBoxClass.value">
             {{ recalculated?.value ?? '계산 중' }}
           </p>
@@ -219,51 +281,46 @@
         </div>
         <span
           v-if="isRecalculating"
-          class="absolute right-4 top-4 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-primary"
+          class="absolute right-4 top-4 size-4 animate-spin rounded-full border-2 border-gray-300 border-t-primary"
           aria-label="다시 계산하고 있어요"
         />
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { formatKRWCompact } from '@/shared/lib/money'
 
-/**
- * @typedef {Object} FeasibilityStat
- * @property {string} label
- * @property {string} value
- */
+const isInfoOpen = ref(false)
 
-/**
- * @typedef {Object} FeasibilityAlternative
- * @property {'period' | 'amount'} key
- * @property {string} label
- * @property {string} sublabel
- */
+function handleDocumentClick() {
+  if (isInfoOpen.value) {
+    isInfoOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleDocumentClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleDocumentClick)
+})
 
 const props = defineProps({
   availableLabel: { type: String, required: true },
-  availableHelp: { type: String, default: '' },
   availableAmount: { type: Number, required: true },
   requiredLabel: { type: String, required: true },
   requiredAmount: { type: Number, required: true },
-  status: { type: String, required: true }, // 'success' | 'warning' | 'danger'
-  statusTitle: { type: String, required: true },
-  statusMessage: { type: String, default: '' },
-
+  status: { type: String, required: true },
   monthlyLabel: { type: String, default: '' },
   periodLabel: { type: String, default: '' },
   goalLabel: { type: String, default: '' },
-
-  /** @type {import('vue').PropType<FeasibilityStat[]>} */
   stats: { type: Array, default: () => [] },
-
   adjustTitle: { type: String, default: '' },
   adjustMessage: { type: String, default: '' },
-  /** @type {import('vue').PropType<FeasibilityAlternative[]>} */
   alternatives: { type: Array, default: () => [] },
   selectedAlternative: { type: String, default: '' },
   recalculated: { type: Object, default: null },
@@ -275,7 +332,7 @@ const props = defineProps({
   periodExtension: { type: Number, default: 12 },
   amountReduction: { type: Number, default: 20 },
 })
-const isAvailableHelpOpen = ref(false)
+
 const emit = defineEmits([
   'update:selectedAlternative',
   'update:periodExtension',
@@ -295,9 +352,12 @@ function alternativeValueLabel(key) {
 }
 
 function alternativePercent(alternative) {
+  if (!alternative || typeof alternative.min !== 'number' || typeof alternative.max !== 'number')
+    return 0
   const range = alternative.max - alternative.min
   if (range <= 0) return 0
-  return ((alternativeValue(alternative.key) - alternative.min) / range) * 100
+  const val = alternativeValue(alternative.key)
+  return Math.min(100, Math.max(0, ((val - alternative.min) / range) * 100))
 }
 
 function handleAlternativeInput(key, event) {
@@ -308,35 +368,28 @@ function handleAlternativeInput(key, event) {
 
 const STATUS_CLASS = {
   success: {
-    text: 'text-primary',
-    bar: 'bg-primary',
-    badgeBg: 'bg-accent-light',
-    iconBg: 'bg-primary text-white',
+    text: 'text-emerald-600',
+    box: 'border-emerald-100 bg-emerald-50/80',
+    icon: 'bg-emerald-500',
   },
-  warning: {
-    text: 'text-amber-500',
-    bar: 'bg-amber-400',
-    badgeBg: 'bg-amber-50',
-    iconBg: 'bg-amber-500 text-white',
-  },
-  danger: {
-    text: 'text-red-500',
-    bar: 'bg-red-400',
-    badgeBg: 'bg-red-50',
-    iconBg: 'bg-red-500 text-white',
-  },
+  warning: { text: 'text-amber-600', box: 'border-amber-100 bg-amber-50/80', icon: 'bg-amber-500' },
+  danger: { text: 'text-rose-600', box: 'border-rose-100 bg-rose-50/80', icon: 'bg-rose-500' },
 }
-
-const statusClass = computed(() => STATUS_CLASS[props.status] ?? STATUS_CLASS.success)
+const statusClass = computed(() => STATUS_CLASS[props.status] ?? STATUS_CLASS.danger)
 const statusTextClass = computed(() => statusClass.value.text)
-const statusBarClass = computed(() => statusClass.value.bar)
-const statusBadgeBgClass = computed(() => statusClass.value.badgeBg)
-const statusIconBgClass = computed(() => statusClass.value.iconBg)
-
+const statusBoxClass = computed(() => statusClass.value.box)
+const statusIconClass = computed(() => statusClass.value.icon)
+const availableValueLabel = computed(() => formatKRWCompact(props.availableAmount))
+const requiredValueLabel = computed(() => formatKRWCompact(props.requiredAmount))
+const differenceAmount = computed(() => Math.abs(props.availableAmount - props.requiredAmount))
+const differenceTitle = computed(() => {
+  const amount = formatKRWCompact(differenceAmount.value)
+  return props.status === 'success' ? `매달 ${amount} 여유가 있어요` : `매달 ${amount} 부족해요`
+})
 const RECALCULATED_BOX_CLASS = {
-  success: { bg: 'bg-accent-light', value: 'text-primary' },
-  warning: { bg: 'bg-amber-50', value: 'text-amber-600' },
-  danger: { bg: 'bg-red-50', value: 'text-red-600' },
+  success: { bg: 'border-blue-200 bg-blue-50', value: 'text-primary' },
+  warning: { bg: 'border-amber-200 bg-amber-50/80', value: 'text-amber-600' },
+  danger: { bg: 'border-rose-200 bg-rose-50/80', value: 'text-rose-600' },
 }
 const recalculatedBoxClass = computed(
   () => RECALCULATED_BOX_CLASS[props.recalculatedStatus] ?? RECALCULATED_BOX_CLASS.danger
@@ -346,12 +399,4 @@ const recalculatedStatusMessage = computed(() => {
   if (props.recalculatedStatus === 'warning') return '조금 빠듯하지만 진행할 수 있어요'
   return '조금 더 조정해 주세요'
 })
-
-const availableValueLabel = computed(() => formatKRWCompact(props.availableAmount))
-const requiredValueLabel = computed(() => formatKRWCompact(props.requiredAmount))
-const requiredBarPercent = computed(() =>
-  props.availableAmount > 0
-    ? Math.min(100, Math.round((props.requiredAmount / props.availableAmount) * 100))
-    : 100
-)
 </script>
