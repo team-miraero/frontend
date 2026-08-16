@@ -319,11 +319,6 @@ function stopTipRotation() {
   tipIntervalId = null
 }
 
-function navigateImmediately() {
-  window.clearTimeout(navigationTimeoutId)
-  router.replace({ name: ROUTE_NAMES.GOAL_SELECT })
-}
-
 async function fetchActualAccountCount() {
   try {
     const res = await getAccounts()
