@@ -1,7 +1,7 @@
 <template>
   <HeroBackground>
     <!-- Header -->
-    <StepHeader :show-back="false">
+    <StepHeader show-brand :show-back="false">
       <nav class="flex items-center gap-3 md:gap-6">
         <a href="#service-intro" class="hidden text-sm text-gray-700 sm:inline">서비스 소개</a>
         <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }" class="text-sm text-gray-700">

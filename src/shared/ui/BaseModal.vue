@@ -12,7 +12,7 @@
       <div
         v-if="modelValue"
         class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-xs sm:items-center sm:p-4"
-        @click.self="$emit('update:modelValue', false)"
+        @mousedown.self="handleBackdropClick"
       >
         <Transition
           enter-active-class="transition duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
@@ -47,9 +47,17 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   modelValue: { type: Boolean, default: false },
   hideDefaultClose: { type: Boolean, default: false },
+  closeOnBackdrop: { type: Boolean, default: true },
 })
-defineEmits(['update:modelValue'])
+
+const emit = defineEmits(['update:modelValue'])
+
+function handleBackdropClick() {
+  if (props.closeOnBackdrop) {
+    emit('update:modelValue', false)
+  }
+}
 </script>

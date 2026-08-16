@@ -39,11 +39,11 @@ export const SIGNUP_TERMS = [
   },
   {
     id: 'mydata',
-    label: 'KB Pay 마이데이터 연동·활용 동의',
+    label: '마이데이터 자산 연결 및 활용 동의',
     description: '자산·소득·지출·거래 내역 조회 및 활용',
     required: true,
     summary: [
-      'KB Pay 마이데이터로 자산·소득·지출·거래 내역을 불러와요.',
+      '연결한 금융기관에서 자산·거래 정보를 불러와요.',
       '이 정보는 맞춤 로드맵 설계와 변화 대응(감지·재편)에만 활용돼요.',
       '투자 권유·매매에는 사용하지 않으며, 연동은 언제든 해제할 수 있어요.',
     ],
@@ -70,7 +70,6 @@ export const MYDATA_SYNC_ITEMS = [
   { id: 'accounts', label: '계좌 및 자산 현황' },
   { id: 'income', label: '월 소득 정보' },
   { id: 'spending', label: '지출·소비 내역' },
-  { id: 'transactions', label: '거래 내역' },
-  { id: 'investments', label: '보유 투자 종목' },
-  { id: 'loans', label: '대출 내역' },
+  { id: 'transactions', label: '고정지출 및 거래 내역' },
+  { id: 'loans', label: '대출 및 부채 현황' },
 ]
