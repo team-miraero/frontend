@@ -367,11 +367,9 @@ import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import StepHeader from '@/shared/ui/StepHeader.vue'
 import ProgressBar from '@/shared/ui/ProgressBar.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
-import AmountInputCard from '@/shared/ui/AmountInputCard.vue'
-import AmountPresetCard from '@/features/goal/components/AmountPresetCard.vue'
 import PeriodSliderCard from '@/shared/ui/PeriodSliderCard.vue'
 import { useGoalStore } from '@/features/goal'
-import { GOAL_PRESETS, GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
+import { GOAL_PRESET_IDS } from '@/features/goal/constants/goal.constants.js'
 import {
   GOAL_DETAIL_CONFIG,
   DEFAULT_GOAL_DETAIL_CONFIG,
@@ -386,9 +384,6 @@ const { selectedGoalPresetId, goalParams } = storeToRefs(goalStore)
 
 const isStudentLoan = computed(() => selectedGoalPresetId.value === GOAL_PRESET_IDS.STUDENT_LOAN)
 
-const selectedGoal = computed(() =>
-  GOAL_PRESETS.find((preset) => preset.id === selectedGoalPresetId.value)
-)
 const config = computed(
   () => GOAL_DETAIL_CONFIG[selectedGoalPresetId.value] ?? DEFAULT_GOAL_DETAIL_CONFIG
 )
@@ -447,16 +442,6 @@ onMounted(() => {
   }
 })
 
-const formattedExtraPayment = computed(() => {
-  if (!extraPayment.value) return ''
-  return extraPayment.value.toLocaleString()
-})
-
-function handleExtraPaymentInput(e) {
-  const rawValue = e.target.value.replace(/[^0-9]/g, '')
-  extraPayment.value = rawValue ? parseInt(rawValue, 10) : 0
-}
-
 const loanResult = computed(() =>
   calculateStudentLoan({
     amount: amount.value,
@@ -489,7 +474,6 @@ function formatPeriodHuman(m) {
   return `${m}개월`
 }
 
-const periodFormulaLabel = computed(() => `${formatKRWCompact(amount.value)} ÷ ${months.value}개월`)
 const ctaDisabled = computed(
   () => !amount.value || amount.value <= 0 || startAmount.value > amount.value
 )
