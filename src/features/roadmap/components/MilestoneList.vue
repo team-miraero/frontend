@@ -21,15 +21,15 @@
           </svg>
         </span>
         <div class="min-w-0 flex-1">
-          <h3 class="text-sm font-black tracking-tight text-[#0a192f] whitespace-nowrap sm:text-base">
+          <h3 class="text-sm font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-base">
             스플릿 기록
           </h3>
-          <p class="text-[11px] font-bold text-slate-400 truncate whitespace-nowrap sm:text-xs">
+          <p class="text-[11px] font-normal text-slate-400 truncate whitespace-nowrap sm:text-xs">
             구간별 달성 현황과 페이스 기록이에요
           </p>
         </div>
       </div>
-      <span class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-500 whitespace-nowrap">
+      <span class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-500 whitespace-nowrap">
         총 {{ milestones.length }}개 구간
       </span>
     </div>
@@ -39,13 +39,13 @@
       <template v-for="(milestone, index) in milestones" :key="milestone.milestoneId">
         <div
           :data-in-progress="milestone.status === 'IN_PROGRESS' ? 'true' : null"
-          class="group relative flex min-w-[170px] sm:min-w-[175px] flex-1 cursor-pointer flex-col justify-between rounded-2xl border p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-1 active:translate-y-0 active:scale-[0.97] select-none snap-start"
+          class="group relative flex min-w-[170px] sm:min-w-[175px] flex-1 cursor-pointer flex-col justify-between rounded-xl border p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-1 active:translate-y-0 active:scale-[0.97] select-none snap-start"
           :class="[
             milestone.status === 'COMPLETED'
-              ? 'border-primary/20 bg-[#f8fbff] hover:border-primary/40 hover:bg-[#f0f6ff] hover:shadow-[0_10px_20px_-4px_rgba(0,102,255,0.10),0_3px_6px_-2px_rgba(0,102,255,0.05)]'
+              ? 'border-primary/20 bg-[#f8fbff] hover:border-primary/40 hover:bg-[#f0f6ff] hover:shadow-2xs'
               : milestone.status === 'IN_PROGRESS'
-                ? 'border-primary/80 bg-white shadow-[0_3px_12px_-2px_rgba(0,102,255,0.12)] hover:border-primary hover:shadow-[0_12px_24px_-4px_rgba(0,102,255,0.16),0_4px_8px_-2px_rgba(0,102,255,0.08)]'
-                : 'border-slate-200/80 bg-slate-50/60 opacity-80 hover:border-slate-300 hover:bg-white hover:opacity-100 hover:shadow-[0_10px_20px_-4px_rgba(15,23,42,0.08),0_3px_6px_-2px_rgba(15,23,42,0.04)]',
+                ? 'border-primary/80 bg-white shadow-2xs hover:border-primary hover:shadow-xs'
+                : 'border-slate-200/80 bg-slate-50/60 opacity-80 hover:border-slate-300 hover:bg-white hover:opacity-100 hover:shadow-2xs',
           ]"
           @click="$emit('select-milestone', milestone)"
         >
@@ -53,12 +53,12 @@
             <!-- 상단 뱃지 & 단계 (한 줄 유지) -->
             <div class="flex items-center justify-between gap-1.5 whitespace-nowrap">
               <span
-                class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black tracking-tight transition-transform duration-200 group-hover:scale-105"
+                class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight transition-transform duration-200 group-hover:scale-105"
                 :class="
                   milestone.status === 'COMPLETED'
                     ? 'bg-primary/10 text-primary'
                     : milestone.status === 'IN_PROGRESS'
-                      ? 'bg-primary text-white shadow-sm'
+                      ? 'bg-primary text-white shadow-2xs'
                       : 'bg-slate-200/80 text-slate-500'
                 "
               >
@@ -66,17 +66,17 @@
               </span>
 
               <span
-                class="flex shrink-0 items-center gap-0.5 text-[10px] font-bold tabular-nums transition-colors duration-200"
-                :class="milestone.status === 'COMPLETED' ? 'text-primary' : 'text-slate-400 group-hover:text-slate-600'"
+                class="flex shrink-0 items-center gap-0.5 text-[10px] font-medium tabular-nums transition-colors duration-200"
+                :class="milestone.status === 'COMPLETED' ? 'text-primary font-bold' : 'text-slate-400 group-hover:text-slate-600'"
               >
-                <span v-if="milestone.status === 'COMPLETED'" class="text-xs font-black">✓</span>
+                <span v-if="milestone.status === 'COMPLETED'" class="text-xs font-bold">✓</span>
                 {{ milestone.percentage }}%
               </span>
             </div>
 
             <!-- 목표 금액 (한 줄 유지) -->
             <p
-              class="pt-2 text-base font-black tracking-tight whitespace-nowrap tabular-nums transition-colors duration-200"
+              class="pt-2 text-base font-bold tracking-tight whitespace-nowrap tabular-nums transition-colors duration-200"
               :class="
                 milestone.status === 'COMPLETED' || milestone.status === 'IN_PROGRESS'
                   ? 'text-[#0a192f]'
@@ -88,7 +88,7 @@
 
             <p
               v-if="milestone.title"
-              class="pt-0.5 text-[11px] font-bold text-slate-500 truncate whitespace-nowrap"
+              class="pt-0.5 text-[11px] font-medium text-slate-500 truncate whitespace-nowrap"
             >
               {{ milestone.title }}
             </p>
@@ -104,15 +104,15 @@
                   :style="{ width: `${segmentProgress(milestone, index)}%` }"
                 />
               </div>
-              <div class="flex items-center justify-between text-[10px] font-bold whitespace-nowrap gap-1">
-                <span class="text-primary tabular-nums shrink-0">{{ segmentProgress(milestone, index) }}% 달성</span>
+              <div class="flex items-center justify-between text-[10px] font-medium whitespace-nowrap gap-1">
+                <span class="text-primary font-bold tabular-nums shrink-0">{{ segmentProgress(milestone, index) }}% 달성</span>
                 <span class="text-slate-400 tabular-nums shrink-0">{{ formatManwon(remainingToNext(milestone)) }}원 남음</span>
               </div>
             </div>
 
             <!-- 완료/예정 상태 텍스트 (한 줄 유지) -->
             <div v-else class="flex items-center justify-between text-[10px] font-medium text-slate-400 whitespace-nowrap gap-1">
-              <span v-if="milestone.status === 'COMPLETED'" class="font-bold text-primary shrink-0">
+              <span v-if="milestone.status === 'COMPLETED'" class="font-semibold text-primary shrink-0">
                 달성 완료 🎉
               </span>
               <span v-else class="transition-colors group-hover:text-slate-600 shrink-0">도전 대기 중</span>

@@ -31,8 +31,8 @@
           <p class="text-xs text-slate-500">
             {{ target?.bankName }} {{ target?.accountNumberMasked }}
           </p>
-          <p class="pt-0.5 text-sm font-bold text-[#0a192f]">
-            {{ target?.icon }} {{ target?.goalName }}
+          <p class="inline-flex items-center gap-1 pt-0.5 text-sm font-bold text-[#0a192f]">
+            <GoalTypeIcon :goal-type="target?.goalType" size="sm" /> {{ target?.goalName }}
           </p>
         </div>
         <p class="text-lg font-black text-primary">+{{ formatWon(amount) }}</p>
@@ -54,6 +54,7 @@
 
 <script setup>
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
 defineProps({
   modelValue: {

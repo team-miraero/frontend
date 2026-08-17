@@ -1,5 +1,5 @@
 <template>
-  <div class="sticky top-0 z-20 -mx-4 bg-[#f7f9fc] px-4 pb-3 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8">
+  <div class="sticky top-0 z-20 -mx-4 bg-[#f8fbff] px-4 pb-3 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8">
     <section class="flex flex-col gap-3 pt-4 sm:flex-row">
       <div class="relative flex-1">
         <svg
@@ -58,11 +58,11 @@
           :key="category.id"
           type="button"
           role="tab"
-          class="shrink-0 rounded-full border px-4 py-2 text-[13px] font-bold transition-colors"
+          class="flex shrink-0 items-center justify-center rounded-full border px-4 py-1.5 text-xs sm:text-[13px] font-bold transition-all duration-150 cursor-pointer select-none"
           :class="
             youthPolicyStore.categoryId === category.id
-              ? 'border-primary bg-primary text-white'
-              : 'border-gray-200 bg-white text-gray-500 hover:border-primary/30 hover:text-primary'
+              ? 'border-primary bg-primary text-white shadow-xs'
+              : 'border-gray-200 bg-white text-slate-600 hover:border-primary/30 hover:text-primary hover:bg-[#f8fbff]'
           "
           :aria-selected="youthPolicyStore.categoryId === category.id"
           @click="applyCategory(category.id)"

@@ -1,99 +1,150 @@
-<!-- 친구에게 공유하기 카드 미리보기: 목표별 캐릭터 + 대시보드 진행률 -->
+<!-- 친구에게 공유하기 카드 미리보기: 인스타 포스터 감성 러닝 챌린지 카드 (금액 미노출) -->
 <template>
   <div
     ref="cardRef"
-    class="relative overflow-hidden rounded-3xl border border-[#dbeafe] bg-[#f4f8ff] px-5 py-5"
+    class="relative overflow-hidden rounded-3xl border border-[#cde0ff] bg-gradient-to-b from-[#ebf3ff] via-[#f5f9ff] to-[#ffffff] px-4 py-4 sm:px-5 sm:py-5 shadow-sm"
   >
-    <div
-      class="relative z-20 flex min-w-0 items-center justify-center gap-1.5 pb-2 text-center whitespace-nowrap"
+    <!-- 배경 앰비언트 글로우 및 반짝이(Sparkle) 벡터 장식 (저장 이미지에도 영구 보존) -->
+    <div class="pointer-events-none absolute -left-10 -top-10 size-36 rounded-full bg-primary/10 blur-2xl" />
+    <div class="pointer-events-none absolute -right-10 top-20 size-32 rounded-full bg-[#66b2ff]/15 blur-2xl" />
+
+    <!-- 좌상단 반짝이 ✨ -->
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      class="pointer-events-none absolute left-4 top-4 size-4 text-[#ffc83b]/80"
     >
+      <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
+    </svg>
+
+    <!-- 우상단 미니 반짝이 ✦ -->
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      class="pointer-events-none absolute right-4 top-8 size-3 text-primary/60"
+    >
+      <path d="M12 0L14 9L23 11L14 13L12 22L10 13L1 11L10 9L12 0Z" />
+    </svg>
+
+    <!-- 좌하단 미니 반짝이 ✦ -->
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      class="pointer-events-none absolute bottom-14 left-4 size-2.5 text-[#ff8fab]/70"
+    >
+      <path d="M12 0L14 9L23 11L14 13L12 22L10 13L1 11L10 9L12 0Z" />
+    </svg>
+
+    <!-- 상단 편집 가능한 타이틀 -->
+    <div class="relative z-20 flex min-w-0 items-center justify-center gap-1 pb-1 pt-1 text-center whitespace-nowrap">
       <input
         v-if="isEditingTitle"
         ref="titleInputRef"
         v-model="titleText"
         type="text"
         maxlength="20"
-        class="w-40 whitespace-nowrap border-b border-primary bg-transparent text-center text-sm font-bold text-[#0a192f] outline-none"
+        class="w-44 whitespace-nowrap border-b-2 border-primary bg-white/90 px-2 py-0.5 text-center text-sm font-black text-[#0a192f] outline-none shadow-2xs rounded"
         @blur="isEditingTitle = false"
         @keyup.enter="isEditingTitle = false"
       />
-      <p v-else class="shrink-0 whitespace-nowrap text-sm font-bold text-[#0a192f]">
+      <p v-else class="shrink-0 whitespace-nowrap text-sm sm:text-[15px] font-black tracking-tight text-[#0a192f]">
         {{ titleText }}
       </p>
-      <button type="button" class="shrink-0" data-html2canvas-ignore="true" @click="startEditTitle">
-        <img src="@/assets/images/pencil.png" alt="편집" class="size-3.5 object-contain" />
+      <button
+        type="button"
+        class="flex size-6 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-white/80 hover:text-primary active:scale-95 cursor-pointer"
+        data-html2canvas-ignore="true"
+        aria-label="문구 직접 편집"
+        @click="startEditTitle"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-3.5"
+        >
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+          <path d="m15 5 4 4" />
+        </svg>
       </button>
     </div>
 
-    <!-- 기존 모달 오픈 시 실행되는 canvas-confetti 애니메이션을 그대로 사용 -->
+    <!-- 모달 오픈 시 축하 폭죽 캔버스 -->
     <canvas
       ref="confettiCanvasRef"
       class="pointer-events-none absolute inset-0 z-10 size-full"
       data-html2canvas-ignore="true"
     />
 
-    <!-- 100%: 목표 캐릭터와 콜리가 가까이 붙어 완주를 축하 -->
-    <div
-      v-if="isCompleted"
-      class="relative z-0 mx-auto mt-1 flex h-44 max-w-[235px] items-end justify-center pb-3 sm:h-48 sm:max-w-[255px]"
-    >
-      <img
-        :src="goalCharacterImage"
-        :alt="`${goal.goalName} 캐릭터`"
-        class="celebration-character h-[130px] w-[55%] object-contain sm:h-[144px]"
-      />
-      <div class="-ml-8 flex w-[48%] items-end sm:-ml-9" :style="celebrationColiStyle">
-        <img
-          :src="coliFriendImage"
-          alt="페이스메이커 콜리"
-          class="celebration-character h-[120px] w-full object-contain sm:h-[134px]"
-        />
-      </div>
-    </div>
-
-    <!-- 100% 미만: 메인 대시보드와 동일한 목표별 달리기 캐릭터 + 콜리 페이스메이커 -->
-    <div
-      v-else
-      class="relative z-0 mx-auto mt-1 flex h-40 max-w-[230px] items-end justify-center pb-0.5 sm:h-44"
-    >
-      <img
-        :src="runningGoalCharacterImage"
-        :alt="`${goal.goalName} 달리기 캐릭터`"
-        class="running-character h-[112px] w-[54%] object-contain sm:h-[124px]"
-        :style="runningGoalCharacterStyle"
-      />
+    <!-- 캐릭터 러닝 영역 -->
+    <div class="relative z-10 my-1">
+      <!-- 100%: 완주 축하 캐릭터 -->
       <div
-        class="relative -ml-7 flex h-[94px] w-[32%] items-end justify-center sm:-ml-8 sm:h-[104px]"
+        v-if="isCompleted"
+        class="relative mx-auto flex h-40 max-w-[235px] items-end justify-center pb-2 sm:h-44 sm:max-w-[255px]"
       >
         <img
-          :src="coliRunningImage"
-          alt="페이스메이커 콜리"
-          class="running-character h-[72px] w-full object-contain sm:h-[80px]"
+          :src="goalCharacterImage"
+          :alt="`${goal.goalName} 캐릭터`"
+          class="celebration-character h-[124px] w-[55%] object-contain sm:h-[138px] drop-shadow-sm"
         />
+        <div class="-ml-8 flex w-[48%] items-end sm:-ml-9" :style="celebrationColiStyle">
+          <img
+            :src="coliFriendImage"
+            alt="페이스메이커 콜리"
+            class="celebration-character h-[114px] w-full object-contain sm:h-[128px] drop-shadow-sm"
+          />
+        </div>
+      </div>
+
+      <!-- 100% 미만: 달리기 캐릭터 + 콜리 -->
+      <div
+        v-else
+        class="relative mx-auto flex h-36 max-w-[230px] items-end justify-center pb-0 sm:h-40"
+      >
+        <img
+          :src="runningGoalCharacterImage"
+          :alt="`${goal.goalName} 달리기 캐릭터`"
+          class="running-character h-[108px] w-[54%] object-contain sm:h-[120px] drop-shadow-sm"
+          :style="runningGoalCharacterStyle"
+        />
+        <div
+          class="relative -ml-7 flex h-[90px] w-[32%] items-end justify-center sm:-ml-8 sm:h-[100px]"
+        >
+          <img
+            :src="coliRunningImage"
+            alt="페이스메이커 콜리"
+            class="running-character h-[70px] w-full object-contain sm:h-[78px] drop-shadow-sm"
+          />
+        </div>
       </div>
     </div>
 
-    <div class="relative z-20 mt-0 px-1">
-      <div class="relative h-20">
-        <div class="absolute left-[5%] right-[5%] top-5 h-[3px] rounded-full bg-slate-300" />
+    <!-- 마일스톤 프로그레스 바 -->
+    <div class="relative z-20 mt-1 px-1">
+      <div class="relative h-16">
+        <div class="absolute left-[5%] right-[5%] top-4 h-1.5 rounded-full bg-slate-200/80" />
         <div
-          class="absolute left-[5%] top-5 h-[3px] rounded-full bg-primary transition-[width] duration-500"
+          class="absolute left-[5%] top-4 h-1.5 rounded-full bg-gradient-to-r from-primary to-[#54a3ff] shadow-xs transition-[width] duration-500"
           :style="{ width: `${progressFillWidth}%` }"
         />
 
         <div
           v-for="milestone in shareMilestones"
           :key="milestone.id"
-          class="absolute top-[12px] flex -translate-x-1/2 flex-col items-center"
+          class="absolute top-[9px] flex -translate-x-1/2 flex-col items-center"
           :style="{ left: `${milestone.position}%` }"
         >
           <span
-            class="flex size-[18px] items-center justify-center rounded-full border-2"
+            class="flex size-5 items-center justify-center rounded-full border-2 transition-all"
             :class="
               milestone.completed
-                ? '!border-primary !bg-primary text-white'
+                ? '!border-primary !bg-primary text-white shadow-2xs'
                 : milestone.current
-                  ? 'border-primary bg-white shadow-[0_0_0_4px_rgba(0,102,255,0.12)]'
+                  ? 'border-primary bg-white shadow-[0_0_0_3px_rgba(0,102,255,0.18)] scale-110'
                   : 'border-slate-300 bg-white'
             "
           >
@@ -110,14 +161,14 @@
             <span v-else-if="milestone.current" class="size-2 rounded-full bg-primary" />
           </span>
           <span
-            class="mt-2.5 whitespace-nowrap text-[11px] font-bold"
-            :class="milestone.completed || milestone.current ? 'text-primary' : 'text-slate-500'"
+            class="mt-1.5 whitespace-nowrap text-[11px] font-black"
+            :class="milestone.completed || milestone.current ? 'text-primary' : 'text-slate-400'"
           >
             {{ milestone.percent }}%
           </span>
           <span
             class="mt-0.5 whitespace-nowrap text-[10px]"
-            :class="milestone.current ? 'font-bold text-primary' : 'text-slate-500'"
+            :class="milestone.current ? 'font-black text-primary' : 'text-slate-400 font-medium'"
           >
             {{ milestone.label }}
           </span>
@@ -125,19 +176,28 @@
       </div>
     </div>
 
-    <p class="relative z-20 mt-1 text-center text-5xl font-black tracking-tight text-primary">
-      {{ normalizedProgress }}<span class="ml-1 text-2xl">%</span>
-    </p>
-    <p
-      class="relative z-20 mx-auto mt-2 w-max max-w-full shrink-0 whitespace-nowrap rounded-full bg-[#eaf2ff] px-5 py-2 text-center text-xs font-bold text-[#0a192f]"
-    >
-      {{ achievementMessage }}
-    </p>
+    <!-- 하단 달성률 빅 타이포그래피 & 칭찬 배지 (카운트업 애니메이션 적용) -->
+    <div class="relative z-20 mt-1 flex flex-col items-center justify-center text-center">
+      <div class="flex items-baseline justify-center gap-0.5">
+        <span class="text-4xl sm:text-5xl font-black tracking-tight text-[#0a192f]">
+          {{ animatedProgress }}
+        </span>
+        <span class="text-2xl sm:text-3xl font-black text-primary">%</span>
+      </div>
 
-    <div class="relative z-20 mt-4 border-t border-blue-100 pt-3">
+      <p
+        class="mt-2 inline-flex items-center rounded-full border border-blue-200/80 bg-white/90 px-4 py-1.5 text-xs font-bold text-[#0a192f] shadow-2xs backdrop-blur-xs"
+      >
+        <span>{{ achievementMessage }}</span>
+      </p>
+    </div>
+
+    <!-- 푸터 워터마크 (공식 인증 로고) -->
+    <div class="relative z-20 mt-3.5 border-t border-blue-100/80 pt-2.5">
       <div class="mx-auto flex w-max items-center justify-center gap-1.5 whitespace-nowrap">
         <img src="@/assets/images/logo.png" alt="" class="block size-4 shrink-0 object-contain" />
-        <span class="shrink-0 text-xs font-bold tracking-[-0.2px] text-primary">미래로</span>
+        <span class="shrink-0 text-xs font-black tracking-[-0.2px] text-primary">미래로</span>
+        <span class="text-[10px] font-semibold text-slate-400 tracking-wider">MIRAERO CHALLENGE</span>
       </div>
     </div>
   </div>
@@ -146,6 +206,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import confetti from 'canvas-confetti'
+import { useCountUp } from '@/shared/composables/useCountUp'
 import duckFriendImage from '@/assets/images/duck_friend.png'
 import lamaFriendImage from '@/assets/images/lama_friend.png'
 import bearFriendImage from '@/assets/images/bear_friend.png'
@@ -154,7 +215,7 @@ import coliFriendImage from '@/assets/images/coli_friend.png'
 import duckRunningImage from '@/assets/images/duck_new.png'
 import lamaRunningImage from '@/assets/images/lama_new.png'
 import bearRunningImage from '@/assets/images/bear_new.png'
-import rabbitRunningImage from '@/assets/images/rabbit_new.png'
+import rabbitRunningImage from '@/assets/images/rabbit_3d.png'
 import coliRunningImage from '@/assets/images/coli_new.png'
 
 const props = defineProps({
@@ -197,6 +258,7 @@ const goalCharacterImage = computed(
 const normalizedProgress = computed(() =>
   Math.min(100, Math.max(0, Math.round(Number(props.goal.progressRate) || 0)))
 )
+const { displayValue: animatedProgress } = useCountUp(normalizedProgress, { duration: 900 })
 const isCompleted = computed(() => normalizedProgress.value >= 100)
 const celebrationColiStyle = computed(() => ({
   transform: `translateY(${CELEBRATION_COLI_FOOT_OFFSET[props.goal.goalType] ?? 0}px)`,
@@ -240,7 +302,7 @@ const shareMilestones = computed(() => {
   })
 })
 
-const progressFillWidth = computed(() => (normalizedProgress.value / 100) * 90)
+const progressFillWidth = computed(() => (animatedProgress.value / 100) * 90)
 const achievementMessage = computed(() =>
   normalizedProgress.value >= 100 ? '멋지게 목표를 완주했어요!' : '목표까지 잘 달려가고 있어요!'
 )

@@ -9,7 +9,7 @@
       @update:selected-goal-id="$emit('select-goal', $event)"
     />
 
-    <div class="page-container pb-24 pt-3 md:pb-12 md:pt-4">
+    <div class="page-container pb-10 pt-4 sm:pb-14 sm:pt-6">
       <LoadingSpinner v-if="isLoading" message="지출 정보를 불러오고 있어요" />
 
       <p
@@ -101,7 +101,7 @@ const props = defineProps({
 defineEmits(['select-goal'])
 
 const roadmapHelperText = computed(() =>
-  props.selectedGoal ? `저축 여력과 목표 현황은 ${props.selectedGoal} 로드맵 기준으로 계산돼요` : ''
+  props.selectedGoal ? `‘${props.selectedGoal}’ 로드맵 기준으로 계산돼요` : ''
 )
 
 const hasNumericGoalId = computed(() => {

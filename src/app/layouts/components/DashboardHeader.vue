@@ -105,11 +105,16 @@
                   class="group relative flex min-h-[64px] cursor-pointer items-center gap-3 rounded-xl border border-slate-100 bg-[#f8fbff] p-3 transition hover:bg-blue-50/60 hover:border-blue-200"
                   @click="handleNotificationClick(item)"
                 >
-                  <!-- 이모지 뱃지 아이콘 -->
+                  <!-- 테마별 컬러 틴트 아이콘 -->
                   <div
-                    class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-200/80"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs"
+                    :class="getNotificationIconStyle(item.type, item.badgeIcon).container"
                   >
-                    <span>{{ item.badgeIcon || '💬' }}</span>
+                    <AppIcon
+                      :name="getNotificationIconStyle(item.type, item.badgeIcon).icon"
+                      size="sm"
+                      :class="getNotificationIconStyle(item.type, item.badgeIcon).iconColor"
+                    />
                   </div>
 
                   <!-- 내용 -->
@@ -171,27 +176,33 @@
         <div ref="roadmapDropdownRef" class="relative flex shrink-0 items-stretch">
           <button
             type="button"
-            class="group relative flex items-center justify-center gap-1.5 px-2 text-sm font-bold transition hover:text-primary"
+            class="group relative flex items-center justify-center gap-1 px-2 text-sm font-bold transition hover:text-primary cursor-pointer select-none"
             :class="isRoadmapActive ? 'text-primary' : 'text-[#0a192f]'"
             aria-haspopup="menu"
             :aria-expanded="isRoadmapDropdownOpen"
-            @click="isRoadmapDropdownOpen = !isRoadmapDropdownOpen"
+            @click="handleRoadmapHeaderClick"
           >
-            로드맵
-            <svg
-              viewBox="0 0 20 20"
-              fill="none"
-              class="size-3.5 transition-transform"
-              :class="isRoadmapDropdownOpen ? 'rotate-180' : ''"
+            <span>로드맵</span>
+            <span
+              class="flex items-center justify-center rounded-full p-0.5 transition hover:bg-slate-100"
+              aria-label="로드맵 목록 열기"
+              @click.stop="isRoadmapDropdownOpen = !isRoadmapDropdownOpen"
             >
-              <path
-                d="m5 7.5 5 5 5-5"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                class="size-3.5 transition-transform duration-200"
+                :class="isRoadmapDropdownOpen ? 'rotate-180 text-primary' : ''"
+              >
+                <path
+                  d="m5 7.5 5 5 5-5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
             <span
               class="absolute inset-x-1 bottom-0 h-0.5 origin-left bg-primary transition-transform duration-300 ease-out group-hover:scale-x-100"
               :class="isRoadmapActive ? 'scale-x-100' : 'scale-x-0'"
@@ -354,11 +365,16 @@
                   class="group relative flex min-h-[68px] cursor-pointer items-center gap-3 rounded-xl border border-slate-100 bg-[#f8fbff] p-3 transition hover:bg-blue-50/60 hover:border-blue-200"
                   @click="handleNotificationClick(item)"
                 >
-                  <!-- 큼직한 이모지 뱃지 아이콘 -->
+                  <!-- 테마별 컬러 틴트 아이콘 -->
                   <div
-                    class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-200/80"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs"
+                    :class="getNotificationIconStyle(item.type, item.badgeIcon).container"
                   >
-                    <span>{{ item.badgeIcon || '💬' }}</span>
+                    <AppIcon
+                      :name="getNotificationIconStyle(item.type, item.badgeIcon).icon"
+                      size="sm"
+                      :class="getNotificationIconStyle(item.type, item.badgeIcon).iconColor"
+                    />
                   </div>
 
                   <!-- 내용 -->
@@ -429,6 +445,36 @@ import { useGoalStore } from '@/features/goal'
 import { usePacemakerToast } from '@/features/pacemaker'
 import { NAV_ITEMS } from '@/shared/constants/navigation'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import AppIcon from '@/shared/ui/AppIcon.vue'
+
+function getNotificationIconStyle(type, badgeIcon) {
+  if (type === 'STREAK' || badgeIcon === '🔥') {
+    return {
+      container: 'bg-amber-50 border border-amber-200/80 text-amber-500 shadow-amber-500/10',
+      icon: 'fire',
+      iconColor: 'text-amber-500',
+    }
+  }
+  if (type === 'SAVING' || badgeIcon === '💰' || badgeIcon === '💸') {
+    return {
+      container: 'bg-blue-50 border border-blue-200/80 text-primary shadow-blue-500/10',
+      icon: 'money',
+      iconColor: 'text-primary',
+    }
+  }
+  if (type === 'ACHIEVE' || badgeIcon === '🎯') {
+    return {
+      container: 'bg-emerald-50 border border-emerald-200/80 text-emerald-600 shadow-emerald-500/10',
+      icon: 'target',
+      iconColor: 'text-emerald-600',
+    }
+  }
+  return {
+    container: 'bg-[#f0f6ff] border border-blue-100 text-primary shadow-blue-500/10',
+    icon: badgeIcon || 'check',
+    iconColor: 'text-primary',
+  }
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -472,6 +518,20 @@ const isRoadmapActive = computed(() =>
 
 function isSelectedGoal(goal) {
   return String(goal.goalId) === String(goalStore.selectedGoalId)
+}
+
+function handleRoadmapHeaderClick() {
+  if (isRoadmapActive.value) {
+    isRoadmapDropdownOpen.value = !isRoadmapDropdownOpen.value
+  } else {
+    isRoadmapDropdownOpen.value = false
+    const targetGoalId = goalStore.selectedGoalId
+    if (targetGoalId) {
+      router.push({ name: ROUTE_NAMES.DASHBOARD_GOAL, params: { goalId: targetGoalId } })
+    } else {
+      router.push({ name: ROUTE_NAMES.DASHBOARD })
+    }
+  }
 }
 
 function toggleDropdown() {

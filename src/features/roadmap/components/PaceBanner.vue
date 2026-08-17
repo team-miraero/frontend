@@ -1,6 +1,6 @@
 <template>
   <section
-    class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.04)] sm:p-7 md:p-8"
+    class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-7 md:p-8"
   >
     <div
       class="grid w-full gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,450px)] lg:items-stretch"
@@ -9,45 +9,57 @@
       <div class="flex h-full flex-col justify-between">
         <div>
           <!-- 상단 뱃지 + 목표 일시정지/재개 버튼 -->
-          <div class="flex items-center justify-between gap-2">
-            <!-- 진행 중 뱃지 -->
+          <div class="flex items-center justify-between gap-2 min-w-0">
+            <!-- 진행 중 뱃지 (반응형 말줄임 지원) -->
             <span
               v-if="!disabled"
-              class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary"
+              class="inline-flex min-w-0 max-w-[calc(100%-100px)] items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary sm:px-3"
             >
-              <span class="size-1.5 rounded-full bg-primary" />
-              진행 중인 목표
+              <span class="size-1.5 shrink-0 rounded-full bg-primary" />
+              <span class="shrink-0 whitespace-nowrap">진행 중</span>
+              <template v-if="goalName">
+                <span class="size-1.5 shrink-0 rounded-full bg-primary" />
+                <span class="truncate max-w-[110px] font-bold text-primary sm:max-w-[180px] md:max-w-[240px]">
+                  {{ goalName }}
+                </span>
+              </template>
             </span>
-            <!-- 일시정지 뱃지 -->
+            <!-- 일시정지 뱃지 (반응형 말줄임 지원) -->
             <span
               v-else
-              class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500"
+              class="inline-flex min-w-0 max-w-[calc(100%-100px)] items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500 sm:px-3"
             >
-              <span class="size-1.5 rounded-full bg-slate-400" />
-              일시정지된 목표
+              <span class="size-1.5 shrink-0 rounded-full bg-slate-400" />
+              <span class="shrink-0 whitespace-nowrap">일시정지</span>
+              <template v-if="goalName">
+                <span class="size-1.5 shrink-0 rounded-full bg-slate-400" />
+                <span class="truncate max-w-[110px] font-bold text-slate-600 sm:max-w-[180px] md:max-w-[240px]">
+                  {{ goalName }}
+                </span>
+              </template>
             </span>
 
-            <!-- 진행 중일 때: 목표 일시정지 버튼 (보조 버튼) -->
+            <!-- 진행 중일 때: 목표 일시정지 버튼 (보조 버튼, shrink-0으로 찌그러짐 방지) -->
             <button
               v-if="!disabled"
               type="button"
-              class="flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0a192f] active:scale-95 cursor-pointer select-none"
+              class="flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0a192f] active:scale-95 cursor-pointer select-none"
               @click="$emit('pause')"
             >
               <img src="@/assets/icons/goal-pause.svg" alt="" class="size-2.5 opacity-60" />
-              목표 일시정지
+              <span class="whitespace-nowrap">목표 일시정지</span>
             </button>
-            <!-- 일시정지일 때: 목표 재개하기 버튼 (Primary 강조 버튼) -->
+            <!-- 일시정지일 때: 목표 재개하기 버튼 (Primary 강조 버튼, shrink-0) -->
             <button
               v-else
               type="button"
-              class="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-white shadow-[0_2px_8px_rgba(0,102,255,0.28)] transition hover:bg-primary/90 active:scale-95 cursor-pointer select-none"
+              class="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-white shadow-[0_2px_8px_rgba(0,102,255,0.28)] transition hover:bg-primary/90 active:scale-95 cursor-pointer select-none"
               @click="$emit('resume')"
             >
               <svg class="size-2.5 fill-current" viewBox="0 0 24 24">
                 <polygon points="6 4 20 12 6 20 6 4" />
               </svg>
-              목표 재개하기
+              <span class="whitespace-nowrap">목표 재개하기</span>
             </button>
           </div>
 
@@ -63,16 +75,16 @@
           </h1>
 
           <!-- 달성률 및 도착 예정일 (일시정지 시 안내 캡션 연동) -->
-          <div class="mt-3 flex items-center gap-2 text-xs font-bold sm:text-sm">
-            <span class="text-[#0a192f]">
+          <div class="mt-3 flex items-center gap-2 text-xs sm:text-sm">
+            <span class="text-[#0a192f] font-bold">
               <span class="tabular-nums">{{ progressRate }}%</span>
-              <span class="font-medium text-slate-500">달성</span>
+              <span class="font-normal text-slate-500 ml-0.5">달성</span>
             </span>
             <span class="size-1 rounded-full bg-slate-300" />
-            <span v-if="!disabled" class="font-medium text-slate-500">
-              예상 도착일 <strong class="font-bold text-slate-700">{{ formattedEndDate }}</strong>
+            <span v-if="!disabled" class="font-normal text-slate-500">
+              예상 도착일 <strong class="font-semibold text-slate-700">{{ formattedEndDate }}</strong>
             </span>
-            <span v-else class="font-medium text-slate-400">
+            <span v-else class="font-normal text-slate-400">
               자동이체 해제됨 · 저금통 적립 일시정지
             </span>
           </div>
@@ -80,46 +92,46 @@
 
         <!-- 하단: 페이스 정보 인셋 카드 (우측 패널과 대칭되는 카드 형태) -->
         <div class="mt-5 sm:mt-6">
-          <div class="rounded-2xl border border-slate-100 bg-[#f8fbff] p-3 sm:p-3.5 shadow-xs">
+          <div class="rounded-xl border border-slate-100 bg-[#f8fbff] p-3 sm:p-3.5 shadow-2xs">
             <div class="grid grid-cols-3 divide-x divide-slate-200/80 items-center">
               <!-- 1. 현재 페이스 -->
               <div class="px-2 text-center sm:text-left sm:pl-3 sm:pr-2">
-                <span class="block text-[11px] font-bold text-slate-500">현재 페이스</span>
+                <span class="block text-[11px] font-medium text-slate-500">현재 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
-                    class="text-xs font-black tabular-nums text-primary sm:text-sm md:text-base"
+                    class="text-xs font-bold tabular-nums text-primary sm:text-sm md:text-base"
                   >
                     {{ formatManwon(currentAmount) }}만원
                   </strong>
-                  <span class="text-[10px] font-bold text-slate-400 sm:text-xs">/월</span>
+                  <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
               </div>
 
               <!-- 2. 목표 페이스 -->
               <div class="px-2 text-center sm:text-left sm:pl-4 sm:pr-2">
-                <span class="block text-[11px] font-bold text-slate-500">목표 페이스</span>
+                <span class="block text-[11px] font-medium text-slate-500">목표 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
-                    class="text-xs font-black tabular-nums text-[#0a192f] sm:text-sm md:text-base"
+                    class="text-xs font-bold tabular-nums text-[#0a192f] sm:text-sm md:text-base"
                   >
                     {{ formatManwon(pace.expectedAmount) }}만원
                   </strong>
-                  <span class="text-[10px] font-bold text-slate-400 sm:text-xs">/월</span>
+                  <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
               </div>
 
               <!-- 3. 차이 금액 -->
               <div class="px-2 text-center sm:text-left sm:pl-4 sm:pr-2">
-                <span class="block text-[11px] font-bold text-slate-500">페이스 차이</span>
+                <span class="block text-[11px] font-medium text-slate-500">페이스 차이</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
-                    class="text-xs font-black tabular-nums sm:text-sm md:text-base"
+                    class="text-xs font-bold tabular-nums sm:text-sm md:text-base"
                     :style="{ color: theme.badgeText }"
                   >
                     {{ pace.paceStatus === 'BEHIND' ? '-' : '+'
                     }}{{ formatManwon(Math.abs(pace.differenceAmount)) }}만원
                   </strong>
-                  <span class="text-[10px] font-bold text-slate-400 sm:text-xs">/월</span>
+                  <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
               </div>
             </div>
@@ -129,7 +141,7 @@
 
       <!-- 우측: 스마트 자동 저축 카드 (슬림형 인셋 패널 · 균등 분배) -->
       <div
-        class="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-100 bg-[#f8fbff] p-3.5 sm:p-4 shadow-xs"
+        class="flex flex-col justify-between overflow-hidden rounded-xl border border-slate-100 bg-[#f8fbff] p-3.5 sm:p-4 shadow-2xs"
       >
         <div
           v-if="dailyAvailableMoney || monthlyAvailableMoney"
@@ -138,32 +150,32 @@
           <button
             v-if="dailyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-primary/10 bg-white px-3 py-2 text-left shadow-xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-md active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-xl border border-primary/10 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!monthlyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-today')"
           >
             <span
-              class="block text-[11px] font-bold text-slate-500 group-hover:text-primary transition-colors"
+              class="block text-[11px] font-medium text-slate-500 group-hover:text-primary transition-colors"
               >오늘 여유자금</span
             >
-            <strong class="mt-0.5 block text-sm font-black tabular-nums text-primary sm:text-base">
+            <strong class="mt-0.5 block text-sm font-bold tabular-nums text-primary sm:text-base">
               {{ formatWon(dailyAvailableMoney.todayAvailableMoney) }}
             </strong>
           </button>
           <button
             v-if="monthlyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-primary/10 bg-white px-3 py-2 text-left shadow-xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-md active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-xl border border-primary/10 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!dailyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-month')"
           >
             <span
-              class="block text-[11px] font-bold text-slate-500 group-hover:text-primary transition-colors"
+              class="block text-[11px] font-medium text-slate-500 group-hover:text-primary transition-colors"
               >이번 달 여유자금</span
             >
-            <strong class="mt-0.5 block text-sm font-black tabular-nums text-primary sm:text-base">
+            <strong class="mt-0.5 block text-sm font-bold tabular-nums text-primary sm:text-base">
               {{ formatWon(monthlyAvailableMoney.availableMoney) }}
             </strong>
           </button>
@@ -288,6 +300,7 @@ import { useCountUp } from '@/shared/composables/useCountUp'
 const props = defineProps({
   pace: { type: Object, required: true },
   progressRate: { type: Number, required: true },
+  goalName: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
   currentAmount: { type: Number, default: 0 },
   goalAmount: { type: Number, default: 0 },

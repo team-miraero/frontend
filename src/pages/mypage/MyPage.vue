@@ -1,18 +1,7 @@
 <template>
   <div class="min-h-full bg-[#f8fbff] text-[#0a192f]">
-    <header
-      class="flex min-h-[78px] items-center border-b border-slate-200 bg-white px-5 py-4 lg:min-h-[86px] lg:px-10 lg:py-5"
-    >
-      <div class="flex items-center gap-3">
-        <div>
-          <p class="text-xs text-slate-500">계정 · 설정</p>
-          <h1 class="mt-0.5 text-[22px] font-black tracking-[-0.02em]">마이페이지</h1>
-        </div>
-      </div>
-    </header>
-
-    <main class="page-container pb-12 pt-5 lg:pb-16 lg:pt-8">
-      <div class="mx-auto flex w-full max-w-[860px] flex-col gap-5">
+    <main class="page-container-narrow pb-10 pt-4 sm:pb-14 sm:pt-6">
+      <div class="flex flex-col gap-5">
         <ProfileSection
           :profile="profile"
           :profile-image-url="displayProfileImageUrl"
