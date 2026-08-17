@@ -78,6 +78,6 @@ const router = useRouter()
 
 function goToPacemakerSetup() {
   emit('update:modelValue', false)
-  router.push({ name: ROUTE_NAMES.PACEMAKER })
+  router.push({ name: ROUTE_NAMES.PACEMAKER_SETUP })
 }
 </script>

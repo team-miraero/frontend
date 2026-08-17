@@ -319,7 +319,14 @@ export const useGoalStore = defineStore('feature-goal', () => {
       if (payload.status) targetGoal.status = payload.status
     }
     if (currentGoal.value && String(currentGoal.value.goalId) === String(goalId)) {
-      currentGoal.value = { ...currentGoal.value, ...payload }
+      const { goalDate, ...goalFields } = payload
+      currentGoal.value = {
+        ...currentGoal.value,
+        ...goalFields,
+        period: goalDate
+          ? { ...currentGoal.value.period, endDate: goalDate }
+          : currentGoal.value.period,
+      }
     }
     return result
   }

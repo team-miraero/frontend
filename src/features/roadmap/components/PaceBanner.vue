@@ -56,13 +56,17 @@
             class="mt-3.5 text-2xl font-black leading-[1.35] text-[#0a192f] sm:text-3xl lg:text-[34px] break-keep"
           >
             {{ formatManwon(goalAmount) }}만원 목표까지<br />
-            <span class="text-primary tabular-nums">{{ formatManwon(animatedCurrentAmount) }}만원</span> 모았어요
+            <span class="text-primary tabular-nums"
+              >{{ formatManwon(animatedCurrentAmount) }}만원</span
+            >
+            모았어요
           </h1>
 
           <!-- 달성률 및 도착 예정일 (일시정지 시 안내 캡션 연동) -->
           <div class="mt-3 flex items-center gap-2 text-xs font-bold sm:text-sm">
             <span class="text-[#0a192f]">
-              <span class="tabular-nums">{{ progressRate }}%</span> <span class="font-medium text-slate-500">달성</span>
+              <span class="tabular-nums">{{ progressRate }}%</span>
+              <span class="font-medium text-slate-500">달성</span>
             </span>
             <span class="size-1 rounded-full bg-slate-300" />
             <span v-if="!disabled" class="font-medium text-slate-500">
@@ -76,15 +80,15 @@
 
         <!-- 하단: 페이스 정보 인셋 카드 (우측 패널과 대칭되는 카드 형태) -->
         <div class="mt-5 sm:mt-6">
-          <div
-            class="rounded-2xl border border-slate-100 bg-[#f8fbff] p-3 sm:p-3.5 shadow-xs"
-          >
+          <div class="rounded-2xl border border-slate-100 bg-[#f8fbff] p-3 sm:p-3.5 shadow-xs">
             <div class="grid grid-cols-3 divide-x divide-slate-200/80 items-center">
               <!-- 1. 현재 페이스 -->
               <div class="px-2 text-center sm:text-left sm:pl-3 sm:pr-2">
                 <span class="block text-[11px] font-bold text-slate-500">현재 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
-                  <strong class="text-xs font-black tabular-nums text-primary sm:text-sm md:text-base">
+                  <strong
+                    class="text-xs font-black tabular-nums text-primary sm:text-sm md:text-base"
+                  >
                     {{ formatManwon(currentAmount) }}만원
                   </strong>
                   <span class="text-[10px] font-bold text-slate-400 sm:text-xs">/월</span>
@@ -95,7 +99,9 @@
               <div class="px-2 text-center sm:text-left sm:pl-4 sm:pr-2">
                 <span class="block text-[11px] font-bold text-slate-500">목표 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
-                  <strong class="text-xs font-black tabular-nums text-[#0a192f] sm:text-sm md:text-base">
+                  <strong
+                    class="text-xs font-black tabular-nums text-[#0a192f] sm:text-sm md:text-base"
+                  >
                     {{ formatManwon(pace.expectedAmount) }}만원
                   </strong>
                   <span class="text-[10px] font-bold text-slate-400 sm:text-xs">/월</span>
@@ -110,7 +116,8 @@
                     class="text-xs font-black tabular-nums sm:text-sm md:text-base"
                     :style="{ color: theme.badgeText }"
                   >
-                    {{ pace.paceStatus === 'BEHIND' ? '-' : '+' }}{{ formatManwon(Math.abs(pace.differenceAmount)) }}만원
+                    {{ pace.paceStatus === 'BEHIND' ? '-' : '+'
+                    }}{{ formatManwon(Math.abs(pace.differenceAmount)) }}만원
                   </strong>
                   <span class="text-[10px] font-bold text-slate-400 sm:text-xs">/월</span>
                 </div>
@@ -136,7 +143,10 @@
             :disabled="disabled"
             @click="$emit('open-today')"
           >
-            <span class="block text-[11px] font-bold text-slate-500 group-hover:text-primary transition-colors">오늘 여유자금</span>
+            <span
+              class="block text-[11px] font-bold text-slate-500 group-hover:text-primary transition-colors"
+              >오늘 여유자금</span
+            >
             <strong class="mt-0.5 block text-sm font-black tabular-nums text-primary sm:text-base">
               {{ formatWon(dailyAvailableMoney.todayAvailableMoney) }}
             </strong>
@@ -149,7 +159,10 @@
             :disabled="disabled"
             @click="$emit('open-month')"
           >
-            <span class="block text-[11px] font-bold text-slate-500 group-hover:text-primary transition-colors">이번 달 여유자금</span>
+            <span
+              class="block text-[11px] font-bold text-slate-500 group-hover:text-primary transition-colors"
+              >이번 달 여유자금</span
+            >
             <strong class="mt-0.5 block text-sm font-black tabular-nums text-primary sm:text-base">
               {{ formatWon(monthlyAvailableMoney.availableMoney) }}
             </strong>
@@ -160,22 +173,55 @@
           <!-- 1. 알아서 모으기 -->
           <button
             type="button"
-            class="group flex w-full items-center gap-3.5 rounded-xl py-1 text-left transition sm:py-1.5 active:scale-[0.98] cursor-pointer select-none"
-            :class="disabled ? 'pointer-events-none opacity-45' : ''"
+            class="group flex w-full items-center gap-3.5 rounded-xl text-left transition active:scale-[0.98] cursor-pointer select-none"
+            :class="[
+              disabled ? 'pointer-events-none opacity-45' : '',
+              isAssistMode ? 'px-3 py-2.5 shadow-sm' : 'py-1 sm:py-1.5',
+            ]"
+            :style="
+              isAssistMode
+                ? {
+                    backgroundImage: theme.ctaGradient,
+                    boxShadow: `0 4px 16px ${theme.ctaShadow}`,
+                  }
+                : undefined
+            "
+            :disabled="disabled"
             @click="$emit('cta-click')"
           >
             <span
-              class="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
+              class="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
+              :class="isAssistMode ? 'bg-white/20' : 'bg-primary'"
             >
-              <img src="@/assets/icons/pacemaker-setup-cta.svg" alt="" class="size-3.5 sm:size-4" />
+              <img
+                :src="isAssistMode ? theme.ctaIcon : pacemakerSetupCtaIcon"
+                alt=""
+                class="size-3.5 sm:size-4"
+              />
             </span>
             <span class="min-w-0 flex-1">
-              <strong class="block text-xs sm:text-sm font-bold text-[#0a192f] transition-colors duration-200 group-hover:text-primary">알아서 모으기</strong>
-              <span class="mt-0.5 block text-[11px] sm:text-xs font-medium text-[#73809c]"
-                >이번 달 목표 금액을 자동으로 모아요</span
+              <strong
+                class="block text-xs sm:text-sm font-bold transition-colors duration-200"
+                :class="isAssistMode ? 'text-white' : 'text-[#0a192f] group-hover:text-primary'"
               >
+                {{ primaryCtaTitle }}
+              </strong>
+              <span
+                class="mt-0.5 block text-[11px] sm:text-xs font-medium"
+                :class="isAssistMode ? 'text-white/80' : 'text-[#73809c]'"
+              >
+                {{ primaryCtaDescription }}
+              </span>
             </span>
-            <span class="text-xl leading-none text-slate-300 transition-all duration-200 group-hover:translate-x-1 group-hover:text-primary">›</span>
+            <span
+              class="text-xl leading-none transition-all duration-200 group-hover:translate-x-1"
+              :class="
+                isAssistMode
+                  ? 'text-white/80 group-hover:text-white'
+                  : 'text-slate-300 group-hover:text-primary'
+              "
+              >›</span
+            >
           </button>
 
           <!-- 깔끔한 직선 구분선 -->
@@ -197,10 +243,14 @@
             <span class="min-w-0 flex-1">
               <span class="flex items-center justify-between gap-3">
                 <span class="min-w-0">
-                  <strong class="block text-xs sm:text-sm font-bold text-[#0a192f] truncate">다음 달 자금마련</strong>
+                  <strong class="block text-xs sm:text-sm font-bold text-[#0a192f] truncate"
+                    >다음 달 자금마련</strong
+                  >
                   <span
                     class="mt-0.5 block text-[11px] sm:text-xs truncate transition-colors"
-                    :class="pacemaker?.enabled ? 'font-bold text-primary' : 'font-medium text-[#73809c]'"
+                    :class="
+                      pacemaker?.enabled ? 'font-bold text-primary' : 'font-medium text-[#73809c]'
+                    "
                   >
                     {{
                       pacemaker?.enabled
@@ -231,6 +281,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import pacemakerSetupCtaIcon from '@/assets/icons/pacemaker-setup-cta.svg'
 import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
 import { useCountUp } from '@/shared/composables/useCountUp'
 
@@ -250,6 +301,16 @@ const props = defineProps({
 defineEmits(['cta-click', 'pause', 'resume', 'open-today', 'open-month', 'toggle'])
 
 const theme = computed(() => PACE_THEME[props.pace.paceStatus] ?? PACE_THEME.ON_TRACK)
+const isAssistMode = computed(() => props.pace.paceStatus === 'BEHIND')
+const isPacemakerRegistered = computed(() => props.pacemaker?.registered === true)
+const primaryCtaTitle = computed(() => {
+  if (isAssistMode.value) return '페이스메이커가 도와줄게요'
+  return isPacemakerRegistered.value ? '알아서 모으기' : '페이스메이커가 알아서 모아줄게요'
+})
+const primaryCtaDescription = computed(() => {
+  if (isAssistMode.value) return theme.value.ctaAction
+  return isPacemakerRegistered.value ? '이번 달 목표 금액을 자동으로 모아요' : '다음달 자금마련 →'
+})
 const formattedEndDate = computed(() => props.endDate?.replace('-', '.') ?? '')
 
 // 메인 금액 부드러운 카운트업 (1초 감속 롤링)

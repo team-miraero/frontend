@@ -203,7 +203,7 @@
             </button>
           </div>
 
-          <div class="grid gap-2 sm:grid-cols-2">
+          <div class="grid grid-cols-2 gap-2">
             <button
               type="button"
               class="rounded-xl border border-[#c5dcff] bg-[#f8fbff] px-3 py-2.5 text-left disabled:cursor-default"
@@ -236,7 +236,7 @@
               v-for="asset in selectableAssets(group)"
               :key="asset.assetId"
               type="button"
-              class="grid w-full gap-2 text-left sm:grid-cols-2"
+              class="grid w-full grid-cols-2 gap-2 text-left"
               @click="selectDepositAsset(group.goalId, asset.assetId)"
             >
               <span class="rounded-xl border border-[#edf2ff] bg-white px-3 py-2.5">
