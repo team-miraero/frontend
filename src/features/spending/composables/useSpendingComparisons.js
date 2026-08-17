@@ -156,14 +156,14 @@ export function usePeerSpendingComparison(summary) {
 
   const totalDifferenceLabel = computed(() => {
     if (totalDifference.value > 0) {
-      return '더 사용하고 있어요'
+      return '더 쓰고 있어요'
     }
 
     if (totalDifference.value < 0) {
-      return '덜 사용하고 있어요'
+      return '덜 쓰고 있어요'
     }
 
-    return '비슷하게 사용하고 있어요'
+    return '비슷하게 쓰고 있어요'
   })
 
   const largestDifferenceCategoryNames = computed(() =>

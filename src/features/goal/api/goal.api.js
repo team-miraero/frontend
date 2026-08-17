@@ -77,7 +77,10 @@ export async function getFeasibility(params) {
  */
 
 /**
- * @param {{ accountType?: 'CHECKING' | 'SAVING' | 'DEPOSIT' }} [params]
+ * @param {{
+ *   accountType?: 'CHECKING' | 'SAVING' | 'DEPOSIT',
+ *   excludeGoalLinked?: boolean
+ * }} [params]
  * @returns {Promise<{ totalBalance: number, accounts: AccountItem[] }>}
  */
 export async function getAccounts(params) {
@@ -180,21 +183,54 @@ export async function getGoalDetail(goalId) {
 }
 
 /**
+ * 세 필드를 항상 함께 보낸다. 화면에서 수정하지 않는 필드도 현재 값을 실어야 한다.
+ *
+ * 서버 DTO(GoalUpdateRequest)는 String/Long/Integer라 필드를 빼도 역직렬화는 통과하지만,
+ * UPDATE 문이 전달된 값으로 컬럼을 조건 없이 덮어쓰기 때문에 빠뜨린 필드가 NULL이 된다.
+ * 즉 타입상으로만 부분 수정이 가능하고 실제로는 안전하지 않다.
  * @typedef {Object} UpdateGoalPayload
- * @property {string} goalDate 목표일(YYYY-MM-DD)
+ * @property {string} goalName 목표명
  * @property {number} goalAmount 목표 금액
- * @property {'ACTIVE' | 'PAUSED'} status 목표 상태
+ * @property {number} goalMonths 현재 월부터 목표 월까지의 개월 수
  */
 
 /**
- * 목표 금액·목표일·상태를 간단 수정한다.
+ * 목표명·목표 금액·목표 기간을 수정한다.
  * @param {number} goalId
  * @param {UpdateGoalPayload} payload
- * @returns {Promise<{ goalId: number }>}
+ * @returns {Promise<null>}
  */
 export async function updateGoal(goalId, payload) {
   const { data: responseBody } = await client.patch(`/goals/${goalId}`, payload)
   return unwrapApiData(responseBody)
+}
+
+/**
+ * @typedef {Object} PullGoalFundsPayload
+ * @property {number} sourceAccountId 끌어올 입출금 계좌 ID
+ * @property {number} amount 끌어올 금액
+ */
+
+/**
+ * @typedef {Object} PullGoalFundsResponse
+ * @property {number} pulledAmount 끌어온 금액
+ * @property {number} currentAmount 끌어온 뒤 목표 자산의 현재 금액
+ */
+
+/**
+ * 뒤처진 목표에 다른 입출금 계좌의 자금을 채운다.
+ * @param {number} goalId
+ * @param {PullGoalFundsPayload} payload
+ * @returns {Promise<PullGoalFundsResponse>}
+ */
+export async function pullGoalFunds(goalId, payload) {
+  const { data: responseBody } = await client.post(`/goals/${goalId}/pull-funds`, payload)
+  const data = unwrapApiData(responseBody)
+
+  return {
+    pulledAmount: Number(data?.pulledAmount ?? 0),
+    currentAmount: Number(data?.currentAmount ?? 0),
+  }
 }
 
 /**

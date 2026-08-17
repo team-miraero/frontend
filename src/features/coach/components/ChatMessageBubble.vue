@@ -10,11 +10,11 @@
     </div>
 
     <div
-      class="max-w-[540px] rounded-[20px] px-[17px] py-[13px] text-sm leading-[22.75px] whitespace-pre-wrap"
+      class="max-w-[88%] rounded-[18px] px-3.5 py-2.5 text-xs leading-[20px] whitespace-pre-wrap break-words sm:max-w-[540px] sm:rounded-[20px] sm:px-[17px] sm:py-[13px] sm:text-sm sm:leading-[22.75px]"
       :class="
         isUser
-          ? 'rounded-tr-[4px] bg-primary text-white'
-          : 'rounded-tl-[4px] border border-[#dbeafe] bg-[#f4f8ff] text-[#0a192f]'
+          ? 'rounded-tr-[4px] bg-primary text-white shadow-xs'
+          : 'rounded-tl-[4px] border border-[#dbeafe] bg-[#f4f8ff] text-[#0a192f] shadow-xs'
       "
     >
       {{ message.content }}

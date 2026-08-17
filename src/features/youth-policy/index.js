@@ -15,5 +15,6 @@ export { default as PolicyDetailModal } from '@/features/youth-policy/components
 export { default as RecommendationBasisCard } from '@/features/youth-policy/components/RecommendationBasisCard.vue'
 export { default as RegionSelectPopover } from '@/features/youth-policy/components/RegionSelectPopover.vue'
 export { default as YouthPolicyFilters } from '@/features/youth-policy/components/YouthPolicyFilters.vue'
+export { default as PolicyCategoryIcon } from '@/features/youth-policy/components/PolicyCategoryIcon.vue'
 export { default as RecommendedPoliciesSection } from '@/features/youth-policy/components/RecommendedPoliciesSection.vue'
 export { default as PolicyListSection } from '@/features/youth-policy/components/PolicyListSection.vue'

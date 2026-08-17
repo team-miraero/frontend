@@ -101,8 +101,8 @@ export function usePacemakerToast() {
         addToast({
           type: 'SAVING',
           badgeIcon: '💰',
-          title: `오늘의 여유자금: ${formatWon(todayAmount)}`,
-          body: `이번달 여유자금 ${formatWon(monthlyRemaining)} 남았어요!`,
+          title: `오늘의 권장 여유자금: ${formatWon(todayAmount)}`,
+          body: `안전한 완주를 위해 계산된 오늘 하루 지출 예산이에요!`,
           duration: firstDuration,
         })
       }, initialDelay)
@@ -112,8 +112,8 @@ export function usePacemakerToast() {
         addToast({
           type: 'STREAK',
           badgeIcon: '🔥',
-          title: `연속 ${streak}일째 모으는중 !`,
-          body: `페이스메이커가 ${formatWon(moneyBoxBalance)} 확보했어요!`,
+          title: `연속 ${streak}일째 페이스 달성 중!`,
+          body: `오늘도 저금통에 여유자금 ${formatWon(moneyBoxBalance)} 확보 완료!`,
           duration: 4000,
         })
       }, initialDelay + firstDuration + transitionGap)
@@ -123,8 +123,8 @@ export function usePacemakerToast() {
         addToast({
           type: 'SAVING',
           badgeIcon: '💰',
-          title: `오늘의 여유자금: ${formatWon(todayAmount)}`,
-          body: `이번달 여유자금 ${formatWon(monthlyRemaining)} 남았어요!`,
+          title: `오늘의 권장 여유자금: ${formatWon(todayAmount)}`,
+          body: `안전한 완주를 위해 계산된 오늘 하루 지출 예산이에요!`,
           duration: 7000,
         })
       }, initialDelay)
@@ -133,8 +133,8 @@ export function usePacemakerToast() {
         addToast({
           type: 'STREAK',
           badgeIcon: '🔥',
-          title: `연속 ${streak}일째 모으는중 !`,
-          body: `페이스메이커가 ${formatWon(moneyBoxBalance)} 확보했어요!`,
+          title: `연속 ${streak}일째 페이스 달성 중!`,
+          body: `오늘도 저금통에 여유자금 ${formatWon(moneyBoxBalance)} 확보 완료!`,
           duration: 8500,
         })
       }, initialDelay + 1200)

@@ -1,14 +1,10 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 챗봇 안테나 -->
-  <path d="M12 2V5" stroke="#0066FF" stroke-width="1.8" stroke-linecap="round"/>
-  <circle cx="12" cy="2" r="1" fill="#0066FF"/>
-  <!-- 챗봇 머리/페이스 -->
-  <rect x="3.5" y="5" width="17" height="13" rx="4" stroke="#0066FF" stroke-width="1.8"/>
-  <!-- 챗봇 눈 & 미소 -->
-  <circle cx="8.5" cy="11.5" r="1.25" fill="#0066FF"/>
-  <circle cx="15.5" cy="11.5" r="1.25" fill="#0066FF"/>
-  <path d="M10 14.5C10.6 15.3 11.2 15.5 12 15.5C12.8 15.5 13.4 15.3 14 14.5" stroke="#0066FF" stroke-width="1.6" stroke-linecap="round"/>
-  <!-- 챗봇 귀/헤드셋 디테일 -->
-  <path d="M2 10.5V12.5" stroke="#0066FF" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M22 10.5V12.5" stroke="#0066FF" stroke-width="1.8" stroke-linecap="round"/>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a192f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 2v3"/>
+  <path d="M8 2h8"/>
+  <rect width="18" height="13" x="3" y="6" rx="4"/>
+  <circle cx="9" cy="12.5" r="1.25" fill="#0a192f"/>
+  <circle cx="15" cy="12.5" r="1.25" fill="#0a192f"/>
+  <path d="M10 15.5c.6.6 1.3.8 2 .8s1.4-.2 2-.8"/>
+  <path d="M2 11.5v2"/>
+  <path d="M22 11.5v2"/>
 </svg>

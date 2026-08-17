@@ -20,25 +20,40 @@
           role="alert"
           @click="onToastClick(toast)"
         >
-          <!-- 좌측 큼직한 이모지 뱃지 아이콘 (💰, 🔥 등) -->
-          <div
-            class="mr-3 flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl shadow-sm ring-1 ring-slate-200/80"
-          >
-            <span>{{ toast.badgeIcon || '💬' }}</span>
+          <!-- 좌측: 3D 페이스메이커 콜리 아바타 + 미니 테마 뱃지 -->
+          <div class="relative mr-3.5 shrink-0">
+            <div
+              class="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-gradient-to-br from-[#eaf2ff] via-[#f4f8ff] to-white p-1 shadow-xs transition-transform group-hover:scale-105"
+            >
+              <img
+                src="@/assets/images/coli_new.png"
+                alt="페이스메이커 콜리"
+                class="size-9 object-contain drop-shadow-xs"
+              />
+            </div>
+            <!-- 우측 하단 미니 테마 뱃지 -->
+            <span
+              class="absolute -bottom-1 -right-1 flex size-4.5 items-center justify-center rounded-full text-[10px] shadow-2xs"
+              :class="toast.type === 'STREAK' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-primary'"
+            >
+              <AppIcon :name="toast.type === 'STREAK' ? 'fire' : 'money'" size="sm" class="size-3" />
+            </span>
           </div>
 
           <!-- 알림 메인 텍스트 영역 -->
           <div class="flex-1 min-w-0 self-center">
-            <!-- 1행: 알림 타이틀 + (평소: '방금' ➔ Hover 시: X 버튼 교체) -->
-            <div class="flex items-center justify-between gap-2">
-              <h4 class="text-[13px] font-bold text-[#1c1c1e] tracking-tight leading-none truncate">
-                {{ toast.title }}
-              </h4>
+            <!-- 1행: 페이스메이커 라벨 + (평소: '방금' ➔ Hover 시: X 버튼 교체) -->
+            <div class="flex items-center justify-between gap-2 mb-0.5">
+              <span class="text-[11px] font-bold text-primary flex items-center gap-1 leading-none">
+                페이스메이커 콜리
+              </span>
 
               <!-- Hover Swap 영역: 평소엔 '방금', 마우스 대면 X 버튼으로 교체 -->
               <div class="relative shrink-0 flex items-center justify-end min-w-[28px] h-4">
                 <!-- 평소: '방금' 텍스트 -->
-                <span class="text-[11px] font-medium text-[#8e8e93] transition-opacity duration-200 group-hover:opacity-0">
+                <span
+                  class="text-[11px] font-medium text-[#8e8e93] transition-opacity duration-200 group-hover:opacity-0"
+                >
                   방금
                 </span>
 
@@ -49,15 +64,26 @@
                   aria-label="닫기"
                   @click.stop="emit('remove', toast.id)"
                 >
-                  <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <svg
+                    class="size-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
             </div>
 
-            <!-- 2행: 알림 본문 설명 -->
-            <p class="mt-1 text-[12px] font-normal text-[#636366] leading-snug truncate">
+            <!-- 2행: 알림 타이틀 -->
+            <h4 class="text-[13px] font-bold text-[#1c1c1e] tracking-tight leading-tight truncate">
+              {{ toast.title }}
+            </h4>
+
+            <!-- 3행: 알림 본문 설명 -->
+            <p class="mt-0.5 text-[11.5px] font-normal text-[#636366] leading-snug truncate">
               {{ toast.body }}
             </p>
           </div>
@@ -68,6 +94,7 @@
 </template>
 
 <script setup>
+import AppIcon from '@/shared/ui/AppIcon.vue'
 defineProps({
   toastList: {
     type: Array,
@@ -79,5 +106,34 @@ const emit = defineEmits(['remove', 'click-toast'])
 
 function onToastClick(toast) {
   emit('click-toast', toast)
+}
+
+function getIconTheme(type, badgeIcon) {
+  if (type === 'STREAK' || badgeIcon === '🔥') {
+    return {
+      container: 'bg-amber-50 border border-amber-200/80 text-amber-500 shadow-amber-500/10',
+      icon: 'fire',
+      iconColor: 'text-amber-500',
+    }
+  }
+  if (type === 'SAVING' || badgeIcon === '💰' || badgeIcon === '💸') {
+    return {
+      container: 'bg-blue-50 border border-blue-200/80 text-primary shadow-blue-500/10',
+      icon: 'money',
+      iconColor: 'text-primary',
+    }
+  }
+  if (type === 'ACHIEVE' || badgeIcon === '🎯') {
+    return {
+      container: 'bg-emerald-50 border border-emerald-200/80 text-emerald-600 shadow-emerald-500/10',
+      icon: 'target',
+      iconColor: 'text-emerald-600',
+    }
+  }
+  return {
+    container: 'bg-[#f0f6ff] border border-blue-100 text-primary shadow-blue-500/10',
+    icon: badgeIcon || 'check',
+    iconColor: 'text-primary',
+  }
 }
 </script>

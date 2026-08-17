@@ -25,10 +25,11 @@
         </header>
 
         <div class="min-h-0 flex-1 overflow-y-auto px-6 py-6">
-          <div v-if="isLoading" class="flex min-h-[280px] flex-col items-center justify-center">
-            <span class="size-8 animate-spin rounded-full border-4 border-primary/15 border-t-primary" />
-            <p class="mt-3 text-sm text-gray-500">정책 정보를 불러오고 있어요</p>
-          </div>
+          <LoadingSpinner
+            v-if="isLoading"
+            message="정책 정보를 불러오고 있어요"
+            container-class="min-h-[280px]"
+          />
 
           <div v-else-if="hasError" class="flex min-h-[280px] flex-col items-center justify-center text-center">
             <p class="text-sm font-bold text-gray-900">상세 정보를 불러오지 못했어요</p>
@@ -42,11 +43,23 @@
           </div>
 
           <div v-else-if="policy">
-            <span class="rounded-full bg-accent-light px-3 py-1 text-[11px] font-bold text-primary">
-              {{ policy.providerInstitutionName }}
-            </span>
-            <h3 class="mt-3 text-xl font-black text-gray-900">{{ policy.policyName }}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-gray-500">{{ policy.policyDescription }}</p>
+            <div class="flex flex-wrap items-center gap-1.5 mb-2">
+              <span
+                v-for="keyword in keywordTags"
+                :key="keyword"
+                class="rounded-md bg-[#eef5ff] px-2.5 py-1 text-[11px] font-bold text-primary"
+              >
+                {{ keyword }}
+              </span>
+              <span
+                v-if="policy.providerInstitutionName"
+                class="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600"
+              >
+                {{ policy.providerInstitutionName }}
+              </span>
+            </div>
+            <h3 class="mt-2 text-xl font-black text-[#0a192f]">{{ policy.policyName }}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ policy.policyDescription }}</p>
 
             <div class="mt-5 rounded-2xl bg-accent-light px-5 py-4">
               <p class="text-xs text-primary/70">지원 내용</p>
@@ -78,6 +91,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -87,6 +101,15 @@ const props = defineProps({
   hasError: { type: Boolean, default: false },
 })
 const emit = defineEmits(['close', 'retry'])
+
+const keywordTags = computed(() => {
+  if (!props.policy) return []
+  const tags = (props.policy.policyKeyword || '')
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+  return tags.length > 0 ? tags : (props.policy.policyCategory ? [props.policy.policyCategory] : [])
+})
 
 const infoRows = computed(() => {
   if (!props.policy) return []

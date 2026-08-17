@@ -38,7 +38,7 @@ export const SPENDING_CATEGORIES = [
     icon: '🏠',
     current: 38,
     accent: '#3D8BFF',
-    softColor: '#EEF5FF',
+    softColor: '#F2F4F6',
     borderColor: '#B9D4FF',
   },
   {
@@ -49,7 +49,7 @@ export const SPENDING_CATEGORIES = [
     icon: '📱',
     current: 7,
     accent: '#0EA5E9',
-    softColor: '#F0F9FF',
+    softColor: '#F2F4F6',
     borderColor: '#BAE6FD',
   },
   {
@@ -60,7 +60,7 @@ export const SPENDING_CATEGORIES = [
     icon: '🛡️',
     current: 12,
     accent: '#6366F1',
-    softColor: '#EEF2FF',
+    softColor: '#F2F4F6',
     borderColor: '#C7D2FE',
   },
   {
@@ -71,7 +71,7 @@ export const SPENDING_CATEGORIES = [
     icon: '📺',
     current: 8,
     accent: '#8B5CF6',
-    softColor: '#F5F3FF',
+    softColor: '#F2F4F6',
     borderColor: '#DDD6FE',
   },
   {
@@ -82,7 +82,7 @@ export const SPENDING_CATEGORIES = [
     icon: '🏦',
     current: 15,
     accent: '#64748B',
-    softColor: '#F1F5F9',
+    softColor: '#F2F4F6',
     borderColor: '#CBD5E1',
   },
   {
@@ -93,7 +93,7 @@ export const SPENDING_CATEGORIES = [
     icon: '🐷',
     current: 20,
     accent: '#10B981',
-    softColor: '#ECFDF5',
+    softColor: '#F2F4F6',
     borderColor: '#A7F3D0',
   },
   {
@@ -104,7 +104,7 @@ export const SPENDING_CATEGORIES = [
     icon: '📈',
     current: 10,
     accent: '#14B8A6',
-    softColor: '#F0FDFA',
+    softColor: '#F2F4F6',
     borderColor: '#99F6E4',
   },
   {
@@ -117,7 +117,7 @@ export const SPENDING_CATEGORIES = [
     min: 0,
     step: 1,
     accent: '#FF6B6B',
-    softColor: '#FFF1F2',
+    softColor: '#F2F4F6',
     borderColor: '#FFCDD2',
   },
   {
@@ -130,7 +130,7 @@ export const SPENDING_CATEGORIES = [
     min: 0,
     step: 1,
     accent: '#F59E0B',
-    softColor: '#FFF7E8',
+    softColor: '#F2F4F6',
     borderColor: '#FDD99A',
   },
   {
@@ -141,7 +141,7 @@ export const SPENDING_CATEGORIES = [
     icon: '🚌',
     current: 9,
     accent: '#10B981',
-    softColor: '#ECFDF5',
+    softColor: '#F2F4F6',
     borderColor: '#A7F3D0',
   },
   {
@@ -154,7 +154,7 @@ export const SPENDING_CATEGORIES = [
     min: 0,
     step: 1,
     accent: '#A855F7',
-    softColor: '#F8F0FF',
+    softColor: '#F2F4F6',
     borderColor: '#DDB9FF',
   },
   {
@@ -167,7 +167,7 @@ export const SPENDING_CATEGORIES = [
     min: 0,
     step: 1,
     accent: '#EC4899',
-    softColor: '#FDF2F8',
+    softColor: '#F2F4F6',
     borderColor: '#FBCFE8',
   },
   {
@@ -180,7 +180,7 @@ export const SPENDING_CATEGORIES = [
     min: 0,
     step: 1,
     accent: '#06B6D4',
-    softColor: '#ECFEFF',
+    softColor: '#F2F4F6',
     borderColor: '#A5F3FC',
   },
   {
@@ -193,7 +193,7 @@ export const SPENDING_CATEGORIES = [
     min: 0,
     step: 1,
     accent: '#64748B',
-    softColor: '#F1F5F9',
+    softColor: '#F2F4F6',
     borderColor: '#CBD5E1',
   },
 ]
