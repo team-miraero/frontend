@@ -87,7 +87,11 @@
 
         <!-- 스플릿 기록 -->
         <div class="mt-3.5 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:mt-4 sm:pt-5">
-          <MilestoneList :milestones="roadmapStore.milestones" :goal="displayedGoal" />
+          <MilestoneList
+            :milestones="roadmapStore.milestones"
+            :goal="displayedGoal"
+            @select-milestone="handleSelectMilestone"
+          />
         </div>
       </section>
 
@@ -119,6 +123,7 @@
       :monthly="goalStore.monthlyAvailableMoney ?? EMPTY_MONTHLY_AVAILABLE_MONEY"
     />
     <LinkedAssetsModal v-model="isLinkedAssetsModalOpen" :assets="goalStore.assets" />
+    <MilestoneReportModal v-model="isMilestoneReportModalOpen" :milestone="selectedMilestone" />
     <GoalStatusConfirmModal
       v-model="isStatusConfirmModalOpen"
       :mode="statusConfirmMode"
@@ -196,6 +201,7 @@ import {
   PaceBanner,
   MilestoneProgressBar,
   MilestoneList,
+  MilestoneReportModal,
   TodayAvailableMoneyModal,
   MonthlyAvailableMoneyModal,
   LinkedAssetsModal,
@@ -221,6 +227,11 @@ const { isOpen: isPacemakerAssistFlowOpen, open: openPacemakerAssistFlow } = use
 const { isOpen: isTodayAvailableMoneyModalOpen } = useModal()
 const { isOpen: isMonthlyAvailableMoneyModalOpen } = useModal()
 const { isOpen: isLinkedAssetsModalOpen, open: openLinkedAssetsModal } = useModal()
+const {
+  isOpen: isMilestoneReportModalOpen,
+  open: openMilestoneReportModal,
+  close: closeMilestoneReportModal,
+} = useModal()
 const { isOpen: isStatusConfirmModalOpen, open: openStatusConfirmModal } = useModal()
 const { isOpen: isShareGoalModalOpen, open: openShareGoalModal } = useModal()
 const {
@@ -230,6 +241,7 @@ const {
 } = useModal()
 
 const statusConfirmMode = ref('pause')
+const selectedMilestone = ref(null)
 const achievementErrorMessage = ref('')
 const previousProgressRate = ref(null)
 
@@ -299,6 +311,11 @@ function handleOpenMonthlyAvailableMoneyModal() {
 
 function handleOpenLinkedAssets() {
   openLinkedAssetsModal()
+}
+
+function handleSelectMilestone(milestone) {
+  selectedMilestone.value = milestone
+  openMilestoneReportModal()
 }
 
 function handleOpenShareGoal() {
@@ -412,6 +429,8 @@ async function handleStatusConfirm() {
 
 // 목표 상세(대시보드 데이터+마일스톤)를 불러오고 사이드바 로드맵 목록과 선택 상태를 맞춤
 async function loadGoalDashboard(goalId) {
+  closeMilestoneReportModal()
+  selectedMilestone.value = null
   previousProgressRate.value = null
   goalStore.selectGoal(goalId)
   let goal

@@ -77,7 +77,18 @@ function milestoneResponse(milestones) {
         milestoneAmount: milestone.targetAmount,
         achieved: milestone.status === 'COMPLETED',
         achievedAt: milestone.status === 'COMPLETED' ? milestone.targetDate + '-01T00:00:00' : null,
-        report: milestone.title ? { title: milestone.title } : null,
+        report: milestone.title
+          ? {
+              milestoneReportId: milestone.milestoneId,
+              status: milestone.status === 'COMPLETED' ? 'COMPLETED' : 'PENDING',
+              title: milestone.title,
+              content:
+                milestone.status === 'COMPLETED'
+                  ? (milestone.reportContent ??
+                    `이번 마일스톤을 안정적으로 달성했어요. 지금까지 만든 저축 흐름을 유지하면 다음 목표에도 무리 없이 도달할 수 있습니다.\n\n최근의 꾸준한 실행이 가장 큰 강점이에요. 다음 구간에서는 현재 저축 속도를 유지하면서 갑작스러운 지출만 한 번 더 점검해 보세요.`)
+                  : null,
+            }
+          : null,
       })),
     },
     error: null,
