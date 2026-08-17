@@ -288,20 +288,20 @@
             "
           >
             <span
-              class="text-xs font-black tracking-[-0.1px]"
-              :class="milestone.status === 'COMPLETED' ? 'text-primary' : 'text-slate-500'"
+              class="text-xs font-bold tracking-[-0.1px]"
+              :class="milestone.status === 'COMPLETED' ? 'text-primary' : 'text-slate-600'"
             >
               {{ formatManwon(milestone.targetAmount) }}원
             </span>
             <span
-              class="text-[11px] font-bold"
-              :class="milestone.status === 'COMPLETED' ? 'text-primary/70' : 'text-slate-400'"
+              class="text-[11px] font-medium"
+              :class="milestone.status === 'COMPLETED' ? 'text-primary/80' : 'text-slate-400'"
             >
               {{ milestone.percentage }}%
             </span>
             <span
               v-if="isLastMilestone(milestone)"
-              class="mt-0.5 flex items-center gap-1 whitespace-nowrap border-t border-slate-100 pt-1 text-[10px] font-bold text-slate-400"
+              class="mt-0.5 flex items-center gap-1 whitespace-nowrap border-t border-slate-100 pt-1 text-[10px] font-normal text-slate-400"
             >
               예상 도착일 {{ formatEndDate(goal.period.endDate) }}
             </span>

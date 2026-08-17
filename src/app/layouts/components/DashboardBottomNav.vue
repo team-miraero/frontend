@@ -37,11 +37,6 @@
                   : 'opacity-50 grayscale'
               "
             />
-            <!-- 복수 목표 보유 시 전환 가능 힌트 닷 -->
-            <span
-              v-if="isRoadmapActiveTab && goalStore.goals.length > 1"
-              class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary ring-2 ring-white"
-            />
           </span>
           <span class="flex max-w-full items-center gap-0.5 truncate">
             {{ getNavLabel(item) }}

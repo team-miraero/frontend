@@ -51,13 +51,13 @@
 
       <!-- 2. 목표 진행 로드맵 카드 (MilestoneProgressBar + MilestoneList) -->
       <section
-        class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-7 md:p-8"
+        class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-7 md:p-8"
         :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''"
       >
         <div class="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-2">
           <div class="flex min-w-0 items-center gap-2.5">
             <span
-              class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm ring-1 ring-primary/20"
+              class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-2xs ring-1 ring-primary/20"
             >
               <svg
                 class="size-3.5"
@@ -73,10 +73,10 @@
               </svg>
             </span>
             <div class="min-w-0 flex-1">
-              <h2 class="text-base font-black tracking-tight text-[#0a192f] sm:text-lg">
+              <h2 class="text-base font-bold tracking-tight text-[#0a192f] sm:text-lg">
                 나의 로드맵 여정
               </h2>
-              <p class="text-xs font-bold text-slate-400">
+              <p class="text-xs font-normal text-slate-400">
                 목표 지점까지 달성한 마일스톤과 주행 현황이에요
               </p>
             </div>
