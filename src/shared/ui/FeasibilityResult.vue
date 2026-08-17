@@ -37,7 +37,9 @@
               >
                 <div class="flex items-start justify-between gap-2">
                   <p class="text-xs font-medium leading-relaxed text-gray-700 break-keep">
-                    <span class="font-bold text-[#0066FF]">💡 월 가능액 산정 기준</span><br />
+                    <span class="inline-flex items-center gap-1 font-bold text-[#0066FF]">
+                      <AppIcon name="lightbulb" size="sm" /> 월 가능액 산정 기준 </span
+                    ><br />
                     최근 3개월 평균 소득에서 고정 지출을 제외한 순수 저축·상환 여력이에요.
                   </p>
                   <button
@@ -126,7 +128,8 @@
       class="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-6"
     >
       <p class="break-keep text-base font-bold leading-relaxed text-gray-900 sm:text-lg">
-        매달 <span class="text-primary">{{ monthlyLabel }}</span>이면 <span class="text-primary">{{ periodLabel }}</span> 뒤 {{ goalLabel }} 달성이 가능해요
+        매달 <span class="text-primary">{{ monthlyLabel }}</span
+        >이면 <span class="text-primary">{{ periodLabel }}</span> 뒤 {{ goalLabel }} 달성이 가능해요
       </p>
 
       <div class="mt-4 grid grid-cols-3 gap-2">
@@ -196,14 +199,21 @@
                     : 'border-2 border-slate-300 bg-white text-transparent'
                 "
               >
-                <svg class="size-3 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg
+                  class="size-3 stroke-[3]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
 
               <span
                 class="text-sm font-bold transition-colors"
-                :class="selectedAlternative === alternative.key ? 'text-[#0066FF]' : 'text-gray-900'"
+                :class="
+                  selectedAlternative === alternative.key ? 'text-[#0066FF]' : 'text-gray-900'
+                "
               >
                 {{ alternative.label }}
               </span>
@@ -292,6 +302,7 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { formatKRWCompact } from '@/shared/lib/money'
+import AppIcon from '@/shared/ui/AppIcon.vue'
 
 const isInfoOpen = ref(false)
 
