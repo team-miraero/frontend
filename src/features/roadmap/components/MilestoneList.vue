@@ -4,7 +4,9 @@
     <!-- 헤더 (모바일 한 줄 최적화 레이아웃) -->
     <div class="flex items-center justify-between gap-2 pb-3 sm:pb-3.5">
       <div class="flex min-w-0 items-center gap-2 sm:gap-2.5">
-        <span class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm ring-1 ring-primary/20">
+        <span
+          class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm ring-1 ring-primary/20"
+        >
           <svg
             class="size-3.5"
             viewBox="0 0 24 24"
@@ -21,7 +23,9 @@
           </svg>
         </span>
         <div class="min-w-0 flex-1">
-          <h3 class="text-sm font-black tracking-tight text-[#0a192f] whitespace-nowrap sm:text-base">
+          <h3
+            class="text-sm font-black tracking-tight text-[#0a192f] whitespace-nowrap sm:text-base"
+          >
             스플릿 기록
           </h3>
           <p class="text-[11px] font-bold text-slate-400 truncate whitespace-nowrap sm:text-xs">
@@ -29,17 +33,23 @@
           </p>
         </div>
       </div>
-      <span class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-500 whitespace-nowrap">
+      <span
+        class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-500 whitespace-nowrap"
+      >
         총 {{ milestones.length }}개 구간
       </span>
     </div>
 
     <!-- 가로 스크롤 스플릿 카드 리스트 (모바일 스냅 스크롤 & 터치 피드백) -->
-    <div ref="scrollContainer" class="no-scrollbar -mx-2 -my-3 flex items-stretch gap-2.5 sm:gap-3 overflow-x-auto px-2 py-3.5 sm:-mx-3 sm:-my-4 sm:px-3 sm:py-4 snap-x snap-mandatory scroll-smooth scroll-px-2 sm:scroll-px-3 touch-pan-x">
+    <div
+      ref="scrollContainer"
+      class="no-scrollbar -mx-2 -my-3 flex items-stretch gap-2.5 sm:gap-3 overflow-x-auto px-2 py-3.5 sm:-mx-3 sm:-my-4 sm:px-3 sm:py-4 snap-x snap-mandatory scroll-smooth scroll-px-2 sm:scroll-px-3 touch-pan-x"
+    >
       <template v-for="(milestone, index) in milestones" :key="milestone.milestoneId">
-        <div
+        <button
+          type="button"
           :data-in-progress="milestone.status === 'IN_PROGRESS' ? 'true' : null"
-          class="group relative flex min-w-[170px] sm:min-w-[175px] flex-1 cursor-pointer flex-col justify-between rounded-2xl border p-3 sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-1 active:translate-y-0 active:scale-[0.97] select-none snap-start"
+          class="group relative flex min-w-[170px] sm:min-w-[175px] flex-1 cursor-pointer flex-col justify-between rounded-2xl border p-3 text-left sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-0 active:scale-[0.97] select-none snap-start"
           :class="[
             milestone.status === 'COMPLETED'
               ? 'border-primary/20 bg-[#f8fbff] hover:border-primary/40 hover:bg-[#f0f6ff] hover:shadow-[0_10px_20px_-4px_rgba(0,102,255,0.10),0_3px_6px_-2px_rgba(0,102,255,0.05)]'
@@ -67,7 +77,11 @@
 
               <span
                 class="flex shrink-0 items-center gap-0.5 text-[10px] font-bold tabular-nums transition-colors duration-200"
-                :class="milestone.status === 'COMPLETED' ? 'text-primary' : 'text-slate-400 group-hover:text-slate-600'"
+                :class="
+                  milestone.status === 'COMPLETED'
+                    ? 'text-primary'
+                    : 'text-slate-400 group-hover:text-slate-600'
+                "
               >
                 <span v-if="milestone.status === 'COMPLETED'" class="text-xs font-black">✓</span>
                 {{ milestone.percentage }}%
@@ -104,22 +118,35 @@
                   :style="{ width: `${segmentProgress(milestone, index)}%` }"
                 />
               </div>
-              <div class="flex items-center justify-between text-[10px] font-bold whitespace-nowrap gap-1">
-                <span class="text-primary tabular-nums shrink-0">{{ segmentProgress(milestone, index) }}% 달성</span>
-                <span class="text-slate-400 tabular-nums shrink-0">{{ formatManwon(remainingToNext(milestone)) }}원 남음</span>
+              <div
+                class="flex items-center justify-between text-[10px] font-bold whitespace-nowrap gap-1"
+              >
+                <span class="text-primary tabular-nums shrink-0"
+                  >{{ segmentProgress(milestone, index) }}% 달성</span
+                >
+                <span class="text-slate-400 tabular-nums shrink-0"
+                  >{{ formatManwon(remainingToNext(milestone)) }}원 남음</span
+                >
               </div>
             </div>
 
             <!-- 완료/예정 상태 텍스트 (한 줄 유지) -->
-            <div v-else class="flex items-center justify-between text-[10px] font-medium text-slate-400 whitespace-nowrap gap-1">
+            <div
+              v-else
+              class="flex items-center justify-between text-[10px] font-medium text-slate-400 whitespace-nowrap gap-1"
+            >
               <span v-if="milestone.status === 'COMPLETED'" class="font-bold text-primary shrink-0">
                 달성 완료 🎉
               </span>
-              <span v-else class="transition-colors group-hover:text-slate-600 shrink-0">도전 대기 중</span>
-              <span v-if="milestone.targetDate" class="shrink-0 tabular-nums">{{ milestone.targetDate }}</span>
+              <span v-else class="transition-colors group-hover:text-slate-600 shrink-0"
+                >도전 대기 중</span
+              >
+              <span v-if="milestone.targetDate" class="shrink-0 tabular-nums">{{
+                milestone.targetDate
+              }}</span>
             </div>
           </div>
-        </div>
+        </button>
       </template>
     </div>
   </div>
@@ -169,7 +196,10 @@ function segmentProgress(milestone, index) {
   const from = props.milestones[index - 1]?.targetAmount ?? 0
   const to = milestone.targetAmount
   if (to <= from) return 100
-  return Math.min(100, Math.max(0, Math.round(((props.goal.currentAmount - from) / (to - from)) * 100)))
+  return Math.min(
+    100,
+    Math.max(0, Math.round(((props.goal.currentAmount - from) / (to - from)) * 100))
+  )
 }
 
 function remainingToNext(milestone) {

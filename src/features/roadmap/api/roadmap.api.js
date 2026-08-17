@@ -8,7 +8,7 @@ import { unwrapApiData } from '@/shared/api/unwrapApiData'
  * @property {number} milestoneAmount
  * @property {boolean} achieved
  * @property {string | null} achievedAt
- * @property {{ title?: string } | null} report
+ * @property {{ milestoneReportId?: number, status?: string, title?: string, content?: string | null } | null} report
  */
 
 /**
@@ -19,7 +19,7 @@ import { unwrapApiData } from '@/shared/api/unwrapApiData'
 export async function getMilestones(goalId) {
   const { data: responseBody } = await client.get(`/goals/${goalId}/milestones`)
   const data = unwrapApiData(responseBody)
-  return mapMilestoneResponses(data.milestones)
+  return mapMilestoneResponses(data?.milestones ?? [])
 }
 
 /**
@@ -37,6 +37,14 @@ export function mapMilestoneResponses(milestones) {
     targetAmount: milestone.milestoneAmount,
     targetDate: milestone.achievedAt ? milestone.achievedAt.slice(0, 10) : null,
     title: milestone.report?.title ?? '',
+    report: milestone.report
+      ? {
+          milestoneReportId: milestone.report.milestoneReportId ?? null,
+          status: milestone.report.status ?? '',
+          title: milestone.report.title ?? '',
+          content: milestone.report.content ?? '',
+        }
+      : null,
     tags: [],
     status: milestone.achieved
       ? 'COMPLETED'
