@@ -9,45 +9,57 @@
       <div class="flex h-full flex-col justify-between">
         <div>
           <!-- 상단 뱃지 + 목표 일시정지/재개 버튼 -->
-          <div class="flex items-center justify-between gap-2">
-            <!-- 진행 중 뱃지 -->
+          <div class="flex items-center justify-between gap-2 min-w-0">
+            <!-- 진행 중 뱃지 (반응형 말줄임 지원) -->
             <span
               v-if="!disabled"
-              class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary"
+              class="inline-flex min-w-0 max-w-[calc(100%-100px)] items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary sm:px-3"
             >
-              <span class="size-1.5 rounded-full bg-primary" />
-              진행 중인 목표
+              <span class="size-1.5 shrink-0 rounded-full bg-primary" />
+              <span class="shrink-0 whitespace-nowrap">진행 중</span>
+              <template v-if="goalName">
+                <span class="size-1.5 shrink-0 rounded-full bg-primary" />
+                <span class="truncate max-w-[110px] font-bold text-primary sm:max-w-[180px] md:max-w-[240px]">
+                  {{ goalName }}
+                </span>
+              </template>
             </span>
-            <!-- 일시정지 뱃지 -->
+            <!-- 일시정지 뱃지 (반응형 말줄임 지원) -->
             <span
               v-else
-              class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500"
+              class="inline-flex min-w-0 max-w-[calc(100%-100px)] items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500 sm:px-3"
             >
-              <span class="size-1.5 rounded-full bg-slate-400" />
-              일시정지된 목표
+              <span class="size-1.5 shrink-0 rounded-full bg-slate-400" />
+              <span class="shrink-0 whitespace-nowrap">일시정지</span>
+              <template v-if="goalName">
+                <span class="size-1.5 shrink-0 rounded-full bg-slate-400" />
+                <span class="truncate max-w-[110px] font-bold text-slate-600 sm:max-w-[180px] md:max-w-[240px]">
+                  {{ goalName }}
+                </span>
+              </template>
             </span>
 
-            <!-- 진행 중일 때: 목표 일시정지 버튼 (보조 버튼) -->
+            <!-- 진행 중일 때: 목표 일시정지 버튼 (보조 버튼, shrink-0으로 찌그러짐 방지) -->
             <button
               v-if="!disabled"
               type="button"
-              class="flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0a192f] active:scale-95 cursor-pointer select-none"
+              class="flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0a192f] active:scale-95 cursor-pointer select-none"
               @click="$emit('pause')"
             >
               <img src="@/assets/icons/goal-pause.svg" alt="" class="size-2.5 opacity-60" />
-              목표 일시정지
+              <span class="whitespace-nowrap">목표 일시정지</span>
             </button>
-            <!-- 일시정지일 때: 목표 재개하기 버튼 (Primary 강조 버튼) -->
+            <!-- 일시정지일 때: 목표 재개하기 버튼 (Primary 강조 버튼, shrink-0) -->
             <button
               v-else
               type="button"
-              class="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-white shadow-[0_2px_8px_rgba(0,102,255,0.28)] transition hover:bg-primary/90 active:scale-95 cursor-pointer select-none"
+              class="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-white shadow-[0_2px_8px_rgba(0,102,255,0.28)] transition hover:bg-primary/90 active:scale-95 cursor-pointer select-none"
               @click="$emit('resume')"
             >
               <svg class="size-2.5 fill-current" viewBox="0 0 24 24">
                 <polygon points="6 4 20 12 6 20 6 4" />
               </svg>
-              목표 재개하기
+              <span class="whitespace-nowrap">목표 재개하기</span>
             </button>
           </div>
 
@@ -288,6 +300,7 @@ import { useCountUp } from '@/shared/composables/useCountUp'
 const props = defineProps({
   pace: { type: Object, required: true },
   progressRate: { type: Number, required: true },
+  goalName: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
   currentAmount: { type: Number, default: 0 },
   goalAmount: { type: Number, default: 0 },

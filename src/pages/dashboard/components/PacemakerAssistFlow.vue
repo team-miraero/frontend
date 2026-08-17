@@ -54,7 +54,11 @@
           class="group flex w-full items-start gap-4 rounded-2xl border border-slate-200 bg-[#f4f8ff] p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/20 hover:bg-blue-50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
           @click="selectStrategy(option.id)"
         >
-          <span class="text-2xl leading-none" aria-hidden="true">{{ option.icon }}</span>
+          <span
+            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#F2F4F6] text-primary"
+          >
+            <AppIcon :name="option.icon" />
+          </span>
           <span class="min-w-0 flex-1">
             <strong class="block text-sm font-bold text-[#0a192f] group-hover:text-primary">
               {{ option.title }}
@@ -286,7 +290,7 @@
           class="flex size-16 items-center justify-center rounded-2xl bg-blue-50 text-3xl"
           aria-hidden="true"
         >
-          {{ successState.icon }}
+          <AppIcon :name="successState.icon" size="xl" />
         </div>
         <h4 class="mt-4 text-lg font-black text-[#0a192f]">{{ successState.title }}</h4>
         <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ successState.description }}</p>
@@ -315,6 +319,7 @@ import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGoalStore } from '@/features/goal/store/goal.store'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import AppIcon from '@/shared/ui/AppIcon.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
 

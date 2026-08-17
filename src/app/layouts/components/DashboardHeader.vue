@@ -171,27 +171,33 @@
         <div ref="roadmapDropdownRef" class="relative flex shrink-0 items-stretch">
           <button
             type="button"
-            class="group relative flex items-center justify-center gap-1.5 px-2 text-sm font-bold transition hover:text-primary"
+            class="group relative flex items-center justify-center gap-1 px-2 text-sm font-bold transition hover:text-primary cursor-pointer select-none"
             :class="isRoadmapActive ? 'text-primary' : 'text-[#0a192f]'"
             aria-haspopup="menu"
             :aria-expanded="isRoadmapDropdownOpen"
-            @click="isRoadmapDropdownOpen = !isRoadmapDropdownOpen"
+            @click="handleRoadmapHeaderClick"
           >
-            로드맵
-            <svg
-              viewBox="0 0 20 20"
-              fill="none"
-              class="size-3.5 transition-transform"
-              :class="isRoadmapDropdownOpen ? 'rotate-180' : ''"
+            <span>로드맵</span>
+            <span
+              class="flex items-center justify-center rounded-full p-0.5 transition hover:bg-slate-100"
+              aria-label="로드맵 목록 열기"
+              @click.stop="isRoadmapDropdownOpen = !isRoadmapDropdownOpen"
             >
-              <path
-                d="m5 7.5 5 5 5-5"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                class="size-3.5 transition-transform duration-200"
+                :class="isRoadmapDropdownOpen ? 'rotate-180 text-primary' : ''"
+              >
+                <path
+                  d="m5 7.5 5 5 5-5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
             <span
               class="absolute inset-x-1 bottom-0 h-0.5 origin-left bg-primary transition-transform duration-300 ease-out group-hover:scale-x-100"
               :class="isRoadmapActive ? 'scale-x-100' : 'scale-x-0'"
@@ -472,6 +478,20 @@ const isRoadmapActive = computed(() =>
 
 function isSelectedGoal(goal) {
   return String(goal.goalId) === String(goalStore.selectedGoalId)
+}
+
+function handleRoadmapHeaderClick() {
+  if (isRoadmapActive.value) {
+    isRoadmapDropdownOpen.value = !isRoadmapDropdownOpen.value
+  } else {
+    isRoadmapDropdownOpen.value = false
+    const targetGoalId = goalStore.selectedGoalId
+    if (targetGoalId) {
+      router.push({ name: ROUTE_NAMES.DASHBOARD_GOAL, params: { goalId: targetGoalId } })
+    } else {
+      router.push({ name: ROUTE_NAMES.DASHBOARD })
+    }
+  }
 }
 
 function toggleDropdown() {

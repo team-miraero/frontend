@@ -27,10 +27,11 @@
       </div>
 
       <!-- 1. 상단 통합 현황 카드 (PaceBanner: 진행 중/일시정지 상태 및 재개 토글 내장) -->
-      <div class="animate-stagger-1">
+      <div>
         <PaceBanner
           :pace="displayedPace"
           :progress-rate="goalStore.currentGoal.progressRate"
+          :goal-name="displayedGoal.goalName"
           :disabled="isGoalPaused"
           :current-amount="goalStore.currentGoal.currentAmount"
           :goal-amount="goalStore.currentGoal.goalAmount"
@@ -50,7 +51,7 @@
 
       <!-- 2. 목표 진행 로드맵 카드 (MilestoneProgressBar + MilestoneList) -->
       <section
-        class="animate-stagger-2 overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-7 md:p-8"
+        class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-7 md:p-8"
         :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''"
       >
         <div class="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-2">
@@ -82,18 +83,18 @@
           </div>
         </div>
 
-        <MilestoneProgressBar :goal="goalStore.currentGoal" :milestones="roadmapStore.milestones" />
+        <MilestoneProgressBar :goal="displayedGoal" :milestones="roadmapStore.milestones" />
 
         <!-- 스플릿 기록 -->
         <div class="mt-3.5 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:mt-4 sm:pt-5">
-          <MilestoneList :milestones="roadmapStore.milestones" :goal="goalStore.currentGoal" />
+          <MilestoneList :milestones="roadmapStore.milestones" :goal="displayedGoal" />
         </div>
       </section>
 
       <!-- 3. 요약 통계 그룹 (자산 현황 카드) -->
-      <div class="animate-stagger-3" :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''">
+      <div :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''">
         <RaceRecordSummary
-          :goal="goalStore.currentGoal"
+          :goal="displayedGoal"
           :assets="goalStore.assets"
           :pacemaker="displayedPacemaker"
           :is-toggling="pacemakerStore.isToggling"
@@ -275,10 +276,11 @@ const displayedPace = computed(() => {
     differenceAmount: Math.max(500000, Math.abs(Number(pace.differenceAmount ?? 0))),
   }
 })
-const assistFlowGoal = computed(() => ({
+const displayedGoal = computed(() => ({
   ...goalStore.currentGoal,
   pace: displayedPace.value,
 }))
+const assistFlowGoal = displayedGoal
 const hasSupplementaryError = computed(
   () =>
     Object.keys(goalStore.dashboardSupplementaryErrors).length > 0 || Boolean(roadmapStore.error)
@@ -497,44 +499,3 @@ watch(
   }
 )
 </script>
-
-<style scoped>
-@keyframes dashboardStaggerUp {
-  0% {
-    opacity: 0;
-    transform: translateY(28px) scale(0.97);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.animate-stagger-1 {
-  animation: dashboardStaggerUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 40ms;
-  will-change: transform, opacity;
-}
-
-.animate-stagger-2 {
-  animation: dashboardStaggerUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 160ms;
-  will-change: transform, opacity;
-}
-
-.animate-stagger-3 {
-  animation: dashboardStaggerUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 280ms;
-  will-change: transform, opacity;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-stagger-1,
-  .animate-stagger-2,
-  .animate-stagger-3 {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
-</style>

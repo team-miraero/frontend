@@ -13,9 +13,10 @@
         <div>
           <div class="flex items-center justify-between">
             <span
-              class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap"
-              >☀️ 오늘</span
+              class="flex items-center gap-1 text-xs sm:text-sm font-bold text-slate-500 whitespace-nowrap"
             >
+              <AppIcon name="sun" size="sm" /> 오늘
+            </span>
           </div>
           <p
             class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap"
@@ -24,7 +25,7 @@
           </p>
         </div>
         <p class="pt-1 text-[10px] leading-tight text-slate-400 sm:text-xs">
-          오늘 하루 안심하고 쓸 수 있는 돈 🎯
+          오늘 하루 안심하고 쓸 수 있는 돈 <span class="font-tossface">🎯</span>
         </p>
       </button>
 
@@ -36,9 +37,10 @@
         <div>
           <div class="flex items-center justify-between">
             <span
-              class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap"
-              >📅 이번 달</span
+              class="flex items-center gap-1 text-xs sm:text-sm font-bold text-slate-500 whitespace-nowrap"
             >
+              <span class="font-tossface text-base">📅</span> 이번 달
+            </span>
           </div>
           <p
             class="pt-1.5 text-sm font-black text-[#0a192f] sm:pt-3 sm:text-xl lg:text-2xl whitespace-nowrap"
@@ -47,7 +49,7 @@
           </p>
         </div>
         <p class="pt-1 text-[10px] leading-tight text-slate-400 sm:text-xs">
-          고정지출 뺀 이번 달 순수 여유금 🍀
+          고정지출 뺀 이번 달 순수 여유금 <span class="font-tossface">🍀</span>
         </p>
       </button>
     </div>
@@ -56,6 +58,7 @@
 
 <script setup>
 import { formatKRW } from '@/shared/lib/money'
+import AppIcon from '@/shared/ui/AppIcon.vue'
 defineProps({
   monthly: {
     type: Object,

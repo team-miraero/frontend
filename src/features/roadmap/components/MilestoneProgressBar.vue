@@ -419,7 +419,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import rabbitImage from '@/assets/images/rabbit_new.png'
+import rabbitImage from '@/assets/images/rabbit_3d.png'
 import lamaImage from '@/assets/images/lama_new.png'
 import bearImage from '@/assets/images/bear_new.png'
 import duckImage from '@/assets/images/duck_new.png'

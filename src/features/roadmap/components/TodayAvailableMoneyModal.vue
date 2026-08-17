@@ -7,7 +7,9 @@
   >
     <div class="flex items-start justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
       <div>
-        <p class="text-xs font-bold text-slate-400">☀️ 오늘의 여유자금</p>
+        <p class="inline-flex items-center gap-1 text-xs font-bold text-slate-400">
+          <AppIcon name="sun" size="sm" /> 오늘의 여유자금
+        </p>
         <p class="pt-1 text-2xl font-black tracking-[-0.72px] text-primary">
           {{ formatKRW(daily.todayAvailableMoney) }}
         </p>
@@ -57,6 +59,7 @@
 <script setup>
 import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import AppIcon from '@/shared/ui/AppIcon.vue'
 import { formatKRW } from '@/shared/lib/money'
 
 const props = defineProps({

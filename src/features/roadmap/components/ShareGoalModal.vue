@@ -6,21 +6,17 @@
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <div class="max-h-[90vh] w-full overflow-y-auto">
-      <div class="grid grid-cols-3 items-center border-b border-slate-100 px-3 sm:px-5 py-3">
-        <button type="button" class="justify-self-start text-xl text-slate-700" @click="close">
-          ‹
-        </button>
-        <p
-          class="justify-self-center whitespace-nowrap text-center text-sm sm:text-base font-bold text-[#0a192f]"
-        >
-          친구에게 공유하기
-        </p>
+      <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">
+        <h3 class="text-sm font-bold text-[#0a192f] sm:text-base">친구에게 공유하기</h3>
         <button
           type="button"
-          class="justify-self-end text-sm font-bold text-primary"
+          class="flex size-7 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 cursor-pointer select-none"
+          aria-label="닫기"
           @click="close"
         >
-          완료
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="size-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12" />
+          </svg>
         </button>
       </div>
 

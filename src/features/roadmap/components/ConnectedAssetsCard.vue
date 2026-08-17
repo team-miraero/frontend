@@ -2,7 +2,7 @@
 <template>
   <button
     type="button"
-    class="group flex flex-col justify-between rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 text-left transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-[0_6px_20px_rgba(0,102,255,0.08)] active:scale-[0.98] cursor-pointer break-keep"
+    class="group flex flex-col justify-between rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 text-left transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary/40 hover:bg-white hover:shadow-md active:scale-[0.98] cursor-pointer break-keep select-none"
     @click="$emit('open-detail')"
   >
     <div>
