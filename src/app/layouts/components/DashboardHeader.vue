@@ -105,11 +105,16 @@
                   class="group relative flex min-h-[64px] cursor-pointer items-center gap-3 rounded-xl border border-slate-100 bg-[#f8fbff] p-3 transition hover:bg-blue-50/60 hover:border-blue-200"
                   @click="handleNotificationClick(item)"
                 >
-                  <!-- 이모지 뱃지 아이콘 -->
+                  <!-- 테마별 컬러 틴트 아이콘 -->
                   <div
-                    class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-200/80"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs"
+                    :class="getNotificationIconStyle(item.type, item.badgeIcon).container"
                   >
-                    <span>{{ item.badgeIcon || '💬' }}</span>
+                    <AppIcon
+                      :name="getNotificationIconStyle(item.type, item.badgeIcon).icon"
+                      size="sm"
+                      :class="getNotificationIconStyle(item.type, item.badgeIcon).iconColor"
+                    />
                   </div>
 
                   <!-- 내용 -->
@@ -360,11 +365,16 @@
                   class="group relative flex min-h-[68px] cursor-pointer items-center gap-3 rounded-xl border border-slate-100 bg-[#f8fbff] p-3 transition hover:bg-blue-50/60 hover:border-blue-200"
                   @click="handleNotificationClick(item)"
                 >
-                  <!-- 큼직한 이모지 뱃지 아이콘 -->
+                  <!-- 테마별 컬러 틴트 아이콘 -->
                   <div
-                    class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-200/80"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs"
+                    :class="getNotificationIconStyle(item.type, item.badgeIcon).container"
                   >
-                    <span>{{ item.badgeIcon || '💬' }}</span>
+                    <AppIcon
+                      :name="getNotificationIconStyle(item.type, item.badgeIcon).icon"
+                      size="sm"
+                      :class="getNotificationIconStyle(item.type, item.badgeIcon).iconColor"
+                    />
                   </div>
 
                   <!-- 내용 -->
@@ -435,6 +445,36 @@ import { useGoalStore } from '@/features/goal'
 import { usePacemakerToast } from '@/features/pacemaker'
 import { NAV_ITEMS } from '@/shared/constants/navigation'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import AppIcon from '@/shared/ui/AppIcon.vue'
+
+function getNotificationIconStyle(type, badgeIcon) {
+  if (type === 'STREAK' || badgeIcon === '🔥') {
+    return {
+      container: 'bg-amber-50 border border-amber-200/80 text-amber-500 shadow-amber-500/10',
+      icon: 'fire',
+      iconColor: 'text-amber-500',
+    }
+  }
+  if (type === 'SAVING' || badgeIcon === '💰' || badgeIcon === '💸') {
+    return {
+      container: 'bg-blue-50 border border-blue-200/80 text-primary shadow-blue-500/10',
+      icon: 'money',
+      iconColor: 'text-primary',
+    }
+  }
+  if (type === 'ACHIEVE' || badgeIcon === '🎯') {
+    return {
+      container: 'bg-emerald-50 border border-emerald-200/80 text-emerald-600 shadow-emerald-500/10',
+      icon: 'target',
+      iconColor: 'text-emerald-600',
+    }
+  }
+  return {
+    container: 'bg-[#f0f6ff] border border-blue-100 text-primary shadow-blue-500/10',
+    icon: badgeIcon || 'check',
+    iconColor: 'text-primary',
+  }
+}
 
 const route = useRoute()
 const router = useRouter()

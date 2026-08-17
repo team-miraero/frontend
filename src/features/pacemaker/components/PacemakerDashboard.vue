@@ -108,9 +108,43 @@
 
           <!-- 🔥 연속 일수 뱃지 -->
           <span
-            class="shrink-0 inline-flex items-center gap-1 sm:gap-1.5 rounded-full bg-orange-50 border border-orange-200/70 px-2.5 py-1 text-xs font-black text-orange-600 shadow-2xs whitespace-nowrap"
+            class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black shadow-2xs whitespace-nowrap transition-colors"
+            :class="
+              pacemaker.currentStreak > 0
+                ? 'bg-orange-50 border border-orange-200/80 text-orange-600'
+                : 'bg-slate-100 border border-slate-200/80 text-slate-500'
+            "
           >
-            <span>🔥</span>
+            <!-- 선명한 듀오톤 SVG 불꽃 -->
+            <svg
+              v-if="pacemaker.currentStreak > 0"
+              class="size-3.5 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 22C16.4183 22 20 18.4183 20 14C20 10.5 17.5 7.5 15 4C15 7 13.5 8 12.5 9C11.5 6 9 3 9 2C5.5 6.5 4 10 4 14C4 18.4183 7.58172 22 12 22Z"
+                fill="#FF6B00"
+              />
+              <path
+                d="M12 20C14.2091 20 16 18.2091 16 16C16 13.8 14.5 12 13 10.5C12.5 12 11.5 12.5 11 13C10.5 11.5 9 10 9 9.5C7.5 11.5 7 13.5 7 16C7 18.2091 8.79086 20 12 20Z"
+                fill="#FFD233"
+              />
+            </svg>
+            <svg
+              v-else
+              class="size-3.5 shrink-0 text-slate-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 22c4 0 7-3 7-7 0-3-2-6-5-9 0 3-1 4-2 5-1-3-3-5-5-7 1 5-2 7-2 11 0 4 3 7 7 7Z" />
+            </svg>
             <span>{{ formatNumber(pacemaker.currentStreak) }}일 연속</span>
           </span>
         </div>

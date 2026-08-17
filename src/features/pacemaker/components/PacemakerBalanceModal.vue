@@ -34,8 +34,24 @@
         </p>
         <div class="relative flex items-center gap-2 pt-2 text-xs text-white/70">
           <span>오늘 +{{ formatNumber(pacemaker.todaySavingAmount) }}원</span>
-          <span class="size-1 rounded-full bg-white/40" />
-          <span>🔥 연속 {{ pacemaker.currentStreak }}일</span>
+          <span class="inline-flex items-center gap-1">
+            <svg
+              class="size-3.5 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 22C16.4183 22 20 18.4183 20 14C20 10.5 17.5 7.5 15 4C15 7 13.5 8 12.5 9C11.5 6 9 3 9 2C5.5 6.5 4 10 4 14C4 18.4183 7.58172 22 12 22Z"
+                fill="#FF6B00"
+              />
+              <path
+                d="M12 20C14.2091 20 16 18.2091 16 16C16 13.8 14.5 12 13 10.5C12.5 12 11.5 12.5 11 13C10.5 11.5 9 10 9 9.5C7.5 11.5 7 13.5 7 16C7 18.2091 8.79086 20 12 20Z"
+                fill="#FFD233"
+              />
+            </svg>
+            <span>연속 {{ pacemaker.currentStreak }}일</span>
+          </span>
         </div>
       </div>
 
