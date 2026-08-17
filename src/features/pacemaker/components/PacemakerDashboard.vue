@@ -1,17 +1,15 @@
 <template>
-  <div
-    class="mx-auto flex w-full max-w-[900px] flex-col gap-6 px-4 py-6 pb-16 sm:px-8 lg:px-10 lg:py-8"
-  >
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <p class="mb-1 text-xs font-bold text-slate-400">페이스메이커 저금통</p>
-        <h2 class="text-2xl font-black tracking-[-0.03em] text-[#0a192f]">
+  <div class="page-container-narrow pb-10 pt-4 sm:pb-14 sm:pt-6 flex flex-col gap-6 sm:gap-8">
+    <div class="flex items-center justify-between gap-2.5 sm:gap-4">
+      <div class="min-w-0 flex-1">
+        <p class="mb-0.5 text-xs font-bold text-slate-400 sm:mb-1">페이스메이커 저금통</p>
+        <h2 class="text-xl font-black tracking-tight text-[#0a192f] whitespace-nowrap sm:text-2xl">
           오늘까지 모인 여유자금
         </h2>
       </div>
       <button
         type="button"
-        class="shrink-0 rounded-full border border-[#c5dcff] bg-[#eaf2ff] px-4 py-2 text-xs font-bold text-primary transition hover:bg-[#dceaff] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
+        class="shrink-0 rounded-full border border-[#c5dcff] bg-[#eaf2ff] px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-[#dceaff] active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:px-4 sm:py-2 cursor-pointer select-none"
         @click="$emit('edit-max-amount')"
       >
         ⚙ 상한선 수정
@@ -77,46 +75,76 @@
     </section>
 
     <section
-      class="rounded-[20px] border border-slate-200 bg-white px-5 py-5 sm:px-6"
+      class="rounded-[20px] border border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5"
       aria-labelledby="streak-title"
     >
-      <div class="mb-4 flex items-center justify-between gap-3">
-        <div class="flex items-center gap-1.5">
-          <div>
-            <div class="flex items-center gap-1.5">
-              <h3 id="streak-title" class="text-sm font-black text-[#0a192f]">
-                {{ isMonthlyStreak ? '이번 달 자동 저축 스트릭' : '이번 주 자동 저축 스트릭' }}
-              </h3>
-              <button
-                type="button"
-                class="text-xs leading-none text-slate-400"
-                :aria-label="isMonthlyStreak ? '주간 스트릭 보기' : '월간 스트릭 보기'"
-                @click="isMonthlyStreak = !isMonthlyStreak"
+      <div class="mb-4 flex flex-col gap-1">
+        <!-- 상단 헤더 행: 타이틀/전환 버튼 + 연속 일수 뱃지 수직 중앙 정렬 -->
+        <div class="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            class="group inline-flex min-w-0 items-center gap-1.5 sm:gap-2 text-left outline-none cursor-pointer select-none"
+            :aria-label="isMonthlyStreak ? '주간 스트릭 보기로 전환' : '월간 달력 보기로 전환'"
+            @click="isMonthlyStreak = !isMonthlyStreak"
+          >
+            <h3 id="streak-title" class="truncate text-sm sm:text-base font-black text-[#0a192f] transition-colors group-hover:text-primary">
+              {{ isMonthlyStreak ? '이번 달 자동 저축 달력' : '이번 주 자동 저축 스트릭' }}
+            </h3>
+            <span
+              class="flex size-5 sm:size-6 shrink-0 items-center justify-center rounded-full bg-slate-100/90 text-slate-500 transition-all duration-200 group-hover:bg-primary/10 group-hover:text-primary shadow-2xs"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                class="size-3 sm:size-3.5 transition-transform duration-200"
+                :class="isMonthlyStreak ? 'rotate-180 text-primary' : ''"
               >
-                {{ isMonthlyStreak ? '⌃' : '⌄' }}
-              </button>
-            </div>
-            <p class="mt-0.5 text-[11px] font-medium text-slate-400">{{ formatTodayLabel }} 기준</p>
-          </div>
+                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+              </svg>
+            </span>
+          </button>
+
+          <!-- 🔥 연속 일수 뱃지 -->
+          <span
+            class="shrink-0 inline-flex items-center gap-1 sm:gap-1.5 rounded-full bg-orange-50 border border-orange-200/70 px-2.5 py-1 text-xs font-black text-orange-600 shadow-2xs whitespace-nowrap"
+          >
+            <span>🔥</span>
+            <span>{{ formatNumber(pacemaker.currentStreak) }}일 연속</span>
+          </span>
         </div>
-        <span class="text-xs font-black text-primary">
-          🔥 {{ formatNumber(pacemaker.currentStreak) }}일 연속
-        </span>
+
+        <!-- 하단 안내 문구 -->
+        <p class="text-[11px] font-medium text-slate-400">
+          {{ isMonthlyStreak ? '클릭하여 주간 스트릭으로 접기' : '클릭하여 월간 달력으로 펼치기' }} · {{ formatTodayLabel }} 기준
+        </p>
       </div>
 
-      <div v-if="!isMonthlyStreak" class="grid grid-cols-7 gap-2">
-        <div v-for="day in weekDays" :key="day.label" class="flex flex-col items-center gap-1.5">
+      <div v-if="!isMonthlyStreak" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+        <div v-for="day in weekDays" :key="day.label" class="flex flex-col items-center gap-1 sm:gap-1.5">
           <div
-            class="flex size-9 items-center justify-center rounded-full text-xs font-black"
+            class="flex size-8 sm:size-10 items-center justify-center rounded-full text-xs font-black transition-all duration-150"
             :class="
-              day.status === 'SUCCESS' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-300'
+              day.status === 'SUCCESS'
+                ? 'bg-primary text-white shadow-xs scale-105'
+                : 'bg-slate-100 text-slate-300'
             "
           >
-            {{ day.status === 'SUCCESS' ? '✓' : '—' }}
+            <svg
+              v-if="day.status === 'SUCCESS'"
+              class="size-3.5 sm:size-4 stroke-[3]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span v-else class="font-bold text-xs">—</span>
           </div>
           <span
-            class="text-xs font-bold"
-            :class="day.status === 'SUCCESS' ? 'text-[#0a192f]' : 'text-slate-300'"
+            class="text-[11px] sm:text-xs font-bold"
+            :class="day.status === 'SUCCESS' ? 'text-[#0a192f]' : 'text-slate-400'"
           >
             {{ day.label }}
           </span>
@@ -130,7 +158,7 @@
           <span v-for="(day, index) in monthDays" :key="day?.date ?? `empty-${index}`">
             <span
               v-if="day"
-              class="mx-auto flex size-7 items-center justify-center rounded-full text-[10px] font-bold"
+              class="mx-auto flex size-7 items-center justify-center rounded-full text-[10px] font-bold transition-all"
               :class="monthDayClass(day)"
             >
               {{ day.day }}
@@ -139,7 +167,7 @@
         </div>
       </div>
 
-      <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400">
+      <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400 border-t border-slate-100 pt-3">
         <span>{{ monthLabel }} 자동 저축</span>
         <span class="font-black text-primary">{{ formatNumber(monthlySuccessCount) }}회 성공</span>
       </div>
@@ -180,9 +208,9 @@
           <div class="flex items-center justify-between gap-3">
             <div class="flex min-w-0 items-center gap-3">
               <div
-                class="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-[#eaf2ff] text-base"
+                class="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-[#F2F4F6] text-primary"
               >
-                {{ group.icon }}
+                <GoalTypeIcon :goal-type="group.goalType" />
               </div>
               <div class="min-w-0">
                 <p class="truncate text-sm font-black text-[#0a192f]">{{ group.goalName }}</p>
@@ -338,7 +366,7 @@ import { usePacemakerDeposit } from '@/features/pacemaker/composables/usePacemak
 import PacemakerDepositModal from '@/features/pacemaker/components/PacemakerDepositModal.vue'
 import PacemakerDepositSuccessModal from '@/features/pacemaker/components/PacemakerDepositSuccessModal.vue'
 import { useModal } from '@/shared/composables/useModal'
-import { GOAL_TYPE_ICON } from '@/features/pacemaker/constants/pacemaker.constants'
+import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
 defineEmits(['edit-max-amount'])
 
@@ -415,12 +443,7 @@ const formatTodayLabel = computed(() => {
 const monthLabel = computed(() => `${referenceDate.value.split('-')[1]}월`)
 const monthlySuccessCount = computed(() => pacemaker.value.monthlySuccessCount)
 
-const accountGroups = computed(() =>
-  pacemakerStore.depositTargets.map((group) => ({
-    ...group,
-    icon: group.icon ?? goalIcon(group.goalType),
-  }))
-)
+const accountGroups = computed(() => pacemakerStore.depositTargets)
 
 function selectedDepositAsset(group) {
   const selectedId = selectedAssetIds.value[group.goalId] ?? group.depositAssets?.[0]?.assetId
@@ -517,10 +540,6 @@ function describeHistory(item) {
     return item.description ?? '하루 여유자금 자동 저축'
   }
   return item.description ?? '여유자금 없음 — 저축 건너뜀'
-}
-
-function goalIcon(goalType) {
-  return GOAL_TYPE_ICON[goalType] ?? '🎯'
 }
 
 function monthDayClass(day) {

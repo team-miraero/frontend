@@ -114,13 +114,12 @@
                   :key="transaction.transactionId"
                   class="flex items-center gap-3 border-b border-[#EEF2F6] py-3.5 last:border-b-0"
                 >
-                  <span
-                    class="flex size-10 shrink-0 items-center justify-center rounded-full text-lg"
-                    :style="{ backgroundColor: categoryMeta(transaction.categoryName).softColor }"
-                    aria-hidden="true"
-                  >
-                    {{ categoryMeta(transaction.categoryName).icon }}
-                  </span>
+                  <SpendingCategoryIcon
+                    :icon="categoryMeta(transaction.categoryName).icon"
+                    :category-id="categoryMeta(transaction.categoryName).id"
+                    :accent="categoryMeta(transaction.categoryName).accent"
+                    size="md"
+                  />
 
                   <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-semibold text-[#0A192F]">
@@ -159,6 +158,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
+import SpendingCategoryIcon from '@/features/spending/components/SpendingCategoryIcon.vue'
 import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
 import { SPENDING_CATEGORIES } from '@/features/spending/constants/spending.constants'
 

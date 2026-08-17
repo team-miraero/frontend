@@ -24,7 +24,7 @@
           <div
             class="mr-3 flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl shadow-sm ring-1 ring-slate-200/80"
           >
-            <span>{{ toast.badgeIcon || '💬' }}</span>
+            <AppIcon :name="toast.badgeIcon || 'target'" />
           </div>
 
           <!-- 알림 메인 텍스트 영역 -->
@@ -38,7 +38,9 @@
               <!-- Hover Swap 영역: 평소엔 '방금', 마우스 대면 X 버튼으로 교체 -->
               <div class="relative shrink-0 flex items-center justify-end min-w-[28px] h-4">
                 <!-- 평소: '방금' 텍스트 -->
-                <span class="text-[11px] font-medium text-[#8e8e93] transition-opacity duration-200 group-hover:opacity-0">
+                <span
+                  class="text-[11px] font-medium text-[#8e8e93] transition-opacity duration-200 group-hover:opacity-0"
+                >
                   방금
                 </span>
 
@@ -49,7 +51,13 @@
                   aria-label="닫기"
                   @click.stop="emit('remove', toast.id)"
                 >
-                  <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <svg
+                    class="size-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -68,6 +76,7 @@
 </template>
 
 <script setup>
+import AppIcon from '@/shared/ui/AppIcon.vue'
 defineProps({
   toastList: {
     type: Array,

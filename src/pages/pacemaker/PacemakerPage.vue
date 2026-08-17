@@ -3,20 +3,12 @@
     <section
       v-if="isLoading"
       class="mx-auto flex min-h-[calc(100vh-89px)] w-full max-w-[800px] items-center justify-center px-5 py-16"
-      aria-live="polite"
-      aria-busy="true"
     >
-      <div class="flex flex-col items-center text-center" role="status">
-        <div class="relative size-12" aria-hidden="true">
-          <div class="absolute inset-0 rounded-full border-4 border-[#e6effc]" />
-          <div
-            class="absolute inset-0 rounded-full border-4 border-transparent border-t-primary motion-safe:animate-spin"
-          />
-          <div class="absolute inset-[15px] rounded-full bg-primary/10" />
-        </div>
-        <p class="mt-4 text-sm font-black text-[#0a192f]">페이스메이커를 확인하고 있어요</p>
-        <p class="mt-1 text-xs text-slate-400">나에게 맞는 화면을 준비할게요.</p>
-      </div>
+      <LoadingSpinner
+        message="페이스메이커를 확인하고 있어요"
+        sub-message="나에게 맞는 화면을 준비할게요."
+        size="lg"
+      />
     </section>
 
     <section
@@ -79,7 +71,7 @@
 
     <div
       v-else-if="pacemakerStore.pacemakerStatus?.registered === false"
-      class="mx-auto flex w-full max-w-[800px] flex-col gap-6 px-4 py-6 pb-14 sm:gap-8 sm:px-8 sm:py-10 lg:px-10 lg:pb-20"
+      class="page-container-narrow pb-10 pt-4 sm:pb-14 sm:pt-6 flex flex-col gap-6 sm:gap-8"
     >
       <!-- 와이어프레임 Hero card -->
       <section
@@ -139,7 +131,11 @@
             class="flex gap-4 rounded-[20px] border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] motion-safe:animate-fade-in-up md:flex-col md:gap-3"
             :style="{ animationDelay: `${100 + index * 80}ms` }"
           >
-            <span class="shrink-0 text-2xl" aria-hidden="true">{{ feature.icon }}</span>
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#F2F4F6] text-primary"
+            >
+              <AppIcon :name="feature.icon" />
+            </span>
             <div>
               <h3 class="mb-1 text-sm font-bold text-[#0a192f]">{{ feature.title }}</h3>
               <p class="text-xs leading-relaxed text-slate-500">{{ feature.description }}</p>
@@ -227,6 +223,8 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { PacemakerDashboard, usePacemakerStore } from '@/features/pacemaker'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
+import AppIcon from '@/shared/ui/AppIcon.vue'
 
 const router = useRouter()
 const pacemakerStore = usePacemakerStore()

@@ -1,6 +1,6 @@
 <template>
   <section class="h-full" aria-labelledby="spending-peer-title">
-    <article class="h-full rounded-2xl border border-[#E2E8F0] bg-white p-5">
+    <article class="h-full rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
       <h2 id="spending-peer-title" class="sr-only">또래 지출과 비교</h2>
 
       <div
@@ -16,10 +16,10 @@
             v-for="basis in SPENDING_COMPARISON_BASES"
             :key="basis.id"
             type="button"
-            class="whitespace-nowrap rounded-lg px-1 py-2 text-[9px] font-semibold transition-colors sm:px-2 sm:text-xs"
+            class="whitespace-nowrap rounded-lg px-1 py-2 text-[9px] font-semibold transition-all duration-150 sm:px-2 sm:text-xs"
             :class="
               selectedComparisonBasis === basis.id
-                ? 'bg-white text-[#0066FF] shadow-sm'
+                ? 'bg-white text-[#0066FF] shadow-sm font-bold'
                 : 'text-[#64748B]'
             "
             :aria-pressed="selectedComparisonBasis === basis.id"
@@ -38,10 +38,10 @@
             v-for="type in categoryTypes"
             :key="type.id"
             type="button"
-            class="whitespace-nowrap rounded-lg px-1 py-2 text-[9px] font-semibold transition-colors sm:px-2 sm:text-xs"
+            class="whitespace-nowrap rounded-lg px-1 py-2 text-[9px] font-semibold transition-all duration-150 sm:px-2 sm:text-xs"
             :class="
               selectedCategoryType === type.id
-                ? 'bg-white text-[#0066FF] shadow-sm'
+                ? 'bg-white text-[#0066FF] shadow-sm font-bold'
                 : 'text-[#64748B]'
             "
             :aria-pressed="selectedCategoryType === type.id"
@@ -51,21 +51,39 @@
           </button>
         </div>
 
-        <label class="min-w-0 text-xs font-medium text-[#64748B]">
-          <span class="sr-only">비교 그룹</span>
+        <div class="relative min-w-0">
+          <label for="spending-peer-group-select" class="sr-only">비교 그룹</label>
           <select
+            id="spending-peer-group-select"
             v-model="selectedPeerGroupId"
-            class="w-[76px] rounded-lg border border-[#D6E4FF] bg-[#F8FBFF] px-1.5 py-2 text-[10px] font-semibold text-[#0A192F] outline-none focus:border-[#0066FF] sm:w-auto sm:px-3 sm:text-xs"
+            class="w-[88px] appearance-none cursor-pointer rounded-xl border border-[#D6E4FF] bg-[#F8FBFF] py-2 pl-2 pr-6 text-[10px] font-bold text-[#0A192F] shadow-2xs outline-none transition-all duration-150 hover:border-[#0066FF]/60 hover:bg-[#F0F6FF] focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/20 sm:w-[124px] sm:py-2 sm:pl-3 sm:pr-7 sm:text-xs"
           >
             <option v-for="group in peerGroupOptions" :key="group.id" :value="group.id">
               {{ group.label }}
             </option>
           </select>
-        </label>
+          <div class="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-[#0066FF] sm:right-2">
+            <svg
+              class="h-3 w-3 sm:h-3.5 sm:w-3.5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+        </div>
       </div>
 
-      <div v-if="comparisonItems.length > 0" class="mt-4 rounded-xl bg-[#F4F8FF] px-4 py-3">
-        <p class="text-sm font-semibold text-[#0A192F]">
+      <div
+        v-if="comparisonItems.length > 0"
+        class="mt-4 flex min-h-[64px] flex-col justify-center rounded-xl border border-primary/10 bg-[#F4F8FF] px-3.5 py-2.5 sm:px-4 sm:py-3"
+      >
+        <p class="text-xs font-bold tracking-tight text-[#0A192F] break-keep sm:text-sm">
           {{ selectedPeerGroupLabel }} {{ peerComparisonLabel }}보다
 
           <strong :class="totalDifferenceClass">
@@ -74,26 +92,25 @@
           </strong>
         </p>
 
-        <p class="mt-1 text-xs text-[#64748B]">
+        <p class="mt-1 text-[11px] text-[#64748B] break-keep sm:text-xs">
           가장 차이가 큰 항목은 {{ largestDifferenceCategoryNames }}{{ categoryNamesEnding }}.
         </p>
       </div>
 
-      <ul v-if="comparisonItems.length > 0" class="mt-2 divide-y divide-[#EEF2F7]">
+      <ul v-if="comparisonItems.length > 0" class="mt-2 divide-y divide-slate-100">
         <li
           v-for="category in comparisonItems"
           :key="category.id"
-          class="grid min-w-0 grid-cols-[28px_36px_minmax(100px,1fr)_52px] items-center gap-1.5 py-4 first:pt-2 last:pb-0 sm:grid-cols-[32px_56px_minmax(140px,1fr)_64px] sm:gap-3"
+          class="grid min-w-0 grid-cols-[28px_36px_minmax(100px,1fr)_52px] items-center gap-1.5 py-3.5 first:pt-2 last:pb-0 sm:grid-cols-[32px_56px_minmax(140px,1fr)_64px] sm:gap-3"
         >
-          <span
-            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs sm:h-8 sm:w-8 sm:text-sm"
-            :style="{ backgroundColor: category.softColor }"
-            aria-hidden="true"
-          >
-            {{ category.icon }}
-          </span>
+          <SpendingCategoryIcon
+            :icon="category.icon"
+            :category-id="category.id"
+            :accent="category.accent"
+            size="sm"
+          />
 
-          <span class="truncate text-[11px] font-semibold text-[#0A192F] sm:text-xs">
+          <span class="truncate text-xs font-bold text-[#0A192F]">
             {{ category.name }}
           </span>
 
@@ -105,14 +122,14 @@
             <div
               class="grid grid-cols-[28px_minmax(0,1fr)_42px] items-center gap-1 text-[9px] text-[#64748B] sm:grid-cols-[32px_minmax(0,1fr)_48px] sm:text-[10px]"
             >
-              <span>나</span>
+              <span class="font-bold">나</span>
               <div class="h-1.5 overflow-hidden rounded-full bg-[#EEF2F7]">
                 <div
-                  class="h-full rounded-full bg-[#0066FF]"
+                  class="h-full rounded-full bg-[#0066FF] transition-all duration-300 ease-out"
                   :style="{ width: `${category.currentWidth}%` }"
                 />
               </div>
-              <strong class="whitespace-nowrap text-right text-[#0A192F]"
+              <strong class="whitespace-nowrap text-right font-black tabular-nums text-[#0A192F]"
                 >{{ formatAmount(category.current) }}만원</strong
               >
             </div>
@@ -121,20 +138,20 @@
               class="grid grid-cols-[28px_minmax(0,1fr)_42px] items-center gap-1 text-[9px] text-[#64748B] sm:grid-cols-[32px_minmax(0,1fr)_48px] sm:text-[10px]"
             >
               <span>평균</span>
-              <div class="h-1.5 overflow-hidden rounded-full bg-[#F1F5F9]">
+              <div class="h-1.5 overflow-hidden rounded-full bg-[#EEF2F7]">
                 <div
-                  class="h-full rounded-full bg-[#CBD5E1]"
+                  class="h-full rounded-full bg-[#94A3B8] transition-all duration-300 ease-out"
                   :style="{ width: `${category.peerWidth}%` }"
                 />
               </div>
-              <strong class="whitespace-nowrap text-right text-[#64748B]"
-                >{{ formatAmount(category.peerAmount) }}만원</strong
+              <span class="whitespace-nowrap text-right tabular-nums text-[#64748B]"
+                >{{ formatAmount(category.peerAmount) }}만원</span
               >
             </div>
           </div>
 
           <span
-            class="whitespace-nowrap text-right text-[10px] font-semibold sm:text-[11px]"
+            class="whitespace-nowrap text-right text-xs font-black tabular-nums"
             :class="getDifferenceClass(category.difference)"
           >
             {{ formatDifference(category.difference) }}
@@ -154,6 +171,7 @@
 
 <script setup>
 import { computed, toRef } from 'vue'
+import SpendingCategoryIcon from '@/features/spending/components/SpendingCategoryIcon.vue'
 import { usePeerSpendingComparison } from '@/features/spending/composables/useSpendingComparisons'
 import {
   SPENDING_CATEGORY_TYPES,
@@ -188,11 +206,11 @@ const {
 } = usePeerSpendingComparison(toRef(props, 'summary'))
 
 const peerComparisonLabel = computed(() =>
-  selectedComparisonBasis.value === 'AGE' ? '또래' : '소득 구간 평균'
+  selectedComparisonBasis.value === 'AGE' ? '또래' : '소득평균'
 )
 
 const peerAverageLabel = computed(() =>
-  selectedComparisonBasis.value === 'AGE' ? '또래 평균' : '소득구간 평균'
+  selectedComparisonBasis.value === 'AGE' ? '또래 평균' : '소득평균'
 )
 
 const categoryNamesEnding = computed(() => {

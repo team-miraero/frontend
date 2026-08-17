@@ -102,7 +102,11 @@
             class="flex items-center justify-between rounded-2xl border border-[#edf2ff] bg-[#f8fbff] px-4 py-3"
           >
             <div class="flex items-center gap-3">
-              <span class="text-lg leading-none">{{ goalIcon(goal.goalType) }}</span>
+              <span
+                class="flex size-8 items-center justify-center rounded-lg bg-[#F2F4F6] text-primary"
+              >
+                <GoalTypeIcon :goal-type="goal.goalType" size="sm" />
+              </span>
               <div>
                 <p class="text-xs font-bold text-[#0a192f]">{{ goal.goalName }}</p>
                 <p v-if="goal.withdrawalAccounts?.[0]" class="text-xs text-slate-400">
@@ -150,7 +154,7 @@
 
 <script setup>
 import BaseModal from '@/shared/ui/BaseModal.vue'
-import { GOAL_TYPE_ICON } from '@/features/pacemaker/constants/pacemaker.constants'
+import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
 defineProps({
   modelValue: {
@@ -192,9 +196,5 @@ defineEmits([
 
 function formatNumber(amount) {
   return (amount ?? 0).toLocaleString()
-}
-
-function goalIcon(goalType) {
-  return GOAL_TYPE_ICON[goalType] ?? '🎯'
 }
 </script>

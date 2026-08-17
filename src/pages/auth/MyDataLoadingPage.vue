@@ -27,10 +27,14 @@
               <circle cx="12" cy="12" r="9" />
             </svg>
           </div>
-          <h1 class="mt-5 text-lg font-bold text-gray-900 sm:text-xl [word-break:keep-all] break-keep">
+          <h1
+            class="mt-5 text-lg font-bold text-gray-900 sm:text-xl [word-break:keep-all] break-keep"
+          >
             마이데이터를 연동하지 못했어요
           </h1>
-          <p class="mt-2 text-xs sm:text-sm leading-relaxed text-gray-500 [word-break:keep-all] break-keep">
+          <p
+            class="mt-2 text-xs sm:text-sm leading-relaxed text-gray-500 [word-break:keep-all] break-keep"
+          >
             {{ mydataSyncError }}
           </p>
           <button
@@ -49,11 +53,7 @@
               <div class="absolute inset-0 rounded-full border-4 border-slate-100" />
               <div
                 class="absolute inset-0 rounded-full border-4 border-transparent transition-all duration-500"
-                :class="
-                  isComplete
-                    ? 'border-primary'
-                    : 'animate-spin border-t-primary'
-                "
+                :class="isComplete ? 'border-primary' : 'animate-spin border-t-primary'"
               />
               <!-- 완료 시 은은하게 퍼지는 블루 펄스 링 -->
               <div
@@ -92,14 +92,18 @@
               </div>
             </div>
 
-            <h1 class="mt-6 text-lg font-bold text-gray-900 sm:text-[22px] [word-break:keep-all] break-keep transition-all duration-300">
+            <h1
+              class="mt-6 text-lg font-bold text-gray-900 sm:text-[22px] [word-break:keep-all] break-keep transition-all duration-300"
+            >
               {{
                 isComplete
                   ? '금융정보 분석이 완료되었어요'
                   : 'KB 마이데이터로 금융정보를 불러오고 있어요'
               }}
             </h1>
-            <p class="mt-2 text-xs sm:text-sm leading-relaxed text-gray-500 [word-break:keep-all] break-keep">
+            <p
+              class="mt-2 text-xs sm:text-sm leading-relaxed text-gray-500 [word-break:keep-all] break-keep"
+            >
               {{
                 isComplete
                   ? '분석된 금융 데이터를 바탕으로 맞춤 로드맵 화면으로 이동할게요.'
@@ -108,7 +112,9 @@
             </p>
           </div>
 
-          <div class="mt-7 sm:mt-8 rounded-2xl border border-gray-200 bg-white p-5 sm:p-7 shadow-sm">
+          <div
+            class="mt-7 sm:mt-8 rounded-2xl border border-gray-200 bg-white p-5 sm:p-7 shadow-sm"
+          >
             <div class="flex items-center justify-between">
               <p class="text-xs font-semibold text-gray-400">데이터 분석 진행 상황</p>
               <span class="text-xs font-bold text-primary font-mono">{{ displayPercent }}%</span>
@@ -198,11 +204,31 @@
           </div>
 
           <!-- 금융 꿀팁 롤링 배너 -->
-          <div class="mt-4 sm:mt-5 rounded-xl border border-blue-100/70 bg-[#f8fbff] px-3.5 py-3 text-center transition-all">
-            <Transition mode="out-in" enter-active-class="transition duration-300" enter-from-class="opacity-0 translate-y-1" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0 -translate-y-1">
-              <div :key="currentTipIndex" class="flex items-center justify-center gap-2 text-xs text-slate-600">
-                <span class="shrink-0 text-sm">{{ TIPS[currentTipIndex].icon }}</span>
-                <span class="font-medium text-slate-700 [word-break:keep-all] break-keep leading-relaxed">{{ TIPS[currentTipIndex].text }}</span>
+          <div
+            class="mt-4 sm:mt-5 rounded-xl border border-blue-100/70 bg-[#f8fbff] px-3.5 py-3 text-center transition-all"
+          >
+            <Transition
+              mode="out-in"
+              enter-active-class="transition duration-300"
+              enter-from-class="opacity-0 translate-y-1"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition duration-200"
+              leave-from-class="opacity-100"
+              leave-to-class="opacity-0 -translate-y-1"
+            >
+              <div
+                :key="currentTipIndex"
+                class="flex items-center justify-center gap-2 text-xs text-slate-600"
+              >
+                <span
+                  class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#F2F4F6] text-primary"
+                >
+                  <AppIcon :name="TIPS[currentTipIndex].icon" size="sm" />
+                </span>
+                <span
+                  class="font-medium text-slate-700 [word-break:keep-all] break-keep leading-relaxed"
+                  >{{ TIPS[currentTipIndex].text }}</span
+                >
               </div>
             </Transition>
           </div>
@@ -218,6 +244,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import StepHeader from '@/shared/ui/StepHeader.vue'
+import AppIcon from '@/shared/ui/AppIcon.vue'
 import { useAuthFeatureStore } from '@/features/auth'
 import { MYDATA_SYNC_ITEMS } from '@/features/auth/constants/auth.constants'
 import { ROUTE_NAMES } from '@/shared/constants/routes'

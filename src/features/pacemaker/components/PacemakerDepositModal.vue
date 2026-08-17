@@ -3,8 +3,8 @@
   <BaseModal :model-value="modelValue" hide-default-close @update:model-value="handleClose">
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
       <div>
-        <p class="text-xs font-bold text-slate-400">
-          {{ target?.icon }} {{ target?.goalName }} 목표
+        <p class="inline-flex items-center gap-1 text-xs font-bold text-slate-400">
+          <GoalTypeIcon :goal-type="target?.goalType" size="sm" /> {{ target?.goalName }} 목표
         </p>
         <h3 class="pt-0.5 text-base font-black text-[#0a192f]">입금할 계좌에 입금하기</h3>
       </div>
@@ -139,6 +139,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
 const props = defineProps({
   modelValue: {

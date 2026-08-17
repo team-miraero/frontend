@@ -2,39 +2,30 @@
 <template>
   <div class="flex h-full">
     <div class="flex h-full flex-1 flex-col bg-[#f8fbff]">
-      <!-- 인트로: 모바일에선 타이틀 + 짧은 설명만, 데스크톱에선 전체 문구 -->
+      <!-- AI 코치 상단 채팅 헤더 바 -->
       <div
-        class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 lg:px-10 lg:py-6"
+        class="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 sm:px-6 md:px-8"
       >
-        <div class="flex items-center gap-3 lg:items-start">
-          <!-- 모바일: 메인 사이드바(메뉴) 열기 버튼 — 다른 탭 헤더와 동일한 위치/동작 -->
+        <div class="flex items-center gap-3">
           <div
-            class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#66b2ff] lg:size-10 lg:rounded-2xl lg:drop-shadow-[0_4px_7px_rgba(0,102,255,0.22)]"
+            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#66b2ff] shadow-sm"
           >
-            <img src="@/assets/icons/ai-coach-avatar.svg" alt="" class="size-3.5 lg:size-[18px]" />
+            <img src="@/assets/icons/ai-coach-avatar.svg" alt="" class="size-4" />
           </div>
-          <div>
-            <h1 class="text-base font-black tracking-[-0.4px] text-[#0a192f] lg:text-xl">
-              AI 목표 코치
-            </h1>
-
-            <!-- 모바일 전용 축약 설명 -->
-            <p class="text-xs text-slate-500 lg:hidden">저축·목표 관리를 도와드려요</p>
-
-            <!-- 데스크톱 전용 상세 설명 -->
-            <p class="hidden pt-1 text-sm leading-[22.75px] text-[#4a5568] lg:block">
-              내 자산(마이데이터)과 목표를 바탕으로
-              <strong class="font-bold">"이거 써도 될까?"</strong>,
-              <strong class="font-bold">"저축 금액이 밀렸는데 페이스 회복 가능해?"</strong>,
-              <strong class="font-bold">"목표 언제 도달해?"</strong>
-              같은 궁금증에 답해드려요.
-            </p>
-            <div class="hidden items-center gap-1.5 pt-2 lg:flex">
-              <span class="size-1.5 shrink-0 rounded-full bg-amber-500" />
-              <p class="text-xs text-slate-500">
-                저축·목표 관리 상담만 해요. 투자 종목 추천이나 매매 조언은 하지 않아요.
-              </p>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h1 class="text-sm font-black tracking-[-0.3px] text-[#0a192f] sm:text-base">
+                AI 목표 코치
+              </h1>
+              <span
+                class="hidden items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary sm:inline-flex"
+              >
+                {{ goalLabel ? `${goalLabel} 맞춤 코칭` : '마이데이터 맞춤 코칭' }}
+              </span>
             </div>
+            <p class="text-xs text-slate-500 truncate max-w-[240px] sm:max-w-md">
+              저축 및 목표 달성 페이스를 코칭해드려요
+            </p>
           </div>
         </div>
 
@@ -60,13 +51,42 @@
         </button>
       </div>
 
-      <!-- 메시지 리스트 -->
-      <div ref="messageListRef" class="flex-1 space-y-4 overflow-y-auto px-4 py-6 lg:px-10">
-        <ChatMessageBubble
-          v-for="message in coachStore.messages"
-          :key="message.id"
-          :message="message"
+      <!-- 메시지 리스트 (반응형 패딩 및 스크롤) -->
+      <div
+        ref="messageListRef"
+        class="flex-1 space-y-3 overflow-y-auto px-3.5 py-4 sm:space-y-4 sm:px-6 sm:py-6 lg:px-10"
+      >
+        <LoadingSpinner
+          v-if="coachStore.isLoadingMessages && coachStore.messages.length === 0"
+          message="대화 내역을 불러오고 있어요"
+          sub-message="AI 코칭 데이터를 준비 중이에요."
+          container-class="py-20"
         />
+        <template v-else>
+          <ChatMessageBubble
+            v-for="message in coachStore.messages"
+            :key="message.id"
+            :message="message"
+          />
+
+          <!-- AI 답변 생성 중 (생각 중 / 타이핑 인디케이터 말풍선) -->
+          <div v-if="coachStore.isSending" class="flex w-full items-end gap-2.5 justify-start">
+            <div class="mb-0.5 shrink-0">
+              <div
+                class="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#66b2ff] drop-shadow-[0_2px_5px_rgba(0,102,255,0.28)]"
+              >
+                <img src="@/assets/icons/ai-coach-avatar.svg" alt="" class="size-[13px]" />
+              </div>
+            </div>
+            <div
+              class="flex items-center gap-1.5 rounded-[18px] rounded-tl-[4px] border border-[#dbeafe] bg-[#f4f8ff] px-4 py-3 shadow-xs text-[#0a192f]"
+            >
+              <span class="size-2 rounded-full bg-primary/70 animate-bounce" style="animation-delay: 0ms;" />
+              <span class="size-2 rounded-full bg-primary/70 animate-bounce" style="animation-delay: 150ms;" />
+              <span class="size-2 rounded-full bg-primary/70 animate-bounce" style="animation-delay: 300ms;" />
+            </div>
+          </div>
+        </template>
       </div>
 
       <!-- 입력 영역 -->
@@ -90,6 +110,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useGoalStore } from '@/features/goal'
 import { GOAL_TYPES } from '@/shared/constants/goals'
 import { useMediaQuery } from '@/shared/composables/useMediaQuery'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import {
   useCoachStore,
   ChatMessageBubble,
@@ -128,7 +149,7 @@ function scrollToBottom() {
 }
 
 watch(
-  () => coachStore.messages.length,
+  () => [coachStore.messages.length, coachStore.isSending],
   () => scrollToBottom()
 )
 

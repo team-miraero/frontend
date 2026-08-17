@@ -27,7 +27,11 @@
         :key="item.title"
         class="flex items-center gap-4 rounded-[14px] border border-[#edf2ff] bg-[#f8fbff] px-4 py-3.5"
       >
-        <span class="shrink-0 text-xl" aria-hidden="true">{{ item.icon }}</span>
+        <span
+          class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#F2F4F6] text-primary"
+        >
+          <AppIcon :name="item.icon" />
+        </span>
         <div>
           <h3 class="text-sm font-bold text-[#0a192f]">{{ item.title }}</h3>
           <p class="mt-0.5 text-xs leading-5 text-slate-400">{{ item.description }}</p>
@@ -55,6 +59,7 @@
 </template>
 
 <script setup>
+import AppIcon from '@/shared/ui/AppIcon.vue'
 defineEmits(['next', 'back'])
 
 const moneyBoxFeatures = [

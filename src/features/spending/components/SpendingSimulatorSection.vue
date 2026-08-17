@@ -11,14 +11,14 @@
         </h2>
 
         <div
-          class="inline-flex min-w-0 items-center gap-1.5 rounded-xl bg-[#0066FF] px-2.5 py-2 text-xs font-semibold text-white sm:gap-2 sm:px-4"
+          class="inline-flex min-w-0 items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-white shadow-[0_2px_8px_rgba(0,102,255,0.28)] sm:gap-2 sm:px-4"
         >
           <svg
-            class="h-4 w-4 shrink-0"
+            class="h-3.5 w-3.5 shrink-0"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="1.8"
+            stroke-width="2.2"
             aria-hidden="true"
           >
             <path
@@ -48,30 +48,30 @@
           v-for="category in categories"
           :key="category.id"
           type="button"
-          class="relative flex min-h-[78px] flex-col items-center justify-center rounded-xl border bg-white px-2 py-3 transition-colors"
-          :style="getSelectorStyle(category)"
+          class="relative flex min-h-[82px] flex-col items-center justify-center rounded-2xl border p-2 transition-all active:scale-[0.98] cursor-pointer select-none"
+          :class="
+            selectedCategoryId === category.id
+              ? 'border-primary/40 bg-[#EAF2FF] shadow-xs'
+              : 'border-slate-200/80 bg-white hover:bg-[#F8FAFC]'
+          "
           :aria-pressed="selectedCategoryId === category.id"
           @click="selectCategory(category.id)"
         >
-          <span
-            class="flex h-8 w-8 items-center justify-center rounded-full text-base"
-            :style="{
-              backgroundColor: category.softColor,
-            }"
-            aria-hidden="true"
-          >
-            {{ category.icon }}
-          </span>
+          <SpendingCategoryIcon
+            :icon="category.icon"
+            :category-id="category.id"
+            :accent="category.accent"
+            size="sm"
+            :active="selectedCategoryId === category.id"
+          />
 
-          <span class="mt-1.5 text-xs font-semibold text-[#0A192F]">
+          <span class="mt-1.5 text-xs font-bold text-[#0A192F]">
             {{ category.name }}
           </span>
 
           <span
-            class="absolute right-2 top-2 h-2 w-2 rounded-full"
-            :style="{
-              backgroundColor: getStatusColor(category),
-            }"
+            v-if="category.target !== null"
+            class="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary"
             aria-hidden="true"
           />
         </button>
@@ -92,7 +92,7 @@
       <div class="mt-3 flex items-center justify-center gap-3 text-xs text-[#64748B]">
         <button
           type="button"
-          class="flex h-8 w-8 items-center justify-center rounded-full border border-[#E2E8F0] bg-white disabled:cursor-not-allowed disabled:opacity-40"
+          class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="selectedCategoryIndex === 0"
           aria-label="이전 카테고리"
           @click="selectPreviousCategory"
@@ -100,11 +100,13 @@
           ‹
         </button>
 
-        <span> {{ selectedCategoryIndex + 1 }} / {{ categories.length }} </span>
+        <span class="font-bold tabular-nums">
+          {{ selectedCategoryIndex + 1 }} / {{ categories.length }}
+        </span>
 
         <button
           type="button"
-          class="flex h-8 w-8 items-center justify-center rounded-full border border-[#E2E8F0] bg-white disabled:cursor-not-allowed disabled:opacity-40"
+          class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="selectedCategoryIndex === categories.length - 1"
           aria-label="다음 카테고리"
           @click="selectNextCategory"
@@ -130,6 +132,7 @@
 <script setup>
 import { toRef } from 'vue'
 import SpendingCategoryCard from '@/features/spending/components/SpendingCategoryCard.vue'
+import SpendingCategoryIcon from '@/features/spending/components/SpendingCategoryIcon.vue'
 import { useSpendingSimulator } from '@/features/spending/composables/useSpendingSimulator'
 import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 
@@ -154,17 +157,6 @@ const {
   selectCategoryByOffset,
   updateCategoryTarget,
 } = useSpendingSimulator(toRef(props, 'summary'))
-
-const getSelectorStyle = (category) => {
-  const isSelected = selectedCategoryId.value === category.id
-
-  return {
-    borderColor: isSelected ? category.accent : '#E2E8F0',
-    backgroundColor: isSelected ? category.softColor : '#FFFFFF',
-  }
-}
-
-const getStatusColor = (category) => (category.target !== null ? category.accent : '#CBD5E1')
 
 const selectPreviousCategory = () => selectCategoryByOffset(-1)
 

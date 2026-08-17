@@ -13,7 +13,7 @@
       >
         <section
           ref="modalRef"
-          class="flex max-h-[calc(100vh-2rem)] w-full max-w-[760px] flex-col overflow-hidden rounded-[24px] bg-white shadow-[0_24px_80px_rgba(10,25,47,0.24)] sm:max-h-[calc(100vh-3rem)]"
+          class="flex max-h-[calc(100vh-2rem)] w-full max-w-[760px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_24px_80px_rgba(10,25,47,0.24)] sm:max-h-[calc(100vh-3rem)]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="product-detail-title"
@@ -27,33 +27,26 @@
               <h2 id="product-detail-title" class="text-xs font-bold text-primary">
                 {{ modalTitle }}
               </h2>
-              <p id="product-detail-description" class="mt-0.5 text-[11px] text-slate-400">
+              <p id="product-detail-description" class="mt-0.5 text-[11px] font-medium text-slate-400">
                 가입 전 공시 정보를 확인해 주세요
               </p>
             </div>
             <button
               type="button"
-              class="flex size-10 items-center justify-center rounded-full bg-slate-100 text-xl text-slate-500"
+              class="flex size-9 items-center justify-center rounded-full bg-slate-100 text-lg font-bold text-slate-500 transition hover:bg-slate-200 cursor-pointer"
               aria-label="상품 상세 닫기"
               @click="$emit('close')"
             >
-              ×
+              ✕
             </button>
           </header>
 
           <div class="min-h-0 flex-1 overflow-y-auto">
-            <div
+            <LoadingSpinner
               v-if="isLoading"
-              class="flex min-h-[420px] flex-col items-center justify-center"
-              role="status"
-              aria-live="polite"
-            >
-              <span
-                class="size-9 animate-spin rounded-full border-4 border-primary/15 border-t-primary"
-                aria-hidden="true"
-              />
-              <p class="mt-4 text-sm font-semibold text-slate-500">상품 정보를 불러오고 있어요</p>
-            </div>
+              message="상품 정보를 불러오고 있어요"
+              container-class="min-h-[420px]"
+            />
 
             <div
               v-else-if="hasError"
@@ -76,23 +69,23 @@
             </div>
 
             <div v-else-if="product" class="px-5 py-6 sm:px-7">
-              <span class="rounded-full bg-[#eef5ff] px-3 py-1 text-[11px] font-bold text-primary">
+              <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
                 {{ product.institutionName }}
               </span>
-              <h3 class="mt-3 text-[24px] font-black tracking-[-0.7px] text-[#10233f]">
+              <h3 class="mt-3 text-xl sm:text-2xl font-black tracking-[-0.5px] text-[#0a192f]">
                 {{ product.productName }}
               </h3>
               <p class="mt-1 text-xs text-slate-400">{{ product.productCode }}</p>
 
               <div
-                class="mt-5 rounded-[20px] bg-gradient-to-br from-[#0b6cff] to-[#0052cc] px-5 py-5 text-white"
+                class="mt-5 rounded-2xl bg-gradient-to-br from-[#0066ff] to-[#0047b3] px-6 py-5 text-white shadow-md shadow-primary/20"
               >
                 <div class="flex items-end justify-between gap-4">
                   <div>
-                    <p class="text-xs text-white/70">최고 금리</p>
+                    <p class="text-xs font-bold text-white/80">최고 금리</p>
                     <p class="mt-1 text-sm font-bold">
                       연
-                      <strong class="ml-1 text-[34px] font-black">
+                      <strong class="ml-1 text-3xl sm:text-4xl font-black tabular-nums">
                         {{ formatRate(product.maximumInterestRate) }}
                       </strong>
                       %
@@ -107,15 +100,15 @@
               </div>
 
               <section class="mt-7">
-                <h3 class="text-base font-black text-[#10233f]">가입 정보</h3>
-                <dl class="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 px-4">
+                <h3 class="text-base font-black text-[#0a192f]">가입 정보</h3>
+                <dl class="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200/80 bg-[#f8fbff] px-4">
                   <div
                     v-for="item in joinInfo"
                     :key="item.label"
                     class="grid grid-cols-[88px_1fr] gap-3 py-3.5"
                   >
-                    <dt class="text-xs text-slate-400">{{ item.label }}</dt>
-                    <dd class="text-sm font-bold leading-relaxed text-slate-700">
+                    <dt class="text-xs font-bold text-slate-400">{{ item.label }}</dt>
+                    <dd class="text-xs sm:text-sm font-bold leading-relaxed text-slate-700">
                       {{ item.value }}
                     </dd>
                   </div>
@@ -124,12 +117,12 @@
 
               <section class="mt-7">
                 <div class="flex items-end justify-between">
-                  <h3 class="text-base font-black text-[#10233f]">기간별 금리</h3>
-                  <p class="text-[11px] text-slate-400">단위: 연 %</p>
+                  <h3 class="text-base font-black text-[#0a192f]">기간별 금리</h3>
+                  <p class="text-[11px] font-medium text-slate-400">단위: 연 %</p>
                 </div>
-                <div class="mt-3 overflow-hidden rounded-2xl border border-slate-200">
+                <div class="mt-3 overflow-hidden rounded-2xl border border-slate-200/80">
                   <div
-                    class="grid bg-[#f7faff] px-4 py-3 text-[11px] font-bold text-slate-400"
+                    class="grid bg-[#f8fbff] px-4 py-3 text-xs font-bold text-slate-500"
                     :class="productType === 'saving' ? 'grid-cols-4' : 'grid-cols-3'"
                   >
                     <span>기간</span>
@@ -158,14 +151,14 @@
               </section>
 
               <section class="mt-7 space-y-3">
-                <h3 class="text-base font-black text-[#10233f]">꼭 확인해요</h3>
+                <h3 class="text-base font-black text-[#0a192f]">꼭 확인해요</h3>
                 <div
                   v-for="item in conditions"
                   :key="item.label"
-                  class="rounded-2xl bg-slate-50 px-4 py-4"
+                  class="rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 shadow-xs"
                 >
                   <p class="text-[11px] font-bold text-slate-400">{{ item.label }}</p>
-                  <p class="mt-1.5 text-sm font-medium leading-relaxed text-slate-700">
+                  <p class="mt-1.5 text-xs sm:text-sm font-medium leading-relaxed text-slate-700">
                     {{ item.value }}
                   </p>
                 </div>
@@ -177,13 +170,13 @@
             v-if="product && !isLoading"
             class="border-t border-slate-100 bg-white p-4 sm:px-7"
           >
-            <p class="mb-3 text-center text-[10px] leading-relaxed text-slate-400">
+            <p class="mb-3 text-center text-[11px] leading-relaxed text-slate-400">
               {{ officialProductLink.description }}. 새 탭에서 열립니다.
             </p>
             <div class="grid gap-2.5 sm:grid-cols-[0.65fr_1.35fr]">
               <button
                 type="button"
-                class="h-12 rounded-2xl border border-slate-200 bg-white text-sm font-black text-slate-600 transition hover:bg-slate-50"
+                class="flex h-12 items-center justify-center rounded-2xl border border-slate-200/90 bg-white text-sm font-bold text-slate-600 transition hover:bg-slate-50 cursor-pointer"
                 @click="$emit('close')"
               >
                 닫기
@@ -192,7 +185,7 @@
                 :href="officialProductLink.href"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex h-12 items-center justify-center rounded-2xl bg-primary text-sm font-black text-white transition hover:bg-[#005bd9] focus:outline-none focus:ring-2 focus:ring-primary/30"
+                class="flex h-12 items-center justify-center rounded-2xl bg-primary text-sm font-bold text-white shadow-md shadow-primary/25 transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
               >
                 {{ officialProductLink.label }}
                 <span class="ml-1.5 text-base" aria-hidden="true">↗</span>
@@ -207,6 +200,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import { formatProductLimit, formatRate } from '@/features/products/lib/product-formatters'
 import { getOfficialProductLink } from '@/features/products/lib/product-links'
 

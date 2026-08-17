@@ -5,7 +5,7 @@
   <!-- 모바일 오버레이 배경 -->
   <div
     v-if="!isDesktop && isOpen"
-    class="fixed inset-0 z-30 bg-black/40 lg:hidden"
+    class="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs lg:hidden"
     @click="$emit('update:isOpen', false)"
   />
 
@@ -16,8 +16,10 @@
       isDesktop
         ? 'relative'
         : [
-            'fixed inset-y-0 right-0 z-40 w-[85%] max-w-[320px] transition-transform duration-200 ease-out',
-            isOpen ? 'translate-x-0' : 'translate-x-full',
+            'fixed inset-y-0 right-0 z-50 w-[85%] max-w-[320px] transition-all duration-200 ease-out',
+            isOpen
+              ? 'translate-x-0 shadow-2xl opacity-100 visible'
+              : 'translate-x-full shadow-none opacity-0 invisible pointer-events-none',
           ]
     "
     :style="isDesktop ? { width: isDesktopCollapsed ? '0px' : `${width}px` } : undefined"
@@ -58,7 +60,7 @@
       </div>
 
       <!-- 대화방 리스트 -->
-      <ul class="flex-1 overflow-y-auto p-2">
+      <ul class="flex-1 overflow-y-auto p-2 pb-[calc(20px+env(safe-area-inset-bottom))]">
         <li v-for="conversation in conversations" :key="conversation.conversationId">
           <div
             class="group flex items-center gap-1 rounded-xl px-3 py-2.5"
