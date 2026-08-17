@@ -41,9 +41,9 @@
 
     <div class="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
       <div class="rounded-xl bg-[#F8FBFF] border border-slate-100 px-3 py-3 text-center">
-        <p class="text-xs font-bold text-[#94A3B8]">기준 지출</p>
+        <p class="text-xs font-medium text-[#64748B]">기준 지출</p>
 
-        <p class="mt-1 text-base font-black tabular-nums text-[#0A192F]">
+        <p class="mt-1 text-base font-bold tabular-nums text-[#0A192F]">
           {{ formatAmount(category.recentThreeMonthAverage) }}만원
         </p>
       </div>
@@ -65,10 +65,10 @@
         class="rounded-xl border px-3 py-3 text-center transition-colors"
         :class="hasTarget ? 'border-[#B9D4FF] bg-[#F4F8FF]' : 'border-transparent bg-[#F2F4F6]'"
       >
-        <p class="text-xs font-bold text-[#94A3B8]">목표 지출</p>
+        <p class="text-xs font-medium text-[#64748B]">목표 지출</p>
 
         <p
-          class="mt-1 text-base font-black tabular-nums"
+          class="mt-1 text-base font-bold tabular-nums"
           :class="category.target === null ? 'text-[#94A3B8]' : 'text-primary'"
         >
           {{
@@ -95,7 +95,7 @@
       />
 
       <div
-        class="mt-2 flex items-center justify-between text-xs font-bold tabular-nums text-[#94A3B8]"
+        class="mt-2 flex items-center justify-between text-xs font-medium tabular-nums text-[#94A3B8]"
       >
         <span>{{ formatAmount(category.min) }}</span>
         <span>{{ formatAmount(category.recentThreeMonthAverage) }}만원</span>

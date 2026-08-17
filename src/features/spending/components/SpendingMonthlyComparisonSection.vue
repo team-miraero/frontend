@@ -37,8 +37,8 @@
             class="category-comparison grid min-w-0 -translate-x-2 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 text-center"
           >
             <div>
-              <p class="text-[10px] font-bold text-[#94A3B8]">지난달</p>
-              <strong class="mt-0.5 block text-xs font-black tabular-nums text-[#0A192F]">
+              <p class="text-[10px] font-medium text-[#94A3B8]">지난달</p>
+              <strong class="mt-0.5 block text-xs font-bold tabular-nums text-[#0A192F]">
                 {{ formatAmount(category.previousAmount) }}만원
               </strong>
             </div>
@@ -46,15 +46,15 @@
             <span class="text-xs text-[#94A3B8]" aria-hidden="true">→</span>
 
             <div>
-              <p class="text-[10px] font-bold text-[#94A3B8]">이번 달</p>
-              <strong class="mt-0.5 block text-xs font-black tabular-nums text-[#0A192F]">
+              <p class="text-[10px] font-medium text-[#94A3B8]">이번 달</p>
+              <strong class="mt-0.5 block text-xs font-bold tabular-nums text-[#0A192F]">
                 {{ formatAmount(category.current) }}만원
               </strong>
             </div>
           </div>
 
           <span
-            class="change-amount whitespace-nowrap text-xs font-black tabular-nums"
+            class="change-amount whitespace-nowrap text-xs font-bold tabular-nums"
             :class="getDifferenceClass(category.difference)"
           >
             {{ formatDifference(category.difference) }}

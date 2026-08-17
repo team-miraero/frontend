@@ -122,14 +122,14 @@
             <div
               class="grid grid-cols-[28px_minmax(0,1fr)_42px] items-center gap-1 text-[9px] text-[#64748B] sm:grid-cols-[32px_minmax(0,1fr)_48px] sm:text-[10px]"
             >
-              <span class="font-bold">나</span>
+              <span class="font-medium text-[#64748B]">나</span>
               <div class="h-1.5 overflow-hidden rounded-full bg-[#EEF2F7]">
                 <div
                   class="h-full rounded-full bg-[#0066FF] transition-all duration-300 ease-out"
                   :style="{ width: `${category.currentWidth}%` }"
                 />
               </div>
-              <strong class="whitespace-nowrap text-right font-black tabular-nums text-[#0A192F]"
+              <strong class="whitespace-nowrap text-right font-bold tabular-nums text-[#0A192F]"
                 >{{ formatAmount(category.current) }}만원</strong
               >
             </div>
@@ -137,21 +137,21 @@
             <div
               class="grid grid-cols-[28px_minmax(0,1fr)_42px] items-center gap-1 text-[9px] text-[#64748B] sm:grid-cols-[32px_minmax(0,1fr)_48px] sm:text-[10px]"
             >
-              <span>평균</span>
+              <span class="font-normal text-[#94A3B8]">평균</span>
               <div class="h-1.5 overflow-hidden rounded-full bg-[#EEF2F7]">
                 <div
                   class="h-full rounded-full bg-[#94A3B8] transition-all duration-300 ease-out"
                   :style="{ width: `${category.peerWidth}%` }"
                 />
               </div>
-              <span class="whitespace-nowrap text-right tabular-nums text-[#64748B]"
+              <span class="whitespace-nowrap text-right font-medium tabular-nums text-[#64748B]"
                 >{{ formatAmount(category.peerAmount) }}만원</span
               >
             </div>
           </div>
 
           <span
-            class="whitespace-nowrap text-right text-xs font-black tabular-nums"
+            class="whitespace-nowrap text-right text-xs font-bold tabular-nums"
             :class="getDifferenceClass(category.difference)"
           >
             {{ formatDifference(category.difference) }}
