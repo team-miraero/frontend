@@ -29,7 +29,7 @@ export const useCollectionStore = defineStore('feature-collection', () => {
       const data = await collectionApi.getAchievedGoals()
       achievedGoals.value = Array.isArray(data) ? data : []
     } catch (caughtError) {
-      error.value = caughtError
+      error.value = caughtError?.message || '완주한 목표를 불러오지 못했습니다.'
       achievedGoals.value = []
     } finally {
       isLoading.value = false
