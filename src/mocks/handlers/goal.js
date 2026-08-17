@@ -5,6 +5,14 @@ import mydata from '@/mocks/fixtures/mydata.json'
 // TODO: 실제 마이데이터 연동 전까지 사용하는 mock 월 저축 가능 금액
 const MOCK_MONTHLY_SAVING_CAPACITY = 620000
 const MOCK_GOAL_UPDATES = new Map()
+const MOCK_PULL_CURRENT_AMOUNTS = new Map()
+const MOCK_GOAL_LINKED_ACCOUNT_IDS = new Set([1])
+// 목표별 기준 금액. 목록·상세가 같은 값에서 파생돼야 달성률이 어긋나지 않는다.
+const MOCK_GOAL_BASE_AMOUNTS = {
+  1: { goalAmount: 30000000, currentAmount: 11500000 },
+  2: { goalAmount: 10000000, currentAmount: 4500000 },
+  3: { goalAmount: 25000000, currentAmount: 5000000 },
+}
 const MOCK_COLLECTIONS = [
   {
     goalId: 12,
@@ -30,6 +38,33 @@ function getGoalMonths(goalDate) {
     1,
     (target.getFullYear() - today.getFullYear()) * 12 + target.getMonth() - today.getMonth()
   )
+}
+
+function getGoalDateFromMonths(goalMonths) {
+  const target = new Date()
+  target.setDate(1)
+  target.setMonth(target.getMonth() + goalMonths + 1, 0)
+
+  const year = target.getFullYear()
+  const month = String(target.getMonth() + 1).padStart(2, '0')
+  const day = String(target.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+/**
+ * 끌어쓰기(currentAmount)와 목표 수정(goalAmount)이 달성률에 그대로 반영되도록
+ * 세 값을 한곳에서 파생시킨다.
+ */
+function getMockGoalAmounts(goalId) {
+  const base = MOCK_GOAL_BASE_AMOUNTS[goalId] ?? MOCK_GOAL_BASE_AMOUNTS[1]
+  const goalAmount = MOCK_GOAL_UPDATES.get(goalId)?.goalAmount ?? base.goalAmount
+  const currentAmount = MOCK_PULL_CURRENT_AMOUNTS.get(goalId) ?? base.currentAmount
+
+  return {
+    goalAmount,
+    currentAmount,
+    progressRate: goalAmount ? Math.round((currentAmount / goalAmount) * 1000) / 10 : 0,
+  }
 }
 
 function milestoneResponse(milestones) {
@@ -165,10 +200,13 @@ export const goalHandlers = [
     await delay(300)
     const url = new URL(request.url)
     const accountType = url.searchParams.get('accountType')
+    const excludeGoalLinked = url.searchParams.get('excludeGoalLinked') === 'true'
 
-    const accounts = accountType
-      ? MOCK_ACCOUNTS.filter((account) => account.accountType === accountType)
-      : MOCK_ACCOUNTS
+    const accounts = MOCK_ACCOUNTS.filter(
+      (account) =>
+        (!accountType || account.accountType === accountType) &&
+        (!excludeGoalLinked || !MOCK_GOAL_LINKED_ACCOUNT_IDS.has(account.accountId))
+    )
 
     return HttpResponse.json({
       success: true,
@@ -200,6 +238,39 @@ export const goalHandlers = [
         maturityAt: null,
         monthlyPaymentLimit: null,
       },
+      error: null,
+    })
+  }),
+
+  http.post('*/api/goals/:goalId/pull-funds', async ({ params, request }) => {
+    await delay(350)
+    const goalId = Number(params.goalId)
+    const { sourceAccountId, amount } = await request.json()
+    const sourceAccount = MOCK_ACCOUNTS.find(
+      (account) => account.accountId === Number(sourceAccountId)
+    )
+
+    if (!sourceAccount || !Number.isFinite(amount) || amount <= 0) {
+      return HttpResponse.json(
+        { success: false, data: null, error: { message: '끌어쓰기 입력값을 확인해주세요.' } },
+        { status: 400 }
+      )
+    }
+
+    if (amount > sourceAccount.balance) {
+      return HttpResponse.json(
+        { success: false, data: null, error: { message: '계좌 잔액이 부족합니다.' } },
+        { status: 400 }
+      )
+    }
+
+    sourceAccount.balance -= amount
+    const currentAmount = getMockGoalAmounts(goalId).currentAmount + amount
+    MOCK_PULL_CURRENT_AMOUNTS.set(goalId, currentAmount)
+
+    return HttpResponse.json({
+      success: true,
+      data: { pulledAmount: amount, currentAmount },
       error: null,
     })
   }),
@@ -257,21 +328,21 @@ export const goalHandlers = [
           goalId: 1,
           goalName: '독립 자금',
           goalType: 'INDEPENDENCE',
-          progressRate: 42.0,
+          progressRate: getMockGoalAmounts(1).progressRate,
           status: MOCK_GOAL_UPDATES.get(1)?.status ?? 'ACTIVE',
         },
         {
           goalId: 2,
           goalName: '학자금 대출 상환',
           goalType: 'LOAN',
-          progressRate: 45.0,
+          progressRate: getMockGoalAmounts(2).progressRate,
           status: 'ACTIVE',
         },
         {
           goalId: 3,
           goalName: '결혼 자금',
           goalType: 'WEDDING',
-          progressRate: 20.0,
+          progressRate: getMockGoalAmounts(3).progressRate,
           status: 'ACTIVE',
         },
       ],
@@ -283,17 +354,24 @@ export const goalHandlers = [
     const goalId = Number(params.goalId)
     const payload = await request.json()
 
+    // 서버 DTO는 필드가 모두 nullable이지만 UPDATE 문이 컬럼을 조건 없이 덮어써서
+    // 필드를 빠뜨리면 NULL이 된다. 부분 수정을 허용하지 않도록 일부러 필수로 검증한다.
     if (
-      !/^\d{4}-\d{2}-\d{2}$/.test(payload.goalDate) ||
       !Number.isFinite(payload.goalAmount) ||
       payload.goalAmount < 10000 ||
-      !['ACTIVE', 'PAUSED'].includes(payload.status)
+      !Number.isInteger(payload.goalMonths) ||
+      payload.goalMonths <= 0
     ) {
       return HttpResponse.json({ message: '목표 수정 입력값을 확인해주세요.' }, { status: 400 })
     }
 
-    MOCK_GOAL_UPDATES.set(goalId, payload)
-    return HttpResponse.json({ goalId })
+    const currentGoal = MOCK_GOAL_UPDATES.get(goalId) ?? {}
+    MOCK_GOAL_UPDATES.set(goalId, {
+      ...currentGoal,
+      ...payload,
+      goalDate: getGoalDateFromMonths(payload.goalMonths),
+    })
+    return HttpResponse.json({ success: true, data: null, error: null })
   }),
 
   http.get('*/api/goals/:goalId/linked-assets', async ({ params }) => {
@@ -373,14 +451,15 @@ export const goalHandlers = [
 
   http.get('*/api/goals/:goalId', async ({ params }) => {
     if (params.goalId === '2') {
+      const { goalAmount, currentAmount, progressRate } = getMockGoalAmounts(2)
       return HttpResponse.json({
         goalId: 2,
         goalType: 'LOAN',
         goalName: '학자금 대출 상환',
-        goalAmount: 10000000,
+        goalAmount,
         startAmount: 0,
-        currentAmount: 4500000,
-        progressRate: 45.0,
+        currentAmount,
+        progressRate,
         period: {
           goalMonths: 8,
           startDate: '2026-01',
@@ -397,14 +476,15 @@ export const goalHandlers = [
     }
 
     if (params.goalId === '3') {
+      const { goalAmount, currentAmount, progressRate } = getMockGoalAmounts(3)
       return HttpResponse.json({
         goalId: 3,
         goalType: 'WEDDING',
         goalName: '결혼 자금',
-        goalAmount: 25000000,
+        goalAmount,
         startAmount: 0,
-        currentAmount: 5000000,
-        progressRate: 20.0,
+        currentAmount,
+        progressRate,
         period: {
           goalMonths: 18,
           startDate: '2026-07',
@@ -420,17 +500,19 @@ export const goalHandlers = [
       })
     }
 
-    const override = MOCK_GOAL_UPDATES.get(Number(params.goalId))
+    const goalId = Number(params.goalId)
+    const override = MOCK_GOAL_UPDATES.get(goalId)
+    const { goalAmount, currentAmount, progressRate } = getMockGoalAmounts(goalId)
     return HttpResponse.json({
-      goalId: Number(params.goalId),
+      goalId,
       goalType: 'INDEPENDENCE',
-      goalName: '독립 자금',
-      goalAmount: override?.goalAmount ?? 30000000,
+      goalName: override?.goalName ?? '독립 자금',
+      goalAmount,
       startAmount: 0,
-      currentAmount: 11500000,
-      progressRate: 38.0,
+      currentAmount,
+      progressRate,
       period: {
-        goalMonths: getGoalMonths(override?.goalDate),
+        goalMonths: override?.goalMonths ?? getGoalMonths(override?.goalDate),
         startDate: '2026-06',
         endDate: override?.goalDate ?? '2028-03',
         remainMonths: getGoalMonths(override?.goalDate),

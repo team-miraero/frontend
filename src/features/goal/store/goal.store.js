@@ -155,12 +155,19 @@ export const useGoalStore = defineStore('feature-goal', () => {
 
   /**
    * @param {'CHECKING' | 'SAVING' | 'DEPOSIT'} [accountType]
+   * @param {{ excludeGoalLinked?: boolean }} [options]
    */
-  async function fetchAccounts(accountType) {
+  async function fetchAccounts(accountType, options = {}) {
     areAccountsLoading.value = true
     accountsError.value = null
     try {
-      const response = await goalApi.getAccounts(accountType ? { accountType } : undefined)
+      const params = {
+        ...(accountType ? { accountType } : {}),
+        ...(options.excludeGoalLinked ? { excludeGoalLinked: true } : {}),
+      }
+      const response = await goalApi.getAccounts(
+        Object.keys(params).length > 0 ? params : undefined
+      )
       accounts.value = response.accounts
       return response
     } catch (caughtError) {
@@ -313,22 +320,15 @@ export const useGoalStore = defineStore('feature-goal', () => {
    * @param {import('@/features/goal/api/goal.api').UpdateGoalPayload} payload
    */
   async function updateGoal(goalId, payload) {
-    const result = await goalApi.updateGoal(goalId, payload)
-    const targetGoal = goals.value.find((g) => String(g.goalId) === String(goalId))
-    if (targetGoal) {
-      if (payload.status) targetGoal.status = payload.status
-    }
-    if (currentGoal.value && String(currentGoal.value.goalId) === String(goalId)) {
-      const { goalDate, ...goalFields } = payload
-      currentGoal.value = {
-        ...currentGoal.value,
-        ...goalFields,
-        period: goalDate
-          ? { ...currentGoal.value.period, endDate: goalDate }
-          : currentGoal.value.period,
-      }
-    }
-    return result
+    return goalApi.updateGoal(goalId, payload)
+  }
+
+  /**
+   * @param {number} goalId
+   * @param {import('@/features/goal/api/goal.api').PullGoalFundsPayload} payload
+   */
+  async function pullGoalFunds(goalId, payload) {
+    return goalApi.pullGoalFunds(goalId, payload)
   }
 
   /**
@@ -390,6 +390,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
     fetchDashboardData,
     fetchSupplementaryDashboardData,
     updateGoal,
+    pullGoalFunds,
     updateCurrentGoalStatus,
     fetchFeasibility,
     fetchRecalculatedFeasibility,

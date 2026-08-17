@@ -181,8 +181,13 @@ async function fetchCurrentGoal() {
   goalLoadError.value = ''
   try {
     const goals = await goalApi.getGoals()
-    const activeGoal = goals.find((goal) => goal.status === 'ACTIVE') ?? goals[0]
-    currentGoal.value = activeGoal ? await goalApi.getGoalDetail(activeGoal.goalId) : null
+    // 이미 보고 있던 목표는 일시정지로 상태가 바뀌어도 계속 같은 목표를 보여준다.
+    // 목록에서 사라진 경우(달성·삭제)에만 진행 중인 목표로 넘어간다.
+    const viewingGoal = currentGoal.value
+      ? goals.find((goal) => String(goal.goalId) === String(currentGoal.value.goalId))
+      : null
+    const targetGoal = viewingGoal ?? goals.find((goal) => goal.status === 'ACTIVE') ?? goals[0]
+    currentGoal.value = targetGoal ? await goalApi.getGoalDetail(targetGoal.goalId) : null
   } catch (error) {
     goalLoadError.value = error.message ?? '목표 정보를 불러오지 못했습니다.'
   } finally {
@@ -245,17 +250,32 @@ async function saveGoalReset(payload) {
   if (!currentGoal.value || isGoalSaving.value) return
   const goalId = currentGoal.value.goalId
   const nextStatus = payload.status === 'PAUSE' ? 'PAUSED' : 'ACTIVE'
+  const previousStatus = ['PAUSE', 'PAUSED'].includes(currentGoal.value.status)
+    ? 'PAUSED'
+    : 'ACTIVE'
+  // 금액·기간 저장 후 상태 변경이 실패하면 앞의 저장만 반영된 상태이므로 따로 안내한다.
+  let isGoalSaved = false
   isGoalSaving.value = true
   goalResetError.value = ''
 
   try {
     await goalApi.updateGoal(goalId, {
-      goalDate: payload.goalDate,
+      // 목표명은 이 화면에서 수정하지 않지만 빠뜨리면 NULL로 덮이므로 현재 값을 함께 보낸다.
+      goalName: currentGoal.value.goalName,
       goalAmount: payload.goalAmount,
-      status: nextStatus,
+      goalMonths: payload.goalMonths,
     })
+    isGoalSaved = true
+
+    // 목표 상태는 PATCH /goals/{goalId}/status 로만 변경된다.
+    if (nextStatus !== previousStatus) {
+      await goalApi.updateGoalStatus(goalId, nextStatus)
+    }
   } catch (error) {
-    goalResetError.value = error.message ?? '목표를 재설정하지 못했습니다.'
+    goalResetError.value = isGoalSaved
+      ? `목표 금액·기간은 저장했지만 상태를 변경하지 못했습니다. ${error.message ?? ''}`.trim()
+      : (error.message ?? '목표를 재설정하지 못했습니다.')
+    if (isGoalSaved) await fetchCurrentGoal()
     return
   } finally {
     isGoalSaving.value = false
