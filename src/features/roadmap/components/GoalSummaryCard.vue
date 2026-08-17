@@ -10,18 +10,20 @@
         <span class="text-xl font-black tracking-tight tabular-nums text-[#0a192f] sm:text-2xl">
           {{ formatManwon(goal.currentAmount) }}
         </span>
-        <span class="text-xs font-bold tabular-nums text-slate-400">/ {{ formatWon(goal.goalAmount) }}</span>
+        <span class="text-xs font-bold tabular-nums text-slate-400"
+          >/ {{ formatWon(goal.goalAmount) }}</span
+        >
       </div>
 
       <div class="pt-3">
         <div class="h-2 w-full overflow-hidden rounded-full bg-primary/15">
           <div
             class="h-2 rounded-full bg-primary transition-all duration-500"
-            :style="{ width: `${goal.progressRate}%` }"
+            :style="{ width: `${progressRate}%` }"
           />
         </div>
         <div class="flex items-center justify-between pt-1.5 text-xs font-bold">
-          <span class="text-primary tabular-nums">{{ goal.progressRate }}% 달성</span>
+          <span class="text-primary tabular-nums">{{ progressRate }}% 달성</span>
           <span class="text-slate-400">{{ formatEndDate(goal.period.endDate) }} 목표</span>
         </div>
       </div>
@@ -29,7 +31,9 @@
 
     <div class="mt-3 flex items-center gap-1.5 border-t border-slate-200/60 pt-2.5">
       <span class="size-2 shrink-0 rounded-full" :class="paceDotClass" />
-      <span class="text-xs font-black tabular-nums whitespace-nowrap" :class="paceTextClass">{{ paceLabel }}</span>
+      <span class="text-xs font-black tabular-nums whitespace-nowrap" :class="paceTextClass">{{
+        paceLabel
+      }}</span>
     </div>
   </div>
 </template>
@@ -43,6 +47,11 @@ const props = defineProps({
     required: true,
   },
 })
+
+// 초과 달성해도 진행 바가 컨테이너를 넘지 않도록 0~100으로 묶는다.
+const progressRate = computed(() =>
+  Math.min(100, Math.max(0, Number(props.goal.progressRate) || 0))
+)
 
 const paceDotClass = computed(() =>
   props.goal.pace?.paceStatus === 'BEHIND' ? 'bg-rose-500' : 'bg-emerald-500'

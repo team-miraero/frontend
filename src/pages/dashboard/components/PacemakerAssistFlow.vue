@@ -41,7 +41,7 @@
       <div v-if="step === 'strategy'" class="flex flex-col gap-3 px-6 py-5 sm:px-7">
         <div class="rounded-2xl border border-pink-200 bg-pink-50 px-4 py-3.5">
           <p class="text-sm leading-relaxed text-slate-700">
-            이번 달 지출이 평소보다 늘어 목표 페이스가
+            현재 목표 페이스가
             <strong class="font-black text-[#be185d]">{{ shortageLabel }} 부족해요.</strong>
             지금 상황에 맞는 대응 방법을 골라보세요.
           </p>
@@ -132,7 +132,12 @@
         </div>
       </div>
 
-      <form v-else-if="step === 'amount'" class="px-6 py-5 sm:px-7" @submit.prevent="confirmPull">
+      <form
+        v-else-if="step === 'amount'"
+        class="px-6 py-5 sm:px-7"
+        :aria-busy="isSubmitting"
+        @submit.prevent="confirmPull"
+      >
         <div class="rounded-2xl border border-slate-200 bg-[#f4f8ff] p-4">
           <div class="flex items-center gap-3">
             <span
@@ -170,6 +175,7 @@
             placeholder="0"
             class="w-full rounded-2xl border-2 border-slate-200 bg-[#f4f8ff] py-4 pl-4 pr-10 text-right text-xl font-black tracking-tight text-[#0a192f] outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
             aria-describedby="pacemaker-pull-help"
+            :disabled="isPullLocked"
             @input="handlePullAmountInput"
           />
           <span
@@ -184,14 +190,32 @@
             :key="amount"
             type="button"
             class="rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-primary transition hover:border-primary hover:bg-primary hover:text-white"
-            @click="pullAmount = amount"
+            :disabled="isPullLocked"
+            @click="setPullAmount(amount)"
           >
             {{ formatKRWCompact(amount) }}
           </button>
         </div>
 
         <p
-          v-if="pullAmount > selectedAccount.balance"
+          v-if="isPullOutcomeUnknown"
+          id="pacemaker-pull-help"
+          class="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-xs font-bold leading-relaxed text-amber-800"
+          role="alert"
+        >
+          이체 결과를 확인하지 못했어요. 이미 처리됐을 수도 있어서 다시 보내지 않았어요. 목표 자산을
+          확인한 뒤 필요하면 다시 시도해 주세요.
+        </p>
+        <p
+          v-else-if="pullFormError"
+          id="pacemaker-pull-help"
+          class="mt-4 rounded-xl border border-pink-200 bg-pink-50 px-3 py-2.5 text-xs font-bold leading-relaxed text-[#be185d]"
+          role="alert"
+        >
+          {{ pullFormError }}
+        </p>
+        <p
+          v-else-if="pullAmount > selectedAccount.balance"
           id="pacemaker-pull-help"
           class="mt-4 rounded-xl border border-pink-200 bg-pink-50 px-3 py-2.5 text-xs font-bold leading-relaxed text-[#be185d]"
           role="alert"
@@ -204,26 +228,45 @@
         </p>
 
         <div class="mt-5 flex gap-3">
+          <!-- 결과를 모를 때는 재전송 대신 실제 상태를 확인하러 보낸다. -->
           <button
+            v-if="isPullOutcomeUnknown"
             type="button"
-            class="flex-1 rounded-2xl bg-slate-100 py-3.5 text-sm font-bold text-slate-500 transition hover:bg-slate-200"
-            @click="goBack"
+            class="w-full rounded-2xl bg-primary py-3.5 text-sm font-black text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700"
+            @click="closeFlow(false)"
           >
-            취소
+            목표 자산 확인하기
           </button>
-          <button
-            type="submit"
-            class="flex-[2] rounded-2xl bg-primary py-3.5 text-sm font-black text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:shadow-none"
-            :disabled="!isPullAmountValid"
-          >
-            {{ isPullAmountValid ? `${formatKRW(pullAmount)} 끌어쓰기` : '금액을 입력해 주세요' }}
-          </button>
+          <template v-else>
+            <button
+              type="button"
+              class="flex-1 rounded-2xl bg-slate-100 py-3.5 text-sm font-bold text-slate-500 transition hover:bg-slate-200"
+              :disabled="isSubmitting"
+              @click="goBack"
+            >
+              취소
+            </button>
+            <button
+              type="submit"
+              class="flex-[2] rounded-2xl bg-primary py-3.5 text-sm font-black text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:shadow-none"
+              :disabled="!isPullAmountValid || isSubmitting"
+            >
+              {{
+                isSubmitting
+                  ? '끌어오는 중…'
+                  : isPullAmountValid
+                    ? `${formatKRW(pullAmount)} 끌어쓰기`
+                    : '금액을 입력해 주세요'
+              }}
+            </button>
+          </template>
         </div>
       </form>
 
       <form
         v-else-if="step === 'goal'"
         class="px-6 py-5 sm:px-7"
+        :aria-busy="isSubmitting"
         @submit.prevent="saveGoalAdjustment"
       >
         <label for="pacemaker-goal-amount" class="block text-xs font-bold text-[#0a192f]"
@@ -236,6 +279,7 @@
             type="text"
             inputmode="numeric"
             autocomplete="off"
+            :disabled="isSubmitting"
             class="w-full rounded-2xl border-2 border-slate-200 bg-[#f4f8ff] py-3.5 pl-4 pr-10 text-right text-base font-black text-[#0a192f] outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
             @input="handleGoalAmountInput"
           />
@@ -245,20 +289,21 @@
           >
         </div>
 
-        <label for="pacemaker-goal-date" class="mt-4 block text-xs font-bold text-[#0a192f]"
-          >목표 날짜</label
+        <label for="pacemaker-goal-month" class="mt-4 block text-xs font-bold text-[#0a192f]"
+          >목표 월</label
         >
         <input
-          id="pacemaker-goal-date"
-          v-model="goalDate"
-          type="date"
-          :min="minimumGoalDate"
+          id="pacemaker-goal-month"
+          v-model="goalMonth"
+          type="month"
+          :min="minimumGoalMonth"
+          :disabled="isSubmitting"
           class="mt-2 w-full rounded-2xl border-2 border-slate-200 bg-[#f4f8ff] px-4 py-3.5 text-sm font-bold text-[#0a192f] outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
         />
 
         <div class="mt-4 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
           <p class="text-xs leading-relaxed text-slate-600">
-            저장하면 새 목표 금액과 날짜를 기준으로 월별 페이스를 다시 계산해요.
+            목표일은 선택한 월의 마지막 날로 저장되고, 월별 페이스를 다시 계산해요.
           </p>
         </div>
 
@@ -318,6 +363,13 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGoalStore } from '@/features/goal/store/goal.store'
+import {
+  calculateGoalMonths,
+  clampGoalMonth,
+  formatGoalMonth,
+  getMinimumGoalMonth,
+  normalizeGoalMonth,
+} from '@/features/goal/lib/goal-months'
 import BaseModal from '@/shared/ui/BaseModal.vue'
 import AppIcon from '@/shared/ui/AppIcon.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -337,8 +389,11 @@ const step = ref('strategy')
 const selectedAccount = ref(null)
 const pullAmount = ref(0)
 const goalAmount = ref(0)
-const goalDate = ref('')
-const minimumGoalDate = ref('')
+const goalMonth = ref('')
+const minimumGoalMonth = ref('')
+const pullFormError = ref('')
+// 이체 성공/실패를 확인하지 못한 상태. 재전송이 이중 이체가 될 수 있어 폼을 잠근다.
+const isPullOutcomeUnknown = ref(false)
 const goalFormError = ref('')
 const isSubmitting = ref(false)
 const shouldRefreshGoal = ref(false)
@@ -367,7 +422,7 @@ const strategyOptions = Object.freeze([
     id: 'goal',
     icon: '📅',
     title: '목표 조정하기',
-    description: '목표 금액이나 날짜를 수정해서 로드맵을 다시 맞춰요.',
+    description: '목표 금액이나 목표 월을 수정해서 로드맵을 다시 맞춰요.',
   },
 ])
 
@@ -389,7 +444,11 @@ const formattedGoalAmount = computed(() =>
 const isPullAmountValid = computed(
   () => pullAmount.value > 0 && pullAmount.value <= Number(selectedAccount.value?.balance ?? 0)
 )
-const canGoBack = computed(() => !['strategy', 'success'].includes(step.value))
+const isPullLocked = computed(() => isSubmitting.value || isPullOutcomeUnknown.value)
+// 결과를 모르는 동안은 계좌·금액을 바꿔 재시도하는 경로를 막고 상태 확인만 남긴다.
+const canGoBack = computed(
+  () => !['strategy', 'success'].includes(step.value) && !isPullOutcomeUnknown.value
+)
 
 const eyebrow = computed(() => {
   if (step.value === 'accounts' || step.value === 'amount') return '끌어쓰기'
@@ -414,15 +473,14 @@ watch(
 )
 
 function resetFlow() {
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-
   step.value = 'strategy'
   selectedAccount.value = null
   pullAmount.value = 0
   goalAmount.value = Number(props.goal?.goalAmount ?? 0)
-  goalDate.value = normalizeGoalDate(props.goal?.period?.endDate)
-  minimumGoalDate.value = toLocalDate(tomorrow)
+  minimumGoalMonth.value = getMinimumGoalMonth()
+  goalMonth.value = clampGoalMonth(props.goal?.period?.endDate, minimumGoalMonth.value)
+  pullFormError.value = ''
+  isPullOutcomeUnknown.value = false
   goalFormError.value = ''
   isSubmitting.value = false
   shouldRefreshGoal.value = false
@@ -455,18 +513,26 @@ async function selectStrategy(strategy) {
 }
 
 async function loadAccounts() {
-  await goalStore.fetchAccounts('CHECKING').catch(() => undefined)
+  await goalStore.fetchAccounts('CHECKING', { excludeGoalLinked: true }).catch(() => undefined)
 }
 
 function selectAccount(account) {
   selectedAccount.value = account
   pullAmount.value = 0
+  pullFormError.value = ''
   step.value = 'amount'
 }
 
 function handlePullAmountInput(event) {
   const digitsOnly = event.target.value.replace(/[^0-9]/g, '')
   pullAmount.value = digitsOnly ? Number(digitsOnly) : 0
+  pullFormError.value = ''
+}
+
+function setPullAmount(amount) {
+  if (isPullLocked.value) return
+  pullAmount.value = amount
+  pullFormError.value = ''
 }
 
 function handleGoalAmountInput(event) {
@@ -474,21 +540,51 @@ function handleGoalAmountInput(event) {
   goalAmount.value = digitsOnly ? Number(digitsOnly) : 0
 }
 
-function confirmPull() {
-  if (!isPullAmountValid.value) return
+async function confirmPull() {
+  if (!isPullAmountValid.value || isPullLocked.value) return
 
-  successState.value = {
-    icon: '💸',
-    title: '부족분을 채울 준비가 됐어요',
-    description: `${selectedAccount.value.accountName}에서 끌어쓸 금액을 확인했어요.`,
-    detailLabel: '끌어쓸 금액',
-    detailValue: formatKRW(pullAmount.value),
+  pullFormError.value = ''
+  isSubmitting.value = true
+  try {
+    const result = await goalStore.pullGoalFunds(props.goal.goalId, {
+      sourceAccountId: selectedAccount.value.accountId,
+      amount: pullAmount.value,
+    })
+
+    successState.value = {
+      icon: '💸',
+      title: '부족분을 채웠어요',
+      description: `${selectedAccount.value.accountName}에서 목표 자산으로 자금을 옮겼어요.`,
+      detailLabel: '끌어온 금액',
+      detailValue: formatKRW(result.pulledAmount),
+    }
+    shouldRefreshGoal.value = true
+    step.value = 'success'
+  } catch (error) {
+    // status 0은 응답을 못 받은 경우(네트워크 끊김·타임아웃), 5xx는 서버가 처리 중 실패한 경우다.
+    // 둘 다 이체가 이미 커밋됐을 수 있어 재전송을 막는다.
+    // 4xx와 본문으로 거절된 경우(status 없는 Error)는 서버가 처리하지 않은 것이라 재시도해도 안전하다.
+    const status = error?.status
+    if (status === 0 || status >= 500) {
+      isPullOutcomeUnknown.value = true
+      shouldRefreshGoal.value = true
+      return
+    }
+
+    pullFormError.value = error?.message ?? '자금을 끌어오지 못했어요. 잠시 후 다시 시도해 주세요.'
+    return
+  } finally {
+    isSubmitting.value = false
   }
-  step.value = 'success'
+
+  // 이체 후 잔액은 다른 화면과 공유하는 스토어 상태라 갱신해두되,
+  // 성공 화면을 곧바로 닫을 수 있어야 하므로 isSubmitting을 푼 뒤에 재조회한다.
+  await goalStore.fetchAccounts('CHECKING', { excludeGoalLinked: true }).catch(() => undefined)
 }
 
 async function saveGoalAdjustment() {
   goalFormError.value = ''
+  const goalMonths = calculateGoalMonths(goalMonth.value)
 
   if (!Number.isFinite(goalAmount.value) || goalAmount.value < 10000) {
     goalFormError.value = '목표 금액을 10,000원 이상으로 입력해 주세요.'
@@ -498,17 +594,18 @@ async function saveGoalAdjustment() {
     goalFormError.value = '목표 금액은 현재 모인 금액보다 작게 설정할 수 없어요.'
     return
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(goalDate.value) || goalDate.value < minimumGoalDate.value) {
-    goalFormError.value = '목표 날짜는 내일 이후로 선택해 주세요.'
+  if (!normalizeGoalMonth(goalMonth.value) || goalMonths <= 0) {
+    goalFormError.value = '목표 월은 다음 달 이후로 선택해 주세요.'
     return
   }
 
   isSubmitting.value = true
   try {
     await goalStore.updateGoal(props.goal.goalId, {
+      // 목표명은 이 화면에서 수정하지 않지만 빠뜨리면 NULL로 덮이므로 현재 값을 함께 보낸다.
+      goalName: props.goal.goalName,
       goalAmount: goalAmount.value,
-      goalDate: goalDate.value,
-      status: props.goal.status === 'PAUSED' ? 'PAUSED' : 'ACTIVE',
+      goalMonths,
     })
 
     successState.value = {
@@ -516,7 +613,7 @@ async function saveGoalAdjustment() {
       title: '새 계획을 로드맵에 반영했어요',
       description: '변경한 목표를 기준으로 앞으로의 페이스를 이어가요.',
       detailLabel: '새 목표',
-      detailValue: `${formatKRW(goalAmount.value)} · ${formatDate(goalDate.value)}`,
+      detailValue: `${formatKRW(goalAmount.value)} · ${formatGoalMonth(goalMonth.value)}`,
     }
     shouldRefreshGoal.value = true
     step.value = 'success'
@@ -528,31 +625,12 @@ async function saveGoalAdjustment() {
 }
 
 function goBack() {
+  pullFormError.value = ''
   goalFormError.value = ''
   if (step.value === 'amount') {
     step.value = 'accounts'
     return
   }
   step.value = 'strategy'
-}
-
-function normalizeGoalDate(value) {
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value ?? '')) return value
-  if (!/^\d{4}-\d{2}$/.test(value ?? '')) return ''
-
-  const [year, month] = value.split('-').map(Number)
-  const lastDay = new Date(year, month, 0).getDate()
-  return `${value}-${String(lastDay).padStart(2, '0')}`
-}
-
-function toLocalDate(date) {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-function formatDate(value) {
-  return value.replaceAll('-', '.')
 }
 </script>

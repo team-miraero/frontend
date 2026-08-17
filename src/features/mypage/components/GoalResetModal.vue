@@ -56,13 +56,14 @@
       </div>
 
       <label class="block">
-        <span class="mb-2 block text-sm font-bold text-[#0a192f]">목표 날짜</span>
+        <span class="mb-2 block text-sm font-bold text-[#0a192f]">목표 월</span>
         <input
-          v-model="form.goalDate"
-          type="date"
-          :min="minimumGoalDate"
+          v-model="form.goalMonth"
+          type="month"
+          :min="minimumGoalMonth"
           class="mypage-goal-input"
         />
+        <p class="mt-1.5 text-xs text-slate-400">목표일은 선택한 월의 마지막 날로 저장됩니다.</p>
       </label>
 
       <fieldset>
@@ -93,7 +94,7 @@
         </p>
         <p class="mt-2 flex justify-between gap-4">
           <span class="text-slate-500">달성 예정</span>
-          <strong class="text-right text-[#0a192f]">{{ formatGoalDate(form.goalDate) }}</strong>
+          <strong class="text-right text-[#0a192f]">{{ goalMonthLabel }}</strong>
         </p>
       </div>
 
@@ -121,6 +122,12 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
+import {
+  calculateGoalMonths,
+  clampGoalMonth,
+  getMinimumGoalMonth,
+  normalizeGoalMonth,
+} from '@/features/goal'
 import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
 import MypageModal from '@/features/mypage/components/MypageModal.vue'
 
@@ -132,7 +139,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'submit'])
-const form = reactive({ goalAmount: 0, goalDate: '', status: 'ACTIVE' })
+const form = reactive({ goalAmount: 0, goalMonth: '', status: 'ACTIVE' })
 const validationError = ref('')
 const amountPresets = [10000000, 30000000, 50000000]
 const statusOptions = [
@@ -144,41 +151,26 @@ const isOpen = computed({
   set: (value) => emit('update:modelValue', value),
 })
 // 반응형 의존성이 없어 computed로 두면 자정을 넘겨도 갱신되지 않으므로 열릴 때마다 계산한다.
-const minimumGoalDate = ref('')
-
-function toLocalDate(date) {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-function normalizeGoalDate(value) {
-  if (!value) return ''
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
-  if (/^\d{4}-\d{2}$/.test(value)) return `${value}-01`
-  return toLocalDate(new Date(value))
-}
-
-function formatGoalDate(value) {
-  if (!value) return '-'
-  const [year, month, day] = value.split('-')
-  return `${year}년 ${Number(month)}월 ${Number(day)}일`
-}
+const minimumGoalMonth = ref('')
+const goalMonthLabel = computed(() => {
+  const normalized = normalizeGoalMonth(form.goalMonth)
+  if (!normalized) return '-'
+  const [year, month] = normalized.split('-')
+  return `${year}년 ${Number(month)}월`
+})
 
 function resetForm() {
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-
+  minimumGoalMonth.value = getMinimumGoalMonth()
   form.goalAmount = props.goal?.goalAmount ?? 0
-  form.goalDate = normalizeGoalDate(props.goal?.period?.endDate)
+  form.goalMonth = clampGoalMonth(props.goal?.period?.endDate, minimumGoalMonth.value)
   form.status = ['PAUSE', 'PAUSED'].includes(props.goal?.status) ? 'PAUSE' : 'ACTIVE'
-  minimumGoalDate.value = toLocalDate(tomorrow)
   validationError.value = ''
 }
 
 function submit() {
   validationError.value = ''
+  const goalMonths = calculateGoalMonths(form.goalMonth)
+
   if (!Number.isFinite(form.goalAmount) || form.goalAmount < 10000) {
     validationError.value = '목표 금액을 1만원 이상 입력해주세요.'
     return
@@ -187,14 +179,14 @@ function submit() {
     validationError.value = '목표 금액은 현재 모은 금액보다 작을 수 없습니다.'
     return
   }
-  if (!form.goalDate || form.goalDate < minimumGoalDate.value) {
-    validationError.value = '목표 날짜는 내일 이후로 설정해주세요.'
+  if (!normalizeGoalMonth(form.goalMonth) || goalMonths <= 0) {
+    validationError.value = '목표 월은 다음 달 이후로 설정해주세요.'
     return
   }
 
   emit('submit', {
-    goalDate: form.goalDate,
     goalAmount: form.goalAmount,
+    goalMonths,
     status: form.status,
   })
 }
