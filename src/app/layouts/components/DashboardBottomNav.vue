@@ -23,10 +23,10 @@
               : ''
           "
         >
-          <!-- 활성: Solid Primary Blue Fill 깃발 / 비활성: Outline 깃발 -->
+          <!-- 활성: Solid Primary Blue Fill 깃발 / 비활성: Outline 깃발 (다른 탭들과 시각적 1:1 광학 균형) -->
           <svg
             viewBox="0 0 24 24"
-            class="size-5 transition-transform duration-200"
+            class="size-[18px] transition-transform duration-200"
             :class="isRoadmapActiveTab ? 'scale-105 fill-primary stroke-primary' : 'fill-none stroke-current'"
             stroke-width="1.8"
             stroke-linecap="round"

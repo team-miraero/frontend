@@ -4,7 +4,6 @@
       :goals="goals"
       :selected-goal-id="selectedGoalId"
       :disabled="areGoalsLoading"
-      :helper-text="roadmapHelperText"
       :trailing-text="myDataStatusText"
       @update:selected-goal-id="$emit('select-goal', $event)"
     />

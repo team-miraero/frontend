@@ -22,21 +22,26 @@
             {{ userInitial }}
           </div>
           <div class="min-w-0">
-            <div class="flex items-center gap-2">
-              <strong class="text-base font-bold text-[#0a192f]">{{ userName || '회원' }} 님</strong>
-              <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-                마이페이지
-              </span>
-            </div>
-            <p class="mt-1 text-xs text-slate-500">
+            <strong class="block text-base sm:text-lg font-bold text-[#0a192f] truncate">
+              {{ userName || '회원' }} 님
+            </strong>
+            <p class="mt-0.5 text-xs text-slate-500">
               진행 중인 목표 <span class="font-bold text-primary">{{ goalStore.goals.length }}</span>개
             </p>
           </div>
         </div>
         <div class="flex items-center gap-1 text-xs font-bold text-slate-400 group-hover:text-primary transition-colors">
           <span>내 정보 관리</span>
-          <svg class="size-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+          <svg
+            class="size-4 shrink-0 transition-transform group-hover:translate-x-0.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
           </svg>
         </div>
       </RouterLink>
@@ -48,29 +53,49 @@
           <!-- 청년 정책 -->
           <RouterLink
             :to="{ name: ROUTE_NAMES.YOUTH_POLICY }"
-            class="flex items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
+            class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
           >
-            <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
-              <img :src="iconMap.policy" alt="" class="size-5 object-contain" />
-            </div>
-            <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-3">
+              <div class="flex size-9.5 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
+                <img :src="iconMap.policy" alt="" class="size-5 object-contain" />
+              </div>
               <strong class="text-sm font-bold text-[#0a192f]">청년 정책 지원금</strong>
-              <p class="text-xs text-slate-400 truncate">나에게 맞는 청년 혜택 모아보기</p>
             </div>
+            <svg
+              class="size-4 shrink-0 text-slate-300"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
           </RouterLink>
 
-          <!-- 금융 상품 추천 -->
+          <!-- KB 금융 상품 추천 -->
           <RouterLink
             :to="{ name: ROUTE_NAMES.PRODUCTS }"
-            class="flex items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
+            class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
           >
-            <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-              <img :src="iconMap.products" alt="" class="size-5 object-contain" />
+            <div class="flex items-center gap-3">
+              <div class="flex size-9.5 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                <img :src="iconMap.products" alt="" class="size-5 object-contain" />
+              </div>
+              <strong class="text-sm font-bold text-[#0a192f]">KB 금융 상품</strong>
             </div>
-            <div class="min-w-0 flex-1">
-              <strong class="text-sm font-bold text-[#0a192f]">맞춤 금융 상품</strong>
-              <p class="text-xs text-slate-400 truncate">금리 높은 적금·예금 비교</p>
-            </div>
+            <svg
+              class="size-4 shrink-0 text-slate-300"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
           </RouterLink>
         </div>
       </section>
@@ -82,17 +107,22 @@
           :to="{ name: ROUTE_NAMES.COLLECTION }"
           class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
         >
-          <div class="flex items-center gap-3.5">
-            <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+          <div class="flex items-center gap-3">
+            <div class="flex size-9.5 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
               <img :src="iconMap.collection" alt="" class="size-5 object-contain" />
             </div>
-            <div>
-              <strong class="text-sm font-bold text-[#0a192f]">나의 컬렉션</strong>
-              <p class="text-xs text-slate-400">획득한 캐릭터 뱃지와 성취 도감</p>
-            </div>
+            <strong class="text-sm font-bold text-[#0a192f]">나의 컬렉션</strong>
           </div>
-          <svg class="size-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+          <svg
+            class="size-4 shrink-0 text-slate-300"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
           </svg>
         </RouterLink>
       </section>
@@ -105,7 +135,7 @@
             :to="{ name: ROUTE_NAMES.DASHBOARD }"
             class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
-            <img :src="iconMap.roadmap" alt="" class="size-4.5 object-contain" />
+            <img :src="iconMap.roadmap" alt="" class="size-5 object-contain" />
             <span>목표 로드맵</span>
           </RouterLink>
 
@@ -113,7 +143,7 @@
             :to="{ name: ROUTE_NAMES.SPENDING }"
             class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
-            <img :src="iconMap.spending" alt="" class="size-4.5 object-contain" />
+            <img :src="iconMap.spending" alt="" class="size-5 object-contain" />
             <span>지출 관리</span>
           </RouterLink>
 
@@ -121,7 +151,7 @@
             :to="{ name: ROUTE_NAMES.PACEMAKER }"
             class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
-            <img :src="iconMap.pacemaker" alt="" class="size-4.5 object-contain" />
+            <img :src="iconMap.pacemaker" alt="" class="size-5 object-contain" />
             <span>페이스메이커</span>
           </RouterLink>
 
@@ -129,7 +159,7 @@
             :to="{ name: ROUTE_NAMES.COACH }"
             class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
-            <img :src="iconMap.coach" alt="" class="size-4.5 object-contain" />
+            <img :src="iconMap.coach" alt="" class="size-5 object-contain" />
             <span>AI 목표 코치</span>
           </RouterLink>
         </div>
@@ -137,30 +167,45 @@
 
       <!-- 5. 계정 & 설정 -->
       <section class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs">
-        <h2 class="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">계정 & 설정</h2>
-        <ul class="divide-y divide-slate-100 text-sm font-bold text-slate-700">
-          <li>
-            <RouterLink :to="{ name: ROUTE_NAMES.MYPAGE }" class="flex items-center justify-between py-3 hover:text-primary transition">
-              <span>계정 및 마이데이터 관리</span>
-              <svg class="size-4 text-slate-300" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-              </svg>
-            </RouterLink>
-          </li>
-          <li>
-            <button
-              type="button"
-              class="flex w-full items-center justify-between py-3 text-rose-500 hover:text-rose-600 transition cursor-pointer"
-              @click="logoutModalOpen = true"
+        <h2 class="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">계정 & 설정</h2>
+        <div class="divide-y divide-slate-100 text-sm font-bold text-slate-700">
+          <RouterLink
+            :to="{ name: ROUTE_NAMES.MYPAGE }"
+            class="group flex w-full items-center justify-between py-3.5 text-left transition hover:text-primary"
+          >
+            <span class="leading-none">계정 및 마이데이터 관리</span>
+            <svg
+              class="size-4 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
-              <span>로그아웃</span>
-              <svg class="size-4 text-rose-300" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z" clip-rule="evenodd" />
-                <path fill-rule="evenodd" d="M19 10a.75.75 0 00-.75-.75H8.704l2.47-2.47a.75.75 0 10-1.06-1.06l-3.75 3.75a.75.75 0 000 1.06l3.75 3.75a.75.75 0 101.06-1.06l-2.47-2.47H18.25A.75.75 0 0019 10z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </li>
-        </ul>
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </RouterLink>
+
+          <button
+            type="button"
+            class="group flex w-full items-center justify-between py-3.5 text-left text-slate-700 transition hover:text-rose-600 cursor-pointer"
+            @click="logoutModalOpen = true"
+          >
+            <span class="leading-none">로그아웃</span>
+            <svg
+              class="size-4 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-rose-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+        </div>
       </section>
     </div>
 

@@ -4,15 +4,30 @@
   >
     <!-- 모바일/태블릿 헤더 (lg:hidden) -->
     <div class="page-container flex h-14 sm:h-16 items-center justify-between gap-3 lg:hidden">
-      <!-- 1. 뒤로가기 서브 헤더 (상세/서브 페이지) -->
-      <div v-if="route.meta.showBack" class="flex items-center gap-1.5 min-w-0">
+      <!-- 1. 뒤로가기 / 닫기 서브 헤더 (상세/서브 페이지 및 챗봇 세션) -->
+      <div v-if="route.meta.showBack || route.meta.showBackButton || route.meta.showClose" class="flex items-center gap-1.5 min-w-0">
         <button
           type="button"
           class="-ml-1.5 flex size-9 shrink-0 items-center justify-center rounded-xl text-slate-700 transition hover:bg-slate-100 active:scale-95 cursor-pointer"
-          aria-label="이전 화면으로 이동"
-          @click="router.back()"
+          :aria-label="route.meta.showClose ? '화면 닫기' : '이전 화면으로 이동'"
+          @click="handleBackOrClose"
         >
-          <svg class="size-5" viewBox="0 0 20 20" fill="currentColor">
+          <!-- 닫기 (✕) 아이콘 -->
+          <svg
+            v-if="route.meta.showClose"
+            class="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          <!-- 뒤로가기 (<) 화살표 아이콘 -->
+          <svg v-else class="size-5" viewBox="0 0 20 20" fill="currentColor">
             <path
               fill-rule="evenodd"
               d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
@@ -41,9 +56,11 @@
 
         <RouterLink
           :to="{ name: ROUTE_NAMES.DASHBOARD }"
-          class="flex shrink-0 items-center gap-1.5"
+          class="flex shrink-0 items-center gap-2"
         >
-          <img src="@/assets/images/logo.png" alt="미래로 로고" class="size-7 object-contain" />
+          <div class="flex size-7 items-center justify-center rounded-[10px] bg-primary shadow-xs">
+            <img src="@/assets/icons/logo.svg" alt="미래로" class="size-4" />
+          </div>
           <strong class="text-base font-bold tracking-tight text-[#0a192f] hidden sm:block">미래로</strong>
         </RouterLink>
 
@@ -267,9 +284,11 @@
     <div class="page-container hidden h-20 items-center gap-5 lg:flex">
       <RouterLink
         :to="{ name: ROUTE_NAMES.DASHBOARD }"
-        class="mr-4 flex shrink-0 items-center gap-2"
+        class="mr-4 flex shrink-0 items-center gap-2.5"
       >
-        <img src="@/assets/images/logo.png" alt="미래로 로고" class="size-8 object-contain" />
+        <div class="flex size-8 items-center justify-center rounded-[12px] bg-primary shadow-xs">
+          <img src="@/assets/icons/logo.svg" alt="미래로" class="size-[18px]" />
+        </div>
         <strong class="text-xl font-bold tracking-tight text-[#0a192f]">미래로</strong>
       </RouterLink>
 
@@ -800,6 +819,14 @@ function handleRoadmapHeaderClick() {
     } else {
       router.push({ name: ROUTE_NAMES.DASHBOARD })
     }
+  }
+}
+
+function handleBackOrClose() {
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push({ name: ROUTE_NAMES.DASHBOARD })
   }
 }
 

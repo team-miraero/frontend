@@ -4,7 +4,6 @@
       :goals="goals"
       :selected-goal-id="selectedGoalId"
       :disabled="areGoalsLoading"
-      :helper-text="roadmapHelperText"
       @update:selected-goal-id="goalStore.selectGoal"
     />
 
@@ -15,20 +14,7 @@
         aria-labelledby="recommendation-summary-title"
       >
         <div class="flex flex-col gap-4">
-          <!-- 상단 뱃지 -->
-          <div class="flex flex-wrap items-center gap-2">
-            <span
-              class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary"
-            >
-              맞춤 금융 상품
-            </span>
-            <span
-              v-if="selectedGoalName"
-              class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-bold text-slate-600"
-            >
-              {{ selectedGoalName }}
-            </span>
-          </div>
+          <!-- 로딩 상태 -->
 
           <!-- 로딩 상태 -->
           <div v-if="isRecommendationLoading" class="space-y-2 py-2">
@@ -98,7 +84,7 @@
             <!-- 하단 인셋 비교 카드 (대시보드 인셋 스타일) -->
             <div
               v-if="linkedAssets.length > 0 || bestProduct"
-              class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 rounded-2xl border border-slate-100 bg-[#f8fbff] p-3 sm:p-4 shadow-xs"
+              class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 sm:p-4 shadow-xs"
             >
               <div class="px-2">
                 <span class="text-[11px] font-bold text-slate-400">현재 상태</span>
@@ -241,7 +227,7 @@
       </section>
 
       <div
-        class="mt-6 flex items-start gap-2.5 rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 text-[11px] leading-relaxed text-slate-400 shadow-xs"
+        class="mt-6 flex items-start gap-2.5 rounded-2xl border border-slate-200/60 bg-slate-50/80 p-4 text-[11px] leading-relaxed text-slate-400 shadow-xs"
       >
         <span
           class="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-slate-200/80 text-[10px] font-bold text-slate-600"

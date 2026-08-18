@@ -1,15 +1,14 @@
 <template>
-  <div class="page-container-narrow pb-10 pt-4 sm:pb-14 sm:pt-6 flex flex-col gap-6 sm:gap-8">
+  <div class="page-container-narrow pb-10 pt-3 sm:pb-14 sm:pt-6 flex flex-col gap-4 sm:gap-6">
     <div class="flex items-center justify-between gap-2.5 sm:gap-4">
       <div class="min-w-0 flex-1">
-        <p class="mb-0.5 text-xs font-bold text-slate-400 sm:mb-1">페이스메이커 저금통</p>
         <h2 class="text-xl font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-2xl">
           오늘까지 모인 여유자금
         </h2>
       </div>
       <button
         type="button"
-        class="shrink-0 rounded-full border border-[#c5dcff] bg-[#eaf2ff] px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-[#dceaff] active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:px-4 sm:py-2 cursor-pointer select-none"
+        class="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition hover:bg-slate-50 active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:px-4 sm:py-2 cursor-pointer select-none"
         @click="$emit('edit-max-amount')"
       >
         ⚙ 상한선 수정
@@ -75,7 +74,7 @@
     </section>
 
     <section
-      class="rounded-[20px] border border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5"
+      class="rounded-[20px] border border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 shadow-xs"
       aria-labelledby="streak-title"
     >
       <div class="mb-4 flex flex-col gap-1">
@@ -208,7 +207,7 @@
     </section>
 
     <section aria-labelledby="goal-accounts-title">
-      <h3 id="goal-accounts-title" class="mb-3 text-sm font-bold text-[#0a192f]">
+      <h3 id="goal-accounts-title" class="mb-2.5 px-0.5 text-base font-bold text-[#0a192f] sm:text-lg">
         목표별 입금 계좌
       </h3>
       <div
@@ -237,7 +236,7 @@
         <article
           v-for="group in accountGroups"
           :key="group.goalId"
-          class="flex flex-col gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 sm:px-5"
+          class="flex flex-col gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 sm:px-5 shadow-xs"
         >
           <div class="flex items-center justify-between gap-3">
             <div class="flex min-w-0 items-center gap-3">
@@ -268,7 +267,7 @@
           <div class="grid grid-cols-2 gap-2">
             <button
               type="button"
-              class="rounded-xl border border-[#c5dcff] bg-[#f8fbff] px-3 py-2.5 text-left disabled:cursor-default"
+              class="rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-2.5 text-left disabled:cursor-default"
               :disabled="(group.depositAssets?.length ?? 0) < 2"
               :aria-expanded="expandedGoalId === group.goalId"
               @click="toggleAssetList(group.goalId)"
@@ -285,7 +284,7 @@
                 {{ formatCompactWon(selectedDepositAsset(group)?.balance) }}
               </span>
             </button>
-            <div class="rounded-xl border border-[#c5dcff] bg-[#f8fbff] px-3 py-2.5">
+            <div class="rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-2.5">
               <span class="block truncate text-xs text-slate-400">연동 출금계좌</span>
               <span class="mt-0.5 block text-sm font-bold text-[#0a192f]">
                 {{ formatCompactWon(selectedWithdrawalAccount(group)?.balance) }}
