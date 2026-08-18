@@ -49,16 +49,29 @@ export const useCoachStore = defineStore('feature-coach', () => {
   }
 
   /**
-   * @param {'USER' | 'ASSISTANT'} senderType
+   * @param {string | null | undefined} senderType
    */
   function mapSenderType(senderType) {
-    return senderType === 'USER' ? CHAT_ROLES.USER : CHAT_ROLES.ASSISTANT
+    if (!senderType) return CHAT_ROLES.ASSISTANT
+    const upper = String(senderType).toUpperCase()
+    return upper === 'USER' ? CHAT_ROLES.USER : CHAT_ROLES.ASSISTANT
   }
 
   async function fetchConversations() {
     isLoadingConversations.value = true
     try {
-      conversations.value = await coachApi.getConversations()
+      const res = await coachApi.getConversations()
+      const rawList = Array.isArray(res) ? res : []
+      conversations.value = rawList.map((c) => ({
+        conversationId: c.aiCoachConversationId ?? c.conversationId ?? c.id,
+        title: c.title ?? '새 대화',
+        createdAt: c.createdAt,
+        lastMessageAt: c.lastMessageAt ?? null,
+        ...c,
+      }))
+    } catch (err) {
+      conversations.value = []
+      throw err
     } finally {
       isLoadingConversations.value = false
     }
@@ -74,25 +87,36 @@ export const useCoachStore = defineStore('feature-coach', () => {
     isLoadingMessages.value = true
     try {
       const result = await coachApi.getConversationMessages(conversationId)
-      messages.value = result.messages.map((item) => ({
-        id: item.messageId,
-        role: mapSenderType(item.senderType),
-        content: item.content,
-        createdAt: item.createdAt,
+      const rawMessages = Array.isArray(result) ? result : (result?.messages ?? [])
+      messages.value = rawMessages.map((item) => ({
+        id: item.aiCoachMessageId ?? item.messageId ?? item.id ?? crypto.randomUUID(),
+        role: mapSenderType(item.senderType ?? item.role),
+        content: item.content ?? item.message ?? '',
+        createdAt: item.createdAt ?? new Date().toISOString(),
       }))
+    } catch (err) {
+      messages.value = []
+      throw err
     } finally {
       isLoadingMessages.value = false
     }
   }
 
   /**
-   * @param {string} title
    * @param {string} [welcomeContent] 새 대화방 진입 시 보여줄 인사말 — 서버엔 저장되지 않는 클라이언트 전용 표시
    */
-  async function createNewConversation(title, welcomeContent) {
-    const conversation = await coachApi.createConversation(title)
+  async function createNewConversation(welcomeContent) {
+    const res = await coachApi.createConversation()
+    const newConvId = res?.aiCoachConversationId ?? res?.conversationId ?? res?.id ?? Date.now()
+    const conversation = {
+      conversationId: newConvId,
+      title: res?.title ?? '새 대화',
+      createdAt: res?.createdAt ?? new Date().toISOString(),
+      lastMessageAt: res?.lastMessageAt ?? null,
+      ...res,
+    }
     conversations.value = [conversation, ...conversations.value]
-    currentConversationId.value = conversation.conversationId
+    currentConversationId.value = newConvId
     draftInput.value = ''
     messages.value = welcomeContent
       ? [createLocalMessage(CHAT_ROLES.ASSISTANT, welcomeContent)]
@@ -104,7 +128,9 @@ export const useCoachStore = defineStore('feature-coach', () => {
    */
   async function removeConversation(conversationId) {
     await coachApi.deleteConversation(conversationId)
-    conversations.value = conversations.value.filter((c) => c.conversationId !== conversationId)
+    conversations.value = conversations.value.filter(
+      (c) => (c.aiCoachConversationId ?? c.conversationId) !== conversationId
+    )
 
     if (currentConversationId.value === conversationId) {
       currentConversationId.value = null

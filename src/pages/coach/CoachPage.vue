@@ -154,7 +154,7 @@ watch(
 )
 
 async function handleCreateConversation() {
-  await coachStore.createNewConversation('새 대화', welcomeMessage.value)
+  await coachStore.createNewConversation(welcomeMessage.value)
   if (!isDesktop.value) isCoachSidebarOpen.value = false
   scrollToBottom()
 }
@@ -178,17 +178,21 @@ async function handleDeleteConversation(conversationId) {
   if (coachStore.conversations.length > 0) {
     await coachStore.selectConversation(coachStore.conversations[0].conversationId)
   } else {
-    await coachStore.createNewConversation('새 대화', welcomeMessage.value)
+    await coachStore.createNewConversation(welcomeMessage.value)
   }
 }
 
 onMounted(async () => {
-  await coachStore.fetchConversations()
+  try {
+    await coachStore.fetchConversations()
+  } catch (err) {
+    console.error('대화방 목록 조회 실패:', err)
+  }
 
-  if (coachStore.conversations.length > 0) {
+  if (coachStore.conversations && coachStore.conversations.length > 0) {
     await coachStore.selectConversation(coachStore.conversations[0].conversationId)
   } else {
-    await coachStore.createNewConversation('새 대화', welcomeMessage.value)
+    await coachStore.createNewConversation(welcomeMessage.value)
   }
 
   scrollToBottom()
