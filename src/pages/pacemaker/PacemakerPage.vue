@@ -222,6 +222,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { PacemakerDashboard, usePacemakerStore } from '@/features/pacemaker'
+import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pacemaker.constants'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import AppIcon from '@/shared/ui/AppIcon.vue'
@@ -245,7 +246,7 @@ const featureItems = [
   {
     icon: '🎯',
     title: '목표 연동 입금',
-    description: '쌓인 여유자금을 목표와 연결된 계좌에 원하는 시점에 입금해요.',
+    description: '쌓인 여유자금을 목표와 연결된 자산에 원하는 시점에 입금해요.',
   },
 ]
 
@@ -262,8 +263,8 @@ const howItWorks = [
   },
   {
     step: '03',
-    title: '쌓인 금액을 목표 연동 계좌에 직접 입금',
-    description: '원하는 목표의 출금계좌로 즉시 이체',
+    title: '쌓인 금액을 목표 연결 자산에 직접 입금',
+    description: '원하는 목표의 연결 자산으로 즉시 이동',
   },
 ]
 
@@ -281,7 +282,9 @@ async function loadPacemakerStatus() {
       await pacemakerStore.fetchPacemakerDashboard()
       await Promise.all([
         pacemakerStore.fetchDepositTargets().catch(() => undefined),
-        pacemakerStore.fetchHistories({ page: 0, size: 31 }).catch(() => undefined),
+        pacemakerStore
+          .fetchHistories({ page: 0, size: PACEMAKER_HISTORY_PAGE_SIZE })
+          .catch(() => undefined),
       ])
     }
   } catch (error) {
