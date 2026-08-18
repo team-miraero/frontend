@@ -36,7 +36,14 @@ import { client } from '@/shared/api/client'
  */
 export async function getYouthPolicies(params) {
   const { data: responseBody } = await client.get('/youth-policies', { params })
-  return unwrapApiData(responseBody)
+  const data = unwrapApiData(responseBody)
+  if (!data) return data
+
+  return {
+    ...data,
+    // 백엔드 PageResponse(0-based)를 화면 UI용 1-based 페이지 번호로 보정
+    page: typeof data.page === 'number' ? data.page + 1 : (params?.page ?? 1),
+  }
 }
 
 /**

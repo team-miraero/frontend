@@ -334,7 +334,7 @@ export const youthPolicyHandlers = [
       success: true,
       data: {
         content,
-        page,
+        page: page - 1,
         size,
         totalElements,
         totalPages,

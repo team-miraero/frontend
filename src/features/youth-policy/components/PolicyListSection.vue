@@ -61,7 +61,7 @@
       <div class="flex items-center gap-3 sm:hidden">
         <button
           type="button"
-          class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-40"
+          class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-600 transition-colors disabled:cursor-default disabled:opacity-30 disabled:pointer-events-none"
           :disabled="youthPolicyStore.page <= 1 || youthPolicyStore.isLoading"
           @click="changePage(youthPolicyStore.page - 1)"
         >
@@ -72,7 +72,7 @@
         </span>
         <button
           type="button"
-          class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-600 disabled:cursor-not-allowed disabled:opacity-40"
+          class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-600 transition-colors disabled:cursor-default disabled:opacity-30 disabled:pointer-events-none"
           :disabled="youthPolicyStore.isLastPage || youthPolicyStore.isLoading"
           @click="changePage(youthPolicyStore.page + 1)"
         >
@@ -83,7 +83,7 @@
       <div class="hidden items-center gap-1.5 sm:flex">
         <button
           type="button"
-          class="flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 disabled:cursor-not-allowed disabled:opacity-40"
+          class="flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors disabled:cursor-default disabled:opacity-30 disabled:pointer-events-none"
           aria-label="이전 페이지"
           :disabled="youthPolicyStore.page <= 1 || youthPolicyStore.isLoading"
           @click="changePage(youthPolicyStore.page - 1)"
@@ -94,7 +94,7 @@
           v-for="pageNumber in visiblePageNumbers"
           :key="pageNumber"
           type="button"
-          class="flex size-9 items-center justify-center rounded-lg border text-sm font-bold transition-colors disabled:cursor-not-allowed"
+          class="flex size-9 items-center justify-center rounded-lg border text-sm font-bold transition-colors disabled:cursor-default"
           :class="
             pageNumber === youthPolicyStore.page
               ? 'border-primary bg-primary text-white'
@@ -108,7 +108,7 @@
         </button>
         <button
           type="button"
-          class="flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 disabled:cursor-not-allowed disabled:opacity-40"
+          class="flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors disabled:cursor-default disabled:opacity-30 disabled:pointer-events-none"
           aria-label="다음 페이지"
           :disabled="youthPolicyStore.isLastPage || youthPolicyStore.isLoading"
           @click="changePage(youthPolicyStore.page + 1)"
