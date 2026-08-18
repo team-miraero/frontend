@@ -1,166 +1,162 @@
 <!-- 청년정책 스타일의 모던 커스텀 로드맵 선택기 (데스크톱: 플로팅 카드 팝오버 / 모바일: 바텀시트) -->
 <template>
   <section
-    class="flex min-h-[64px] sm:min-h-[72px] flex-col gap-3 border-b border-slate-200/60 bg-[#f7faff] px-4 py-3.5 sm:flex-row sm:items-center sm:px-6 md:px-8"
+    class="flex min-h-[52px] sm:min-h-[58px] items-center justify-between gap-3 border-b border-slate-200/80 bg-slate-50/80 px-4 py-2 sm:px-6 md:px-8"
     aria-labelledby="roadmap-selector-title"
   >
-    <p id="roadmap-selector-title" class="shrink-0 text-xs font-medium text-slate-500">적용 대상</p>
+    <div class="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3.5">
+      <p id="roadmap-selector-title" class="shrink-0 text-xs font-medium text-slate-500 whitespace-nowrap">
+        적용 대상
+      </p>
 
-    <!-- 커스텀 드롭다운 트리거 영역 -->
-    <div ref="containerRef" class="relative w-full sm:w-[260px]">
-      <button
-        ref="triggerRef"
-        type="button"
-        class="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-xs font-bold text-[#0a192f] shadow-xs outline-none transition-all duration-150 hover:border-primary/40 hover:bg-primary/[0.02] focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 select-none cursor-pointer"
-        :disabled="disabled || goals.length === 0"
-        aria-haspopup="dialog"
-        :aria-expanded="isOpen"
-        aria-label="로드맵 선택 드롭다운"
-        @click="togglePicker"
-      >
-        <!-- 좌측 선택된 목표 2D 라인 아이콘 + 이름 -->
-        <div class="flex min-w-0 items-center gap-2.5">
-          <span
-            class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[#eaf2ff] text-primary"
-            aria-hidden="true"
-          >
-            <GoalTypeIcon
-              :goal-type="matchedSelectedGoal?.goalType || matchedSelectedGoal?.goalName || ''"
-              size="sm"
-            />
-          </span>
-          <span class="truncate text-xs font-black text-[#0a192f]">
-            {{ selectedGoalLabel }}
-          </span>
-        </div>
-
-        <!-- 우측 회전 화살표 아이콘 -->
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          class="size-3.5 shrink-0 text-slate-400 transition-transform duration-200"
-          :class="isOpen ? 'rotate-180 text-primary' : ''"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
-
-      <!-- 팝오버 / 바텀시트 상자 -->
-      <template v-if="isOpen">
-        <!-- 모바일 백드롭 -->
+      <!-- 커스텀 드롭다운 트리거 영역 -->
+      <div ref="containerRef" class="relative min-w-0 w-full sm:w-[260px]">
         <button
+          ref="triggerRef"
           type="button"
-          class="fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px] sm:bg-transparent sm:backdrop-blur-none"
-          aria-label="로드맵 선택 상자 닫기"
-          @click="closePicker"
-        />
-
-        <!-- 드롭다운 박스 레이어 -->
-        <section
-          id="roadmap-select-dialog"
-          ref="panelRef"
-          role="dialog"
-          aria-modal="true"
-          aria-label="로드맵 선택 목록"
-          class="fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-3xl bg-white p-5 shadow-[0_-16px_48px_rgba(15,23,42,0.18)] sm:absolute sm:inset-x-auto sm:bottom-auto sm:left-0 sm:top-[calc(100%+0.5rem)] sm:max-h-[420px] sm:w-[320px] sm:rounded-2xl sm:border sm:border-slate-200/90 sm:p-3 sm:shadow-[0_18px_48px_rgba(15,23,42,0.14)]"
+          class="flex h-9 sm:h-10 w-full items-center justify-between rounded-xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-bold text-[#0a192f] shadow-2xs outline-none transition-all duration-150 hover:border-slate-300 hover:bg-slate-50/50 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 select-none cursor-pointer"
+          :disabled="disabled || goals.length === 0"
+          aria-haspopup="dialog"
+          :aria-expanded="isOpen"
+          aria-label="로드맵 선택 드롭다운"
+          @click="togglePicker"
         >
-          <!-- 모바일 헤더 (데스크톱에서는 숨김) -->
-          <header class="flex items-center justify-between border-b border-slate-100 pb-3 sm:hidden">
-            <h2 class="text-base font-black text-[#0a192f]">로드맵 선택</h2>
-            <button
-              type="button"
-              class="flex size-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-              aria-label="닫기"
-              @click="closePicker"
+          <!-- 좌측 선택된 목표 2D 라인 아이콘 + 이름 -->
+          <div class="flex min-w-0 items-center gap-2">
+            <span
+              class="flex size-5 sm:size-6 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600"
+              aria-hidden="true"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4">
-                <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12" />
-              </svg>
-            </button>
-          </header>
+              <GoalTypeIcon
+                :goal-type="matchedSelectedGoal?.goalType || matchedSelectedGoal?.goalName || ''"
+                size="sm"
+              />
+            </span>
+            <span class="truncate text-xs font-bold text-[#0a192f]">
+              {{ selectedGoalLabel }}
+            </span>
+          </div>
 
-          <!-- 로드맵 목록 -->
-          <div class="mt-3 sm:mt-0 min-h-0 flex-1 overflow-y-auto space-y-1.5 pr-0.5">
-            <button
-              v-for="goal in goals"
-              :key="goal.goalId"
-              type="button"
-              class="group flex w-full items-center justify-between rounded-xl border p-2.5 sm:p-2.5 text-left transition-all duration-150 cursor-pointer select-none"
-              :class="
-                String(goal.goalId) === String(selectedGoalId)
-                  ? 'border-primary/40 bg-[#f0f6ff] shadow-2xs'
-                  : 'border-transparent bg-[#f8fbff] hover:bg-slate-100/80 hover:border-slate-200'
-              "
-              @click="handleSelect(goal)"
-            >
-              <div class="flex min-w-0 items-center gap-2.5">
-                <div
-                  class="flex size-8 shrink-0 items-center justify-center rounded-lg transition-transform duration-150 group-hover:scale-105"
-                  :class="
-                    String(goal.goalId) === String(selectedGoalId)
-                      ? 'bg-white text-primary shadow-xs'
-                      : 'bg-white/80 text-slate-500 group-hover:text-primary'
-                  "
-                >
-                  <GoalTypeIcon :goal-type="goal.goalType || goal.goalName || ''" size="sm" />
-                </div>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <p
-                      class="truncate text-xs font-black transition-colors"
-                      :class="
-                        String(goal.goalId) === String(selectedGoalId)
-                          ? 'text-primary'
-                          : 'text-[#0a192f]'
-                      "
-                    >
-                      {{ goal.goalName }} 로드맵
-                    </p>
-                  </div>
-                  <p
-                    v-if="goal.goalAmount"
-                    class="mt-0.5 truncate text-[11px] font-medium text-slate-400"
-                  >
-                    {{ formatGoalSubText(goal) }}
-                  </p>
-                </div>
-              </div>
+          <!-- 우측 회전 화살표 아이콘 -->
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            class="size-3.5 shrink-0 text-slate-400 transition-transform duration-200"
+            :class="isOpen ? 'rotate-180 text-primary' : ''"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
 
-              <!-- 우측 체크마크 원 -->
-              <div
-                class="flex size-5 shrink-0 items-center justify-center rounded-full transition-all duration-150"
+        <!-- 팝오버 / 바텀시트 상자 -->
+        <template v-if="isOpen">
+          <!-- 모바일 백드롭 -->
+          <button
+            type="button"
+            class="fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px] sm:bg-transparent sm:backdrop-blur-none"
+            aria-label="로드맵 선택 상자 닫기"
+            @click="closePicker"
+          />
+
+          <!-- 드롭다운 박스 레이어 -->
+          <section
+            id="roadmap-select-dialog"
+            ref="panelRef"
+            role="dialog"
+            aria-modal="true"
+            aria-label="로드맵 선택 목록"
+            class="fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-3xl bg-white p-5 shadow-[0_-16px_48px_rgba(15,23,42,0.18)] sm:absolute sm:inset-x-auto sm:bottom-auto sm:left-0 sm:top-[calc(100%+0.5rem)] sm:max-h-[420px] sm:w-[320px] sm:rounded-2xl sm:border sm:border-slate-200/90 sm:p-3 sm:shadow-[0_18px_48px_rgba(15,23,42,0.14)]"
+          >
+            <!-- 모바일 헤더 (데스크톱에서는 숨김) -->
+            <header class="flex items-center justify-between border-b border-slate-100 pb-3 sm:hidden">
+              <h2 class="text-base font-bold text-[#0a192f]">로드맵 선택</h2>
+              <button
+                type="button"
+                class="flex size-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                aria-label="닫기"
+                @click="closePicker"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4">
+                  <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </header>
+
+            <!-- 로드맵 목록 -->
+            <div class="mt-3 sm:mt-0 min-h-0 flex-1 overflow-y-auto space-y-1.5 pr-0.5">
+              <button
+                v-for="goal in goals"
+                :key="goal.goalId"
+                type="button"
+                class="group flex w-full items-center justify-between rounded-xl border p-2.5 sm:p-2.5 text-left transition-all duration-150 cursor-pointer select-none"
                 :class="
                   String(goal.goalId) === String(selectedGoalId)
-                    ? 'bg-primary text-white shadow-xs scale-100'
-                    : 'border border-slate-200 bg-white text-transparent scale-90 group-hover:border-slate-300'
+                    ? 'border-primary/40 bg-[#f0f6ff] shadow-2xs'
+                    : 'border-transparent bg-[#f8fbff] hover:bg-slate-100/80 hover:border-slate-200'
                 "
+                @click="handleSelect(goal)"
               >
-                <svg
-                  class="size-3 stroke-[3]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <div class="flex min-w-0 items-center gap-2.5">
+                  <div
+                    class="flex size-8 shrink-0 items-center justify-center rounded-lg transition-transform duration-150 group-hover:scale-105"
+                    :class="
+                      String(goal.goalId) === String(selectedGoalId)
+                        ? 'bg-white text-primary shadow-xs'
+                        : 'bg-white/80 text-slate-500 group-hover:text-primary'
+                    "
+                  >
+                    <GoalTypeIcon :goal-type="goal.goalType || goal.goalName || ''" size="sm" />
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                      <p
+                        class="truncate text-xs font-bold transition-colors"
+                        :class="
+                          String(goal.goalId) === String(selectedGoalId)
+                            ? 'text-primary'
+                            : 'text-[#0a192f]'
+                        "
+                      >
+                        {{ goal.goalName }} 로드맵
+                      </p>
+                    </div>
+                    <p
+                      v-if="goal.goalAmount"
+                      class="mt-0.5 truncate text-[11px] font-medium text-slate-400"
+                    >
+                      {{ formatGoalSubText(goal) }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- 우측 체크마크 원 -->
+                <div
+                  class="flex size-5 shrink-0 items-center justify-center rounded-full transition-all duration-150"
+                  :class="
+                    String(goal.goalId) === String(selectedGoalId)
+                      ? 'bg-primary text-white shadow-xs scale-100'
+                      : 'border border-slate-200 bg-white text-transparent scale-90 group-hover:border-slate-300'
+                  "
                 >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </button>
-          </div>
-        </section>
-      </template>
+                  <svg
+                    class="size-3 stroke-[3]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          </section>
+        </template>
+      </div>
     </div>
 
-    <!-- 뱃지 및 보조 텍스트 -->
-    <p
-      v-if="helperText"
-      class="w-fit rounded-full bg-[#e7f1ff] px-3 py-1.5 text-[11px] font-bold text-primary"
-    >
-      {{ helperText }}
-    </p>
-
-    <p v-if="trailingText" class="text-[11px] font-medium text-slate-400 sm:ml-auto sm:shrink-0">
+    <p v-if="trailingText" class="shrink-0 text-[11px] font-medium text-slate-400">
       {{ trailingText }}
     </p>
   </section>

@@ -11,7 +11,7 @@
           :key="item"
           class="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-md border border-blue-200/70 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-700 shadow-2xs"
         >
-          <span class="text-primary font-black">✓</span>
+          <span class="text-primary font-bold">✓</span>
           {{ item }}
         </span>
       </div>

@@ -1,6 +1,6 @@
 <!-- 목표 컬렉션 (Goal Collection) 페이지 (COLL-01~02) -->
 <template>
-  <div class="flex justify-center bg-[#f8fbff] min-h-[calc(100vh-80px)]">
+  <div class="flex justify-center bg-[#f8fafc] min-h-[calc(100vh-80px)]">
     <div class="page-container pb-10 pt-4 sm:pb-14 sm:pt-6">
       <!-- 로딩 중일 때 스피너 표시 -->
       <div v-if="collectionStore.isLoading" class="flex h-96 items-center justify-center">
@@ -19,7 +19,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
           </svg>
         </div>
-        <h3 class="mt-4 text-lg font-black text-[#0a192f] sm:text-xl">
+        <h3 class="mt-4 text-lg font-bold text-[#0a192f] sm:text-xl">
           목표 컬렉션을 불러오지 못했어요
         </h3>
         <p class="mt-1.5 max-w-sm text-xs font-medium leading-relaxed text-slate-500 sm:text-sm">

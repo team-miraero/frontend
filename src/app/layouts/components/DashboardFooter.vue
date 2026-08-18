@@ -4,7 +4,7 @@
     <div class="page-container flex flex-col items-center justify-center gap-1.5">
       <!-- 서비스 슬로건 -->
       <div class="flex items-center gap-1.5 text-slate-500">
-        <span class="text-xs font-black text-primary">미래로</span>
+        <span class="text-xs font-bold text-primary">미래로</span>
         <span class="text-[11px] font-medium text-slate-400">· 청년 금융 페이스메이커</span>
       </div>
 

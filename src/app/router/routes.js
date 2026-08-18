@@ -37,6 +37,12 @@ export const routes = [
       ...youthPolicyRoutes,
       ...coachRoutes,
       ...mypageRoutes,
+      {
+        path: 'menu',
+        name: ROUTE_NAMES.MENU,
+        component: () => import('@/pages/menu/MenuPage.vue'),
+        meta: { title: '전체 메뉴' },
+      },
     ],
   },
 ]

@@ -8,7 +8,7 @@
   >
     <div class="flex flex-col items-center gap-5 px-7 py-7">
       <div
-        class="flex size-24 items-center justify-center overflow-hidden rounded-full border-[3px] border-[#c5dcff] bg-gradient-to-br from-primary to-[#66b2ff] text-3xl font-black text-white"
+        class="flex size-24 items-center justify-center overflow-hidden rounded-full border-[3px] border-[#c5dcff] bg-gradient-to-br from-primary to-[#66b2ff] text-3xl font-bold text-white"
         aria-hidden="true"
       >
         <img v-if="previewUrl" :src="previewUrl" alt="" class="size-full object-cover" />

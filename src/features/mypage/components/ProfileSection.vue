@@ -5,7 +5,7 @@
       :aria-busy="loading"
     >
       <div
-        class="flex size-[52px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-[#66b2ff] text-xl font-black text-white sm:size-16 sm:text-2xl"
+        class="flex size-[52px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-[#66b2ff] text-xl font-bold text-white sm:size-16 sm:text-2xl"
         aria-hidden="true"
       >
         <img
@@ -19,14 +19,14 @@
       </div>
       <div class="min-w-0 flex-1">
         <template v-if="profile">
-          <p class="truncate text-lg font-black text-[#0a192f]">{{ profile.nickname }}</p>
+          <p class="truncate text-lg font-bold text-[#0a192f]">{{ profile.nickname }}</p>
           <p class="truncate text-sm text-slate-500">{{ profile.email }}</p>
           <div
             v-if="profile.kbpayLinked"
             class="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-primary"
           >
             <span
-              class="flex size-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-black text-white"
+              class="flex size-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-white"
               aria-hidden="true"
               >✓</span
             >

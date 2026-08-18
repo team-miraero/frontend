@@ -22,7 +22,7 @@
             class="flex items-center justify-between border-b border-slate-100 px-7 pb-4 pt-5"
           >
             <slot name="heading">
-              <h2 :id="titleId" class="text-base font-black text-[#0a192f]">{{ title }}</h2>
+              <h2 :id="titleId" class="text-base font-bold text-[#0a192f]">{{ title }}</h2>
             </slot>
             <button
               type="button"

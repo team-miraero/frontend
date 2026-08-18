@@ -43,11 +43,11 @@
         v-model="titleText"
         type="text"
         maxlength="20"
-        class="w-44 whitespace-nowrap border-b-2 border-primary bg-white/90 px-2 py-0.5 text-center text-sm font-black text-[#0a192f] outline-none shadow-2xs rounded"
+        class="w-44 whitespace-nowrap border-b-2 border-primary bg-white/90 px-2 py-0.5 text-center text-sm font-bold text-[#0a192f] outline-none shadow-2xs rounded"
         @blur="isEditingTitle = false"
         @keyup.enter="isEditingTitle = false"
       />
-      <p v-else class="shrink-0 whitespace-nowrap text-sm sm:text-[15px] font-black tracking-tight text-[#0a192f]">
+      <p v-else class="shrink-0 whitespace-nowrap text-sm sm:text-[15px] font-bold tracking-tight text-[#0a192f]">
         {{ titleText }}
       </p>
       <button
@@ -161,14 +161,14 @@
             <span v-else-if="milestone.current" class="size-2 rounded-full bg-primary" />
           </span>
           <span
-            class="mt-1.5 whitespace-nowrap text-[11px] font-black"
+            class="mt-1.5 whitespace-nowrap text-[11px] font-bold"
             :class="milestone.completed || milestone.current ? 'text-primary' : 'text-slate-400'"
           >
             {{ milestone.percent }}%
           </span>
           <span
             class="mt-0.5 whitespace-nowrap text-[10px]"
-            :class="milestone.current ? 'font-black text-primary' : 'text-slate-400 font-medium'"
+            :class="milestone.current ? 'font-bold text-primary' : 'text-slate-400 font-medium'"
           >
             {{ milestone.label }}
           </span>
@@ -179,10 +179,10 @@
     <!-- 하단 달성률 빅 타이포그래피 & 칭찬 배지 (카운트업 애니메이션 적용) -->
     <div class="relative z-20 mt-1 flex flex-col items-center justify-center text-center">
       <div class="flex items-baseline justify-center gap-0.5">
-        <span class="text-4xl sm:text-5xl font-black tracking-tight text-[#0a192f]">
+        <span class="text-4xl sm:text-5xl font-bold tracking-tight text-[#0a192f]">
           {{ animatedProgress }}
         </span>
-        <span class="text-2xl sm:text-3xl font-black text-primary">%</span>
+        <span class="text-2xl sm:text-3xl font-bold text-primary">%</span>
       </div>
 
       <p
@@ -195,8 +195,10 @@
     <!-- 푸터 워터마크 (공식 인증 로고) -->
     <div class="relative z-20 mt-3.5 border-t border-blue-100/80 pt-2.5">
       <div class="mx-auto flex w-max items-center justify-center gap-1.5 whitespace-nowrap">
-        <img src="@/assets/images/logo.png" alt="" class="block size-4 shrink-0 object-contain" />
-        <span class="shrink-0 text-xs font-black tracking-[-0.2px] text-primary">미래로</span>
+        <div class="flex size-4 items-center justify-center rounded-[5px] bg-primary">
+          <img src="@/assets/icons/logo.svg" alt="" class="size-2.5" />
+        </div>
+        <span class="shrink-0 text-xs font-bold tracking-tight text-primary">미래로</span>
         <span class="text-[10px] font-semibold text-slate-400 tracking-wider">MIRAERO CHALLENGE</span>
       </div>
     </div>

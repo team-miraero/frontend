@@ -4,7 +4,7 @@
     :aria-labelledby="headingId"
   >
     <div class="border-b border-[#f0f4fb] px-5 py-4 sm:px-6">
-      <h2 :id="headingId" class="text-sm font-black text-[#0a192f]">{{ title }}</h2>
+      <h2 :id="headingId" class="text-sm font-bold text-[#0a192f]">{{ title }}</h2>
     </div>
     <div class="px-5 py-5 sm:px-6" :class="bodyClass">
       <slot />

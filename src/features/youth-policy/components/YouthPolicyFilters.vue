@@ -49,7 +49,7 @@
 
     <div class="mt-3 flex items-center justify-between gap-3">
       <nav
-        class="flex items-center gap-2 overflow-x-auto pb-1"
+        class="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1"
         role="tablist"
         aria-label="정책 카테고리"
       >

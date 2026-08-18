@@ -28,7 +28,7 @@
   >
     <aside
       v-if="uiStore.sidebarOpen"
-      class="fixed inset-y-0 left-0 z-50 flex w-[min(84vw,320px)] flex-col overflow-hidden rounded-r-[28px] border-r border-slate-200 bg-[#f8fbff] shadow-none lg:hidden"
+      class="fixed inset-y-0 left-0 z-50 flex w-[min(84vw,320px)] flex-col overflow-hidden rounded-r-[28px] border-r border-slate-200 bg-[#f8fafc] shadow-none lg:hidden"
       aria-label="사이드바 메뉴"
     >
       <header class="flex items-center justify-between bg-white px-6 pb-5 pt-6">
@@ -37,21 +37,21 @@
             <img src="@/assets/icons/logo.svg" alt="" class="size-5" />
           </span>
           <span>
-            <strong class="block text-lg font-black tracking-[-0.03em] text-[#0a192f]">미래로</strong>
+            <strong class="block text-lg font-bold tracking-tight text-[#0a192f]">미래로</strong>
             <small class="block text-[11px] font-bold text-emerald-600">마이데이터 연동됨</small>
           </span>
         </RouterLink>
-        <button type="button" class="flex size-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 transition hover:bg-slate-200" aria-label="메뉴 닫기" @click="closeSidebar">
-          <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18" /></svg>
+        <button type="button" class="flex size-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 transition hover:bg-slate-200 cursor-pointer" aria-label="메뉴 닫기" @click="closeSidebar">
+          <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18" /></svg>
         </button>
       </header>
 
       <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5">
         <section class="rounded-[24px] border border-[#dbe9ff] bg-white p-3 shadow-[0_8px_24px_rgba(15,35,70,0.06)]">
-          <button type="button" class="flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-left" @click="isRoadmapListExpanded = !isRoadmapListExpanded">
+          <button type="button" class="flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-left cursor-pointer" @click="isRoadmapListExpanded = !isRoadmapListExpanded">
             <span class="flex size-9 items-center justify-center rounded-xl bg-[#eaf2ff]"><img :src="roadmapNav.icon" alt="" class="size-[18px]" /></span>
             <span class="min-w-0 flex-1">
-              <strong class="block text-sm font-black text-[#0a192f]">나의 로드맵</strong>
+              <strong class="block text-sm font-bold text-[#0a192f]">나의 로드맵</strong>
               <small class="block truncate text-[11px] text-slate-400">목표를 선택해 진행 상황을 확인하세요</small>
             </span>
             <img src="@/assets/icons/chevron-down.svg" alt="" class="size-4 transition-transform" :class="isRoadmapListExpanded ? 'rotate-180' : ''" />
@@ -68,7 +68,7 @@
               <div class="flex items-center gap-2">
                 <span class="size-2 rounded-full" :class="isSelectedGoal(goal) ? 'bg-primary' : 'bg-slate-300'" />
                 <span class="min-w-0 flex-1 truncate text-xs font-bold" :class="isSelectedGoal(goal) ? 'text-primary' : 'text-slate-600'">{{ goal.goalName }}</span>
-                <span class="text-xs font-black" :class="isSelectedGoal(goal) ? 'text-primary' : 'text-slate-400'">{{ goal.progressRate }}%</span>
+                <span class="text-xs font-bold" :class="isSelectedGoal(goal) ? 'text-primary' : 'text-slate-400'">{{ goal.progressRate }}%</span>
               </div>
               <div class="ml-4 mt-2 h-1 overflow-hidden rounded-full bg-slate-200"><div class="h-full rounded-full bg-primary" :style="{ width: `${Math.min(100, Math.max(0, goal.progressRate))}%` }" /></div>
             </RouterLink>
@@ -92,8 +92,8 @@
       </div>
 
       <RouterLink :to="{ name: ROUTE_NAMES.MYPAGE }" class="m-4 flex items-center gap-3 rounded-[22px] border border-slate-200 bg-white px-4 py-3.5 shadow-sm transition hover:bg-slate-50" @click="closeSidebar">
-        <span class="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#66b2ff] text-sm font-black text-white">{{ userInitial }}</span>
-        <span class="min-w-0 flex-1"><strong class="block truncate text-sm font-black text-[#0a192f]">{{ userName || '사용자' }}</strong><small class="block text-[11px] text-slate-400">내 정보와 설정</small></span>
+        <span class="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#66b2ff] text-sm font-bold text-white">{{ userInitial }}</span>
+        <span class="min-w-0 flex-1"><strong class="block truncate text-sm font-bold text-[#0a192f]">{{ userName || '사용자' }}</strong><small class="block text-[11px] text-slate-400">내 정보와 설정</small></span>
         <span class="text-slate-300">›</span>
       </RouterLink>
     </aside>

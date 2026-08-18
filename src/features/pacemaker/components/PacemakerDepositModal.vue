@@ -6,7 +6,7 @@
         <p class="inline-flex items-center gap-1 text-xs font-bold text-slate-400">
           <GoalTypeIcon :goal-type="target?.goalType" size="sm" /> {{ target?.goalName }} 목표
         </p>
-        <h3 class="pt-0.5 text-base font-black text-[#0a192f]">입금할 계좌에 입금하기</h3>
+        <h3 class="pt-0.5 text-base font-bold text-[#0a192f]">입금할 계좌에 입금하기</h3>
       </div>
       <button
         type="button"
@@ -24,7 +24,7 @@
         class="flex items-center justify-between rounded-2xl border border-primary/20 bg-[#eaf2ff] px-4 py-3"
       >
         <p class="text-sm font-bold text-[#0a192f]">사용 가능한 여유자금</p>
-        <p class="text-base font-black text-primary">{{ formatWon(availableBalance) }}</p>
+        <p class="text-base font-bold text-primary">{{ formatWon(availableBalance) }}</p>
       </div>
 
       <button
@@ -63,7 +63,7 @@
             >
             <span class="block text-xs text-slate-400">{{ option.accountNumberMasked }}</span>
           </span>
-          <span class="text-sm font-black text-primary">{{
+          <span class="text-sm font-bold text-primary">{{
             formatWon(option.accountBalance)
           }}</span>
         </button>
@@ -75,7 +75,7 @@
           v-model="amountInput"
           type="text"
           inputmode="numeric"
-          class="w-full rounded-2xl border bg-[#f7faff] px-5 py-4 text-right text-xl font-black text-[#0a192f] outline-none"
+          class="w-full rounded-2xl border bg-[#f7faff] px-5 py-4 text-right text-xl font-bold text-[#0a192f] outline-none"
           :class="isOverLimit ? 'border-[#fbcfe8]' : 'border-[#9dc0f5]'"
           :disabled="isSubmitting"
           @input="handleAmountInput"
@@ -118,7 +118,7 @@
 
       <button
         type="button"
-        class="rounded-2xl py-3.5 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-70"
+        class="rounded-2xl py-3.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-70"
         :class="
           canSubmit ? 'shadow-[0_6px_10px_rgba(0,102,255,0.28)]' : 'bg-slate-200 !text-slate-400'
         "

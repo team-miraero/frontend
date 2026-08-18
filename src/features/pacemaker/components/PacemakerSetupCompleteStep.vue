@@ -6,13 +6,13 @@
     aria-live="polite"
   >
     <div
-      class="flex size-24 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-[#66b2ff] text-[44px] font-black text-white shadow-[0_12px_40px_rgba(0,102,255,0.3)]"
+      class="flex size-24 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-[#66b2ff] text-[44px] font-bold text-white shadow-[0_12px_40px_rgba(0,102,255,0.3)]"
       aria-hidden="true"
     >
       ✓
     </div>
 
-    <h2 id="complete-title" class="mt-6 text-2xl font-black tracking-[-0.03em] text-[#0a192f]">
+    <h2 id="complete-title" class="mt-6 text-2xl font-bold tracking-tight text-[#0a192f]">
       개설 완료!
     </h2>
     <p class="mt-2 text-sm leading-6 text-slate-500">
@@ -35,7 +35,7 @@
 
     <button
       type="button"
-      class="mt-6 min-h-12 w-full rounded-2xl bg-gradient-to-br from-primary to-[#66b2ff] px-5 text-sm font-black text-white shadow-[0_6px_20px_rgba(0,102,255,0.28)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99]"
+      class="mt-6 min-h-12 w-full rounded-2xl bg-gradient-to-br from-primary to-[#66b2ff] px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgba(0,102,255,0.28)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99]"
       @click="$emit('open-dashboard')"
     >
       저금통 대시보드 보기 →

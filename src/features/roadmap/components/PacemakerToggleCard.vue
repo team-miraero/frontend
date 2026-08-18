@@ -37,7 +37,7 @@
 
     <!-- ON 상태: 헤드라인 2줄 + 캡션 + 하이라이트 박스 -->
     <template v-if="isOn">
-      <div class="text-[13px] font-black leading-[18.2px] tracking-[-0.13px] text-[#0a192f]">
+      <div class="text-[13px] font-bold leading-[18.2px] tracking-tight text-[#0a192f]">
         <p>다음달 목표자금을</p>
         <p>미리 마련해줄게요</p>
       </div>

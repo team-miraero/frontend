@@ -8,7 +8,7 @@
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
       <div>
         <p class="text-xs font-bold text-slate-400">페이스메이커 전용 저금통</p>
-        <h3 class="pt-0.5 text-base font-black text-[#0a192f]">지금까지 모인 여유자금</h3>
+        <h3 class="pt-0.5 text-base font-bold text-[#0a192f]">지금까지 모인 여유자금</h3>
       </div>
       <button
         type="button"
@@ -29,7 +29,7 @@
       >
         <span class="absolute -right-6 -top-7 size-24 rounded-full bg-white/10" />
         <p class="relative text-xs font-bold text-white/80">페이스메이커 저금통 잔액</p>
-        <p class="relative pt-1 text-[28px] font-black tracking-[-0.84px] text-white">
+        <p class="relative pt-1 text-[28px] font-bold tracking-tight text-white">
           {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="text-base"> 원</span>
         </p>
         <div class="relative flex items-center gap-2 pt-2 text-xs text-white/70">

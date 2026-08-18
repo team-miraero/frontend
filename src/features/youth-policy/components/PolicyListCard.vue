@@ -25,7 +25,7 @@
     </div>
 
     <h3
-      class="mt-3 line-clamp-2 text-base font-black leading-6 text-gray-900 group-hover:text-primary transition-colors"
+      class="mt-3 line-clamp-2 text-base font-bold leading-6 text-gray-900 group-hover:text-primary transition-colors"
     >
       {{ policy.policyName }}
     </h3>
@@ -43,7 +43,7 @@
       </dl>
 
       <span
-        class="shrink-0 inline-flex items-center gap-0.5 text-xs font-black text-primary group-hover:translate-x-0.5 transition-transform"
+        class="shrink-0 inline-flex items-center gap-0.5 text-xs font-bold text-primary group-hover:translate-x-0.5 transition-transform"
       >
         자세히 보기 ›
       </span>

@@ -10,7 +10,7 @@
         <p class="inline-flex items-center gap-1 text-xs font-bold text-slate-400">
           <AppIcon name="sun" size="sm" /> 오늘의 여유자금
         </p>
-        <p class="pt-1 text-2xl font-black tracking-[-0.72px] text-primary">
+        <p class="pt-1 text-2xl font-bold tracking-tight text-primary">
           {{ formatKRW(daily.todayAvailableMoney) }}
         </p>
       </div>
@@ -25,7 +25,7 @@
     </div>
 
     <div class="flex flex-col gap-4 px-7 py-5">
-      <p class="text-xs font-bold uppercase tracking-[1.2px] text-slate-400">오늘의 자금 현황</p>
+      <p class="text-xs font-bold uppercase tracking-wider text-slate-400">오늘의 자금 현황</p>
 
       <div class="flex flex-col">
         <div v-for="(row, index) in rows" :key="row.label">
@@ -34,7 +34,7 @@
               <p class="text-sm font-bold text-[#0a192f]">{{ row.label }}</p>
               <p class="pt-0.5 text-xs text-slate-400">{{ row.caption }}</p>
             </div>
-            <p class="shrink-0 whitespace-nowrap text-sm font-black" :class="row.colorClass">
+            <p class="shrink-0 whitespace-nowrap text-sm font-bold" :class="row.colorClass">
               {{ formatKRW(row.amount) }}
             </p>
           </div>
@@ -46,7 +46,7 @@
         class="flex items-center justify-between rounded-2xl border border-primary/20 bg-[#eaf2ff] px-5 py-4"
       >
         <p class="text-sm font-bold text-[#0a192f]">오늘의 여유자금</p>
-        <p class="text-lg font-black text-primary">{{ formatKRW(daily.todayAvailableMoney) }}</p>
+        <p class="text-lg font-bold text-primary">{{ formatKRW(daily.todayAvailableMoney) }}</p>
       </div>
 
       <p class="text-xs leading-[19.5px] text-slate-400">

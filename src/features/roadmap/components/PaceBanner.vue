@@ -10,33 +10,21 @@
         <div>
           <!-- 상단 뱃지 + 목표 일시정지/재개 버튼 -->
           <div class="flex items-center justify-between gap-2 min-w-0">
-            <!-- 진행 중 뱃지 (반응형 말줄임 지원) -->
+            <!-- 진행 중 뱃지 -->
             <span
               v-if="!disabled"
-              class="inline-flex min-w-0 max-w-[calc(100%-100px)] items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary sm:px-3"
+              class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
             >
               <span class="size-1.5 shrink-0 rounded-full bg-primary" />
-              <span class="shrink-0 whitespace-nowrap">진행 중</span>
-              <template v-if="goalName">
-                <span class="size-1.5 shrink-0 rounded-full bg-primary" />
-                <span class="truncate max-w-[110px] font-bold text-primary sm:max-w-[180px] md:max-w-[240px]">
-                  {{ goalName }}
-                </span>
-              </template>
+              <span>진행 중</span>
             </span>
-            <!-- 일시정지 뱃지 (반응형 말줄임 지원) -->
+            <!-- 일시정지 뱃지 -->
             <span
               v-else
-              class="inline-flex min-w-0 max-w-[calc(100%-100px)] items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500 sm:px-3"
+              class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500"
             >
               <span class="size-1.5 shrink-0 rounded-full bg-slate-400" />
-              <span class="shrink-0 whitespace-nowrap">일시정지</span>
-              <template v-if="goalName">
-                <span class="size-1.5 shrink-0 rounded-full bg-slate-400" />
-                <span class="truncate max-w-[110px] font-bold text-slate-600 sm:max-w-[180px] md:max-w-[240px]">
-                  {{ goalName }}
-                </span>
-              </template>
+              <span>일시정지</span>
             </span>
 
             <!-- 진행 중일 때: 목표 일시정지 버튼 (보조 버튼, shrink-0으로 찌그러짐 방지) -->
@@ -90,16 +78,16 @@
           </div>
         </div>
 
-        <!-- 하단: 페이스 정보 인셋 카드 (우측 패널과 대칭되는 카드 형태) -->
+        <!-- 하단: 페이스 정보 인셋 카드 (슬레이트 톤앤매너) -->
         <div class="mt-5 sm:mt-6">
-          <div class="rounded-xl border border-slate-100 bg-[#f8fbff] p-3 sm:p-3.5 shadow-2xs">
+          <div class="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 sm:p-3.5 shadow-2xs">
             <div class="grid grid-cols-3 divide-x divide-slate-200/80 items-center">
               <!-- 1. 현재 페이스 -->
               <div class="px-2 text-center sm:text-left sm:pl-3 sm:pr-2">
                 <span class="block text-[11px] font-medium text-slate-500">현재 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
-                    class="text-xs font-bold tabular-nums text-primary sm:text-sm md:text-base"
+                    class="text-xs font-bold tabular-nums text-[#0a192f] sm:text-sm md:text-base"
                   >
                     {{ formatManwon(currentAmount) }}만원
                   </strong>
@@ -112,7 +100,7 @@
                 <span class="block text-[11px] font-medium text-slate-500">목표 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
-                    class="text-xs font-bold tabular-nums text-[#0a192f] sm:text-sm md:text-base"
+                    class="text-xs font-bold tabular-nums text-slate-700 sm:text-sm md:text-base"
                   >
                     {{ formatManwon(pace.expectedAmount) }}만원
                   </strong>
@@ -139,9 +127,9 @@
         </div>
       </div>
 
-      <!-- 우측: 스마트 자동 저축 카드 (슬림형 인셋 패널 · 균등 분배) -->
+      <!-- 우측: 스마트 자동 저축 카드 (슬림형 슬레이트 인셋 패널) -->
       <div
-        class="flex flex-col justify-between overflow-hidden rounded-xl border border-slate-100 bg-[#f8fbff] p-3.5 sm:p-4 shadow-2xs"
+        class="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 sm:p-4 shadow-2xs"
       >
         <div
           v-if="dailyAvailableMoney || monthlyAvailableMoney"
@@ -150,7 +138,7 @@
           <button
             v-if="dailyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-primary/10 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!monthlyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-today')"
@@ -166,7 +154,7 @@
           <button
             v-if="monthlyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-primary/10 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!dailyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-month')"
@@ -202,14 +190,22 @@
             @click="$emit('cta-click')"
           >
             <span
-              class="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
-              :class="isAssistMode ? 'bg-white/20' : 'bg-primary'"
+              class="flex size-8 sm:size-8.5 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105"
+              :class="isAssistMode ? 'bg-white/20 text-white' : 'bg-primary text-white shadow-sm'"
             >
-              <img
-                :src="isAssistMode ? theme.ctaIcon : pacemakerSetupCtaIcon"
-                alt=""
-                class="size-3.5 sm:size-4"
-              />
+              <!-- 1. 알아서 모으기 선명한 번개 SVG -->
+              <svg
+                class="size-4 sm:size-4.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
             </span>
             <span class="min-w-0 flex-1">
               <strong
@@ -242,15 +238,31 @@
           <!-- 2. 다음 달 자금마련 (스위치 위치 고정 및 인라인 상태 전환) -->
           <button
             type="button"
-            class="flex w-full items-center gap-3.5 rounded-xl py-1 text-left disabled:cursor-not-allowed disabled:opacity-60 transition active:scale-[0.98] select-none"
+            class="group flex w-full items-center gap-3 rounded-xl py-1 text-left disabled:cursor-not-allowed disabled:opacity-60 transition active:scale-[0.98] select-none cursor-pointer"
             :class="disabled ? 'pointer-events-none opacity-45' : ''"
             :disabled="isToggling || disabled"
             @click="$emit('toggle')"
           >
             <span
-              class="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm"
+              class="flex size-8 sm:size-8.5 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
             >
-              <img src="@/assets/icons/next-month-reserve.svg" alt="" class="size-3.5 sm:size-4" />
+              <!-- 2. 다음 달 자금마련 선명한 캘린더 SVG -->
+              <svg
+                class="size-4 sm:size-4.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <path d="m9 16 2 2 4-4" />
+              </svg>
             </span>
             <span class="min-w-0 flex-1">
               <span class="flex items-center justify-between gap-3">
@@ -293,7 +305,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import pacemakerSetupCtaIcon from '@/assets/icons/pacemaker-setup-cta.svg'
 import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
 import { useCountUp } from '@/shared/composables/useCountUp'
 

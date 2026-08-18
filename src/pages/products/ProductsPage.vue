@@ -1,10 +1,9 @@
 <template>
-  <div class="min-h-full bg-[#f8fbff]">
+  <div class="min-h-full bg-[#f8fafc] pb-16">
     <RoadmapSelector
       :goals="goals"
       :selected-goal-id="selectedGoalId"
       :disabled="areGoalsLoading"
-      :helper-text="roadmapHelperText"
       @update:selected-goal-id="goalStore.selectGoal"
     />
 
@@ -15,20 +14,7 @@
         aria-labelledby="recommendation-summary-title"
       >
         <div class="flex flex-col gap-4">
-          <!-- 상단 뱃지 -->
-          <div class="flex flex-wrap items-center gap-2">
-            <span
-              class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary"
-            >
-              맞춤 금융 상품
-            </span>
-            <span
-              v-if="selectedGoalName"
-              class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-bold text-slate-600"
-            >
-              {{ selectedGoalName }}
-            </span>
-          </div>
+          <!-- 로딩 상태 -->
 
           <!-- 로딩 상태 -->
           <div v-if="isRecommendationLoading" class="space-y-2 py-2">
@@ -41,7 +27,7 @@
             <div>
               <h2
                 id="recommendation-summary-title"
-                class="text-lg font-black tracking-[-0.3px] text-[#0a192f] sm:text-xl md:text-2xl"
+                class="text-lg font-bold tracking-tight text-[#0a192f] sm:text-xl md:text-2xl"
               >
                 <template v-if="hasNoMaturityEligibleProducts">
                   목표 기간 내 만기 가능한 상품이 없어요
@@ -65,7 +51,7 @@
                 class="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500"
               >
                 {{ bestProduct.productName }}에 연결하면 최고
-                <strong class="font-black text-primary tabular-nums">
+                <strong class="font-bold text-primary tabular-nums">
                   연 {{ formatRateCompact(bestRate) }}%
                 </strong>
                 이자를 받으며 목표를 더 빠르게 달성할 수 있어요.
@@ -75,21 +61,21 @@
                 class="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500"
               >
                 현재 연결 자산의 잔액 가중평균 금리는
-                <strong class="font-black text-[#0a192f] tabular-nums">
+                <strong class="font-bold text-[#0a192f] tabular-nums">
                   연 {{ formatRate(currentInterestRate) }}%
                 </strong>
                 이고, 추천 상품 중 최고 금리는
-                <strong class="font-black text-primary tabular-nums">연 {{ formatRate(bestRate) }}%</strong>
+                <strong class="font-bold text-primary tabular-nums">연 {{ formatRate(bestRate) }}%</strong>
                 입니다.
                 <template v-if="rateDifference > 0">
                   현재 금리보다
-                  <strong class="font-black text-primary tabular-nums">{{ formatRate(rateDifference) }}%p</strong>
+                  <strong class="font-bold text-primary tabular-nums">{{ formatRate(rateDifference) }}%p</strong>
                   더 높아요.
                 </template>
                 <template v-else-if="rateDifference === 0"> 현재 상품과 같은 수준이에요. </template>
                 <template v-else>
                   현재 상품이
-                  <strong class="font-black text-primary tabular-nums">{{ formatRate(-rateDifference) }}%p</strong>
+                  <strong class="font-bold text-primary tabular-nums">{{ formatRate(-rateDifference) }}%p</strong>
                   더 높아요.
                 </template>
               </p>
@@ -98,23 +84,23 @@
             <!-- 하단 인셋 비교 카드 (대시보드 인셋 스타일) -->
             <div
               v-if="linkedAssets.length > 0 || bestProduct"
-              class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 rounded-2xl border border-slate-100 bg-[#f8fbff] p-3 sm:p-4 shadow-xs"
+              class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 sm:p-4 shadow-xs"
             >
               <div class="px-2">
                 <span class="text-[11px] font-bold text-slate-400">현재 상태</span>
-                <p class="mt-0.5 text-sm sm:text-base font-black text-[#0a192f] tabular-nums">
+                <p class="mt-0.5 text-sm sm:text-base font-bold text-[#0a192f] tabular-nums">
                   {{ linkedAssets.length > 0 ? `연 ${formatRate(currentInterestRate)}%` : '일반 저금통 (0%)' }}
                 </p>
               </div>
               <div class="px-2 border-l border-slate-200/70">
                 <span class="text-[11px] font-bold text-slate-400">추천 상품 금리</span>
-                <p class="mt-0.5 text-sm sm:text-base font-black text-primary tabular-nums">
+                <p class="mt-0.5 text-sm sm:text-base font-bold text-primary tabular-nums">
                   최고 연 {{ formatRate(bestRate) }}%
                 </p>
               </div>
               <div class="col-span-2 sm:col-span-1 px-2 border-t sm:border-t-0 sm:border-l border-slate-200/70 pt-2 sm:pt-0">
                 <span class="text-[11px] font-bold text-slate-400">금리 혜택</span>
-                <p class="mt-0.5 text-sm sm:text-base font-black text-primary tabular-nums">
+                <p class="mt-0.5 text-sm sm:text-base font-bold text-primary tabular-nums">
                   {{ rateDifference > 0 ? `+${formatRate(rateDifference)}%p UP` : (hasOnlyMoneyBox ? `+${formatRate(bestRate)}%p 이자 혜택` : '동일 수준') }}
                 </p>
               </div>
@@ -191,7 +177,7 @@
             >
               !
             </div>
-            <p class="mt-3 text-[15px] font-black text-[#10233f]">상품을 불러오지 못했어요</p>
+            <p class="mt-3 text-[15px] font-bold text-[#10233f]">상품을 불러오지 못했어요</p>
             <p class="mt-1 text-[13px] text-slate-400">잠시 후 다시 시도해 주세요.</p>
             <button
               type="button"
@@ -211,7 +197,7 @@
             >
               %
             </div>
-            <p class="mt-3 text-[15px] font-black text-[#10233f]">확인 가능한 상품이 아직 없어요</p>
+            <p class="mt-3 text-[15px] font-bold text-[#10233f]">확인 가능한 상품이 아직 없어요</p>
             <button
               type="button"
               class="mt-4 rounded-xl border border-primary/20 px-5 py-2.5 text-[13px] font-bold text-primary"
@@ -241,7 +227,7 @@
       </section>
 
       <div
-        class="mt-6 flex items-start gap-2.5 rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 text-[11px] leading-relaxed text-slate-400 shadow-xs"
+        class="mt-6 flex items-start gap-2.5 rounded-2xl border border-slate-200/60 bg-slate-50/80 p-4 text-[11px] leading-relaxed text-slate-400 shadow-xs"
       >
         <span
           class="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-slate-200/80 text-[10px] font-bold text-slate-600"

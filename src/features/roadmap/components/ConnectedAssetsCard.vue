@@ -51,13 +51,13 @@ import { formatKRWCompact } from '@/shared/lib/money'
 const props = defineProps({
   assets: {
     type: Array,
-    required: true,
+    default: () => [],
   },
 })
 defineEmits(['open-detail'])
 
 const savingsAssets = computed(() =>
-  props.assets.filter((asset) => asset.assetType === 'MONEY_BOX' || asset.assetType === 'ACCOUNT')
+  (props.assets ?? []).filter((asset) => asset.assetType === 'MONEY_BOX' || asset.assetType === 'ACCOUNT')
 )
 
 const totalBalance = computed(() =>

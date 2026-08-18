@@ -1,12 +1,15 @@
 <template>
-  <div class="border-t border-[#e8effe] bg-white px-3.5 pt-2.5 pb-3 sm:px-6 sm:pt-3 sm:pb-5 lg:px-10">
-    <!-- 추천 질문 칩: 모바일에선 가로 스크롤 탭, 태블릿 이상에선 flex-wrap -->
-    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:flex-wrap sm:pb-0">
+  <div class="border-t border-slate-200/80 bg-white px-3.5 pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom))] sm:px-6 sm:pt-3 sm:pb-3.5 lg:px-10">
+    <!-- 추천 질문 칩 (하단 입력창 위 고정 가로 스크롤 탭) -->
+    <div
+      v-if="!coachStore.isSending"
+      class="mb-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 sm:flex-wrap"
+    >
       <button
         v-for="prompt in SUGGESTED_PROMPTS"
         :key="prompt"
         type="button"
-        class="shrink-0 rounded-full border border-primary/30 bg-[#f4f8ff] px-3 py-1 text-xs font-bold text-primary shadow-2xs transition-all duration-150 hover:-translate-y-0.5 hover:bg-primary/10 hover:border-primary/50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3.5 sm:py-1.5 cursor-pointer select-none"
+        class="shrink-0 rounded-full border border-slate-200/90 bg-slate-50/80 px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/5 hover:text-primary hover:shadow-xs active:scale-95 disabled:opacity-50 cursor-pointer select-none"
         :disabled="coachStore.isSending"
         @click="coachStore.sendMessage(prompt)"
       >
@@ -14,9 +17,9 @@
       </button>
     </div>
 
-    <!-- 입력창 및 전송 버튼 (상하 여백 및 수직 정렬 완벽 대칭) -->
+    <!-- 입력창 및 전송 버튼 -->
     <div
-      class="mt-2.5 flex items-center gap-2 rounded-[20px] border border-[#dbeafe] bg-[#f8fbff] px-3.5 py-2 shadow-xs transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 sm:mt-3 sm:px-4 sm:py-2.5"
+      class="flex items-center gap-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 px-3.5 py-1.5 sm:py-2 shadow-xs transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/15 sm:px-4"
     >
       <textarea
         v-model="draftInput"
@@ -53,10 +56,6 @@
         </svg>
       </button>
     </div>
-
-    <p class="pt-1.5 text-center text-[10px] text-slate-400 sm:pt-2 sm:text-xs">
-      저축·목표 관리 상담만 해요 — 투자 종목 추천·매매 조언은 제공하지 않아요
-    </p>
   </div>
 </template>
 

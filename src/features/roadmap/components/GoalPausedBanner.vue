@@ -8,7 +8,7 @@
         <img src="@/assets/icons/goal-paused-clock.svg" alt="" class="size-[15px]" />
       </div>
       <div>
-        <p class="text-sm font-black tracking-[-0.14px] text-slate-500">목표가 일시정지 중이에요</p>
+        <p class="text-sm font-bold tracking-tight text-slate-500">목표가 일시정지 중이에요</p>
         <p class="pt-0.5 text-xs text-slate-400">
           자동이체가 해제되어 있어요 · 저금통에 자동으로 쌓이지 않아요
         </p>
