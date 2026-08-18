@@ -95,10 +95,10 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
       if (requestId !== fetchRequestId) return
 
       policies.value = response.content
-      page.value = response.page
+      page.value = response.page ?? requestedPage
       totalElements.value = response.totalElements
       totalPages.value = response.totalPages
-      isLastPage.value = response.last
+      isLastPage.value = response.last ?? (page.value >= response.totalPages)
     } catch (caughtError) {
       if (requestId === fetchRequestId) error.value = caughtError
     } finally {
