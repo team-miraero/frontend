@@ -105,19 +105,33 @@ export function usePeerSpendingComparison(summary) {
     },
   })
 
-  const selectedPeerGroupLabel = computed(
+  const usesConnectedPeerAverage = computed(
     () =>
-      peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
+      selectedComparisonBasis.value === 'AGE' &&
+      selectedCategoryType.value === SPENDING_CATEGORY_TYPES.VARIABLE
+  )
+
+  const selectedPeerGroupLabel = computed(
+    () => {
+      if (usesConnectedPeerAverage.value) return '내 또래 평균'
+
+      return peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
+    }
   )
 
   const peerSpending = computed(
-    () => PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value] ?? {}
+    () => {
+      if (usesConnectedPeerAverage.value) {
+        return summary.value.peerAverageSpending ?? {}
+      }
+
+      return PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value] ?? {}
+    }
   )
 
   const categorySpending = computed(() => summary.value.categorySpending ?? {})
 
-  // 또래 평균은 하드코딩이라 모든 카테고리를 갖고 있다. 여기서 peerSpending까지 조건에 넣으면
-  // 내 지출 데이터가 없는 카테고리도 0원으로 비교돼 "또래보다 훨씬 덜 쓴다"는 거짓 결과가 나온다.
+  // 내 지출 데이터가 없는 카테고리도 0원으로 비교하면 "또래보다 훨씬 덜 쓴다"는 거짓 결과가 나온다.
   // 그래서 내 지출 응답에 실제로 존재하는 카테고리만 비교 대상으로 삼는다.
   const comparisonItems = computed(() => {
     return SPENDING_CATEGORIES.filter(
@@ -184,6 +198,7 @@ export function usePeerSpendingComparison(summary) {
     selectedPeerGroupId,
     selectedPeerGroupLabel,
     peerGroupOptions,
+    usesConnectedPeerAverage,
     comparisonItems,
     totalDifference,
     absoluteTotalDifference,

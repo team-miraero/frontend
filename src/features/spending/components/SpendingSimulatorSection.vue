@@ -130,7 +130,7 @@
 </template>
 
 <script setup>
-import { toRef } from 'vue'
+import { onMounted, toRef, watch } from 'vue'
 import SpendingCategoryCard from '@/features/spending/components/SpendingCategoryCard.vue'
 import SpendingCategoryIcon from '@/features/spending/components/SpendingCategoryIcon.vue'
 import { useSpendingSimulator } from '@/features/spending/composables/useSpendingSimulator'
@@ -153,10 +153,21 @@ const {
   selectedCategoryIndex,
   selectedCategory,
   formattedTotalShortenedMonths,
+  loadCategoryTargets,
+  refreshSimulation,
   selectCategory,
   selectCategoryByOffset,
   updateCategoryTarget,
 } = useSpendingSimulator(toRef(props, 'summary'))
+
+onMounted(() => {
+  loadCategoryTargets()
+})
+
+watch(
+  () => props.summary?.referenceMonth,
+  () => refreshSimulation()
+)
 
 const selectPreviousCategory = () => selectCategoryByOffset(-1)
 

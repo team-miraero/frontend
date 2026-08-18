@@ -51,7 +51,13 @@
           </button>
         </div>
 
-        <div class="relative min-w-0">
+        <span
+          v-if="usesConnectedPeerAverage"
+          class="flex h-[34px] items-center justify-center rounded-xl border border-[#D6E4FF] bg-[#F8FBFF] px-2 text-[10px] font-bold text-[#0A192F] sm:px-3 sm:text-xs"
+        >
+          내 또래
+        </span>
+        <div v-else class="relative min-w-0">
           <label for="spending-peer-group-select" class="sr-only">비교 그룹</label>
           <select
             id="spending-peer-group-select"
@@ -79,8 +85,15 @@
         </div>
       </div>
 
-      <div
-        v-if="comparisonItems.length > 0"
+      <p
+        v-if="summary.peerAverageError"
+        class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
+      >
+        또래 평균을 불러오지 못했어요. 잠시 후 다시 확인해 주세요.
+      </p>
+
+      <template v-else-if="comparisonItems.length > 0">
+        <div
         class="mt-4 flex min-h-[64px] flex-col justify-center rounded-xl border border-primary/10 bg-[#F4F8FF] px-3.5 py-2.5 sm:px-4 sm:py-3"
       >
         <p class="text-xs font-bold tracking-tight text-[#0A192F] break-keep sm:text-sm">
@@ -95,9 +108,9 @@
         <p class="mt-1 text-[11px] text-[#64748B] break-keep sm:text-xs">
           가장 차이가 큰 항목은 {{ largestDifferenceCategoryNames }}{{ categoryNamesEnding }}.
         </p>
-      </div>
+        </div>
 
-      <ul v-if="comparisonItems.length > 0" class="mt-2 divide-y divide-slate-100">
+        <ul class="mt-2 divide-y divide-slate-100">
         <li
           v-for="category in comparisonItems"
           :key="category.id"
@@ -157,10 +170,11 @@
             {{ formatDifference(category.difference) }}
           </span>
         </li>
-      </ul>
+        </ul>
+      </template>
 
       <p
-        v-if="comparisonItems.length === 0"
+        v-else
         class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
       >
         비교할 또래 지출 데이터가 없어요.
@@ -198,6 +212,7 @@ const {
   selectedPeerGroupId,
   selectedPeerGroupLabel,
   peerGroupOptions,
+  usesConnectedPeerAverage,
   comparisonItems,
   totalDifference,
   absoluteTotalDifference,
@@ -206,7 +221,11 @@ const {
 } = usePeerSpendingComparison(toRef(props, 'summary'))
 
 const peerComparisonLabel = computed(() =>
-  selectedComparisonBasis.value === 'AGE' ? '또래' : '소득평균'
+  usesConnectedPeerAverage.value
+    ? ''
+    : selectedComparisonBasis.value === 'AGE'
+      ? '또래'
+      : '소득평균'
 )
 
 const peerAverageLabel = computed(() =>

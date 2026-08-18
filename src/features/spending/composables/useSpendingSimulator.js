@@ -4,9 +4,15 @@ import {
   SPENDING_CATEGORY_TYPES,
   SPENDING_CATEGORIES,
 } from '@/features/spending/constants/spending.constants'
+import {
+  getExpenseCategoryTargets,
+  saveExpenseCategoryTargets,
+  simulateExpenseTargets,
+} from '@/features/spending/api/spending.api'
 
 const roundToOneDecimal = (value) => Math.round(value * 10) / 10
 const DAYS_PER_MONTH = 30
+const wonToTenThousands = (value) => Math.round((Number(value) / 10000) * 10) / 10
 
 export function calculateSavingAmount(category) {
   if (category.target === null) {
@@ -47,6 +53,8 @@ export function formatShortenedPeriod(months) {
 
 export function useSpendingSimulator(summary) {
   const categoryTargets = ref({})
+  const categoryTargetIds = ref({})
+  const simulatedSavingAmount = ref(null)
   const categorySpending = computed(() => summary?.value?.categorySpending ?? {})
   const recentThreeMonthAverageSpending = computed(
     () => summary?.value?.recentThreeMonthAverageSpending ?? {}
@@ -63,6 +71,7 @@ export function useSpendingSimulator(summary) {
       .map((category) => ({
         ...category,
         current: categorySpending.value[category.id] ?? 0,
+        categoryId: categoryTargetIds.value[category.id] ?? summary?.value?.categoryIds?.[category.id],
         target: categoryTargets.value[category.id] ?? null,
         // 기준 지출 = 최근 3개월 평균 소비. API가 해당 카테고리의 평균을 안 주면
         // 이번 달 지출로, 그마저 없으면 0으로 대체한다.
@@ -102,11 +111,15 @@ export function useSpendingSimulator(summary) {
     categories.value.find((category) => category.id === selectedCategoryId.value)
   )
 
-  const totalSavingAmount = computed(() =>
+  const localSavingAmount = computed(() =>
     categories.value.reduce(
       (totalSaving, category) => totalSaving + calculateSavingAmount(category),
       0
     )
+  )
+
+  const totalSavingAmount = computed(() =>
+    simulatedSavingAmount.value ?? localSavingAmount.value
   )
 
   const totalShortenedMonths = computed(() => calculateShortenedMonths(totalSavingAmount.value))
@@ -129,7 +142,32 @@ export function useSpendingSimulator(summary) {
     }
   }
 
-  function updateCategoryTarget({ id, target }) {
+  async function loadCategoryTargets() {
+    const targets = await getExpenseCategoryTargets()
+    const nextIds = {}
+    const nextTargets = {}
+
+    targets.forEach((target) => {
+      const category = SPENDING_CATEGORIES.find((item) => item.name === target.categoryName)
+      const categoryId = Number(target.categoryId)
+      const targetAmount = Number(target.targetAmount)
+      if (!category || !Number.isInteger(categoryId) || categoryId <= 0) return
+
+      nextIds[category.id] = categoryId
+      const baselineAmount = Number(
+        recentThreeMonthAverageSpending.value[category.id] ?? categorySpending.value[category.id] ?? 0
+      ) * 10000
+      if (Number.isFinite(targetAmount) && targetAmount >= 0 && targetAmount < baselineAmount) {
+        nextTargets[category.id] = wonToTenThousands(targetAmount)
+      }
+    })
+
+    categoryTargetIds.value = nextIds
+    categoryTargets.value = nextTargets
+    await refreshSimulation()
+  }
+
+  async function updateCategoryTarget({ id, target }) {
     const category = categories.value.find((item) => item.id === id)
 
     if (!category) {
@@ -137,6 +175,41 @@ export function useSpendingSimulator(summary) {
     }
 
     categoryTargets.value[category.id] = target < category.recentThreeMonthAverage ? target : null
+    await saveCategoryTargets()
+    await refreshSimulation()
+  }
+
+  async function saveCategoryTargets() {
+    const targets = categories.value
+      .filter((category) => Number.isInteger(category.categoryId) && category.categoryId > 0)
+      .map((category) => ({
+        categoryId: category.categoryId,
+        targetAmount: Math.round((category.target ?? category.recentThreeMonthAverage) * 10000),
+      }))
+
+    if (targets.length > 0) await saveExpenseCategoryTargets(targets)
+  }
+
+  async function refreshSimulation() {
+    const [year, month] = String(summary?.value?.referenceMonth ?? '').split('-').map(Number)
+    const categoriesForSimulation = categories.value
+      .filter((category) => Number.isInteger(category.categoryId) && category.categoryId > 0)
+      .map((category) => ({
+        categoryId: category.categoryId,
+        targetExpense: Math.round((category.target ?? category.current) * 10000),
+      }))
+
+    if (!Number.isInteger(year) || !Number.isInteger(month) || categoriesForSimulation.length === 0) {
+      simulatedSavingAmount.value = null
+      return
+    }
+
+    const response = await simulateExpenseTargets({
+      year,
+      month,
+      categories: categoriesForSimulation,
+    })
+    simulatedSavingAmount.value = wonToTenThousands(response?.totalReductionAmount)
   }
 
   return {
@@ -145,6 +218,8 @@ export function useSpendingSimulator(summary) {
     selectedCategoryIndex,
     selectedCategory,
     formattedTotalShortenedMonths,
+    loadCategoryTargets,
+    refreshSimulation,
     selectCategory,
     selectCategoryByOffset,
     updateCategoryTarget,

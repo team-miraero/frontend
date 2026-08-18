@@ -56,17 +56,27 @@ function mapCategoryAmounts(items, amountField) {
   }, {})
 }
 
+function mapCategoryIds(items) {
+  return (Array.isArray(items) ? items : []).reduce((mapped, item) => {
+    const category = CATEGORY_META_BY_NAME.get(item?.categoryName)
+    const categoryId = Number(item?.categoryId)
+    if (category && Number.isInteger(categoryId) && categoryId > 0) mapped[category.id] = categoryId
+    return mapped
+  }, {})
+}
+
 /**
  * Swagger DTO를 기존 Spending 화면 모델로 변환한다.
  * Swagger 금액은 원, 현재 화면 금액은 만원 단위다.
  */
-export function mapSpendingSummary({ dashboard, goal, availableMoney }) {
+export function mapSpendingSummary({ dashboard, goal, availableMoney, peerAverage, peerAverageError }) {
   const monthChanges = Array.isArray(dashboard?.categoryMonthChanges)
     ? dashboard.categoryMonthChanges
     : []
   const threeMonthAverages = Array.isArray(dashboard?.categoryThreeMonthAverages?.categories)
     ? dashboard.categoryThreeMonthAverages.categories
     : []
+  const peerAverageCategories = Array.isArray(peerAverage?.categories) ? peerAverage.categories : []
 
   const currentMonthTotal = monthChanges.reduce(
     (total, category) => total + toFiniteNumber(category?.currentMonthAmount),
@@ -96,8 +106,11 @@ export function mapSpendingSummary({ dashboard, goal, availableMoney }) {
     ),
     referenceMonth: hasReferenceMonth ? `${year}-${String(month).padStart(2, '0')}` : null,
     categorySpending: mapCategoryAmounts(monthChanges, 'currentMonthAmount'),
+    categoryIds: mapCategoryIds(monthChanges),
     previousMonthCategorySpending: mapCategoryAmounts(monthChanges, 'previousMonthAmount'),
     recentThreeMonthAverageSpending: mapCategoryAmounts(threeMonthAverages, 'averageMonthlyAmount'),
+    peerAverageSpending: mapCategoryAmounts(peerAverageCategories, 'peerAverageAmount'),
+    peerAverageError: Boolean(peerAverageError),
     // TODO: Swagger에 마이데이터 연동 여부 필드 없음
     myDataLinked: null,
   }
@@ -110,13 +123,20 @@ export function mapSpendingSummary({ dashboard, goal, availableMoney }) {
  */
 export async function getSpendingSummary(goalId) {
   const numericGoalId = requireNumericGoalId(goalId)
-  // 또래/소득구간별 비교 데이터는 백엔드가 아직 연령대·소득 조건 조회를 지원하지 않아
-  // constants.js의 PEER_SPENDING_BY_BASIS 하드코딩 값을 사용한다 (useSpendingComparisons.js 참고).
   const [dashboardResponse, goalResponse, availableMoneyResponse] = await Promise.all([
     client.get('/expense-analysis/dashboard'),
     client.get(`/goals/${numericGoalId}`),
     client.get(`/goals/${numericGoalId}/available-money/monthly`),
   ])
+
+  let peerAverage = null
+  let peerAverageError = false
+  try {
+    const { data: peerAverageResponse } = await client.get('/expense-analysis/peer-average')
+    peerAverage = unwrapApiData(peerAverageResponse)
+  } catch {
+    peerAverageError = true
+  }
 
   return mapSpendingSummary({
     dashboard: unwrapApiData(dashboardResponse.data),
@@ -124,6 +144,8 @@ export async function getSpendingSummary(goalId) {
     // 현재 Swagger는 이 endpoint를 공통 wrapper 없이 직접 DTO로 정의한다.
     // 런타임 응답이 wrapper인 환경도 공통 유틸이 함께 처리한다.
     availableMoney: unwrapApiData(availableMoneyResponse.data),
+    peerAverage,
+    peerAverageError,
   })
 }
 
@@ -193,5 +215,27 @@ export async function getTransactions(params) {
   })
   const page = unwrapApiData(responseBody)
 
-  return mapTransactionPage(page, { year, month, requestedPage })
+  return mapTransactionPage(
+    { ...page, page: Number(page?.page) + 1 },
+    { year, month, requestedPage }
+  )
+}
+
+export async function getExpenseCategoryTargets() {
+  const { data: responseBody } = await client.get('/expense-category-targets')
+  return unwrapApiData(responseBody)?.targets ?? []
+}
+
+export async function saveExpenseCategoryTargets(targets) {
+  const { data: responseBody } = await client.put('/expense-category-targets', { targets })
+  return unwrapApiData(responseBody)?.targets ?? []
+}
+
+export async function simulateExpenseTargets({ year, month, categories }) {
+  const { data: responseBody } = await client.post('/expense-analysis/simulation', {
+    year,
+    month,
+    categories,
+  })
+  return unwrapApiData(responseBody)
 }
