@@ -305,7 +305,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import pacemakerSetupCtaIcon from '@/assets/icons/pacemaker-setup-cta.svg'
 import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
 import { useCountUp } from '@/shared/composables/useCountUp'
 

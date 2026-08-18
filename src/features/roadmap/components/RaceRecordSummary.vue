@@ -27,7 +27,6 @@
 import GoalSummaryCard from '@/features/roadmap/components/GoalSummaryCard.vue'
 import ConnectedAssetsCard from '@/features/roadmap/components/ConnectedAssetsCard.vue'
 import ShareWithFriendsCard from '@/features/roadmap/components/ShareWithFriendsCard.vue'
-import coliBottomImage from '@/assets/images/coli_bottom.png'
 
 defineProps({
   goal: {

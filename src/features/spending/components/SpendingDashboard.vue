@@ -99,10 +99,6 @@ const props = defineProps({
 
 defineEmits(['select-goal'])
 
-const roadmapHelperText = computed(() =>
-  props.selectedGoal ? `‘${props.selectedGoal}’ 로드맵 기준으로 계산돼요` : ''
-)
-
 const hasNumericGoalId = computed(() => {
   const goalId = Number(props.selectedGoalId)
   return Number.isInteger(goalId) && goalId > 0

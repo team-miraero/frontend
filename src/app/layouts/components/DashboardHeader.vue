@@ -691,7 +691,6 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth.store'
 import { useUiStore } from '@/stores/ui.store'
 import { useGoalStore } from '@/features/goal'
 import { useCoachStore } from '@/features/coach'
@@ -731,7 +730,6 @@ function getNotificationIconStyle(type, badgeIcon) {
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
 const uiStore = useUiStore()
 const goalStore = useGoalStore()
 const coachStore = useCoachStore()
@@ -751,9 +749,6 @@ const isRoadmapDropdownOpen = ref(false)
 const roadmapDropdownRef = ref(null)
 const isMobileRoadmapSheetOpen = ref(false)
 const isScrolled = ref(false)
-
-const userName = computed(() => authStore.user?.name ?? '')
-const userInitial = computed(() => userName.value.charAt(0))
 
 const currentSelectedGoalName = computed(() => {
   const matched = goalStore.goals.find((g) => String(g.goalId) === String(goalStore.selectedGoalId))
