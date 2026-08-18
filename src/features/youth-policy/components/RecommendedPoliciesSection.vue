@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import RecommendationBasisCard from '@/features/youth-policy/components/RecommendationBasisCard.vue'
 import RecommendedPolicyCard from '@/features/youth-policy/components/RecommendedPolicyCard.vue'
 import {
@@ -90,6 +90,13 @@ const youthPolicyStore = useYouthPolicyStore()
 const mypageStore = useMypageStore()
 const isExpanded = ref(false)
 const page = ref(1)
+
+watch(
+  () => youthPolicyStore.region,
+  () => {
+    page.value = 1
+  }
+)
 
 const totalPages = computed(() =>
   Math.max(1, Math.ceil(youthPolicyStore.recommendedPolicies.length / RECOMMENDED_PAGE_SIZE))
