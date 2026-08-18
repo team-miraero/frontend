@@ -61,24 +61,24 @@
 
       <!-- 대화방 리스트 -->
       <ul class="flex-1 overflow-y-auto p-2 pb-[calc(20px+env(safe-area-inset-bottom))]">
-        <li v-for="conversation in conversations" :key="conversation.conversationId">
+        <li v-for="conversation in conversations" :key="getConvId(conversation)">
           <div
             class="group flex items-center gap-1 rounded-xl px-3 py-2.5"
             :class="
-              conversation.conversationId === activeConversationId
+              getConvId(conversation) === activeConversationId
                 ? 'bg-[#eaf2ff]'
                 : 'hover:bg-slate-50'
             "
           >
             <button
               type="button"
-              class="min-w-0 flex-1 text-left"
-              @click="$emit('select', conversation.conversationId)"
+              class="min-w-0 flex-1 text-left cursor-pointer"
+              @click="$emit('select', getConvId(conversation))"
             >
               <p
                 class="truncate text-sm font-bold"
                 :class="
-                  conversation.conversationId === activeConversationId
+                  getConvId(conversation) === activeConversationId
                     ? 'text-primary'
                     : 'text-[#0a192f]'
                 "
@@ -89,9 +89,9 @@
             </button>
             <button
               type="button"
-              class="shrink-0 rounded-lg p-1.5 text-slate-300 opacity-0 hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100"
+              class="shrink-0 rounded-lg p-1.5 text-slate-300 opacity-0 hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100 cursor-pointer"
               aria-label="대화방 삭제"
-              @click="$emit('delete', conversation.conversationId)"
+              @click="$emit('delete', getConvId(conversation))"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -194,6 +194,10 @@ function stopDrag() {
 }
 
 onBeforeUnmount(stopDrag)
+
+function getConvId(conversation) {
+  return conversation?.aiCoachConversationId ?? conversation?.conversationId ?? conversation?.id
+}
 
 function formatRelativeDate(conversation) {
   const isoDate = conversation.lastMessageAt ?? conversation.createdAt

@@ -13,13 +13,12 @@ import { client } from '@/shared/api/client'
  */
 
 /**
- * 새 대화방 생성
- * @param {string} [title]
+ * 새 대화방 생성 (백엔드는 Request Body/Params 없이 인증 토큰으로 생성)
  * @returns {Promise<Conversation>}
  */
-export async function createConversation(title) {
-  const { data } = await client.post('/ai-coach/conversations', null, { params: { title } })
-  return data.data
+export async function createConversation() {
+  const { data } = await client.post('/ai-coach/conversations')
+  return data?.data ?? data
 }
 
 /**
@@ -28,12 +27,14 @@ export async function createConversation(title) {
  */
 export async function getConversations() {
   const { data } = await client.get('/ai-coach/conversations')
-  return data.data.conversations
+  const res = data?.data ?? data
+  return res?.conversations ?? (Array.isArray(res) ? res : [])
 }
 
 /**
  * @typedef {Object} ChatMessageDto
- * @property {number} messageId
+ * @property {number} [aiCoachMessageId]
+ * @property {number} [messageId]
  * @property {'USER' | 'ASSISTANT'} senderType
  * @property {string} content
  * @property {string} createdAt
@@ -42,21 +43,21 @@ export async function getConversations() {
 /**
  * 특정 대화방의 메시지 목록 조회
  * @param {number} conversationId
- * @returns {Promise<{ conversation: Conversation, messages: ChatMessageDto[] }>}
+ * @returns {Promise<ChatMessageDto[]>}
  */
 export async function getConversationMessages(conversationId) {
   const { data } = await client.get(`/ai-coach/conversations/${conversationId}/messages`)
-  return data.data
+  return data?.data ?? data
 }
 
 /**
  * 대화방 삭제
  * @param {number} conversationId
- * @returns {Promise<{ conversationId: number }>}
+ * @returns {Promise<void>}
  */
 export async function deleteConversation(conversationId) {
   const { data } = await client.delete(`/ai-coach/conversations/${conversationId}`)
-  return data.data
+  return data?.data ?? data
 }
 
 /**
@@ -71,14 +72,28 @@ export async function deleteConversation(conversationId) {
  */
 
 /**
+ * AI 코치에게 질문 전송
  * @param {SendChatMessagePayload} payload
  * @returns {Promise<SendChatMessageResult>}
  */
 export async function sendMessage(payload) {
-  const { data } = await client.post(`/ai-coach/conversations/${payload.conversationId}/messages`, {
-    content: payload.message,
-  })
+  const { data } = await client.post(
+    `/ai-coach/conversations/${payload.conversationId}/messages`,
+    {
+      content: payload.message,
+    },
+    {
+      timeout: 60000, // LLM 응답 생성 대기 (60초)
+    }
+  )
+  const resData = data?.data ?? data
+  const assistantText =
+    resData?.content ??
+    resData?.assistantMessage?.content ??
+    resData?.message ??
+    (typeof resData === 'string' ? resData : '')
+
   return {
-    message: data?.data?.assistantMessage?.content ?? '',
+    message: assistantText,
   }
 }
