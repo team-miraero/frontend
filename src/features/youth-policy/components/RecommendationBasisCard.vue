@@ -88,10 +88,7 @@ const descriptionText = computed(() => {
   if (!hasProfileBasis.value) {
     return '내 정보를 등록하고 조건에 맞는 정책을 찾아보세요'
   }
-  if (props.region && props.region !== '전체') {
-    return `회원님의 나이, 소득과 ${props.region} 조건을 분석해 딱 맞는 정책을 찾았어요`
-  }
-  return '회원님의 나이와 소득 조건을 분석해 딱 맞는 정책을 찾았어요'
+  return '회원님의 나이, 소득, 지역 조건을 분석해 딱 맞는 정책을 찾았어요'
 })
 
 const basisItems = computed(() => {
