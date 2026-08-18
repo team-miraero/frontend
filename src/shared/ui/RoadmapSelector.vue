@@ -29,7 +29,7 @@
               size="sm"
             />
           </span>
-          <span class="truncate text-xs font-black text-[#0a192f]">
+          <span class="truncate text-xs font-bold text-[#0a192f]">
             {{ selectedGoalLabel }}
           </span>
         </div>
@@ -68,7 +68,7 @@
         >
           <!-- 모바일 헤더 (데스크톱에서는 숨김) -->
           <header class="flex items-center justify-between border-b border-slate-100 pb-3 sm:hidden">
-            <h2 class="text-base font-black text-[#0a192f]">로드맵 선택</h2>
+            <h2 class="text-base font-bold text-[#0a192f]">로드맵 선택</h2>
             <button
               type="button"
               class="flex size-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
@@ -109,7 +109,7 @@
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
                     <p
-                      class="truncate text-xs font-black transition-colors"
+                      class="truncate text-xs font-bold transition-colors"
                       :class="
                         String(goal.goalId) === String(selectedGoalId)
                           ? 'text-primary'

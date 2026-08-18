@@ -40,11 +40,11 @@
           {{ goalTypeLabel }}
         </span>
         <h3
-          class="mt-0.5 text-base font-black text-[#0a192f] transition-colors group-hover:text-primary sm:text-lg"
+          class="mt-0.5 text-base font-bold text-[#0a192f] transition-colors group-hover:text-primary sm:text-lg"
         >
           {{ goal?.title || '달성된 목표' }}
         </h3>
-        <p class="mt-1 text-2xl font-black tracking-[-0.6px] text-[#0a192f]">
+        <p class="mt-1 text-2xl font-bold tracking-tight text-[#0a192f]">
           {{ formattedAmount }}
           <span class="text-xs font-bold text-slate-400 ml-0.5">달성</span>
         </p>

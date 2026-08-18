@@ -4,7 +4,7 @@
     class="mt-8 scroll-mt-36 transition-all duration-200"
   >
     <div class="flex items-center justify-between gap-3">
-      <h2 class="text-lg font-black text-gray-900">
+      <h2 class="text-lg font-bold text-gray-900">
         {{ listTitle }}
         <span class="text-gray-400">({{ youthPolicyStore.totalElements }})</span>
       </h2>

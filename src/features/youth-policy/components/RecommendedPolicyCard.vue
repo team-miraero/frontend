@@ -23,7 +23,7 @@
     </div>
 
     <h3
-      class="mt-3.5 line-clamp-2 min-h-12 text-base font-black leading-6 text-gray-900 group-hover:text-primary transition-colors"
+      class="mt-3.5 line-clamp-2 min-h-12 text-base font-bold leading-6 text-gray-900 group-hover:text-primary transition-colors"
     >
       {{ policy.policyName }}
     </h3>
@@ -57,7 +57,7 @@
     <div class="mt-auto pt-5">
       <button
         type="button"
-        class="flex w-full items-center justify-center rounded-xl bg-[#eaf2ff] py-2.5 text-xs sm:text-sm font-black text-primary transition-all duration-150 hover:bg-primary hover:text-white active:scale-98 cursor-pointer select-none"
+        class="flex w-full items-center justify-center rounded-xl bg-[#eaf2ff] py-2.5 text-xs sm:text-sm font-bold text-primary transition-all duration-150 hover:bg-primary hover:text-white active:scale-98 cursor-pointer select-none"
         @click="emit('view-detail', policy.youthPolicyId)"
       >
         자세히 보기

@@ -13,7 +13,7 @@
           <button
             v-if="canGoBack"
             type="button"
-            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f8fbff] text-sm font-black text-slate-500 transition hover:bg-blue-50 hover:text-primary"
+            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f8fbff] text-sm font-bold text-slate-500 transition hover:bg-blue-50 hover:text-primary"
             aria-label="이전 단계"
             :disabled="isSubmitting"
             @click="goBack"
@@ -22,7 +22,7 @@
           </button>
           <div class="min-w-0">
             <p class="text-xs font-bold text-slate-400">{{ eyebrow }}</p>
-            <h3 :id="titleId" class="truncate pt-0.5 text-base font-black text-[#0a192f]">
+            <h3 :id="titleId" class="truncate pt-0.5 text-base font-bold text-[#0a192f]">
               {{ title }}
             </h3>
           </div>
@@ -42,7 +42,7 @@
         <div class="rounded-2xl border border-pink-200 bg-pink-50 px-4 py-3.5">
           <p class="text-sm leading-relaxed text-slate-700">
             현재 목표 페이스가
-            <strong class="font-black text-[#be185d]">{{ shortageLabel }} 부족해요.</strong>
+            <strong class="font-bold text-[#be185d]">{{ shortageLabel }} 부족해요.</strong>
             지금 상황에 맞는 대응 방법을 골라보세요.
           </p>
         </div>
@@ -116,7 +116,7 @@
               </span>
             </span>
             <span class="shrink-0 text-right">
-              <strong class="block text-sm font-black tabular-nums text-[#0a192f]">
+              <strong class="block text-sm font-bold tabular-nums text-[#0a192f]">
                 {{ formatKRW(account.balance) }}
               </strong>
               <span class="text-xs font-bold text-primary">선택 →</span>
@@ -156,7 +156,7 @@
           </div>
           <div class="mt-3 flex items-end justify-between border-t border-slate-200 pt-3">
             <span class="text-xs text-slate-400">현재 잔액</span>
-            <strong class="text-sm font-black tabular-nums text-[#0a192f]">
+            <strong class="text-sm font-bold tabular-nums text-[#0a192f]">
               {{ formatKRW(selectedAccount.balance) }}
             </strong>
           </div>
@@ -173,7 +173,7 @@
             inputmode="numeric"
             autocomplete="off"
             placeholder="0"
-            class="w-full rounded-2xl border-2 border-slate-200 bg-[#f4f8ff] py-4 pl-4 pr-10 text-right text-xl font-black tracking-tight text-[#0a192f] outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
+            class="w-full rounded-2xl border-2 border-slate-200 bg-[#f4f8ff] py-4 pl-4 pr-10 text-right text-xl font-bold tracking-tight text-[#0a192f] outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
             aria-describedby="pacemaker-pull-help"
             :disabled="isPullLocked"
             @input="handlePullAmountInput"
@@ -232,7 +232,7 @@
           <button
             v-if="isPullOutcomeUnknown"
             type="button"
-            class="w-full rounded-2xl bg-primary py-3.5 text-sm font-black text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700"
+            class="w-full rounded-2xl bg-primary py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700"
             @click="closeFlow(false)"
           >
             목표 자산 확인하기
@@ -248,7 +248,7 @@
             </button>
             <button
               type="submit"
-              class="flex-[2] rounded-2xl bg-primary py-3.5 text-sm font-black text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:shadow-none"
+              class="flex-[2] rounded-2xl bg-primary py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:shadow-none"
               :disabled="!isPullAmountValid || isSubmitting"
             >
               {{
@@ -280,7 +280,7 @@
             inputmode="numeric"
             autocomplete="off"
             :disabled="isSubmitting"
-            class="w-full rounded-2xl border-2 border-slate-200 bg-[#f4f8ff] py-3.5 pl-4 pr-10 text-right text-base font-black text-[#0a192f] outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
+            class="w-full rounded-2xl border-2 border-slate-200 bg-[#f4f8ff] py-3.5 pl-4 pr-10 text-right text-base font-bold text-[#0a192f] outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
             @input="handleGoalAmountInput"
           />
           <span
@@ -322,7 +322,7 @@
           </button>
           <button
             type="submit"
-            class="flex-[2] rounded-2xl bg-primary py-3.5 text-sm font-black text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:shadow-none"
+            class="flex-[2] rounded-2xl bg-primary py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:shadow-none"
             :disabled="isSubmitting"
           >
             {{ isSubmitting ? '반영하는 중…' : '저장 · 로드맵 반영' }}
@@ -337,19 +337,19 @@
         >
           <AppIcon :name="successState.icon" size="xl" />
         </div>
-        <h4 class="mt-4 text-lg font-black text-[#0a192f]">{{ successState.title }}</h4>
+        <h4 class="mt-4 text-lg font-bold text-[#0a192f]">{{ successState.title }}</h4>
         <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ successState.description }}</p>
         <div class="mt-5 w-full rounded-2xl border border-slate-200 bg-[#f8fbff] px-4 py-3.5">
           <div class="flex items-center justify-between gap-3 text-sm">
             <span class="text-slate-400">{{ successState.detailLabel }}</span>
-            <strong class="text-right font-black text-primary">{{
+            <strong class="text-right font-bold text-primary">{{
               successState.detailValue
             }}</strong>
           </div>
         </div>
         <button
           type="button"
-          class="mt-5 w-full rounded-2xl bg-primary py-3.5 text-sm font-black text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700"
+          class="mt-5 w-full rounded-2xl bg-primary py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(0,102,255,0.28)] transition hover:bg-blue-700"
           @click="closeFlow(false)"
         >
           확인

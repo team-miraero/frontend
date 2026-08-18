@@ -5,12 +5,12 @@
     aria-labelledby="limit-title"
   >
     <div class="border-b border-slate-100 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
-      <p class="text-xs font-black tracking-[0.12em] text-primary">
+      <p class="text-xs font-bold tracking-wider text-primary">
         {{ isEditMode ? '페이스메이커 상한선 변경' : '페이스메이커 설정 2/2' }}
       </p>
       <h2
         id="limit-title"
-        class="mt-2 text-xl font-black leading-7 tracking-[-0.4px] text-[#0a192f]"
+        class="mt-2 text-xl font-bold leading-7 tracking-tight text-[#0a192f]"
       >
         자동 저축 상한선을<br />설정해주세요
       </h2>
@@ -22,7 +22,7 @@
         aria-live="polite"
       >
         <p class="text-xs font-semibold text-slate-500">하루 최대 자동 저축 금액</p>
-        <p class="mt-1 text-[32px] font-black tracking-[-0.03em] text-primary">
+        <p class="mt-1 text-[32px] font-bold tracking-tight text-primary">
           {{ formatNumber(selectedMaxAmount) }}<span class="ml-1 text-lg">원</span>
         </p>
       </div>
@@ -124,7 +124,7 @@
                 <span class="block text-[11px] font-bold text-slate-400">
                   {{ account.institutionName }}
                 </span>
-                <span class="mt-0.5 block truncate text-sm font-black text-[#0a192f]">
+                <span class="mt-0.5 block truncate text-sm font-bold text-[#0a192f]">
                   {{ account.accountName }}
                 </span>
                 <span class="mt-0.5 block text-xs text-slate-400">
@@ -133,7 +133,7 @@
               </span>
 
               <span class="flex shrink-0 flex-col items-end gap-1.5">
-                <span class="text-sm font-black text-[#0a192f]">
+                <span class="text-sm font-bold text-[#0a192f]">
                   {{ formatNumber(account.balance)
                   }}<span class="ml-0.5 text-xs font-semibold text-slate-400">원</span>
                 </span>
@@ -179,7 +179,7 @@
     <div class="flex flex-col gap-3 px-5 pb-7 sm:px-8">
       <button
         type="button"
-        class="min-h-12 w-full rounded-2xl bg-gradient-to-br from-primary to-[#66b2ff] px-5 text-sm font-black text-white shadow-[0_6px_20px_rgba(0,102,255,0.28)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        class="min-h-12 w-full rounded-2xl bg-gradient-to-br from-primary to-[#66b2ff] px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgba(0,102,255,0.28)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         :disabled="isSubmitting"
         @click="$emit('complete')"
       >

@@ -7,7 +7,7 @@
   >
     <div class="relative z-10 min-w-0 pr-24 sm:pr-48">
       <!-- 메인 타이틀 -->
-      <h3 class="text-sm font-black tracking-tight text-[#0a192f] sm:text-base">
+      <h3 class="text-sm font-bold tracking-tight text-[#0a192f] sm:text-base">
         친구에게 나의 로드맵 자랑하기
       </h3>
 
@@ -18,7 +18,7 @@
 
       <!-- 하단 인터랙티브 공유 CTA -->
       <div class="mt-2.5 flex items-center gap-1.5 text-xs font-bold text-primary">
-        <span class="font-black">지금 공유하기</span>
+        <span class="font-bold">지금 공유하기</span>
         <span class="transition-transform duration-200 group-hover:translate-x-1">→</span>
       </div>
     </div>

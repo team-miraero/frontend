@@ -16,7 +16,7 @@
       </div>
 
       <div class="flex flex-col items-center gap-1.5 text-center">
-        <h3 class="text-xl font-black tracking-[-0.4px] text-[#0a192f]">입금이 완료되었습니다!</h3>
+        <h3 class="text-xl font-bold tracking-tight text-[#0a192f]">입금이 완료되었습니다!</h3>
         <p class="text-sm leading-[22.75px] text-slate-500">
           {{ formatWon(amount) }}이<br />
           <span class="font-bold text-[#0a192f]">{{ target?.accountNickname }}</span
@@ -35,12 +35,12 @@
             <GoalTypeIcon :goal-type="target?.goalType" size="sm" /> {{ target?.goalName }}
           </p>
         </div>
-        <p class="text-lg font-black text-primary">+{{ formatWon(amount) }}</p>
+        <p class="text-lg font-bold text-primary">+{{ formatWon(amount) }}</p>
       </div>
 
       <button
         type="button"
-        class="w-full rounded-2xl py-3.5 text-sm font-black text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)]"
+        class="w-full rounded-2xl py-3.5 text-sm font-bold text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)]"
         style="
           background-image: linear-gradient(173deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%);
         "

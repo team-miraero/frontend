@@ -38,7 +38,7 @@
         class="fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-3xl bg-white p-5 shadow-[0_-16px_48px_rgba(15,23,42,0.16)] sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:top-[calc(100%+0.5rem)] sm:max-h-[520px] sm:w-[420px] sm:rounded-2xl sm:border sm:border-gray-200 sm:p-5 sm:shadow-[0_18px_48px_rgba(15,23,42,0.16)]"
       >
         <header class="flex items-center justify-between border-b border-gray-200 pb-4">
-          <h2 id="region-select-title" class="text-lg font-black text-gray-900">지역 선택</h2>
+          <h2 id="region-select-title" class="text-lg font-bold text-gray-900">지역 선택</h2>
           <button
             type="button"
             class="flex size-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
@@ -94,7 +94,7 @@
         <footer class="mt-5 flex justify-end border-t border-gray-100 pt-4">
           <button
             type="button"
-            class="w-full rounded-xl bg-primary px-6 py-3 text-sm font-black text-white transition-colors hover:bg-blue-700 sm:w-auto"
+            class="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700 sm:w-auto"
             @click="applyRegion"
           >
             적용

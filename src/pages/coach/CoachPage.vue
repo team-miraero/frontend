@@ -2,9 +2,9 @@
 <template>
   <div class="flex h-full">
     <div class="flex h-full flex-1 flex-col bg-[#f8fbff]">
-      <!-- AI 코치 상단 채팅 헤더 바 -->
+      <!-- AI 코치 상단 채팅 헤더 바 (PC/데스크톱 전용, 모바일은 상단 글로벌 헤더 사용) -->
       <div
-        class="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 sm:px-6 md:px-8"
+        class="hidden lg:flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 sm:px-6 md:px-8"
       >
         <div class="flex items-center gap-3">
           <div
@@ -14,7 +14,7 @@
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2">
-              <h1 class="text-sm font-black tracking-[-0.3px] text-[#0a192f] sm:text-base">
+              <h1 class="text-sm font-bold tracking-tight text-[#0a192f] sm:text-base">
                 AI 목표 코치
               </h1>
               <span
@@ -28,27 +28,6 @@
             </p>
           </div>
         </div>
-
-        <!-- 모바일: 대화 목록 열기 버튼 -->
-        <button
-          type="button"
-          class="flex size-9 shrink-0 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 lg:hidden"
-          aria-label="대화 목록 열기"
-          @click="isCoachSidebarOpen = true"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="size-5"
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-        </button>
       </div>
 
       <!-- 메시지 리스트 (반응형 패딩 및 스크롤) -->
@@ -94,7 +73,7 @@
     </div>
 
     <CoachConversationSidebar
-      v-model:is-open="isCoachSidebarOpen"
+      v-model:is-open="coachStore.isSidebarOpen"
       :conversations="coachStore.conversations"
       :active-conversation-id="coachStore.currentConversationId"
       @create="handleCreateConversation"
@@ -124,9 +103,14 @@ const coachStore = useCoachStore()
 
 const messageListRef = ref(null)
 
-// 대화 목록(모바일 오버레이) 열림 상태 — 데스크톱은 기본 펼침, 모바일은 기본 접힘
 const isDesktop = useMediaQuery('(min-width: 1024px)')
-const isCoachSidebarOpen = ref(isDesktop.value)
+
+// 데스크톱 진입 시 기본 펼침
+onMounted(() => {
+  if (isDesktop.value) {
+    coachStore.toggleSidebar(true)
+  }
+})
 
 const userName = computed(() => authStore.user?.name ?? '')
 const goalLabel = computed(
@@ -155,13 +139,13 @@ watch(
 
 async function handleCreateConversation() {
   await coachStore.createNewConversation(welcomeMessage.value)
-  if (!isDesktop.value) isCoachSidebarOpen.value = false
+  if (!isDesktop.value) coachStore.toggleSidebar(false)
   scrollToBottom()
 }
 
 async function handleSelectConversation(conversationId) {
   await coachStore.selectConversation(conversationId)
-  if (!isDesktop.value) isCoachSidebarOpen.value = false
+  if (!isDesktop.value) coachStore.toggleSidebar(false)
   scrollToBottom()
 }
 

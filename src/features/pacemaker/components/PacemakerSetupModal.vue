@@ -9,7 +9,7 @@
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
       <div>
         <p class="text-xs font-bold text-slate-400">페이스메이커 전용 저금통</p>
-        <h3 class="pt-0.5 text-base font-black text-[#0a192f]">지금까지 모인 여유자금</h3>
+        <h3 class="pt-0.5 text-base font-bold text-[#0a192f]">지금까지 모인 여유자금</h3>
       </div>
       <button
         type="button"
@@ -40,7 +40,7 @@
 
       <button
         type="button"
-        class="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)]"
+        class="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)]"
         style="
           background-image: linear-gradient(173deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%);
         "

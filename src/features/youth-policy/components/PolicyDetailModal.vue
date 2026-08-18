@@ -58,7 +58,7 @@
                 {{ policy.providerInstitutionName }}
               </span>
             </div>
-            <h3 class="mt-2 text-xl font-black text-[#0a192f]">{{ policy.policyName }}</h3>
+            <h3 class="mt-2 text-xl font-bold text-[#0a192f]">{{ policy.policyName }}</h3>
             <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ policy.policyDescription }}</p>
 
             <div class="mt-5 rounded-2xl bg-accent-light px-5 py-4">

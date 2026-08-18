@@ -19,7 +19,7 @@
                 class="flex items-center justify-center transition-all"
                 :class="[
                   idx === activeMilestoneIndex
-                    ? 'h-5 rounded-full bg-primary px-2 text-[9px] font-black text-white shadow-sm ring-2 ring-primary/20'
+                    ? 'h-5 rounded-full bg-primary px-2 text-[9px] font-bold text-white shadow-sm ring-2 ring-primary/20'
                     : idx < activeMilestoneIndex
                       ? 'size-3.5 rounded-full bg-primary/20 text-[8px] font-bold text-primary'
                       : 'size-3 rounded-full bg-slate-200 text-[8px] font-bold text-slate-400'
@@ -70,7 +70,7 @@
             stroke="#ffffff"
             stroke-width="20"
             stroke-linecap="round"
-          />
+            />
           <!-- 3. 트랙 바닥 -->
           <path
             d="M-18 72 C75 58 135 82 210 68 C286 54 334 62 408 48"
@@ -103,7 +103,7 @@
             <span class="block text-[8px] font-bold text-slate-400">
               {{ isActiveMilestoneLast ? '최종 목표' : '다음 목표' }}
             </span>
-            <strong class="block text-[11px] font-black text-[#0a192f]">
+            <strong class="block text-[11px] font-bold text-[#0a192f]">
               {{ formatManwon(activeMilestone.targetAmount) }}원
             </strong>
           </div>
@@ -134,7 +134,7 @@
           <div class="relative ml-0.5 flex items-end">
             <!-- 모바일 콜리 스마트 말풍선 (우측 오프셋 + 적정 높이로 안정적 안착) -->
             <div class="absolute -top-9 left-1/2 z-30 flex w-max -translate-x-[20%] flex-col items-start">
-              <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-black text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap">
+              <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-bold text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap">
                 {{ paceMessage }}
                 <!-- 말풍선 꼬리 (콜리 머리 방향인 좌측 하단) -->
                 <div
@@ -177,7 +177,7 @@
           >
             <div class="relative flex flex-col items-center">
               <div class="absolute -top-9 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center">
-                <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-black text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap">
+                <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-bold text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap">
                   {{ paceMessage }}
                   <!-- 말풍선 꼬리 (아래쪽 화살표) -->
                   <div
@@ -205,7 +205,7 @@
             <p class="text-[11px] font-bold text-slate-400 truncate">
               {{ activeMilestone.title || `다음 ${activeMilestoneIndex + 1}차 마일스톤` }}까지
             </p>
-            <p class="mt-0.5 text-sm font-black text-[#0a192f] whitespace-nowrap">
+            <p class="mt-0.5 text-sm font-bold text-[#0a192f] whitespace-nowrap">
               <span class="text-primary tabular-nums">{{ formatManwon(remainingToActiveMilestone) }}원</span>
               남았어요
             </p>
@@ -344,7 +344,7 @@
               class="absolute -top-7 left-1/2 z-30 flex w-max -translate-x-[20%] flex-col items-start sm:-top-11 md:-top-13 lg:-top-15"
             >
               <div
-                class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-black text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.1)] whitespace-nowrap"
+                class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-bold text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.1)] whitespace-nowrap"
               >
                 {{ paceMessage }}
                 <!-- 말풍선 꼬리 (콜리 머리 방향인 좌측 하단) -->
@@ -392,7 +392,7 @@
                 class="absolute -top-7 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center sm:-top-11 md:-top-13 lg:-top-15"
               >
                 <div
-                  class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-black text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.1)] whitespace-nowrap"
+                  class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-bold text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.1)] whitespace-nowrap"
                 >
                   {{ paceMessage }}
                   <!-- 말풍선 꼬리 (아래쪽 화살표) -->

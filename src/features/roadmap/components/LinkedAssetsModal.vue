@@ -6,7 +6,7 @@
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-4 pt-6">
-      <h3 class="text-base font-black text-[#0a192f]">이 목표에 묶인 자금</h3>
+      <h3 class="text-base font-bold text-[#0a192f]">이 목표에 묶인 자금</h3>
       <button
         type="button"
         class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f8fbff]"
@@ -40,7 +40,7 @@
             </div>
           </div>
           <div class="text-right">
-            <p v-if="row.balance != null" class="text-sm font-black text-[#0a192f]">
+            <p v-if="row.balance != null" class="text-sm font-bold text-[#0a192f]">
               {{ formatKRWCompact(row.balance) }}
             </p>
             <p
@@ -89,11 +89,11 @@
     <div class="flex items-center justify-between border-t border-slate-100 bg-[#f8fbff] px-7 py-4">
       <div>
         <p class="text-xs text-slate-500">합계 잔액</p>
-        <p class="pt-0.5 text-sm font-black text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</p>
+        <p class="pt-0.5 text-sm font-bold text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</p>
       </div>
       <div class="text-right">
         <p class="text-xs text-slate-500">월 자동이체 합계</p>
-        <p class="pt-0.5 text-sm font-black text-primary">{{ formatKRW(totalAutoTransfer) }}</p>
+        <p class="pt-0.5 text-sm font-bold text-primary">{{ formatKRW(totalAutoTransfer) }}</p>
       </div>
     </div>
   </BaseModal>

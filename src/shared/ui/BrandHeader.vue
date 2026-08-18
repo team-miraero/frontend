@@ -4,7 +4,7 @@
     <div class="flex size-8 items-center justify-center rounded-[14px] bg-primary">
       <img src="@/assets/icons/logo.svg" alt="미래로" class="size-[18px]" />
     </div>
-    <span class="text-lg font-black tracking-[-0.45px] text-[#0a192f]">미래로</span>
+    <span class="text-lg font-bold tracking-tight text-[#0a192f]">미래로</span>
   </RouterLink>
 </template>
 

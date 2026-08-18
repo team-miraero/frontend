@@ -3,9 +3,9 @@
   <div class="flex w-full items-end gap-2.5" :class="isUser ? 'justify-end' : 'justify-start'">
     <div v-if="!isUser" class="mb-0.5 shrink-0">
       <div
-        class="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#66b2ff] drop-shadow-[0_2px_5px_rgba(0,102,255,0.28)]"
+        class="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#66b2ff] shadow-xs"
       >
-        <img src="@/assets/icons/ai-coach-avatar.svg" alt="" class="size-[13px]" />
+        <img src="@/assets/icons/ai-coach-avatar.svg" alt="AI 코치" class="size-4 object-contain" />
       </div>
     </div>
 

@@ -10,7 +10,7 @@
             <img :src="coliBottomImage" alt="" class="size-5 object-contain" />
           </span>
           <div class="min-w-0 flex-1">
-            <h3 class="text-sm font-black tracking-tight text-[#0a192f] whitespace-nowrap sm:text-base">
+            <h3 class="text-sm font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-base">
               콜리의 스마트 자산 브리핑
             </h3>
             <p class="text-[11px] font-bold text-slate-400 truncate whitespace-nowrap sm:text-xs">

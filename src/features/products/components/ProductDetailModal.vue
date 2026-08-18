@@ -58,7 +58,7 @@
               >
                 !
               </div>
-              <p class="mt-4 text-sm font-black text-[#10233f]">상세 정보를 불러오지 못했어요</p>
+              <p class="mt-4 text-sm font-bold text-[#10233f]">상세 정보를 불러오지 못했어요</p>
               <button
                 type="button"
                 class="mt-4 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white"
@@ -72,7 +72,7 @@
               <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
                 {{ product.institutionName }}
               </span>
-              <h3 class="mt-3 text-xl sm:text-2xl font-black tracking-[-0.5px] text-[#0a192f]">
+              <h3 class="mt-3 text-xl sm:text-2xl font-bold tracking-tight text-[#0a192f]">
                 {{ product.productName }}
               </h3>
               <p class="mt-1 text-xs text-slate-400">{{ product.productCode }}</p>
@@ -85,7 +85,7 @@
                     <p class="text-xs font-bold text-white/80">최고 금리</p>
                     <p class="mt-1 text-sm font-bold">
                       연
-                      <strong class="ml-1 text-3xl sm:text-4xl font-black tabular-nums">
+                      <strong class="ml-1 text-3xl sm:text-4xl font-bold tabular-nums">
                         {{ formatRate(product.maximumInterestRate) }}
                       </strong>
                       %
@@ -100,7 +100,7 @@
               </div>
 
               <section class="mt-7">
-                <h3 class="text-base font-black text-[#0a192f]">가입 정보</h3>
+                <h3 class="text-base font-bold text-[#0a192f]">가입 정보</h3>
                 <dl class="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200/80 bg-[#f8fbff] px-4">
                   <div
                     v-for="item in joinInfo"
@@ -117,7 +117,7 @@
 
               <section class="mt-7">
                 <div class="flex items-end justify-between">
-                  <h3 class="text-base font-black text-[#0a192f]">기간별 금리</h3>
+                  <h3 class="text-base font-bold text-[#0a192f]">기간별 금리</h3>
                   <p class="text-[11px] font-medium text-slate-400">단위: 연 %</p>
                 </div>
                 <div class="mt-3 overflow-hidden rounded-2xl border border-slate-200/80">
@@ -143,7 +143,7 @@
                     <span class="text-right text-slate-500">
                       {{ formatRate(option.baseInterestRate) }}
                     </span>
-                    <span class="text-right font-black text-primary">
+                    <span class="text-right font-bold text-primary">
                       {{ formatRate(option.maxInterestRate) }}
                     </span>
                   </div>
@@ -151,7 +151,7 @@
               </section>
 
               <section class="mt-7 space-y-3">
-                <h3 class="text-base font-black text-[#0a192f]">꼭 확인해요</h3>
+                <h3 class="text-base font-bold text-[#0a192f]">꼭 확인해요</h3>
                 <div
                   v-for="item in conditions"
                   :key="item.label"

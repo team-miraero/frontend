@@ -31,7 +31,7 @@
             </span>
           </div>
           <h3
-            class="mt-2.5 truncate text-base sm:text-lg font-black tracking-[-0.3px] text-[#0a192f]"
+            class="mt-2.5 truncate text-base sm:text-lg font-bold tracking-tight text-[#0a192f]"
             :title="product.productName"
           >
             {{ product.productName }}
@@ -39,7 +39,7 @@
         </div>
 
         <div class="shrink-0 rounded-2xl border border-slate-100 bg-[#f8fbff] px-3.5 py-2 text-right shadow-xs">
-          <p class="text-lg sm:text-xl font-black tracking-[-0.45px] text-primary tabular-nums">
+          <p class="text-lg sm:text-xl font-bold tracking-tight text-primary tabular-nums">
             연 {{ maximumRateLabel }}%
           </p>
           <p class="mt-0.5 text-[10px] font-bold text-slate-400">우대금리 포함 최고</p>
@@ -49,13 +49,13 @@
       <dl class="mt-4 grid grid-cols-2 gap-2">
         <div class="rounded-xl border border-slate-100 bg-[#f8fbff] px-3.5 py-2.5">
           <dt class="text-[11px] font-bold text-slate-400">납입 기간</dt>
-          <dd class="mt-1 text-xs sm:text-[13px] font-black text-slate-700 tabular-nums" :title="fullTermLabel">
+          <dd class="mt-1 text-xs sm:text-[13px] font-bold text-slate-700 tabular-nums" :title="fullTermLabel">
             {{ termLabel }}
           </dd>
         </div>
         <div class="rounded-xl border border-slate-100 bg-[#f8fbff] px-3.5 py-2.5">
           <dt class="text-[11px] font-bold text-slate-400">한도</dt>
-          <dd class="mt-1 truncate text-xs sm:text-[13px] font-black text-slate-700 tabular-nums" :title="limitLabel">
+          <dd class="mt-1 truncate text-xs sm:text-[13px] font-bold text-slate-700 tabular-nums" :title="limitLabel">
             {{ limitLabel }}
           </dd>
         </div>
@@ -65,13 +65,13 @@
         class="mt-3.5 flex items-center gap-3 rounded-xl border border-primary/15 bg-primary/[0.04] p-3"
       >
         <div
-          class="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-black text-white shadow-xs"
+          class="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shadow-xs"
           aria-hidden="true"
         >
           ₩
         </div>
         <div class="min-w-0">
-          <p class="truncate text-xs sm:text-[13px] font-black text-[#0a192f]">
+          <p class="truncate text-xs sm:text-[13px] font-bold text-[#0a192f]">
             {{ impactTitle }}
           </p>
           <p class="mt-0.5 truncate text-[11px] font-medium text-slate-500">

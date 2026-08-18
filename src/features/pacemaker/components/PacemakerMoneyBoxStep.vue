@@ -11,8 +11,8 @@
       >
         🪣
       </div>
-      <p class="mt-5 text-xs font-black tracking-[0.12em] text-primary">페이스메이커 설정 1/2</p>
-      <h2 id="money-box-title" class="mt-2 text-xl font-black tracking-[-0.4px] text-[#0a192f]">
+      <p class="mt-5 text-xs font-bold tracking-wider text-primary">페이스메이커 설정 1/2</p>
+      <h2 id="money-box-title" class="mt-2 text-xl font-bold tracking-tight text-[#0a192f]">
         페이스메이커 전용 저금통
       </h2>
       <p class="mt-2 text-sm leading-6 text-slate-500">
@@ -42,7 +42,7 @@
     <div class="flex flex-col gap-3 px-5 pb-7 sm:px-8">
       <button
         type="button"
-        class="min-h-12 w-full rounded-2xl bg-gradient-to-br from-primary to-[#66b2ff] px-5 text-sm font-black text-white shadow-[0_6px_20px_rgba(0,102,255,0.28)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99]"
+        class="min-h-12 w-full rounded-2xl bg-gradient-to-br from-primary to-[#66b2ff] px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgba(0,102,255,0.28)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99]"
         @click="$emit('next')"
       >
         저금통 개설하기 →

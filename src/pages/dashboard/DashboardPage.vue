@@ -18,7 +18,7 @@
         <p class="text-xs font-bold text-amber-700">일부 부가 정보를 불러오지 못했어요.</p>
         <button
           type="button"
-          class="text-xs font-black text-amber-800 disabled:opacity-50"
+          class="text-xs font-bold text-amber-800 disabled:opacity-50"
           :disabled="goalStore.isSupplementaryLoading"
           @click="retrySupplementaryData"
         >
@@ -154,7 +154,7 @@
     class="flex min-h-[420px] items-center justify-center px-6"
   >
     <div class="text-center" role="alert">
-      <p class="text-base font-black text-[#0a192f]">로드맵을 불러오지 못했어요</p>
+      <p class="text-base font-bold text-[#0a192f]">로드맵을 불러오지 못했어요</p>
       <p class="pt-2 text-sm text-slate-500">잠시 후 다시 시도해주세요.</p>
       <button
         type="button"
@@ -175,7 +175,7 @@
           <path d="M12 5v14M5 12h14" />
         </svg>
       </div>
-      <p class="text-base font-black text-[#0a192f]">아직 등록된 목표가 없어요</p>
+      <p class="text-base font-bold text-[#0a192f]">아직 등록된 목표가 없어요</p>
       <p class="pt-1.5 text-sm text-slate-500">
         첫 번째 목표를 설정하고 맞춤 로드맵을 시작해보세요.
       </p>

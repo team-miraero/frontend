@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between gap-2.5 sm:gap-4">
       <div class="min-w-0 flex-1">
         <p class="mb-0.5 text-xs font-bold text-slate-400 sm:mb-1">페이스메이커 저금통</p>
-        <h2 class="text-xl font-black tracking-tight text-[#0a192f] whitespace-nowrap sm:text-2xl">
+        <h2 class="text-xl font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-2xl">
           오늘까지 모인 여유자금
         </h2>
       </div>
@@ -38,11 +38,11 @@
               {{ pacemaker.maskedAccountNumber }}
             </span>
           </p>
-          <span class="rounded-full bg-white/20 px-2 py-1 text-[10px] font-black">
+          <span class="rounded-full bg-white/20 px-2 py-1 text-[10px] font-bold">
             자동저축 {{ isActive ? 'ON' : 'OFF' }}
           </span>
         </div>
-        <p class="mt-1 text-[34px] font-black tracking-[-0.04em] sm:text-[36px]">
+        <p class="mt-1 text-[34px] font-bold tracking-tight sm:text-[36px]">
           {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="ml-1 text-xl">원</span>
         </p>
         <p class="mt-1 text-xs text-white/70">
@@ -87,7 +87,7 @@
             :aria-label="isMonthlyStreak ? '주간 스트릭 보기로 전환' : '월간 달력 보기로 전환'"
             @click="isMonthlyStreak = !isMonthlyStreak"
           >
-            <h3 id="streak-title" class="truncate text-sm sm:text-base font-black text-[#0a192f] transition-colors group-hover:text-primary">
+            <h3 id="streak-title" class="truncate text-sm sm:text-base font-bold text-[#0a192f] transition-colors group-hover:text-primary">
               {{ isMonthlyStreak ? '이번 달 자동 저축 달력' : '이번 주 자동 저축 스트릭' }}
             </h3>
             <span
@@ -108,7 +108,7 @@
 
           <!-- 🔥 연속 일수 뱃지 -->
           <span
-            class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black shadow-2xs whitespace-nowrap transition-colors"
+            class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold shadow-2xs whitespace-nowrap transition-colors"
             :class="
               pacemaker.currentStreak > 0
                 ? 'bg-orange-50 border border-orange-200/80 text-orange-600'
@@ -158,7 +158,7 @@
       <div v-if="!isMonthlyStreak" class="grid grid-cols-7 gap-1.5 sm:gap-2">
         <div v-for="day in weekDays" :key="day.label" class="flex flex-col items-center gap-1 sm:gap-1.5">
           <div
-            class="flex size-8 sm:size-10 items-center justify-center rounded-full text-xs font-black transition-all duration-150"
+            class="flex size-8 sm:size-10 items-center justify-center rounded-full text-xs font-bold transition-all duration-150"
             :class="
               day.status === 'SUCCESS'
                 ? 'bg-primary text-white shadow-xs scale-105'
@@ -203,12 +203,12 @@
 
       <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400 border-t border-slate-100 pt-3">
         <span>{{ monthLabel }} 자동 저축</span>
-        <span class="font-black text-primary">{{ formatNumber(monthlySuccessCount) }}회 성공</span>
+        <span class="font-bold text-primary">{{ formatNumber(monthlySuccessCount) }}회 성공</span>
       </div>
     </section>
 
     <section aria-labelledby="goal-accounts-title">
-      <h3 id="goal-accounts-title" class="mb-3 text-sm font-black text-[#0a192f]">
+      <h3 id="goal-accounts-title" class="mb-3 text-sm font-bold text-[#0a192f]">
         목표별 입금 계좌
       </h3>
       <div
@@ -247,7 +247,7 @@
                 <GoalTypeIcon :goal-type="group.goalType" />
               </div>
               <div class="min-w-0">
-                <p class="truncate text-sm font-black text-[#0a192f]">{{ group.goalName }}</p>
+                <p class="truncate text-sm font-bold text-[#0a192f]">{{ group.goalName }}</p>
                 <p class="truncate text-xs text-slate-400">
                   선택 계좌:
                   {{ selectedWithdrawalAccount(group)?.financialInstitutionName ?? '출금계좌' }}
@@ -281,13 +281,13 @@
                   {{ expandedGoalId === group.goalId ? '⌃' : '⌄' }}
                 </span>
               </span>
-              <span class="mt-0.5 block text-sm font-black text-primary">
+              <span class="mt-0.5 block text-sm font-bold text-primary">
                 {{ formatCompactWon(selectedDepositAsset(group)?.balance) }}
               </span>
             </button>
             <div class="rounded-xl border border-[#c5dcff] bg-[#f8fbff] px-3 py-2.5">
               <span class="block truncate text-xs text-slate-400">연동 출금계좌</span>
-              <span class="mt-0.5 block text-sm font-black text-[#0a192f]">
+              <span class="mt-0.5 block text-sm font-bold text-[#0a192f]">
                 {{ formatCompactWon(selectedWithdrawalAccount(group)?.balance) }}
               </span>
             </div>
@@ -305,13 +305,13 @@
                 <span class="block truncate text-xs text-slate-400">
                   {{ depositAssetName(asset) }}
                 </span>
-                <span class="mt-0.5 block text-sm font-black text-primary">
+                <span class="mt-0.5 block text-sm font-bold text-primary">
                   {{ formatCompactWon(asset.balance) }}
                 </span>
               </span>
               <span class="rounded-xl border border-[#edf2ff] bg-white px-3 py-2.5">
                 <span class="block truncate text-xs text-slate-400">연동 출금계좌</span>
-                <span class="mt-0.5 block text-sm font-black text-[#0a192f]">
+                <span class="mt-0.5 block text-sm font-bold text-[#0a192f]">
                   {{ formatCompactWon(withdrawalForAsset(group, asset)?.balance) }}
                 </span>
               </span>
@@ -331,7 +331,7 @@
       class="rounded-[20px] border border-slate-200 bg-white px-5 py-5 sm:px-6"
       aria-labelledby="history-title"
     >
-      <h3 id="history-title" class="mb-4 text-sm font-black text-[#0a192f]">
+      <h3 id="history-title" class="mb-4 text-sm font-bold text-[#0a192f]">
         이번 달 자동 저축 내역
       </h3>
       <div
@@ -367,7 +367,7 @@
             <p class="mt-0.5 truncate text-xs text-slate-400">{{ describeHistory(item) }}</p>
           </div>
           <span
-            class="shrink-0 text-sm font-black"
+            class="shrink-0 text-sm font-bold"
             :class="item.status === 'SAVED' ? 'text-primary' : 'text-slate-300'"
           >
             {{ item.status === 'SAVED' ? `+${formatNumber(item.amount)}원` : '—' }}

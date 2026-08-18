@@ -40,7 +40,7 @@
             />
           </svg>
         </div>
-        <h2 class="mt-5 text-xl font-black tracking-[-0.4px] text-[#0a192f]">
+        <h2 class="mt-5 text-xl font-bold tracking-tight text-[#0a192f]">
           페이스메이커를 불러오지 못했어요
         </h2>
         <p class="mt-2 text-sm leading-6 text-slate-500">
@@ -48,7 +48,7 @@
         </p>
         <button
           type="button"
-          class="mt-7 inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary px-7 text-sm font-black text-white shadow-[0_6px_20px_rgba(0,102,255,0.24)] transition hover:bg-[#0055dd] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+          class="mt-7 inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary px-7 text-sm font-bold text-white shadow-[0_6px_20px_rgba(0,102,255,0.24)] transition hover:bg-[#0055dd] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
           @click="loadPacemakerStatus"
         >
           <svg
@@ -110,7 +110,7 @@
           </div>
           <h2
             id="pacemaker-intro-title"
-            class="text-[26px] font-black leading-[1.2] tracking-[-0.03em]"
+            class="text-[26px] font-bold leading-[1.2] tracking-tight"
           >
             다음달 자금,<br />자동으로 마련해드려요
           </h2>
@@ -155,7 +155,7 @@
         <ol class="flex flex-col gap-3.5">
           <li v-for="step in howItWorks" :key="step.step" class="flex items-start gap-4">
             <span
-              class="flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
+              class="flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
               style="background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%)"
               aria-hidden="true"
             >
@@ -191,7 +191,7 @@
       <!-- 와이어프레임 CTA -->
       <button
         type="button"
-        class="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-[18px] px-5 text-base font-black tracking-[-0.01em] text-white shadow-[0_8px_28px_rgba(0,102,255,0.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:animate-fade-in-up motion-safe:transition motion-safe:hover:scale-[1.01] motion-safe:active:scale-[0.98]"
+        class="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-[18px] px-5 text-base font-bold tracking-tight text-white shadow-[0_8px_28px_rgba(0,102,255,0.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:animate-fade-in-up motion-safe:transition motion-safe:hover:scale-[1.01] motion-safe:active:scale-[0.98]"
         style="
           background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%);
           animation-delay: 400ms;

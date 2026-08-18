@@ -7,7 +7,7 @@
       <p class="text-xs font-bold text-slate-400">모인 금액 / 목표</p>
 
       <div class="flex items-baseline gap-1.5 pt-2">
-        <span class="text-xl font-black tracking-tight tabular-nums text-[#0a192f] sm:text-2xl">
+        <span class="text-xl font-bold tracking-tight tabular-nums text-[#0a192f] sm:text-2xl">
           {{ formatManwon(goal.currentAmount) }}
         </span>
         <span class="text-xs font-bold tabular-nums text-slate-400"
@@ -31,7 +31,7 @@
 
     <div class="mt-3 flex items-center gap-1.5 border-t border-slate-200/60 pt-2.5">
       <span class="size-2 shrink-0 rounded-full" :class="paceDotClass" />
-      <span class="text-xs font-black tabular-nums whitespace-nowrap" :class="paceTextClass">{{
+      <span class="text-xs font-bold tabular-nums whitespace-nowrap" :class="paceTextClass">{{
         paceLabel
       }}</span>
     </div>

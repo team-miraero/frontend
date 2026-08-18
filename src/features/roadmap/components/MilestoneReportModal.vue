@@ -17,10 +17,10 @@
               <img :src="brandLogo" alt="미래로 로고" class="size-full object-contain" />
             </div>
             <div class="min-w-0">
-              <p class="text-[11px] font-black uppercase tracking-[1.2px] text-primary">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-primary">
                 Miraero AI Report
               </p>
-              <h2 class="pt-0.5 text-lg font-black tracking-tight text-[#0a192f]">
+              <h2 class="pt-0.5 text-lg font-bold tracking-tight text-[#0a192f]">
                 마일스톤 AI 리포트
               </h2>
             </div>
@@ -38,16 +38,16 @@
         <div class="mt-5 flex items-end justify-between gap-4">
           <div>
             <span
-              class="inline-flex rounded-full bg-primary px-2.5 py-1 text-[10px] font-black text-white"
+              class="inline-flex rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold text-white"
             >
               SPLIT {{ milestone.order }}
             </span>
-            <p class="mt-2 text-xl font-black tracking-tight text-[#0a192f]">
+            <p class="mt-2 text-xl font-bold tracking-tight text-[#0a192f]">
               {{ reportTitle }}
             </p>
           </div>
           <span
-            class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black"
+            class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold"
             :class="milestoneStatus.className"
           >
             {{ milestoneStatus.label }}
@@ -61,26 +61,26 @@
         >
           <div class="px-2">
             <dt class="text-[10px] font-bold text-slate-400">목표 금액</dt>
-            <dd class="mt-1 text-xs font-black text-[#0a192f]">{{ formattedAmount }}</dd>
+            <dd class="mt-1 text-xs font-bold text-[#0a192f]">{{ formattedAmount }}</dd>
           </div>
           <div class="px-2">
             <dt class="text-[10px] font-bold text-slate-400">목표 지점</dt>
-            <dd class="mt-1 text-xs font-black text-primary">{{ milestone.percentage }}%</dd>
+            <dd class="mt-1 text-xs font-bold text-primary">{{ milestone.percentage }}%</dd>
           </div>
           <div class="px-2">
             <dt class="text-[10px] font-bold text-slate-400">달성일</dt>
-            <dd class="mt-1 text-xs font-black text-[#0a192f]">{{ achievedDate }}</dd>
+            <dd class="mt-1 text-xs font-bold text-[#0a192f]">{{ achievedDate }}</dd>
           </div>
         </dl>
 
         <section v-if="reportContent" class="mt-5" aria-label="AI 분석 내용">
           <div class="mb-3 flex items-center gap-2">
             <span
-              class="flex size-5 items-center justify-center rounded-full bg-emerald-50 text-[11px] font-black text-emerald-600"
+              class="flex size-5 items-center justify-center rounded-full bg-emerald-50 text-[11px] font-bold text-emerald-600"
             >
               ✓
             </span>
-            <p class="text-xs font-black text-emerald-600">AI 분석 완료</p>
+            <p class="text-xs font-bold text-emerald-600">AI 분석 완료</p>
           </div>
           <p class="whitespace-pre-line text-sm leading-7 text-slate-600">{{ reportContent }}</p>
         </section>
@@ -95,7 +95,7 @@
           >
             {{ emptyState.icon }}
           </div>
-          <p class="mt-3 text-sm font-black text-[#0a192f]">{{ emptyState.title }}</p>
+          <p class="mt-3 text-sm font-bold text-[#0a192f]">{{ emptyState.title }}</p>
           <p class="mt-1.5 text-xs leading-5 text-slate-500">{{ emptyState.description }}</p>
         </section>
 

@@ -11,7 +11,7 @@
     </div>
 
     <!-- 타이틀 & 스토리텔링 안내 문구 -->
-    <h3 class="mt-5 text-xl font-black tracking-tight text-[#0a192f] sm:text-2xl">
+    <h3 class="mt-5 text-xl font-bold tracking-tight text-[#0a192f] sm:text-2xl">
       아직 완주한 목표가 없어요
     </h3>
     <p class="mt-2 text-xs font-medium leading-relaxed text-slate-500 sm:text-sm">
