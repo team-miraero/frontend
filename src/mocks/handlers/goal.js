@@ -118,7 +118,7 @@ const MOCK_ACCOUNTS = [
   {
     accountId: 3,
     institutionName: 'KB국민은행',
-    accountType: 'SAVING',
+    accountType: 'SAVINGS',
     accountName: 'KB 스타적금',
     maskedAccountNumber: '···3821',
     balance: 640000,
@@ -127,7 +127,7 @@ const MOCK_ACCOUNTS = [
   {
     accountId: 4,
     institutionName: '카카오뱅크',
-    accountType: 'SAVING',
+    accountType: 'SAVINGS',
     accountName: '카카오뱅크 적금',
     maskedAccountNumber: '···0047',
     balance: 1200000,
@@ -136,7 +136,7 @@ const MOCK_ACCOUNTS = [
   {
     accountId: 5,
     institutionName: '토스뱅크',
-    accountType: 'SAVING',
+    accountType: 'SAVINGS',
     accountName: '토스뱅크 저금통',
     maskedAccountNumber: '···7193',
     balance: 320000,
@@ -145,7 +145,7 @@ const MOCK_ACCOUNTS = [
   {
     accountId: 6,
     institutionName: 'KB국민은행',
-    accountType: 'SAVING',
+    accountType: 'SAVINGS',
     accountName: 'KB 독립적금',
     maskedAccountNumber: '***456',
     balance: 3000000,
@@ -163,7 +163,7 @@ const MOCK_ACCOUNTS = [
   {
     accountId: 11,
     institutionName: '신한은행',
-    accountType: 'SAVING',
+    accountType: 'SAVINGS',
     accountName: '신한 비상금 저금통',
     maskedAccountNumber: '···3333',
     balance: 250000,

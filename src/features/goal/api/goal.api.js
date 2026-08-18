@@ -66,10 +66,16 @@ export async function getFeasibility(params) {
 
 // 계좌 목록 조회 API (GOAL-04: 출금계좌 선택 / 기존 저축계좌 연결)
 /**
+ * 서버 account 테이블의 ck_account_type 제약과 같은 값 집합.
+ * 적금 계좌는 SAVINGS로 내려온다(SAVING이 아니다).
+ * @typedef {'CHECKING' | 'SAVINGS' | 'DEPOSIT' | 'INSTALLMENT' | 'ISA' | 'CMA'} AccountType
+ */
+
+/**
  * @typedef {Object} AccountItem
  * @property {number} accountId
  * @property {string} institutionName
- * @property {'CHECKING' | 'SAVING' | 'DEPOSIT'} accountType
+ * @property {AccountType} accountType
  * @property {string} accountName
  * @property {string} maskedAccountNumber
  * @property {number} balance
@@ -77,8 +83,9 @@ export async function getFeasibility(params) {
  */
 
 /**
+ * accountType에 위 집합 밖의 값을 넘기면 서버가 INVALID_ACCOUNT_TYPE 에러를 반환한다.
  * @param {{
- *   accountType?: 'CHECKING' | 'SAVING' | 'DEPOSIT',
+ *   accountType?: AccountType,
  *   excludeGoalLinked?: boolean
  * }} [params]
  * @returns {Promise<{ totalBalance: number, accounts: AccountItem[] }>}

@@ -184,7 +184,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
   }
 
   /**
-   * @param {'CHECKING' | 'SAVING' | 'DEPOSIT'} [accountType]
+   * @param {import('@/features/goal/api/goal.api').AccountType} [accountType]
    * @param {{ excludeGoalLinked?: boolean }} [options]
    */
   async function fetchAccounts(accountType, options = {}) {
@@ -247,8 +247,10 @@ export const useGoalStore = defineStore('feature-goal', () => {
       })
     }
 
-    if (goalType === 'LOAN') {
-      assets.push({ assetId: 1, assetType: 'LOAN' })
+    // 대출 목표는 상환에 사용할 저금통·계좌 연결이 필수라, 사용자가 고른 자산이 없으면
+    // 임의의 자산으로 대체하지 않고 여기서 막는다.
+    if (goalType === 'LOAN' && assets.length === 0) {
+      throw new Error('대출 상환에 사용할 저금통 또는 계좌를 선택해 주세요.')
     }
 
     const newGoalResult = await goalApi.createGoal({
@@ -259,7 +261,14 @@ export const useGoalStore = defineStore('feature-goal', () => {
       startAmount,
       assets,
     })
-    const createdGoalId = newGoalResult?.goalId ?? 1
+
+    // goalId가 없으면 이후 로직(로컬 목표 목록 갱신, 대시보드 이동)이 잘못된 목표(예: 이전 응답의
+    // 잔여 fallback 값)를 가리키게 되므로, 여기서 멈추고 호출부의 에러 처리에 맡긴다.
+    if (!newGoalResult?.goalId) {
+      throw new Error('목표 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+    }
+
+    const createdGoalId = newGoalResult.goalId
     selectedGoalId.value = createdGoalId
 
     // 신규 목표를 local goals 목록에도 추가해 로드맵 셀렉터/사이드바에 즉시 노출되도록 함
