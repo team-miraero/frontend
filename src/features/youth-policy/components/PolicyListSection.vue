@@ -1,8 +1,11 @@
 <template>
-  <section ref="sectionRef" class="mt-8 scroll-mt-36">
+  <section
+    ref="sectionRef"
+    class="mt-8 scroll-mt-36 transition-all duration-200"
+  >
     <div class="flex items-center justify-between gap-3">
       <h2 class="text-lg font-black text-gray-900">
-        정책 목록
+        {{ listTitle }}
         <span class="text-gray-400">({{ youthPolicyStore.totalElements }})</span>
       </h2>
     </div>
@@ -151,6 +154,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import PolicyListCard from '@/features/youth-policy/components/PolicyListCard.vue'
+import { POLICY_CATEGORY_IDS } from '@/features/youth-policy/constants/youthPolicy.constants'
 import { useYouthPolicyStore } from '@/features/youth-policy/store/youthPolicy.store'
 
 const emit = defineEmits(['view-detail'])
@@ -158,6 +162,12 @@ const youthPolicyStore = useYouthPolicyStore()
 const sectionRef = ref(null)
 
 defineExpose({ scrollToList })
+
+const listTitle = computed(() =>
+  youthPolicyStore.categoryId === POLICY_CATEGORY_IDS.ALL
+    ? '정책 목록'
+    : `${youthPolicyStore.activeCategory.label} 정책 목록`
+)
 
 const visiblePageNumbers = computed(() => {
   const total = youthPolicyStore.totalPages

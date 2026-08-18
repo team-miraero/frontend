@@ -35,11 +35,7 @@
             <p class="text-xs font-semibold text-slate-400">{{ todayLabel }} 기준</p>
           </div>
           <p class="mt-1 text-sm sm:text-base font-black text-[#0a192f]">
-            {{
-              hasProfileBasis
-                ? '회원님의 나이와 소득 조건을 분석해 딱 맞는 정책을 찾았어요'
-                : '내 정보를 등록하고 조건에 맞는 정책을 찾아보세요'
-            }}
+            {{ descriptionText }}
           </p>
         </div>
       </div>
@@ -81,17 +77,31 @@ import { formatKRWCompact } from '@/shared/lib/money'
 const props = defineProps({
   /** @type {import('vue').PropType<{ birthDate?: string, monthlyIncome?: number } | null>} */
   profile: { type: Object, default: null },
+  region: { type: String, default: '전체' },
 })
 
 const age = computed(() => calculateAge(props.profile?.birthDate))
 const todayLabel = formatDate(new Date())
 const hasProfileBasis = computed(() => age.value != null || props.profile?.monthlyIncome != null)
 
+const descriptionText = computed(() => {
+  if (!hasProfileBasis.value) {
+    return '내 정보를 등록하고 조건에 맞는 정책을 찾아보세요'
+  }
+  if (props.region && props.region !== '전체') {
+    return `회원님의 나이, 소득과 ${props.region} 조건을 분석해 딱 맞는 정책을 찾았어요`
+  }
+  return '회원님의 나이와 소득 조건을 분석해 딱 맞는 정책을 찾았어요'
+})
+
 const basisItems = computed(() => {
   const items = []
   if (age.value != null) items.push(`만 ${age.value}세`)
   if (props.profile?.monthlyIncome != null) {
     items.push(`월소득 ${formatKRWCompact(props.profile.monthlyIncome)}`)
+  }
+  if (props.region && props.region !== '전체') {
+    items.push(props.region)
   }
   return items
 })

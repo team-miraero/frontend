@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-full bg-[#f8fbff]">
     <div class="page-container pb-10 pt-4 sm:pb-14 sm:pt-6">
-      <YouthPolicyFilters @category-applied="scrollToPolicyListOnMobile" />
+      <YouthPolicyFilters @category-applied="scrollToPolicyList" />
       <RecommendedPoliciesSection @view-detail="openDetail" />
       <PolicyListSection ref="policyListSectionRef" @view-detail="openDetail" />
     </div>
@@ -58,8 +58,7 @@ function scrollToTop() {
   scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-function scrollToPolicyListOnMobile() {
-  if (!window.matchMedia('(max-width: 639px)').matches) return
+function scrollToPolicyList() {
   policyListSectionRef.value?.scrollToList()
 }
 
