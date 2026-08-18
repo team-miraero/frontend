@@ -24,6 +24,16 @@ export const useCoachStore = defineStore('feature-coach', () => {
   const isLoadingConversations = ref(false)
   const isLoadingMessages = ref(false)
 
+  function $reset() {
+    conversations.value = []
+    currentConversationId.value = null
+    messages.value = []
+    draftInput.value = ''
+    isSending.value = false
+    isLoadingConversations.value = false
+    isLoadingMessages.value = false
+  }
+
   /**
    * @param {'assistant' | 'user'} role
    * @param {string} content
@@ -145,5 +155,6 @@ export const useCoachStore = defineStore('feature-coach', () => {
     removeConversation,
     setDraftInput,
     sendMessage,
+    $reset,
   }
 })

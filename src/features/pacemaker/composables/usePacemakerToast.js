@@ -1,15 +1,16 @@
 // src/features/pacemaker/composables/usePacemakerToast.js
-import { ref } from 'vue'
 import { usePacemakerStore } from '@/features/pacemaker/store/pacemaker.store'
-
-// 전역 싱글톤 상태
-const toastList = ref([]) // 실시간 슬라이드인 토스트 알림
-const notificationHistory = ref([]) // 헤더 알림 종 드롭다운 히스토리
-const hasUnread = ref(false) // 읽지 않은 알림 빨간 뱃지 표시 여부
-const isBalanceModalOpen = ref(false) // 여유자금 상세 모달 열림 여부
+// 전역 싱글톤 상태는 로그아웃 시 초기화할 수 있도록 별도 모듈에서 관리한다.
+import {
+  hasUnread,
+  isBalanceModalOpen,
+  notificationHistory,
+  toastList,
+} from '@/features/pacemaker/composables/pacemakerToast.state'
 
 export function usePacemakerToast() {
-  const pacemakerStore = usePacemakerStore()
+  // 로그아웃 시 store가 폐기되므로 setup 시점에 캡처하지 않고 사용하는 함수 안에서 가져온다.
+  // (App.vue처럼 언마운트되지 않는 컴포넌트가 죽은 인스턴스를 붙잡는 것을 막는다)
 
   // 숫자를 한국 원화 형식으로 포맷팅 (ex: 40000 -> "40,000원")
   const formatWon = (val) => (val ? `${Number(val).toLocaleString()}원` : '0원')
@@ -81,7 +82,7 @@ export function usePacemakerToast() {
    * 💰, 🔥 큼직한 이모지 뱃지 알림 2종 발송
    */
   const showDualNotifications = () => {
-    const viewData = pacemakerStore.pacemakerView
+    const viewData = usePacemakerStore().pacemakerView
 
     const todayAmount = viewData?.todaySavingAmount || 40000
     const monthlyRemaining = viewData?.monthlySecuredAmount || 350000

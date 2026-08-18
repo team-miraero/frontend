@@ -74,6 +74,7 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
   const signupError = ref(null)
   const isSubmittingSignup = ref(false)
   const mydataSyncError = ref(null)
+  const isSubmittingLogout = ref(false)
   let loginRequest = null
 
   function resetLoginError() {
@@ -224,6 +225,9 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
    * 이 기기의 로그인 상태(accessToken/user)는 항상 정리한다.
    */
   async function submitLogout() {
+    if (isSubmittingLogout.value) return
+
+    isSubmittingLogout.value = true
     try {
       await logoutApi()
     } catch (error) {
@@ -231,6 +235,7 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
       console.error('로그아웃 요청 실패:', error)
     } finally {
       useAuthStore().logout()
+      isSubmittingLogout.value = false
     }
   }
 
@@ -249,5 +254,6 @@ export const useAuthFeatureStore = defineStore('feature-auth', () => {
     isSubmittingSignup,
     submitSignup,
     submitLogout,
+    isSubmittingLogout,
   }
 })

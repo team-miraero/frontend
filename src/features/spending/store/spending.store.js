@@ -12,6 +12,17 @@ export const useSpendingStore = defineStore('spending', () => {
   let spendingRequestId = 0
   let transactionsRequestId = 0
 
+  function $reset() {
+    spendingSummary.value = null
+    isLoading.value = false
+    error.value = null
+    transactionHistory.value = null
+    areTransactionsLoading.value = false
+    transactionsError.value = null
+    spendingRequestId += 1
+    transactionsRequestId += 1
+  }
+
   async function loadSpendingData(goalId) {
     const requestId = ++spendingRequestId
     isLoading.value = true
@@ -53,5 +64,6 @@ export const useSpendingStore = defineStore('spending', () => {
     transactionsError,
     loadSpendingData,
     loadTransactions,
+    $reset,
   }
 })

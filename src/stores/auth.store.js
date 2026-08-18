@@ -1,6 +1,7 @@
 // 인증 상태 store: accessToken, user, login/logout
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { resetUserStores } from '@/stores/reset-user-stores'
 
 /**
  * @typedef {Object} AuthUser
@@ -43,6 +44,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function logout() {
+    // 아직 마운트된 화면이 초기화 직후 재조회를 걸어도 유효한 토큰으로 이전 사용자의 데이터를
+    // 다시 채우지 못하도록, 인증 정보를 먼저 끊고 나서 Store를 정리한다.
     accessToken.value = null
     user.value = null
     try {
@@ -50,6 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       // 저장소 오류가 로그아웃과 401 복구 흐름을 막지 않도록 한다.
     }
+    resetUserStores()
   }
 
   /**

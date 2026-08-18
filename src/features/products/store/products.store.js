@@ -48,6 +48,22 @@ export const useProductsStore = defineStore('feature-products', () => {
   const detailError = ref(null)
   let detailRequestId = 0
 
+  function $reset() {
+    productsByType.deposit = []
+    productsByType.saving = []
+    loadedTypes.deposit = false
+    loadedTypes.saving = false
+    isLoading.value = false
+    error.value = null
+    pendingListRequestCount = 0
+    listRequestIds.deposit += 1
+    listRequestIds.saving += 1
+    selectedProduct.value = null
+    isDetailLoading.value = false
+    detailError.value = null
+    detailRequestId += 1
+  }
+
   async function fetchProducts(productType, { force = false } = {}) {
     if (!productsApi.isSupportedProductType(productType)) {
       throw new TypeError(`지원하지 않는 상품 유형입니다: ${productType}`)
@@ -127,5 +143,6 @@ export const useProductsStore = defineStore('feature-products', () => {
     fetchProductDetail,
     selectProduct,
     clearSelectedProduct,
+    $reset,
   }
 })

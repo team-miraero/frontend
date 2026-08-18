@@ -98,6 +98,36 @@ export const useGoalStore = defineStore('feature-goal', () => {
   // 진행 중인 요청의 Promise를 공유해서 동시 호출자가 모두 같은 완료 시점을 기다리게 한다.
   let fetchGoalsPromise = null
 
+  function $reset() {
+    selectedGoalType.value = null
+    selectedGoalPresetId.value = null
+    selectedGoalId.value = null
+    goalParams.value = null
+    feasibilityResult.value = null
+    linkedAccountIds.value = []
+    feasibility.value = null
+    isFeasibilityLoading.value = false
+    feasibilityError.value = null
+    recalculatedFeasibility.value = null
+    feasibilityAdjustment.value = null
+    accounts.value = []
+    areAccountsLoading.value = false
+    accountsError.value = null
+    goals.value = []
+    goalsError.value = null
+    areGoalsLoading.value = false
+    currentGoal.value = null
+    assets.value = []
+    monthlyAvailableMoney.value = null
+    dailyAvailableMoney.value = null
+    isLoading.value = false
+    dashboardError.value = null
+    dashboardSupplementaryErrors.value = {}
+    isSupplementaryLoading.value = false
+    dashboardRequestId += 1
+    fetchGoalsPromise = null
+  }
+
   /**
    * @param {boolean} [force=false]
    */
@@ -397,5 +427,6 @@ export const useGoalStore = defineStore('feature-goal', () => {
     fetchAccounts,
     submitGoalCreation,
     applyRecalculatedFeasibility,
+    $reset,
   }
 })
