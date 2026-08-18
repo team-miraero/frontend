@@ -14,7 +14,7 @@ import { client } from '@/shared/api/client'
 
 /**
  * 새 대화방 생성
- * @param {string} title
+ * @param {string} [title]
  * @returns {Promise<Conversation>}
  */
 export async function createConversation(title) {
@@ -75,9 +75,10 @@ export async function deleteConversation(conversationId) {
  * @returns {Promise<SendChatMessageResult>}
  */
 export async function sendMessage(payload) {
-  // TODO: 메시지 전송 API 명세 확정되면
-  // client.post(`/ai-coach/conversations/${payload.conversationId}/messages`, { content: payload.message })로 교체
+  const { data } = await client.post(`/ai-coach/conversations/${payload.conversationId}/messages`, {
+    content: payload.message,
+  })
   return {
-    message: '말씀해주신 내용을 확인했어요. (AI 코치 응답은 API 연동 후 제공됩니다)',
+    message: data?.data?.assistantMessage?.content ?? '',
   }
 }
