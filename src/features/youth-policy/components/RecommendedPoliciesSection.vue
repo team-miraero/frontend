@@ -7,12 +7,12 @@
     "
     class="mt-4"
   >
-    <div class="flex items-end justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <h2 class="text-xl font-black text-gray-900">내 조건에 맞는 정책</h2>
+    <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <h2 class="text-lg sm:text-xl font-black text-gray-900">내 조건에 맞는 정책</h2>
         <span
           v-if="youthPolicyStore.region !== '전체'"
-          class="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary"
+          class="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary shrink-0 whitespace-nowrap"
         >
           {{ youthPolicyStore.region }}
         </span>
