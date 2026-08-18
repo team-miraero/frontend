@@ -183,10 +183,13 @@ async function handleDeleteConversation(conversationId) {
 }
 
 onMounted(async () => {
-  await Promise.all([
-    coachStore.fetchConversations(),
-    coachStore.loadInitialConversation(welcomeMessage.value),
-  ])
+  await coachStore.fetchConversations()
+
+  if (coachStore.conversations.length > 0) {
+    await coachStore.selectConversation(coachStore.conversations[0].conversationId)
+  } else {
+    await coachStore.createNewConversation('새 대화', welcomeMessage.value)
+  }
 
   scrollToBottom()
 })

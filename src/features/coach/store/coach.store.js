@@ -64,7 +64,7 @@ export const useCoachStore = defineStore('feature-coach', () => {
     isLoadingMessages.value = true
     try {
       const result = await coachApi.getConversationMessages(conversationId)
-      messages.value = (result.messages ?? []).map((item) => ({
+      messages.value = result.messages.map((item) => ({
         id: item.messageId,
         role: mapSenderType(item.senderType),
         content: item.content,
@@ -76,34 +76,10 @@ export const useCoachStore = defineStore('feature-coach', () => {
   }
 
   /**
-   * 최근 대화를 불러오거나 기존 대화가 없으면 새 대화방 생성
-   * @param {string} [welcomeContent]
-   */
-  async function loadInitialConversation(welcomeContent) {
-    isLoadingMessages.value = true
-    try {
-      const result = await coachApi.getLatestConversation()
-      if (result?.conversation) {
-        currentConversationId.value = result.conversation.conversationId
-        messages.value = (result.messages ?? []).map((item) => ({
-          id: item.messageId,
-          role: mapSenderType(item.senderType),
-          content: item.content,
-          createdAt: item.createdAt,
-        }))
-      } else {
-        await createNewConversation('새 대화', welcomeContent)
-      }
-    } finally {
-      isLoadingMessages.value = false
-    }
-  }
-
-  /**
    * @param {string} title
-   * @param {string} [welcomeContent] 새 대화방 진입 시 보여줄 인사말
+   * @param {string} [welcomeContent] 새 대화방 진입 시 보여줄 인사말 — 서버엔 저장되지 않는 클라이언트 전용 표시
    */
-  async function createNewConversation(title = '새 대화', welcomeContent) {
+  async function createNewConversation(title, welcomeContent) {
     const conversation = await coachApi.createConversation(title)
     conversations.value = [conversation, ...conversations.value]
     currentConversationId.value = conversation.conversationId
@@ -140,51 +116,16 @@ export const useCoachStore = defineStore('feature-coach', () => {
     const text = (content ?? draftInput.value).trim()
     if (!text || isSending.value || !currentConversationId.value) return
 
-    const tempId = crypto.randomUUID()
-    messages.value.push({
-      id: tempId,
-      role: CHAT_ROLES.USER,
-      content: text,
-      createdAt: new Date().toISOString(),
-    })
+    messages.value.push(createLocalMessage(CHAT_ROLES.USER, text))
     draftInput.value = ''
     isSending.value = true
 
     try {
-      const result = await coachApi.sendMessage({
+      const reply = await coachApi.sendMessage({
         conversationId: currentConversationId.value,
         message: text,
       })
-
-      // 서버 응답의 userMessage로 임시 메시지 ID/데이터 동기화
-      const userIndex = messages.value.findIndex((m) => m.id === tempId)
-      if (userIndex !== -1 && result?.userMessage) {
-        messages.value[userIndex] = {
-          id: result.userMessage.messageId,
-          role: CHAT_ROLES.USER,
-          content: result.userMessage.content,
-          createdAt: result.userMessage.createdAt,
-        }
-      }
-
-      // 서버 응답의 assistantMessage 추가
-      if (result?.assistantMessage) {
-        messages.value.push({
-          id: result.assistantMessage.messageId,
-          role: CHAT_ROLES.ASSISTANT,
-          content: result.assistantMessage.content,
-          createdAt: result.assistantMessage.createdAt,
-        })
-      }
-
-      // 사이드바 해당 대화방의 lastMessageAt 업데이트
-      const conv = conversations.value.find(
-        (c) => c.conversationId === currentConversationId.value
-      )
-      if (conv && result?.assistantMessage) {
-        conv.lastMessageAt = result.assistantMessage.createdAt
-        conv.updatedAt = result.assistantMessage.createdAt
-      }
+      messages.value.push(createLocalMessage(CHAT_ROLES.ASSISTANT, reply.message))
     } finally {
       isSending.value = false
     }
@@ -200,7 +141,6 @@ export const useCoachStore = defineStore('feature-coach', () => {
     isLoadingMessages,
     fetchConversations,
     selectConversation,
-    loadInitialConversation,
     createNewConversation,
     removeConversation,
     setDraftInput,

@@ -1,6 +1,7 @@
 // coach 도메인 API 함수: AI 목표 코치 대화방 CRUD + 메시지
+// 이 도메인 API만 응답이 { success, data, error } 형태로 감싸져 있어서
+// (다른 feature들은 평평한 JSON을 바로 반환), 여기서 data만 꺼내 반환한다.
 import { client } from '@/shared/api/client'
-import { unwrapApiData } from '@/shared/api/unwrapApiData'
 
 /**
  * @typedef {Object} Conversation
@@ -12,6 +13,25 @@ import { unwrapApiData } from '@/shared/api/unwrapApiData'
  */
 
 /**
+ * 새 대화방 생성
+ * @param {string} [title]
+ * @returns {Promise<Conversation>}
+ */
+export async function createConversation(title) {
+  const { data } = await client.post('/ai-coach/conversations', null, { params: { title } })
+  return data.data
+}
+
+/**
+ * 대화방 목록 조회
+ * @returns {Promise<Conversation[]>}
+ */
+export async function getConversations() {
+  const { data } = await client.get('/ai-coach/conversations')
+  return data.data.conversations
+}
+
+/**
  * @typedef {Object} ChatMessageDto
  * @property {number} messageId
  * @property {'USER' | 'ASSISTANT'} senderType
@@ -20,54 +40,23 @@ import { unwrapApiData } from '@/shared/api/unwrapApiData'
  */
 
 /**
- * 최근 대화 조회 (GET /ai-coach/conversations/latest)
- * @returns {Promise<{ conversation: Conversation | null, messages: ChatMessageDto[] }>}
- */
-export async function getLatestConversation() {
-  const { data } = await client.get('/ai-coach/conversations/latest')
-  return unwrapApiData(data)
-}
-
-/**
- * 새 대화방 생성 (POST /ai-coach/conversations)
- * @param {string} [title]
- * @returns {Promise<Conversation>}
- */
-export async function createConversation(title) {
-  const { data } = await client.post('/ai-coach/conversations', null, {
-    params: title ? { title } : undefined,
-  })
-  return unwrapApiData(data)
-}
-
-/**
- * 대화방 목록 조회 (GET /ai-coach/conversations)
- * @returns {Promise<Conversation[]>}
- */
-export async function getConversations() {
-  const { data } = await client.get('/ai-coach/conversations')
-  const unwrapped = unwrapApiData(data)
-  return unwrapped?.conversations ?? []
-}
-
-/**
- * 특정 대화방의 정보 및 메시지 목록 조회 (GET /ai-coach/conversations/{conversationId}/messages)
+ * 특정 대화방의 메시지 목록 조회
  * @param {number} conversationId
  * @returns {Promise<{ conversation: Conversation, messages: ChatMessageDto[] }>}
  */
 export async function getConversationMessages(conversationId) {
   const { data } = await client.get(`/ai-coach/conversations/${conversationId}/messages`)
-  return unwrapApiData(data)
+  return data.data
 }
 
 /**
- * 대화방 삭제 (DELETE /ai-coach/conversations/{conversationId})
+ * 대화방 삭제
  * @param {number} conversationId
- * @returns {Promise<unknown>}
+ * @returns {Promise<{ conversationId: number }>}
  */
 export async function deleteConversation(conversationId) {
   const { data } = await client.delete(`/ai-coach/conversations/${conversationId}`)
-  return unwrapApiData(data)
+  return data.data
 }
 
 /**
@@ -78,20 +67,18 @@ export async function deleteConversation(conversationId) {
 
 /**
  * @typedef {Object} SendChatMessageResult
- * @property {number} conversationId
- * @property {ChatMessageDto} userMessage
- * @property {ChatMessageDto} assistantMessage
+ * @property {string} message
  */
 
 /**
- * 메시지 전송 및 AI 응답 수신 (POST /ai-coach/conversations/{conversationId}/messages)
  * @param {SendChatMessagePayload} payload
  * @returns {Promise<SendChatMessageResult>}
  */
 export async function sendMessage(payload) {
-  const { data } = await client.post(
-    `/ai-coach/conversations/${payload.conversationId}/messages`,
-    { content: payload.message }
-  )
-  return unwrapApiData(data)
+  const { data } = await client.post(`/ai-coach/conversations/${payload.conversationId}/messages`, {
+    content: payload.message,
+  })
+  return {
+    message: data?.data?.assistantMessage?.content ?? '',
+  }
 }
