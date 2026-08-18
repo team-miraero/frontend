@@ -7,12 +7,14 @@ import {
   POLICY_CATEGORY_IDS,
 } from '@/features/youth-policy/constants/youthPolicy.constants'
 
+const DEFAULT_REGION = '전체'
+
 /**
  * 청년 정책 목록/상세 조회 상태를 관리하는 스토어
  */
 export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
   const categoryId = ref(POLICY_CATEGORY_IDS.ALL)
-  const region = ref('전체')
+  const region = ref(DEFAULT_REGION)
   const searchKeyword = ref('')
 
   const policies = ref([])
@@ -41,11 +43,36 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
   const hasActiveFilters = computed(
     () =>
       categoryId.value !== POLICY_CATEGORY_IDS.ALL ||
-      region.value !== '전체' ||
+      region.value !== DEFAULT_REGION ||
       searchKeyword.value !== ''
   )
 
   let fetchRequestId = 0
+
+  function applyDefaultFilters() {
+    categoryId.value = POLICY_CATEGORY_IDS.ALL
+    region.value = DEFAULT_REGION
+    searchKeyword.value = ''
+  }
+
+  function $reset() {
+    applyDefaultFilters()
+    policies.value = []
+    page.value = 1
+    size.value = DEFAULT_PAGE_SIZE
+    totalElements.value = 0
+    totalPages.value = 0
+    isLastPage.value = true
+    isLoading.value = false
+    error.value = null
+    selectedPolicy.value = null
+    isDetailLoading.value = false
+    detailError.value = null
+    recommendedPolicies.value = []
+    isRecommendedLoading.value = false
+    recommendedError.value = null
+    fetchRequestId += 1
+  }
 
   /**
    * 카테고리/지역/검색어와 페이지 번호를 기준으로 정책 목록을 조회한다.
@@ -135,9 +162,7 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
    */
   function resetFilters() {
     if (!hasActiveFilters.value) return
-    categoryId.value = POLICY_CATEGORY_IDS.ALL
-    region.value = '전체'
-    searchKeyword.value = ''
+    applyDefaultFilters()
     fetchPolicies()
   }
 
@@ -190,5 +215,6 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
     resetFilters,
     fetchPolicyDetail,
     clearSelectedPolicy,
+    $reset,
   }
 })

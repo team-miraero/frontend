@@ -8,5 +8,11 @@ export const useChangeStore = defineStore('feature-change', () => {
   const changeImpact = ref(null)
   const changeHistory = ref([])
 
-  return { pendingChangeRequest, changeImpact, changeHistory }
+  function $reset() {
+    pendingChangeRequest.value = null
+    changeImpact.value = null
+    changeHistory.value = []
+  }
+
+  return { pendingChangeRequest, changeImpact, changeHistory, $reset }
 })

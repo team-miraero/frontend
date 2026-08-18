@@ -8,6 +8,12 @@ export const useUiStore = defineStore('ui', () => {
   /** @type {import('vue').Ref<string | null>} */
   const selectedGoalId = ref(null)
 
+  function $reset() {
+    sidebarOpen.value = false
+    globalLoading.value = false
+    selectedGoalId.value = null
+  }
+
   function toggleSidebar() {
     sidebarOpen.value = !sidebarOpen.value
   }
@@ -33,5 +39,6 @@ export const useUiStore = defineStore('ui', () => {
     toggleSidebar,
     setGlobalLoading,
     setSelectedGoalId,
+    $reset,
   }
 })

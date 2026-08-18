@@ -3,8 +3,7 @@ import { ref } from 'vue'
 import { usePacemakerStore } from '@/features/pacemaker/store/pacemaker.store'
 
 export function usePacemakerDeposit() {
-  const pacemakerStore = usePacemakerStore()
-
+  // 로그아웃 시 store가 폐기되므로 setup 시점에 캡처하지 않고 사용하는 함수 안에서 가져온다.
   const selectedDepositTarget = ref(null)
   const depositedAmount = ref(0)
   const isDepositing = ref(false)
@@ -18,7 +17,7 @@ export function usePacemakerDeposit() {
   function openDeposit(group, preferredAccountId) {
     const depositOptions = (group?.withdrawalAccounts ?? []).map((withdrawalAccount) => ({
       accountId: withdrawalAccount.accountId,
-      moneyBoxId: pacemakerStore.pacemakerView.moneyBoxId,
+      moneyBoxId: usePacemakerStore().pacemakerView.moneyBoxId,
       icon: '🏦',
       accountNickname: withdrawalAccount.financialInstitutionName ?? '출금계좌',
       accountBalance: withdrawalAccount.balance ?? 0,
@@ -45,6 +44,7 @@ export function usePacemakerDeposit() {
   async function submitDeposit({ accountId, amount, moneyBoxId, option }, onSuccess) {
     if (isDepositing.value) return
 
+    const pacemakerStore = usePacemakerStore()
     isDepositing.value = true
     depositErrorMessage.value = ''
     try {
@@ -63,7 +63,7 @@ export function usePacemakerDeposit() {
 
   async function retryDepositTargets() {
     try {
-      await pacemakerStore.fetchDepositTargets()
+      await usePacemakerStore().fetchDepositTargets()
     } catch {
       // 스토어의 오류 상태를 통해 같은 영역에서 재시도 UI를 유지합니다.
     }
@@ -71,7 +71,7 @@ export function usePacemakerDeposit() {
 
   async function retryHistories() {
     try {
-      await pacemakerStore.fetchHistories({ page: 0, size: 31 })
+      await usePacemakerStore().fetchHistories({ page: 0, size: 31 })
     } catch {
       // 스토어의 오류 상태를 통해 같은 영역에서 재시도 UI를 유지합니다.
     }

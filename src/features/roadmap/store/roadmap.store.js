@@ -9,6 +9,13 @@ export const useRoadmapStore = defineStore('feature-roadmap', () => {
   const error = ref(null)
   let milestonesRequestId = 0
 
+  function $reset() {
+    milestones.value = []
+    isLoading.value = false
+    error.value = null
+    milestonesRequestId += 1
+  }
+
   const nextMilestone = computed(
     () => milestones.value.find((milestone) => milestone.status === 'IN_PROGRESS') ?? null
   )
@@ -45,5 +52,5 @@ export const useRoadmapStore = defineStore('feature-roadmap', () => {
     }
   }
 
-  return { milestones, nextMilestone, previousMilestone, isLoading, error, fetchMilestones }
+  return { milestones, nextMilestone, previousMilestone, isLoading, error, fetchMilestones, $reset }
 })

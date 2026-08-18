@@ -12,6 +12,14 @@ export const useCollectionStore = defineStore('feature-collection', () => {
   const isAdding = ref(false)
   const error = ref(null)
 
+  function $reset() {
+    collectionStatus.value = null
+    achievedGoals.value = []
+    isLoading.value = false
+    isAdding.value = false
+    error.value = null
+  }
+
   const hasGoals = computed(
     () => Array.isArray(achievedGoals.value) && achievedGoals.value.length > 0
   )
@@ -47,13 +55,6 @@ export const useCollectionStore = defineStore('feature-collection', () => {
     }
   }
 
-  /**
-   * 테스트/시연용: 빈 상태로 토글하는 함수
-   */
-  function clearAchievedGoals() {
-    achievedGoals.value = []
-  }
-
   return {
     collectionStatus,
     achievedGoals,
@@ -65,6 +66,6 @@ export const useCollectionStore = defineStore('feature-collection', () => {
     totalAchievedAmount,
     fetchAchievedGoals,
     addAchievedGoal,
-    clearAchievedGoals,
+    $reset,
   }
 })

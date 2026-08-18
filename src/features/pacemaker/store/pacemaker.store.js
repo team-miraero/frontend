@@ -23,6 +23,24 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   let depositTargetsRequestId = 0
   let historiesRequestId = 0
 
+  function $reset() {
+    pacemakerStatus.value = null
+    pacemakerDashboard.value = null
+    depositTargets.value = []
+    histories.value = []
+    isDepositTargetsLoading.value = false
+    depositTargetsError.value = null
+    isHistoriesLoading.value = false
+    historiesError.value = null
+    isToggling.value = false
+    toggleError.value = null
+    dashboardError.value = null
+    accountDetails.value = {}
+    accountDetailRequests.clear()
+    depositTargetsRequestId += 1
+    historiesRequestId += 1
+  }
+
   // 기존 대시보드 컴포넌트가 최신 API 필드를 사용할 수 있도록 만든 화면용 모델
   const pacemakerView = computed(() => {
     const status = pacemakerStatus.value
@@ -228,5 +246,6 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     updateMaxAmount,
     depositToGoal,
     fetchHistories,
+    $reset,
   }
 })

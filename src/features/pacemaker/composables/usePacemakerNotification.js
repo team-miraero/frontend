@@ -5,7 +5,7 @@ import { usePacemakerStore } from '@/features/pacemaker/store/pacemaker.store'
  * 페이스메이커 전용 브라우저 시스템 알림(Notification API) Composable
  */
 export function usePacemakerNotification() {
-  const pacemakerStore = usePacemakerStore()
+  // 로그아웃 시 store가 폐기되므로 setup 시점에 캡처하지 않고 사용하는 함수 안에서 가져온다.
   const isSupported = typeof window !== 'undefined' && 'Notification' in window
   const permission = ref(isSupported ? Notification.permission : 'denied')
 
@@ -83,7 +83,7 @@ export function usePacemakerNotification() {
    * 3. 페이스메이커 데이터 조건 충족 시 알림 트리거 (여유자금, 연속 모으는 중 등)
    */
   const checkAndNotifyPacemakerStatus = () => {
-    const viewData = pacemakerStore.pacemakerView
+    const viewData = usePacemakerStore().pacemakerView
     if (!viewData) return
 
     const { todaySavingAmount, currentStreak, moneyBoxBalance } = viewData
@@ -108,7 +108,7 @@ export function usePacemakerNotification() {
    * 4. 버튼 클릭 등 수동 테스트용 즉시 알림 발송
    */
   const sendTestNotification = () => {
-    const viewData = pacemakerStore.pacemakerView
+    const viewData = usePacemakerStore().pacemakerView
     const amount = viewData?.todaySavingAmount || viewData?.moneyBoxBalance || 15000
     const streak = viewData?.currentStreak || 3
 

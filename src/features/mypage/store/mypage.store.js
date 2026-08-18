@@ -6,14 +6,23 @@ import {
   MYPAGE_NOTIFICATION_ITEMS,
   MYPAGE_NOTIFICATION_STORAGE_KEY,
 } from '@/features/mypage/constants/mypage.constants'
+import { useAuthStore } from '@/stores/auth.store'
+
+// 알림 설정은 계정별 화면 설정이므로 저장 키에 userId를 붙인다.
+// 로그인 정보가 없으면(로그아웃 상태) 저장소를 읽거나 쓰지 않고 기본값만 사용한다.
+function getNotificationStorageKey() {
+  const userId = useAuthStore().user?.id
+  return userId ? `${MYPAGE_NOTIFICATION_STORAGE_KEY}:${userId}` : null
+}
 
 function loadNotificationSettings() {
   if (typeof window === 'undefined') return { ...DEFAULT_NOTIFICATION_SETTINGS }
 
+  const storageKey = getNotificationStorageKey()
+  if (!storageKey) return { ...DEFAULT_NOTIFICATION_SETTINGS }
+
   try {
-    const savedSettings = JSON.parse(
-      window.localStorage.getItem(MYPAGE_NOTIFICATION_STORAGE_KEY) ?? '{}'
-    )
+    const savedSettings = JSON.parse(window.localStorage.getItem(storageKey) ?? '{}')
 
     // 목록에서 삭제된 알림 항목의 값이 저장소에 남지 않도록 현재 항목만 반영한다.
     return Object.fromEntries(
@@ -50,6 +59,17 @@ export const useMypageStore = defineStore('feature-mypage', () => {
       enabled: notificationSettings.value[item.id] ?? item.defaultEnabled,
     }))
   )
+
+  function $reset() {
+    clearProfile()
+    isProfileLoading.value = false
+    isProfileImageSaving.value = false
+    isPasswordChanging.value = false
+    isMydataConnectionsLoading.value = false
+    isAccountsSyncing.value = false
+    // 로그아웃 후에는 로그인 정보가 없으므로 기본값으로 돌아간다.
+    notificationSettings.value = loadNotificationSettings()
+  }
 
   async function fetchProfile() {
     isProfileLoading.value = true
@@ -135,11 +155,9 @@ export const useMypageStore = defineStore('feature-mypage', () => {
     }
 
     // 알림 API가 제공되기 전까지 이 기기의 화면 설정으로만 보관한다.
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(
-        MYPAGE_NOTIFICATION_STORAGE_KEY,
-        JSON.stringify(notificationSettings.value)
-      )
+    const storageKey = typeof window !== 'undefined' ? getNotificationStorageKey() : null
+    if (storageKey) {
+      window.localStorage.setItem(storageKey, JSON.stringify(notificationSettings.value))
     }
   }
 
@@ -173,5 +191,6 @@ export const useMypageStore = defineStore('feature-mypage', () => {
     syncAccounts,
     toggleNotification,
     clearProfile,
+    $reset,
   }
 })
