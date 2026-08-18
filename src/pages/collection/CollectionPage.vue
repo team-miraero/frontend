@@ -1,6 +1,6 @@
 <!-- 목표 컬렉션 (Goal Collection) 페이지 (COLL-01~02) -->
 <template>
-  <div class="flex justify-center bg-[#f8fbff] min-h-[calc(100vh-80px)]">
+  <div class="flex justify-center bg-[#f8fafc] min-h-[calc(100vh-80px)]">
     <div class="page-container pb-10 pt-4 sm:pb-14 sm:pt-6">
       <!-- 로딩 중일 때 스피너 표시 -->
       <div v-if="collectionStore.isLoading" class="flex h-96 items-center justify-center">

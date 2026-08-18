@@ -7,7 +7,7 @@
 
   <div
     v-else-if="goalStore.currentGoal"
-    class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fbff] pb-6"
+    class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fafc] pb-6"
   >
     <div class="page-container py-4 sm:py-6 space-y-4 sm:space-y-6">
       <div

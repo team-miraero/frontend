@@ -28,7 +28,7 @@
   >
     <aside
       v-if="uiStore.sidebarOpen"
-      class="fixed inset-y-0 left-0 z-50 flex w-[min(84vw,320px)] flex-col overflow-hidden rounded-r-[28px] border-r border-slate-200 bg-[#f8fbff] shadow-none lg:hidden"
+      class="fixed inset-y-0 left-0 z-50 flex w-[min(84vw,320px)] flex-col overflow-hidden rounded-r-[28px] border-r border-slate-200 bg-[#f8fafc] shadow-none lg:hidden"
       aria-label="사이드바 메뉴"
     >
       <header class="flex items-center justify-between bg-white px-6 pb-5 pt-6">

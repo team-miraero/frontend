@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full bg-[#f8fbff]">
+  <div class="min-h-full bg-[#f8fafc] pb-16">
     <div class="page-container pb-10 pt-4 sm:pb-14 sm:pt-6">
       <YouthPolicyFilters @category-applied="scrollToPolicyList" />
       <RecommendedPoliciesSection @view-detail="openDetail" />

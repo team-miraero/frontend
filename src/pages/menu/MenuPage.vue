@@ -1,6 +1,6 @@
 <!-- 토스 스타일 모바일/태블릿 전체 메뉴 페이지 -->
 <template>
-  <div class="min-h-full bg-[#f8fbff] pb-12">
+  <div class="min-h-full bg-[#f8fafc] pb-12">
     <!-- 상단 페이지 헤더 타이틀 (PC/데스크톱 전용, 모바일은 상단 헤더에 표시되므로 숨김) -->
     <div class="hidden lg:block border-b border-slate-200/80 bg-white px-4 py-4 sm:px-6 md:px-8">
       <div class="mx-auto max-w-2xl">
@@ -9,11 +9,11 @@
       </div>
     </div>
 
-    <div class="mx-auto max-w-2xl px-4 py-5 sm:px-6 space-y-5">
+    <div class="mx-auto max-w-2xl px-4 py-5 sm:px-6 space-y-4">
       <!-- 1. 최상단 사용자 프로필 & 자산 요약 카드 (클릭 시 마이페이지 이동) -->
       <RouterLink
         :to="{ name: ROUTE_NAMES.MYPAGE }"
-        class="group relative flex items-center justify-between rounded-2xl border border-blue-100 bg-gradient-to-br from-white via-[#f4f8ff] to-[#eaf2ff] p-4 sm:p-5 shadow-xs transition-all hover:shadow-md hover:border-primary/40 active:scale-[0.99]"
+        class="group relative flex items-center justify-between rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs transition-all hover:shadow-md hover:border-primary/40 active:scale-[0.99]"
       >
         <div class="flex items-center gap-3.5">
           <div
@@ -48,7 +48,7 @@
           <!-- 청년 정책 -->
           <RouterLink
             :to="{ name: ROUTE_NAMES.YOUTH_POLICY }"
-            class="flex items-center gap-3.5 rounded-xl border border-slate-100 bg-[#fbfdff] p-3.5 transition-all hover:bg-[#f4f8ff] hover:border-primary/30 active:scale-[0.98]"
+            class="flex items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
           >
             <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
               <img :src="iconMap.policy" alt="" class="size-5 object-contain" />
@@ -62,7 +62,7 @@
           <!-- 금융 상품 추천 -->
           <RouterLink
             :to="{ name: ROUTE_NAMES.PRODUCTS }"
-            class="flex items-center gap-3.5 rounded-xl border border-slate-100 bg-[#fbfdff] p-3.5 transition-all hover:bg-[#f4f8ff] hover:border-primary/30 active:scale-[0.98]"
+            class="flex items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
           >
             <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
               <img :src="iconMap.products" alt="" class="size-5 object-contain" />
@@ -80,7 +80,7 @@
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">성취 & 도감</h2>
         <RouterLink
           :to="{ name: ROUTE_NAMES.COLLECTION }"
-          class="flex items-center justify-between rounded-xl border border-slate-100 bg-[#fbfdff] p-3.5 transition-all hover:bg-[#f4f8ff] hover:border-primary/30 active:scale-[0.98]"
+          class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
         >
           <div class="flex items-center gap-3.5">
             <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
@@ -103,7 +103,7 @@
         <div class="grid grid-cols-2 gap-2.5">
           <RouterLink
             :to="{ name: ROUTE_NAMES.DASHBOARD }"
-            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-[#fbfdff] p-3 text-xs font-bold text-slate-700 hover:bg-[#f4f8ff] hover:text-primary transition"
+            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
             <img :src="iconMap.roadmap" alt="" class="size-4.5 object-contain" />
             <span>목표 로드맵</span>
@@ -111,7 +111,7 @@
 
           <RouterLink
             :to="{ name: ROUTE_NAMES.SPENDING }"
-            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-[#fbfdff] p-3 text-xs font-bold text-slate-700 hover:bg-[#f4f8ff] hover:text-primary transition"
+            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
             <img :src="iconMap.spending" alt="" class="size-4.5 object-contain" />
             <span>지출 관리</span>
@@ -119,7 +119,7 @@
 
           <RouterLink
             :to="{ name: ROUTE_NAMES.PACEMAKER }"
-            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-[#fbfdff] p-3 text-xs font-bold text-slate-700 hover:bg-[#f4f8ff] hover:text-primary transition"
+            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
             <img :src="iconMap.pacemaker" alt="" class="size-4.5 object-contain" />
             <span>페이스메이커</span>
@@ -127,7 +127,7 @@
 
           <RouterLink
             :to="{ name: ROUTE_NAMES.COACH }"
-            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-[#fbfdff] p-3 text-xs font-bold text-slate-700 hover:bg-[#f4f8ff] hover:text-primary transition"
+            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
             <img :src="iconMap.coach" alt="" class="size-4.5 object-contain" />
             <span>AI 목표 코치</span>

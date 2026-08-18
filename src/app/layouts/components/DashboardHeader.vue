@@ -1,6 +1,6 @@
 <template>
   <header
-    class="z-30 shrink-0 border-b border-slate-200/80 bg-white/95 shadow-[0_2px_12px_rgba(15,35,70,0.04)] backdrop-blur-xl max-lg:border-b-0 max-lg:bg-[#f8fbff] max-lg:shadow-none"
+    class="z-30 shrink-0 border-b border-slate-200/80 bg-white/95 shadow-[0_2px_12px_rgba(15,35,70,0.04)] backdrop-blur-xl max-lg:border-b-0 max-lg:bg-[#f8fafc] max-lg:shadow-none"
   >
     <!-- 모바일/태블릿 헤더 (lg:hidden) -->
     <div class="page-container flex h-14 sm:h-16 items-center justify-between gap-3 lg:hidden">

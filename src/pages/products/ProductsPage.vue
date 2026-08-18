@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full bg-[#f8fbff]">
+  <div class="min-h-full bg-[#f8fafc] pb-16">
     <RoadmapSelector
       :goals="goals"
       :selected-goal-id="selectedGoalId"

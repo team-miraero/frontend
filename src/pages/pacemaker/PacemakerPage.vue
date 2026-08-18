@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full bg-[#f8fbff]">
+  <div class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fafc] pb-6">
     <section
       v-if="isLoading"
       class="mx-auto flex min-h-[calc(100vh-89px)] w-full max-w-[800px] items-center justify-center px-5 py-16"

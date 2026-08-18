@@ -1,7 +1,7 @@
 <!-- AI 목표 코치 채팅 페이지 -->
 <template>
-  <div class="flex h-full">
-    <div class="flex h-full flex-1 flex-col bg-[#f8fbff]">
+  <div class="flex h-[calc(100vh-56px)] sm:h-[calc(100vh-64px)] lg:h-[calc(100vh-80px)] w-full overflow-hidden bg-[#f8fafc]">
+    <div class="flex h-full flex-1 flex-col bg-[#f8fafc]">
       <!-- AI 코치 상단 채팅 헤더 바 (PC/데스크톱 전용, 모바일은 상단 글로벌 헤더 사용) -->
       <div
         class="hidden lg:flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 sm:px-6 md:px-8"
