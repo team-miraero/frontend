@@ -107,15 +107,22 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
   }
 
   /**
-   * 나이·월소득 조건을 충족하는 정책을 조회하며 일반 목록 필터와 분리한다.
+   * 나이·소득 조건을 충족하는 정책을 조회하며 일반 목록 필터와 분리한다.
+   * 지역 필터가 선택된 경우 해당 지역의 추천 정책도 함께 필터링한다.
    * 후보 전체의 상세(나이·소득 조건 등)를 불러와 자격 조건을 하나라도 충족하지 못하면 제외한다.
    * 후보군 자체가 mock 단계에서 소수로 관리되는 값이라 상세를 전부 불러와도 N+1 부담은 작다.
+   * @param {string} [overrideRegion]
    */
-  async function fetchRecommendedPolicies() {
+  async function fetchRecommendedPolicies(overrideRegion) {
     isRecommendedLoading.value = true
     recommendedError.value = null
+    const targetRegion = overrideRegion !== undefined ? overrideRegion : region.value
+    const requestedRegion = targetRegion === '전체' ? undefined : targetRegion
+
     try {
-      const response = await youthPolicyApi.getRecommendedYouthPolicies()
+      const response = await youthPolicyApi.getRecommendedYouthPolicies({
+        region: requestedRegion,
+      })
 
       const detailResults = await Promise.allSettled(
         response.content.map((item) => youthPolicyApi.getYouthPolicyDetail(item.youthPolicyId))
@@ -147,6 +154,7 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
     if (region.value === nextRegion) return
     region.value = nextRegion
     fetchPolicies()
+    fetchRecommendedPolicies()
   }
 
   /**
@@ -164,6 +172,7 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
     if (!hasActiveFilters.value) return
     applyDefaultFilters()
     fetchPolicies()
+    fetchRecommendedPolicies()
   }
 
   /**

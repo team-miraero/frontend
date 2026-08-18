@@ -19,17 +19,17 @@ export const POLICY_CATEGORY_IDS = Object.freeze({
 /** @type {ReadonlyArray<PolicyCategory>} */
 export const POLICY_CATEGORIES = Object.freeze([
   { id: POLICY_CATEGORY_IDS.ALL, label: '전체', keyword: '' },
-  { id: POLICY_CATEGORY_IDS.LOAN, label: '대출', keyword: '대출' },
-  { id: POLICY_CATEGORY_IDS.SUBSIDY, label: '보조금', keyword: '보조금' },
-  { id: POLICY_CATEGORY_IDS.VOUCHER, label: '바우처', keyword: '바우처' },
-  { id: POLICY_CATEGORY_IDS.INTEREST_BENEFIT, label: '금리혜택', keyword: '금리혜택' },
-  { id: POLICY_CATEGORY_IDS.CREDIT_RECOVERY, label: '신용회복', keyword: '신용회복' },
+  { id: POLICY_CATEGORY_IDS.HOUSING_SUPPORT, label: '월세지원', keyword: '주거지원' },
   {
     id: POLICY_CATEGORY_IDS.PUBLIC_RENTAL_HOUSING,
-    label: '공공임대주택',
+    label: '청년주택',
     keyword: '공공임대주택',
   },
-  { id: POLICY_CATEGORY_IDS.HOUSING_SUPPORT, label: '주거지원', keyword: '주거지원' },
+  { id: POLICY_CATEGORY_IDS.LOAN, label: '대출', keyword: '대출' },
+  { id: POLICY_CATEGORY_IDS.SUBSIDY, label: '지원금', keyword: '보조금' },
+  { id: POLICY_CATEGORY_IDS.VOUCHER, label: '바우처', keyword: '바우처' },
+  { id: POLICY_CATEGORY_IDS.INTEREST_BENEFIT, label: '이자지원', keyword: '금리혜택' },
+  { id: POLICY_CATEGORY_IDS.CREDIT_RECOVERY, label: '신용관리', keyword: '신용회복' },
 ])
 
 export const DEFAULT_PAGE_SIZE = 10

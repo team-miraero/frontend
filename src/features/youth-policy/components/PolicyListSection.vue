@@ -1,8 +1,11 @@
 <template>
-  <section ref="sectionRef" class="mt-8 scroll-mt-36">
+  <section
+    ref="sectionRef"
+    class="mt-8 scroll-mt-36 transition-all duration-200"
+  >
     <div class="flex items-center justify-between gap-3">
       <h2 class="text-lg font-black text-gray-900">
-        정책 목록
+        {{ listTitle }}
         <span class="text-gray-400">({{ youthPolicyStore.totalElements }})</span>
       </h2>
     </div>
@@ -118,39 +121,38 @@
       </div>
     </div>
 
-    <aside
+    <div
       v-if="!youthPolicyStore.error"
-      class="mt-7 flex flex-col items-center border-t border-gray-200 px-4 pt-7 text-center"
+      class="mt-8 flex flex-wrap items-center justify-center gap-1.5 text-xs text-slate-400"
     >
-      <p class="text-sm font-semibold text-gray-600">
-        더 많은 청년정책은 온통청년에서 확인할 수 있어요.
-      </p>
+      <span>더 많은 청년정책은 온통청년에서 확인할 수 있어요.</span>
       <a
         href="https://www.youthcenter.go.kr"
         target="_blank"
         rel="noopener noreferrer"
-        class="mt-3 inline-flex items-center justify-center gap-1.5 text-sm font-bold text-primary hover:text-blue-700"
+        class="inline-flex items-center gap-0.5 font-bold text-primary hover:text-blue-700 transition-colors"
       >
         온통청년 바로가기
         <svg
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          class="size-3.5"
+          stroke-width="2.5"
+          class="size-3"
           aria-hidden="true"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5M19 5l-9 9" />
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 13v6H5V5h6" />
         </svg>
       </a>
-    </aside>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import PolicyListCard from '@/features/youth-policy/components/PolicyListCard.vue'
+import { POLICY_CATEGORY_IDS } from '@/features/youth-policy/constants/youthPolicy.constants'
 import { useYouthPolicyStore } from '@/features/youth-policy/store/youthPolicy.store'
 
 const emit = defineEmits(['view-detail'])
@@ -158,6 +160,12 @@ const youthPolicyStore = useYouthPolicyStore()
 const sectionRef = ref(null)
 
 defineExpose({ scrollToList })
+
+const listTitle = computed(() =>
+  youthPolicyStore.categoryId === POLICY_CATEGORY_IDS.ALL
+    ? '정책 목록'
+    : `${youthPolicyStore.activeCategory.label} 정책 목록`
+)
 
 const visiblePageNumbers = computed(() => {
   const total = youthPolicyStore.totalPages
