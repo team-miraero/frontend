@@ -7,8 +7,10 @@
   >
     <div class="flex items-start justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
       <div>
-        <p class="text-xs font-bold text-slate-400">📅 이번 달 여유자금</p>
-        <p class="pt-1 text-2xl font-bold tracking-tight text-[#0a192f]">
+        <p class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400">
+          <AppIcon name="calendar" size="sm" /> 이번 달 여유자금
+        </p>
+        <p class="pt-1 text-2xl font-bold tracking-tight text-primary">
           {{ formatKRW(monthly.availableMoney) }}
         </p>
       </div>
@@ -44,10 +46,10 @@
       </div>
 
       <div
-        class="flex items-center justify-between rounded-2xl border border-slate-200 bg-[#f4f8ff] px-5 py-4"
+        class="flex items-center justify-between rounded-2xl border border-primary/20 bg-[#eaf2ff] px-5 py-4"
       >
         <p class="text-sm font-bold text-[#0a192f]">이번 달 여유자금</p>
-        <p class="text-lg font-bold text-[#0a192f]">= {{ formatKRW(monthly.availableMoney) }}</p>
+        <p class="text-lg font-bold text-primary">{{ formatKRW(monthly.availableMoney) }}</p>
       </div>
 
       <div>
@@ -71,6 +73,7 @@
 <script setup>
 import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import AppIcon from '@/shared/ui/AppIcon.vue'
 import { formatKRW } from '@/shared/lib/money'
 
 const props = defineProps({

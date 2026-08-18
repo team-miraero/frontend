@@ -3,38 +3,18 @@
   <div class="w-full">
     <!-- 헤더 (모바일 한 줄 최적화 레이아웃) -->
     <div class="flex items-center justify-between gap-2 pb-3 sm:pb-3.5">
-      <div class="flex min-w-0 items-center gap-2 sm:gap-2.5">
-        <span
-          class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm ring-1 ring-primary/20"
+      <div class="flex min-w-0 items-baseline gap-2">
+        <h3
+          class="text-base font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-lg"
         >
-          <svg
-            class="size-3.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="13" r="8" />
-            <path d="M12 9v4l2.5 1.5" />
-            <path d="M10 2h4" />
-            <path d="M18 5l1.5 1.5" />
-          </svg>
-        </span>
-        <div class="min-w-0 flex-1">
-          <h3
-            class="text-sm font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-base"
-          >
-            스플릿 기록
-          </h3>
-          <p class="text-[11px] font-normal text-slate-400 truncate whitespace-nowrap sm:text-xs">
-            구간별 달성 현황과 페이스 기록이에요
-          </p>
-        </div>
+          스플릿 기록
+        </h3>
+        <p class="text-xs font-medium text-slate-400 truncate whitespace-nowrap sm:text-xs">
+          구간별 달성 현황
+        </p>
       </div>
       <span
-        class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-500 whitespace-nowrap"
+        class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500 whitespace-nowrap"
       >
         총 {{ milestones.length }}개 구간
       </span>
@@ -52,10 +32,10 @@
           class="group relative flex min-w-[170px] sm:min-w-[175px] flex-1 cursor-pointer flex-col justify-between rounded-xl border p-3 text-left sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-0 active:scale-[0.97] select-none snap-start"
           :class="[
             milestone.status === 'COMPLETED'
-              ? 'border-primary/20 bg-[#f8fbff] hover:border-primary/40 hover:bg-[#f0f6ff] hover:shadow-2xs'
+              ? 'border-slate-200/80 bg-slate-50/70 hover:border-slate-300 hover:bg-white hover:shadow-2xs'
               : milestone.status === 'IN_PROGRESS'
                 ? 'border-primary/80 bg-white shadow-2xs hover:border-primary hover:shadow-xs'
-                : 'border-slate-200/80 bg-slate-50/60 opacity-80 hover:border-slate-300 hover:bg-white hover:opacity-100 hover:shadow-2xs',
+                : 'border-slate-200/60 bg-slate-50/40 opacity-70 hover:border-slate-300 hover:bg-white hover:opacity-100 hover:shadow-2xs',
           ]"
           @click="$emit('select-milestone', milestone)"
         >
@@ -66,10 +46,10 @@
                 class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight transition-transform duration-200 group-hover:scale-105"
                 :class="
                   milestone.status === 'COMPLETED'
-                    ? 'bg-primary/10 text-primary'
+                    ? 'bg-slate-200/80 text-slate-700'
                     : milestone.status === 'IN_PROGRESS'
                       ? 'bg-primary text-white shadow-2xs'
-                      : 'bg-slate-200/80 text-slate-500'
+                      : 'bg-slate-200/60 text-slate-400'
                 "
               >
                 SPLIT {{ index + 1 }}

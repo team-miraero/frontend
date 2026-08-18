@@ -1,218 +1,176 @@
 <!-- 목표 진행 로드맵: 전체 마일스톤 진행바 + 페이스 상태별 주인공-콜리 랠리 주행 (소프트 스카이블루 테마, 정적 클린 뷰) -->
 <template>
   <div class="w-full">
-    <!-- 모바일: 상단 전체 단계 미니맵 + 현재 목표 구간 클로즈업 뷰 -->
+    <!-- 모바일: 단계, 주행 상황, 다음 마일스톤을 하나의 카드로 단순화 -->
     <section class="sm:hidden" aria-label="현재 마일스톤 진행 상황">
-      <!-- 1. 메인 랠리 클로즈업 카드 -->
-      <div
-        class="relative h-48 overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-b from-[#f0f6ff] via-[#f8fbff] to-white shadow-[0_3px_14px_rgba(0,102,255,0.06)]"
-      >
-        <!-- 상단 전체 단계 미니맵 스텝 바 -->
-        <div class="absolute inset-x-0 top-3 z-30 flex items-center justify-between px-4">
-          <div class="flex items-center gap-1.5">
-            <span
-              v-for="(milestone, idx) in milestones"
-              :key="milestone.milestoneId"
-              class="flex items-center gap-1.5"
-            >
-              <span
-                class="flex items-center justify-center transition-all"
-                :class="[
-                  idx === activeMilestoneIndex
-                    ? 'h-5 rounded-full bg-primary px-2 text-[9px] font-bold text-white shadow-sm ring-2 ring-primary/20'
-                    : idx < activeMilestoneIndex
-                      ? 'size-3.5 rounded-full bg-primary/20 text-[8px] font-bold text-primary'
-                      : 'size-3 rounded-full bg-slate-200 text-[8px] font-bold text-slate-400'
-                ]"
-              >
-                <span v-if="idx < activeMilestoneIndex">✓</span>
-                <span v-else-if="idx === activeMilestoneIndex">{{ idx + 1 }}단계</span>
-                <span v-else>{{ idx + 1 }}</span>
+      <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+        <div class="relative h-44 bg-gradient-to-b from-slate-50/80 to-white">
+          <!-- 현재 단계와 전체 진행률 -->
+          <div class="absolute inset-x-0 top-0 z-30 px-4 pt-3.5">
+            <div class="flex items-center justify-between text-[11px] font-bold">
+              <span class="text-primary">{{ activeMilestoneIndex + 1 }}단계</span>
+              <span class="text-slate-400">
+                {{ activeMilestoneIndex + 1 }} / {{ milestones.length }}
               </span>
-              <span
-                v-if="idx < milestones.length - 1"
-                class="h-0.5 w-2 rounded-full"
-                :class="idx < activeMilestoneIndex ? 'bg-primary/40' : 'bg-slate-200'"
-              />
-            </span>
-          </div>
-
-          <span class="text-[10px] font-bold text-slate-400">
-            {{ activeMilestoneIndex + 1 }} / {{ milestones.length }} 단계
-          </span>
-        </div>
-
-        <!-- 모바일 줌인 도로 트랙 (소프트 스카이블루 프리미엄 트랙) -->
-        <svg
-          class="absolute inset-x-0 bottom-4 h-28 w-full"
-          viewBox="0 0 390 112"
-          fill="none"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <defs>
-            <linearGradient id="mobileTrackGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#0064ff" />
-              <stop offset="100%" stop-color="#38bdf8" />
-            </linearGradient>
-          </defs>
-          <!-- 1. 그림자 -->
-          <path
-            d="M-18 72 C75 58 135 82 210 68 C286 54 334 62 408 48"
-            stroke="#cce1fd"
-            stroke-width="28"
-            stroke-linecap="round"
-            opacity="0.8"
-          />
-          <!-- 2. 화이트 레일 -->
-          <path
-            d="M-18 72 C75 58 135 82 210 68 C286 54 334 62 408 48"
-            stroke="#ffffff"
-            stroke-width="20"
-            stroke-linecap="round"
-            />
-          <!-- 3. 트랙 바닥 -->
-          <path
-            d="M-18 72 C75 58 135 82 210 68 C286 54 334 62 408 48"
-            stroke="#eaf2fe"
-            stroke-width="14"
-            stroke-linecap="round"
-          />
-          <!-- 4. 중앙 점선 -->
-          <path
-            d="M-18 72 C75 58 135 82 210 68 C286 54 334 62 408 48"
-            stroke="#93c5fd"
-            stroke-width="2"
-            stroke-dasharray="10 8"
-            stroke-linecap="round"
-          />
-          <!-- 5. 액티브 주행선 -->
-          <path
-            d="M-18 72 C75 58 135 82 210 68 C286 54 334 62 408 48"
-            pathLength="100"
-            stroke="url(#mobileTrackGrad)"
-            stroke-width="9"
-            stroke-linecap="round"
-            :stroke-dasharray="`${mobileSegmentProgress} 100`"
-          />
-        </svg>
-
-        <!-- 다음 목표 마커 (도로 윗선에 정확히 걸쳐진 마커 핀) -->
-        <div class="absolute bottom-[82px] right-4 flex flex-col items-center z-10">
-          <div class="mb-1 rounded-xl border border-slate-200/90 bg-white px-2.5 py-1 text-center shadow-sm">
-            <span class="block text-[8px] font-bold text-slate-400">
-              {{ isActiveMilestoneLast ? '최종 목표' : '다음 목표' }}
-            </span>
-            <strong class="block text-[11px] font-bold text-[#0a192f]">
-              {{ formatManwon(activeMilestone.targetAmount) }}원
-            </strong>
-          </div>
-          <span
-            v-if="isActiveMilestoneLast"
-            class="flex size-6 translate-y-1/2 items-center justify-center rounded-full border-2 border-primary bg-primary/10 shadow-sm ring-2 ring-primary/15"
-          >
-            <span class="size-2.5 rounded-full border-[2px] border-primary bg-white" />
-          </span>
-          <span
-            v-else
-            class="size-3.5 translate-y-1/2 rounded-full border-[2.5px] border-primary bg-white shadow-sm ring-2 ring-primary/20"
-          />
-        </div>
-
-        <!-- A. 모바일 순항 중 (ON_TRACK): 완벽하게 나란히 어깨 맞대고 위치 -->
-        <div
-          v-if="paceStatus === 'ON_TRACK'"
-          class="absolute bottom-[44px] flex -translate-x-1/2 items-end z-20 transition-[left] duration-500"
-          :style="{ left: `${Math.max(12, Math.min(74, mobilePlayerPosition))}%` }"
-        >
-          <img
-            :src="goalCharacterImage"
-            alt="주인공 위치"
-            class="h-16 w-auto drop-shadow-md"
-            :style="goalCharacterFootStyle"
-          />
-          <div class="relative ml-0.5 flex items-end">
-            <!-- 모바일 콜리 스마트 말풍선 (우측 오프셋 + 적정 높이로 안정적 안착) -->
-            <div class="absolute -top-9 left-1/2 z-30 flex w-max -translate-x-[20%] flex-col items-start">
-              <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-bold text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap">
-                {{ paceMessage }}
-                <!-- 말풍선 꼬리 (콜리 머리 방향인 좌측 하단) -->
-                <div
-                  class="absolute -bottom-1 left-2.5 h-0 w-0 border-x-[4px] border-t-[5px] border-x-transparent border-t-white"
-                ></div>
-                <div
-                  class="absolute -bottom-[5px] left-2.5 -z-10 h-0 w-0 border-x-[4px] border-t-[5px] border-x-transparent border-t-slate-200"
-                ></div>
-              </div>
             </div>
-            <img
-              :src="coliBottomImage"
-              alt="페이스메이커 콜리"
-              class="h-10 w-auto drop-shadow-md"
-            />
+            <div class="mt-2 h-1 overflow-hidden rounded-full bg-slate-200/80">
+              <div
+                class="h-full rounded-full bg-primary transition-[width] duration-700"
+                :style="{ width: `${mobileOverallProgress}%` }"
+              />
+            </div>
           </div>
-        </div>
 
-        <!-- B. 모바일 분리 주행 (BEHIND / AHEAD) -->
-        <template v-else>
-          <!-- 모바일 1. 주인공 캐릭터 -->
-          <div
-            class="absolute bottom-[44px] flex -translate-x-1/2 items-end transition-[left] duration-500"
-            :class="paceStatus === 'AHEAD' ? 'z-20' : 'z-10'"
-            :style="{ left: `${Math.max(12, Math.min(74, mobilePlayerPosition))}%` }"
+          <!-- 모바일 줌인 도로 트랙 -->
+          <svg
+            class="absolute inset-x-0 bottom-0 h-24 w-full"
+            viewBox="0 0 390 96"
+            fill="none"
+            preserveAspectRatio="none"
+            aria-hidden="true"
           >
+            <defs>
+              <linearGradient id="mobileTrackGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0064ff" />
+                <stop offset="100%" stop-color="#38bdf8" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M-18 65 C75 52 135 74 210 62 C286 50 334 56 408 43"
+              stroke="#dbeafe"
+              stroke-width="24"
+              stroke-linecap="round"
+            />
+            <path
+              d="M-18 65 C75 52 135 74 210 62 C286 50 334 56 408 43"
+              stroke="#ffffff"
+              stroke-width="17"
+              stroke-linecap="round"
+            />
+            <path
+              d="M-18 65 C75 52 135 74 210 62 C286 50 334 56 408 43"
+              stroke="#eff6ff"
+              stroke-width="11"
+              stroke-linecap="round"
+            />
+            <path
+              d="M-18 65 C75 52 135 74 210 62 C286 50 334 56 408 43"
+              pathLength="100"
+              stroke="url(#mobileTrackGrad)"
+              stroke-width="7"
+              stroke-linecap="round"
+              class="transition-all duration-500 ease-out"
+              :stroke-dasharray="`${mobileTrackProgress} 100`"
+            />
+          </svg>
+
+          <!-- 도착점 마커 -->
+          <span
+            class="absolute bottom-[44px] right-4 z-10 flex size-5 items-center justify-center rounded-full border-2 border-primary bg-white shadow-sm ring-2 ring-primary/10"
+            aria-hidden="true"
+          >
+            <span class="size-2 rounded-full bg-primary" />
+          </span>
+
+          <!-- A. 모바일 순항 중 (ON_TRACK): 주인공 항상 최상위(z-20), 콜리 뒤쪽(z-10) -->
+          <div
+            v-if="paceStatus === 'ON_TRACK'"
+            class="absolute bottom-[28px] flex -translate-x-1/2 items-end transition-[left] duration-500 pointer-events-none z-20"
+            :style="{ left: `${Math.max(24, Math.min(74, mobilePlayerPosition))}%` }"
+          >
+            <!-- 1. 주인공 캐릭터 (항상 맨 앞 z-20) -->
             <img
               :src="goalCharacterImage"
               alt="주인공 위치"
-              class="h-16 w-auto drop-shadow-md"
+              class="h-[60px] w-auto drop-shadow-md z-20"
               :style="goalCharacterFootStyle"
             />
-          </div>
 
-          <!-- 모바일 2. 페이스메이커 콜리 (상태별 앞/뒤 주행) -->
-          <div
-            class="absolute bottom-[44px] flex -translate-x-1/2 items-end transition-[left] duration-500"
-            :class="paceStatus === 'AHEAD' ? 'z-10' : 'z-20'"
-            :style="{ left: `${Math.max(12, Math.min(74, mobileColiPosition))}%` }"
-          >
-            <div class="relative flex flex-col items-center">
-              <div class="absolute -top-9 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center">
-                <div class="relative rounded-2xl border border-slate-200/90 bg-white px-2.5 py-1 text-[10px] font-bold text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap">
+            <!-- 2. 페이스메이커 콜리 (주인공 뒤 레이어 z-10) + 말풍선 -->
+            <div class="relative -ml-[20px] flex flex-col items-start pl-1 z-10">
+              <!-- 콜리 머리 위 스마트 말풍선 (세모 왼쪽) -->
+              <div class="relative -mb-1 flex flex-col items-start">
+                <div
+                  class="relative rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 py-0.5 text-[10px] font-bold text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap"
+                >
                   {{ paceMessage }}
-                  <!-- 말풍선 꼬리 (아래쪽 화살표) -->
+                  <!-- 말풍선 꼬리 (왼쪽) -->
                   <div
-                    class="absolute -bottom-1 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[4px] border-t-[5px] border-x-transparent border-t-white"
-                  ></div>
+                    class="absolute -bottom-1 left-2.5 h-0 w-0 border-x-[3.5px] border-t-[4px] border-x-transparent border-t-white"
+                  />
                   <div
-                    class="absolute -bottom-[5px] left-1/2 -z-10 h-0 w-0 -translate-x-1/2 border-x-[4px] border-t-[5px] border-x-transparent border-t-slate-200"
-                  ></div>
+                    class="absolute -bottom-[5px] left-2.5 -z-10 h-0 w-0 border-x-[3.5px] border-t-[4px] border-x-transparent border-t-slate-200"
+                  />
                 </div>
               </div>
-              <img
-                :src="coliBottomImage"
-                alt="페이스메이커 콜리"
-                class="h-10 w-auto drop-shadow-md"
-              />
+
+              <img :src="coliBottomImage" alt="페이스메이커 콜리" class="h-10 w-auto drop-shadow-md ml-0.5" />
             </div>
           </div>
-        </template>
-      </div>
 
-      <!-- 2. 하단 스마트 서머리 카드 -->
-      <div class="mt-2.5 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-sm">
-        <div class="flex items-center justify-between gap-2.5">
+          <!-- B. 모바일 분리 주행 (BEHIND / AHEAD): 주인공 항상 z-20, 콜리 z-10 -->
+          <template v-else>
+            <!-- 1. 주인공 캐릭터 (항상 맨 앞 z-20으로 절대 가려지지 않음) -->
+            <div
+              class="absolute bottom-[28px] flex -translate-x-1/2 items-end transition-[left] duration-500 pointer-events-none z-20"
+              :style="{ left: `${Math.max(20, Math.min(76, mobilePlayerPosition))}%` }"
+            >
+              <img
+                :src="goalCharacterImage"
+                alt="주인공 위치"
+                class="h-[60px] w-auto drop-shadow-md"
+                :style="goalCharacterFootStyle"
+              />
+            </div>
+
+            <!-- 2. 페이스메이커 콜리 + 말풍선 (주인공 뒤 레이어 z-10) -->
+            <div
+              class="absolute bottom-[28px] flex -translate-x-1/2 flex-col transition-[left] duration-500 pointer-events-none z-10"
+              :class="paceStatus === 'AHEAD' ? 'items-end pr-1' : 'items-start pl-1'"
+              :style="{ left: `${Math.max(20, Math.min(76, mobileColiPosition))}%` }"
+            >
+              <!-- 콜리 머리 위 스마트 말풍선 (콜리 앞일 때 세모 왼쪽, 콜리 뒤일 때 세모 오른쪽) -->
+              <div class="relative -mb-1 flex flex-col" :class="paceStatus === 'AHEAD' ? 'items-end' : 'items-start'">
+                <div
+                  class="relative rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 py-0.5 text-[10px] font-bold text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap"
+                >
+                  {{ paceMessage }}
+                  <!-- 말풍선 꼬리 (콜리가 앞이면 세모 왼쪽, 콜리가 뒤면 세모 오른쪽) -->
+                  <div
+                    class="absolute -bottom-1 h-0 w-0 border-x-[3.5px] border-t-[4px] border-x-transparent border-t-white"
+                    :class="paceStatus === 'AHEAD' ? 'right-2.5' : 'left-2.5'"
+                  />
+                  <div
+                    class="absolute -bottom-[5px] -z-10 h-0 w-0 border-x-[3.5px] border-t-[4px] border-x-transparent border-t-slate-200"
+                    :class="paceStatus === 'AHEAD' ? 'right-2.5' : 'left-2.5'"
+                  />
+                </div>
+              </div>
+
+              <img :src="coliBottomImage" alt="페이스메이커 콜리" class="h-10 w-auto drop-shadow-md" :class="paceStatus === 'AHEAD' ? 'mr-0.5' : 'ml-0.5'" />
+            </div>
+          </template>
+        </div>
+
+        <!-- 마일스톤 정보는 별도 카드 대신 같은 카드의 요약 영역으로 통합 -->
+        <div class="flex items-center justify-between gap-3 border-t border-slate-100 px-4 py-3.5">
           <div class="min-w-0 flex-1">
-            <p class="text-[11px] font-bold text-slate-400 truncate">
+            <p class="truncate text-[11px] font-semibold text-slate-400">
               {{ activeMilestone.title || `다음 ${activeMilestoneIndex + 1}차 마일스톤` }}까지
             </p>
-            <p class="mt-0.5 text-sm font-bold text-[#0a192f] whitespace-nowrap">
-              <span class="text-primary tabular-nums">{{ formatManwon(remainingToActiveMilestone) }}원</span>
+            <p class="mt-0.5 whitespace-nowrap text-sm font-bold text-[#0a192f]">
+              <span class="tabular-nums text-primary"
+                >{{ formatManwon(remainingToActiveMilestone) }}원</span
+              >
               남았어요
             </p>
           </div>
-          <span class="shrink-0 rounded-full bg-primary/5 px-2.5 py-1 text-[10px] font-bold text-primary whitespace-nowrap">
-            {{ activeMilestone.targetDate || formatEndDate(goal.period.endDate) }} 도착 예정
-          </span>
+          <div class="shrink-0 text-right">
+            <span class="block text-[11px] font-semibold text-slate-400">도착 예정</span>
+            <strong class="mt-0.5 block text-xs font-bold text-primary">
+              {{ activeMilestone.targetDate || formatEndDate(goal.period.endDate) }}
+            </strong>
+          </div>
         </div>
       </div>
     </section>
@@ -220,7 +178,12 @@
     <!-- 태블릿/데스크톱: 소프트 스카이블루 와이드 트랙 (상하 균형 컴팩트 뷰) -->
     <div class="relative hidden w-full sm:block" style="aspect-ratio: 2172 / 370">
       <div class="absolute top-0 left-0 w-full" style="aspect-ratio: 2172 / 370">
-        <svg class="absolute inset-0 size-full" viewBox="0 0 2172 370" fill="none" aria-hidden="true">
+        <svg
+          class="absolute inset-0 size-full"
+          viewBox="0 0 2172 370"
+          fill="none"
+          aria-hidden="true"
+        >
           <defs>
             <linearGradient id="activeTrackGrad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stop-color="#0064ff" />
@@ -323,22 +286,22 @@
           </span>
         </div>
 
-        <!-- A. 데스크톱 순항 중 (ON_TRACK): 완벽하게 나란히 어깨를 맞대고 함께 위치 -->
+        <!-- A. 데스크톱 순항 중 (ON_TRACK): 완벽하게 나란히 어깨를 맞대고 함께 위치 (주인공 z-20, 콜리 z-10) -->
         <div
           v-if="paceStatus === 'ON_TRACK'"
           class="absolute flex -translate-x-1/2 -translate-y-full items-end z-20 transition-all duration-500"
           :style="characterMarkerStyle(playerProgress)"
         >
-          <!-- 1. 주인공 캐릭터 -->
+          <!-- 1. 주인공 캐릭터 (항상 앞 z-20) -->
           <img
             :src="goalCharacterImage"
             alt="현재 위치"
-            class="h-9 w-auto drop-shadow-md sm:h-20 md:h-24 lg:h-28 xl:h-36 transition-transform hover:scale-105"
+            class="h-9 w-auto drop-shadow-md sm:h-20 md:h-24 lg:h-28 xl:h-36 transition-transform hover:scale-105 z-20"
             :style="goalCharacterFootStyle"
           />
 
-          <!-- 2. 페이스메이커 콜리 (나란히 어깨 맞댐: 간격 없이 밀착) -->
-          <div class="relative ml-0.5 sm:ml-1 flex items-end">
+          <!-- 2. 페이스메이커 콜리 (나란히 어깨 맞댐: 주인공 뒤쪽 z-10) -->
+          <div class="relative -ml-2 sm:-ml-4 md:-ml-6 flex items-end z-10">
             <!-- 브로콜리 스마트 말풍선 (우측 오프셋 + 자연스러운 높이 안착) -->
             <div
               class="absolute -top-7 left-1/2 z-30 flex w-max -translate-x-[20%] flex-col items-start sm:-top-11 md:-top-13 lg:-top-15"
@@ -364,12 +327,11 @@
           </div>
         </div>
 
-        <!-- B. 데스크톱 분리 주행 (BEHIND / AHEAD): 앞/뒤로 시원하게 분리 -->
+        <!-- B. 데스크톱 분리 주행 (BEHIND / AHEAD): 앞/뒤로 시원하게 분리 (주인공 항상 z-20, 콜리 z-10) -->
         <template v-else>
-          <!-- 1. 주인공 캐릭터 (실제 달성 위치에서 주행) -->
+          <!-- 1. 주인공 캐릭터 (항상 맨 앞 z-20으로 절대 가려지지 않음) -->
           <div
-            class="absolute flex -translate-x-1/2 -translate-y-full items-end transition-all duration-500"
-            :class="paceStatus === 'AHEAD' ? 'z-20' : 'z-10'"
+            class="absolute flex -translate-x-1/2 -translate-y-full items-end transition-all duration-500 z-20"
             :style="characterMarkerStyle(playerProgress)"
           >
             <img
@@ -380,28 +342,30 @@
             />
           </div>
 
-          <!-- 2. 페이스메이커 콜리 (앞서서 유도하거나 뒤에서 추적) -->
+          <!-- 2. 페이스메이커 콜리 (주인공 뒤 레이어 z-10) -->
           <div
-            class="absolute flex -translate-x-1/2 -translate-y-full items-end transition-all duration-500"
-            :class="paceStatus === 'AHEAD' ? 'z-10' : 'z-20'"
+            class="absolute flex -translate-x-1/2 -translate-y-full items-end transition-all duration-500 z-10"
             :style="characterMarkerStyle(coliProgress)"
           >
-            <div class="relative flex flex-col items-center">
-              <!-- 브로콜리 스마트 말풍선 (자연스러운 높이) -->
+            <div class="relative flex flex-col" :class="paceStatus === 'AHEAD' ? 'items-end' : 'items-start'">
+              <!-- 브로콜리 스마트 말풍선 (콜리 앞일 때 세모 왼쪽, 콜리 뒤일 때 세모 오른쪽) -->
               <div
-                class="absolute -top-7 left-1/2 z-30 flex w-max -translate-x-1/2 flex-col items-center sm:-top-11 md:-top-13 lg:-top-15"
+                class="absolute -top-7 z-30 flex w-max flex-col sm:-top-11 md:-top-13 lg:-top-15"
+                :class="paceStatus === 'AHEAD' ? 'right-0 items-end' : 'left-0 items-start'"
               >
                 <div
                   class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-bold text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.1)] whitespace-nowrap"
                 >
                   {{ paceMessage }}
-                  <!-- 말풍선 꼬리 (아래쪽 화살표) -->
+                  <!-- 말풍선 꼬리 (콜리가 앞이면 세모 왼쪽, 콜리가 뒤면 세모 오른쪽) -->
                   <div
-                    class="absolute -bottom-1.5 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[5px] border-t-[6px] border-x-transparent border-t-white sm:-bottom-2 sm:border-x-[6px] sm:border-t-[7px]"
-                  ></div>
+                    class="absolute -bottom-1.5 h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-white sm:-bottom-2 sm:border-x-[6px] sm:border-t-[7px]"
+                    :class="paceStatus === 'AHEAD' ? 'right-3.5' : 'left-3.5'"
+                  />
                   <div
-                    class="absolute -bottom-[7px] left-1/2 -z-10 h-0 w-0 -translate-x-1/2 border-x-[5px] border-t-[6px] border-x-transparent border-t-slate-200 sm:-bottom-[9px] sm:border-x-[6px] sm:border-t-[7px]"
-                  ></div>
+                    class="absolute -bottom-[7px] -z-10 h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-slate-200 sm:-bottom-[9px] sm:border-x-[6px] sm:border-t-[7px]"
+                    :class="paceStatus === 'AHEAD' ? 'right-3.5' : 'left-3.5'"
+                  />
                 </div>
               </div>
               <img
@@ -485,18 +449,13 @@ const activeMilestoneIndex = computed(() => {
   )
   if (inProgressIndex >= 0) return inProgressIndex
 
-  const upcomingIndex = props.milestones.findIndex(
-    (milestone) => milestone.status !== 'COMPLETED'
-  )
+  const upcomingIndex = props.milestones.findIndex((milestone) => milestone.status !== 'COMPLETED')
   return upcomingIndex >= 0 ? upcomingIndex : Math.max(0, props.milestones.length - 1)
 })
 
 const activeMilestone = computed(
-  () => props.milestones[activeMilestoneIndex.value] ?? { targetAmount: props.goal?.goalAmount ?? 0 }
-)
-
-const isActiveMilestoneLast = computed(
-  () => activeMilestoneIndex.value === Math.max(0, props.milestones.length - 1)
+  () =>
+    props.milestones[activeMilestoneIndex.value] ?? { targetAmount: props.goal?.goalAmount ?? 0 }
 )
 
 const previousMilestoneAmount = computed(
@@ -519,17 +478,48 @@ const mobileSegmentProgress = computed(() => {
   )
 })
 
-// 모바일 위치 계산 (실제 진행률 기준 + 콜리는 확실하게 뒤/앞)
-const mobilePlayerPosition = computed(() => 14 + mobileSegmentProgress.value * 0.58)
+const mobileOverallProgress = computed(() => {
+  const milestoneCount = props.milestones.length
+  if (milestoneCount <= 0) return 0
+  return Math.min(
+    100,
+    ((activeMilestoneIndex.value + mobileSegmentProgress.value / 100) / milestoneCount) * 100
+  )
+})
+
+// 모바일 위치 계산 (ON_TRACK은 어깨 맞댐 밀착, BEHIND는 콜리가 26% 확실하게 앞장서서 리드)
+const mobilePlayerPosition = computed(() => {
+  const progress = mobileSegmentProgress.value / 100
+  if (paceStatus.value === 'BEHIND') {
+    // 뒤처질 때: 주인공은 20% ~ 50%
+    return 20 + progress * 30
+  }
+  if (paceStatus.value === 'AHEAD') {
+    // 앞서갈 때: 주인공은 46% ~ 76%
+    return 46 + progress * 30
+  }
+  // 나란히 달릴 때 (어깨 맞댐): 25% ~ 72%
+  return 25 + progress * 47
+})
 
 const mobileColiPosition = computed(() => {
   if (paceStatus.value === 'BEHIND') {
-    return Math.min(76, mobilePlayerPosition.value + 14)
+    // 뒤처질 때: 콜리는 저 앞에서 확실하게 리드 (46% ~ 76%) -> 간격 26%!
+    return mobilePlayerPosition.value + 26
   }
   if (paceStatus.value === 'AHEAD') {
-    return Math.max(4, mobilePlayerPosition.value - 14)
+    // 앞서갈 때: 콜리는 저 뒤에서 쫓아옴 (20% ~ 50%) -> 간격 26%!
+    return mobilePlayerPosition.value - 26
   }
   return mobilePlayerPosition.value
+})
+
+// 모바일 도로 파란 게이지: 달성률 0%면 파란 선 미표시(0), 1% 이상부터 메인 캐릭터 발밑까지 채움
+const mobileTrackProgress = computed(() => {
+  if (mobileSegmentProgress.value <= 0) return 0
+  const p = mobilePlayerPosition.value
+  // SVG path viewBox 390 기준 (-18 ~ 408, 전체폭 426)
+  return Math.min(100, Math.max(0, ((p * 3.9 + 18) / 426) * 100))
 })
 
 // 각 PNG의 아래쪽 투명 여백 보정 (도로 표면에 정확히 밀착)

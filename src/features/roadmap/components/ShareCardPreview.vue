@@ -195,7 +195,9 @@
     <!-- 푸터 워터마크 (공식 인증 로고) -->
     <div class="relative z-20 mt-3.5 border-t border-blue-100/80 pt-2.5">
       <div class="mx-auto flex w-max items-center justify-center gap-1.5 whitespace-nowrap">
-        <img src="@/assets/images/logo.png" alt="" class="block size-4 shrink-0 object-contain" />
+        <div class="flex size-4 items-center justify-center rounded-[5px] bg-primary">
+          <img src="@/assets/icons/logo.svg" alt="" class="size-2.5" />
+        </div>
         <span class="shrink-0 text-xs font-bold tracking-tight text-primary">미래로</span>
         <span class="text-[10px] font-semibold text-slate-400 tracking-wider">MIRAERO CHALLENGE</span>
       </div>
