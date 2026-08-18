@@ -69,7 +69,7 @@
 
     <PolicyModal v-model="policyModalOpen" :policy-key="activePolicy" />
 
-    <LogoutConfirmModal v-model="logoutModalOpen" @confirm="logout" />
+    <LogoutConfirmModal v-model="logoutModalOpen" :pending="isSubmittingLogout" @confirm="logout" />
 
     <MypageToast :message="toastMessage" :variant="toastVariant" />
   </div>
@@ -79,6 +79,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
+import { useAuthFeatureStore } from '@/features/auth'
 import { goalApi } from '@/features/goal'
 import {
   AccountSection,
@@ -100,6 +101,8 @@ import '@/features/mypage/styles/mypage.css'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const authFeatureStore = useAuthFeatureStore()
+const { isSubmittingLogout } = storeToRefs(authFeatureStore)
 const mypageStore = useMypageStore()
 const {
   profile,
@@ -292,9 +295,9 @@ function openPolicy(policyKey) {
 }
 
 async function logout() {
+  // 서버 로그아웃 응답을 기다리는 동안 모달을 유지해 진행 상태를 보여준다.
+  await authFeatureStore.submitLogout()
   logoutModalOpen.value = false
-  mypageStore.clearProfile()
-  authStore.logout()
   await router.push({ name: ROUTE_NAMES.LOGIN })
 }
 

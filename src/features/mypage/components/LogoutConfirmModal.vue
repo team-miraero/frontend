@@ -16,10 +16,23 @@
       </p>
     </div>
     <div class="mypage-modal-actions pt-2">
-      <button type="button" class="mypage-modal-secondary" autofocus @click="isOpen = false">
+      <button
+        type="button"
+        class="mypage-modal-secondary"
+        autofocus
+        :disabled="pending"
+        @click="isOpen = false"
+      >
         취소
       </button>
-      <button type="button" class="mypage-modal-danger" @click="emit('confirm')">로그아웃</button>
+      <button
+        type="button"
+        class="mypage-modal-danger"
+        :disabled="pending"
+        @click="emit('confirm')"
+      >
+        {{ pending ? '로그아웃 중...' : '로그아웃' }}
+      </button>
     </div>
   </MypageModal>
 </template>
@@ -30,6 +43,8 @@ import MypageModal from '@/features/mypage/components/MypageModal.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
+  // 서버 로그아웃 요청이 진행 중이면 중복 클릭과 취소를 막는다.
+  pending: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm'])
