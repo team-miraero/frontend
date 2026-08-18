@@ -27,8 +27,8 @@
             class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl pb-[env(safe-area-inset-bottom)] sm:pb-0"
             :class="hideDefaultClose ? '' : 'p-6'"
           >
-            <!-- 모바일 상단 손잡이 바 -->
-            <div class="mx-auto mt-2.5 -mb-1 h-1 w-10 shrink-0 rounded-full bg-slate-200 sm:hidden" />
+            <!-- 모바일 상단 손잡이 바 (상단 오버레이로 헤더 여백 침범 방지) -->
+            <div class="pointer-events-none absolute inset-x-0 top-2.5 z-20 mx-auto h-1 w-10 shrink-0 rounded-full bg-slate-300/80 sm:hidden" />
 
             <slot />
             <button

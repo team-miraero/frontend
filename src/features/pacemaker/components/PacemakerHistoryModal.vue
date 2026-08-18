@@ -92,7 +92,8 @@ function describeHistory(item) {
 }
 
 function formatDate(isoDate) {
-  return isoDate.replaceAll('-', '.')
+  if (!isoDate) return ''
+  return String(isoDate).replace(/-/g, '.')
 }
 
 function formatWon(amount) {

@@ -8,10 +8,10 @@
 
       <div class="flex items-baseline gap-1.5 pt-2">
         <span class="text-xl font-bold tracking-tight tabular-nums text-[#0a192f] sm:text-2xl">
-          {{ formatManwon(goal.currentAmount) }}
+          {{ formatManwon(goal?.currentAmount) }}
         </span>
         <span class="text-xs font-bold tabular-nums text-slate-400"
-          >/ {{ formatWon(goal.goalAmount) }}</span
+          >/ {{ formatWon(goal?.goalAmount) }}</span
         >
       </div>
 
@@ -24,7 +24,7 @@
         </div>
         <div class="flex items-center justify-between pt-1.5 text-xs font-bold">
           <span class="text-primary tabular-nums">{{ progressRate }}% 달성</span>
-          <span class="text-slate-400">{{ formatEndDate(goal.period.endDate) }} 목표</span>
+          <span class="text-slate-400">{{ formatEndDate(goal?.period?.endDate) }} 목표</span>
         </div>
       </div>
     </div>
@@ -44,26 +44,26 @@ import { computed } from 'vue'
 const props = defineProps({
   goal: {
     type: Object,
-    required: true,
+    default: () => ({}),
   },
 })
 
 // 초과 달성해도 진행 바가 컨테이너를 넘지 않도록 0~100으로 묶는다.
 const progressRate = computed(() =>
-  Math.min(100, Math.max(0, Number(props.goal.progressRate) || 0))
+  Math.min(100, Math.max(0, Number(props.goal?.progressRate) || 0))
 )
 
 const paceDotClass = computed(() =>
-  props.goal.pace?.paceStatus === 'BEHIND' ? 'bg-rose-500' : 'bg-emerald-500'
+  props.goal?.pace?.paceStatus === 'BEHIND' ? 'bg-rose-500' : 'bg-emerald-500'
 )
 const paceTextClass = computed(() =>
-  props.goal.pace?.paceStatus === 'BEHIND' ? 'text-rose-600' : 'text-emerald-600'
+  props.goal?.pace?.paceStatus === 'BEHIND' ? 'text-rose-600' : 'text-emerald-600'
 )
 const paceLabel = computed(() => {
-  const amount = formatManwon(Math.abs(props.goal.pace?.differenceAmount ?? 0))
-  if (props.goal.pace?.paceStatus === 'BEHIND') return `예정보다 ${amount}원 뒤처져 달리는 중`
-  if (props.goal.pace?.paceStatus === 'AHEAD') return `예정보다 ${amount}원 앞서 달리는 중`
-  return '예정대로 순항 중'
+  const amount = formatManwon(Math.abs(props.goal?.pace?.differenceAmount ?? 0))
+  if (props.goal?.pace?.paceStatus === 'BEHIND') return `예정보다 ${amount}원 뒤처져 달리는 중`
+  if (props.goal?.pace?.paceStatus === 'AHEAD') return `예정보다 ${amount}원 앞서 달리는 중`
+  return '예정대로 잘 달리는 중'
 })
 
 function formatManwon(amount) {

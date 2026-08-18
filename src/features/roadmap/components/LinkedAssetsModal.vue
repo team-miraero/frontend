@@ -156,8 +156,10 @@ const totalAutoTransfer = computed(() =>
 // 남은 개월수·일수: API가 만기일만 주고 가입일은 안 주기 때문에, Figma의 '가입일~만료일 진행바'는
 // 재현할 데이터가 없어 뺐다. 만기일 기준 카운트다운만 오늘 날짜로 계산한다.
 function computeMaturityCountdown(maturityDate) {
+  if (!maturityDate) return { months: 0, days: 0 }
   const today = new Date()
   const target = new Date(maturityDate)
+  if (Number.isNaN(target.getTime())) return { months: 0, days: 0 }
   const days = Math.max(0, Math.ceil((target - today) / (1000 * 60 * 60 * 24)))
   const months = Math.max(
     0,
@@ -167,6 +169,7 @@ function computeMaturityCountdown(maturityDate) {
 }
 
 function formatDate(yyyyMMdd) {
-  return yyyyMMdd.replaceAll('-', '.')
+  if (!yyyyMMdd) return ''
+  return String(yyyyMMdd).replace(/-/g, '.')
 }
 </script>
