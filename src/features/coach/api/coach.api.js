@@ -145,7 +145,8 @@ export async function sendMessageStream(payload, accessToken, handlers = {}) {
     if (eventName === 'error') throw new Error(payloadData.message ?? 'AI 응답을 생성하지 못했습니다.')
   }
 
-  while (true) {
+  let isStreamDone = false
+  while (!isStreamDone) {
     const { done, value } = await reader.read()
     buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done }).replace(/\r/g, '')
 
@@ -155,7 +156,7 @@ export async function sendMessageStream(payload, accessToken, handlers = {}) {
       buffer = buffer.slice(separatorIndex + 2)
       separatorIndex = buffer.indexOf('\n\n')
     }
-    if (done) break
+    isStreamDone = done
   }
 
   if (!completedMessage) throw new Error('AI 응답이 완료되지 않았습니다.')
