@@ -30,11 +30,11 @@
         <!-- 1. 상단 통합 현황 카드 (PaceBanner: 진행 중/일시정지 상태 및 재개 토글 내장) -->
         <div>
           <PaceBanner
-            :pace="displayedPace"
+            :pace="displayedGoal.pace"
             :progress-rate="goalStore.currentGoal.progressRate"
             :goal-name="displayedGoal.goalName"
             :disabled="isGoalPaused"
-            :current-amount="goalStore.currentGoal.currentAmount"
+            :current-amount="displayedGoal.currentAmount"
             :goal-amount="goalStore.currentGoal.goalAmount"
             :end-date="goalStore.currentGoal.period.endDate"
             :goal-months="goalStore.currentGoal.period.goalMonths"
@@ -321,20 +321,22 @@ const displayedPacemaker = computed(() => {
     status: null,
   }
 })
-const displayedPace = computed(() => {
-  const pace = goalStore.currentGoal?.pace
-  if (!pace || !isShortagePreview.value) return pace
+// 개발 중 BEHIND 화면 미리보기(?scenario=shortage): 화면 전체가 바라보는 단일 파생 상태
+// (derivePaceState/deriveGoalPaceMetrics)는 pace.paceStatus/differenceAmount가 아니라
+// currentAmount·period·pace.expectedAmount로 월평균 페이스를 직접 계산하므로,
+// 그 계산에 실제로 영향을 주는 currentAmount를 목표 페이스의 절반 수준으로 낮춰
+// BEHIND가 실제로 재현되게 한다.
+const displayedGoal = computed(() => {
+  const goal = goalStore.currentGoal
+  if (!goal || !isShortagePreview.value) return goal
 
-  return {
-    ...pace,
-    paceStatus: 'BEHIND',
-    differenceAmount: Math.max(500000, Math.abs(Number(pace.differenceAmount ?? 0))),
-  }
+  const { goalMonths = 0, remainMonths = 0 } = goal.period ?? {}
+  const elapsedMonths = Math.max(1, goalMonths - remainMonths)
+  const targetMonthlyPace = goalMonths > 0 ? goal.goalAmount / goalMonths : 0
+  const shortageCurrentAmount = Math.max(0, Math.round(targetMonthlyPace * elapsedMonths * 0.5))
+
+  return { ...goal, currentAmount: shortageCurrentAmount }
 })
-const displayedGoal = computed(() => ({
-  ...goalStore.currentGoal,
-  pace: displayedPace.value,
-}))
 const assistFlowGoal = displayedGoal
 const hasSupplementaryError = computed(
   () =>

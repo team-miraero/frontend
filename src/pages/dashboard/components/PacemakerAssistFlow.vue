@@ -376,6 +376,7 @@ import BaseModal from '@/shared/ui/BaseModal.vue'
 import AppIcon from '@/shared/ui/AppIcon.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
+import { deriveGoalPaceMetrics } from '@/features/roadmap/constants/pace-state.constants'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -434,8 +435,9 @@ const availableAccounts = computed(() =>
     (account) => account.accountType === 'CHECKING' && Number(account.balance) > 0
   )
 )
-const shortageLabel = computed(() =>
-  formatKRW(Math.abs(Number(props.goal?.pace?.differenceAmount ?? 0)))
+// 이 화면은 BEHIND일 때만 열리므로, 메인 카드와 같은 월평균 페이스 차이(누적 금액 아님)로 부족분을 안내한다
+const shortageLabel = computed(
+  () => `월 ${formatKRWCompact(Math.abs(deriveGoalPaceMetrics(props.goal).paceDifference))}`
 )
 const formattedPullAmount = computed(() =>
   pullAmount.value ? pullAmount.value.toLocaleString('ko-KR') : ''
