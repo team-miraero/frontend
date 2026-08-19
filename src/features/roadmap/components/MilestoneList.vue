@@ -22,6 +22,7 @@
     <div
       ref="scrollContainer"
       class="no-scrollbar -mx-2 -my-3 flex items-stretch gap-2.5 sm:gap-3 overflow-x-auto px-2 py-3.5 sm:-mx-3 sm:-my-4 sm:px-3 sm:py-4 snap-x snap-mandatory scroll-smooth scroll-px-2 sm:scroll-px-3 touch-pan-x"
+      @scroll="handleScroll"
     >
       <template v-for="(milestone, index) in milestones" :key="milestone.milestoneId">
         <button
@@ -127,6 +128,16 @@
         </button>
       </template>
     </div>
+
+    <!-- 가로 스크롤 가능함을 알리는 페이지 인디케이터 -->
+    <div v-if="milestones.length > 1" class="mt-2.5 flex items-center justify-center gap-1.5">
+      <span
+        v-for="(milestone, index) in milestones"
+        :key="milestone.milestoneId"
+        class="size-1.5 rounded-full transition-colors duration-200"
+        :class="index === activeIndex ? 'bg-primary' : 'bg-slate-300'"
+      />
+    </div>
   </div>
 </template>
 
@@ -134,6 +145,7 @@
 import { ref, watch } from 'vue'
 
 const scrollContainer = ref(null)
+const activeIndex = ref(0)
 
 defineEmits(['select-milestone'])
 
@@ -155,16 +167,39 @@ watch(
   (milestones) => {
     if (hasScrolledToInProgress || !milestones?.length) return
     const container = scrollContainer.value
+    const inProgressIndex = milestones.findIndex((milestone) => milestone.status === 'IN_PROGRESS')
     const inProgressCardEl = container?.querySelector('[data-in-progress="true"]')
     if (!container || !inProgressCardEl) return
 
     const centeredLeft =
       inProgressCardEl.offsetLeft - (container.clientWidth - inProgressCardEl.clientWidth) / 2
     container.scrollLeft = Math.max(0, centeredLeft)
+    if (inProgressIndex >= 0) activeIndex.value = inProgressIndex
     hasScrolledToInProgress = true
   },
   { immediate: true, flush: 'post' }
 )
+
+// 스크롤 중 뷰포트 중앙에 가장 가까운 카드를 찾아 하단 페이지 인디케이터에 반영
+function handleScroll() {
+  const container = scrollContainer.value
+  if (!container) return
+
+  const containerCenter = container.scrollLeft + container.clientWidth / 2
+  let closestIndex = 0
+  let closestDistance = Infinity
+
+  ;[...container.children].forEach((child, index) => {
+    const childCenter = child.offsetLeft + child.offsetWidth / 2
+    const distance = Math.abs(childCenter - containerCenter)
+    if (distance < closestDistance) {
+      closestDistance = distance
+      closestIndex = index
+    }
+  })
+
+  activeIndex.value = closestIndex
+}
 
 function formatManwon(amount) {
   return `${Math.round(amount / 10000).toLocaleString()}만`
