@@ -241,7 +241,7 @@ function toggleNotification(id) {
 
 function openGoalResetModal() {
   if (!currentGoal.value) {
-    router.push({ name: ROUTE_NAMES.GOAL_SELECT })
+    router.push({ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } })
     return
   }
 

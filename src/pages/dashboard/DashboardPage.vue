@@ -158,7 +158,7 @@
           첫 번째 목표를 설정하고 맞춤 로드맵을 시작해보세요.
         </p>
         <RouterLink
-          :to="{ name: ROUTE_NAMES.GOAL_SELECT }"
+          :to="{ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } }"
           class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-xs transition hover:opacity-90"
         >
           새 목표 만들기

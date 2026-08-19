@@ -84,7 +84,7 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import StepHeader from '@/shared/ui/StepHeader.vue'
 import ProgressBar from '@/shared/ui/ProgressBar.vue'
@@ -95,6 +95,7 @@ import { getGoalPresets } from '@/features/goal/api/goal.api'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const router = useRouter()
+const route = useRoute()
 const goalStore = useGoalStore()
 const presets = ref([])
 const isLoading = ref(true)
@@ -116,7 +117,11 @@ function selectGoal(id) {
 }
 
 function handleBack() {
-  router.push({ name: ROUTE_NAMES.ONBOARDING })
+  if (route.query.from === 'dashboard') {
+    router.push({ name: ROUTE_NAMES.DASHBOARD })
+  } else {
+    router.push({ name: ROUTE_NAMES.ONBOARDING })
+  }
 }
 
 async function fetchPresets() {
