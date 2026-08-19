@@ -302,7 +302,7 @@
             :aria-expanded="isRoadmapDropdownOpen"
             @click="handleRoadmapHeaderClick"
           >
-            <span>로드맵</span>
+            <span>홈</span>
             <span
               class="flex items-center justify-center rounded-full p-0.5 transition hover:bg-slate-100"
               aria-label="로드맵 목록 열기"

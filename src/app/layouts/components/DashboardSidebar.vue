@@ -51,7 +51,7 @@
           <button type="button" class="flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-left cursor-pointer" @click="isRoadmapListExpanded = !isRoadmapListExpanded">
             <span class="flex size-9 items-center justify-center rounded-xl bg-[#eaf2ff]"><img :src="roadmapNav.icon" alt="" class="size-[18px]" /></span>
             <span class="min-w-0 flex-1">
-              <strong class="block text-sm font-bold text-[#0a192f]">나의 로드맵</strong>
+              <strong class="block text-sm font-bold text-[#0a192f]">나의 홈</strong>
               <small class="block truncate text-[11px] text-slate-400">목표를 선택해 진행 상황을 확인하세요</small>
             </span>
             <img src="@/assets/icons/chevron-down.svg" alt="" class="size-4 transition-transform" :class="isRoadmapListExpanded ? 'rotate-180' : ''" />

@@ -4,7 +4,7 @@
     aria-label="모바일 주요 메뉴"
   >
     <div class="grid h-[66px] grid-cols-5 px-1.5">
-      <!-- 1. 로드맵 탭 -->
+      <!-- 1. 홈 탭 -->
       <button
         type="button"
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95 cursor-pointer"
@@ -23,20 +23,25 @@
               : ''
           "
         >
-          <!-- 활성: Solid Primary Blue Fill 깃발 / 비활성: Outline 깃발 (다른 탭들과 시각적 1:1 광학 균형) -->
+          <!-- 활성: Solid Primary Blue Fill 집 / 비활성: Outline 집 -->
           <svg
             viewBox="0 0 24 24"
-            class="size-[18px] transition-transform duration-200"
+            class="size-5 transition-transform duration-200"
             :class="isRoadmapActiveTab ? 'scale-105 fill-primary stroke-primary' : 'fill-none stroke-current'"
             stroke-width="1.8"
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-            <line x1="4" y1="22" x2="4" y2="15" stroke="currentColor" stroke-width="1.8" />
+            <path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <path
+              d="M9 21v-8h6v8"
+              fill="none"
+              :stroke="isRoadmapActiveTab ? '#ffffff' : 'currentColor'"
+              stroke-width="1.8"
+            />
           </svg>
         </span>
-        <span class="max-w-full truncate tracking-tight">로드맵</span>
+        <span class="max-w-full truncate tracking-tight">홈</span>
       </button>
 
       <!-- 2. 지출 탭 -->
