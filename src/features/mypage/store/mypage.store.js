@@ -49,6 +49,8 @@ export const useMypageStore = defineStore('feature-mypage', () => {
   const mydataConnectionsError = ref(null)
   const accountsSyncError = ref(null)
   const notificationSettings = ref(loadNotificationSettings())
+  // 진행 중인 프로필 요청. 여러 화면이 동시에 프로필을 요구해도 요청은 하나만 나가게 한다.
+  let profileRequest = null
 
   const displayProfileImageUrl = computed(
     () => profileImagePreviewUrl.value || profile.value?.profileImageUrl || ''
@@ -85,6 +87,23 @@ export const useMypageStore = defineStore('feature-mypage', () => {
     } finally {
       isProfileLoading.value = false
     }
+  }
+
+  // 프로필이 필요한 화면이 여러 개라 각자 "없으면 불러오기"를 구현하면 요청이 중복되거나 조건이 서로 어긋난다.
+  // 이미 불러왔으면 그대로 쓰고, 요청이 진행 중이면 같은 요청을 함께 기다린다.
+  // 실패해도 호출부가 따로 처리할 필요 없도록 null을 반환한다(에러는 profileError에 남는다).
+  function ensureProfile() {
+    if (profile.value) return Promise.resolve(profile.value)
+
+    if (!profileRequest) {
+      profileRequest = fetchProfile()
+        .catch(() => null)
+        .finally(() => {
+          profileRequest = null
+        })
+    }
+
+    return profileRequest
   }
 
   async function updateProfileImage(file) {
@@ -163,6 +182,8 @@ export const useMypageStore = defineStore('feature-mypage', () => {
 
   function clearProfile() {
     if (profileImagePreviewUrl.value) URL.revokeObjectURL(profileImagePreviewUrl.value)
+    // 로그아웃 후에는 이전 계정의 진행 중인 요청을 재사용하지 않는다.
+    profileRequest = null
     profile.value = null
     profileImagePreviewUrl.value = ''
     mydataConnections.value = []
@@ -185,6 +206,7 @@ export const useMypageStore = defineStore('feature-mypage', () => {
     mydataConnectionsError,
     accountsSyncError,
     fetchProfile,
+    ensureProfile,
     updateProfileImage,
     changePassword,
     fetchMydataConnections,
