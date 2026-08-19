@@ -78,9 +78,14 @@
           </div>
         </div>
 
-        <!-- 하단: 페이스 정보 인셋 카드 (슬레이트 톤앤매너) -->
+        <!-- 하단: 페이스 정보 인셋 카드 (슬레이트 톤앤매너) — 클릭 시 '나의 로드맵 여정' 섹션으로 스크롤 이동 -->
         <div class="mt-5 sm:mt-6">
-          <div class="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 sm:p-3.5 shadow-2xs">
+          <button
+            type="button"
+            class="w-full rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:scale-[0.98] cursor-pointer select-none sm:p-3.5"
+            aria-label="나의 로드맵 여정으로 이동"
+            @click="$emit('view-roadmap')"
+          >
             <div class="grid grid-cols-3 divide-x divide-slate-200/80 items-center">
               <!-- 1. 현재 페이스 -->
               <div class="px-2 text-center sm:text-left sm:pl-3 sm:pr-2">
@@ -123,7 +128,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -322,7 +327,15 @@ const props = defineProps({
   isToggling: { type: Boolean, default: false },
 })
 
-defineEmits(['cta-click', 'pause', 'resume', 'open-today', 'open-month', 'toggle'])
+defineEmits([
+  'cta-click',
+  'pause',
+  'resume',
+  'open-today',
+  'open-month',
+  'toggle',
+  'view-roadmap',
+])
 
 const theme = computed(() => PACE_THEME[props.pace.paceStatus] ?? PACE_THEME.ON_TRACK)
 const isAssistMode = computed(() => props.pace.paceStatus === 'BEHIND')

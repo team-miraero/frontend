@@ -47,11 +47,13 @@
             @resume="openResumeConfirm"
             @open-today="handleOpenTodayAvailableMoneyModal"
             @open-month="handleOpenMonthlyAvailableMoneyModal"
+            @view-roadmap="scrollToRoadmapSection"
           />
         </div>
 
         <!-- 2. 목표 진행 로드맵 카드 (통합 카드 컨테이너) -->
         <section
+          ref="roadmapSectionRef"
           class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-6 md:p-7"
           :class="isGoalPaused ? 'opacity-65' : ''"
         >
@@ -224,6 +226,7 @@ const statusConfirmMode = ref('pause')
 const selectedMilestone = ref(null)
 const achievementErrorMessage = ref('')
 const previousProgressRate = ref(null)
+const roadmapSectionRef = ref(null)
 
 const EMPTY_DAILY_AVAILABLE_MONEY = Object.freeze({
   todayAvailableMoney: 0,
@@ -291,6 +294,33 @@ function handleOpenMonthlyAvailableMoneyModal() {
 
 function handleOpenLinkedAssets() {
   openLinkedAssetsModal()
+}
+
+// 페이스 비교 영역 클릭: 페이지 내 '나의 로드맵 여정' 카드가 고정 헤더~하단 네비게이션 사이
+// 실제 보이는 영역에 (잘리지 않고) 가득 차도록 스크롤 위치를 직접 계산해 이동한다.
+// (카드가 화면보다 커서 둘 다 만족 못하면 하단이 가려지지 않는 쪽을 우선한다.)
+function scrollToRoadmapSection() {
+  const target = roadmapSectionRef.value
+  if (!target) return
+
+  const scrollContainer = target.closest('main')
+  if (!scrollContainer) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    return
+  }
+
+  const bottomNav = document.querySelector('nav[aria-label="모바일 주요 메뉴"]')
+  const bottomNavHeight = bottomNav?.offsetHeight ?? 0
+
+  const usableTop = scrollContainer.getBoundingClientRect().top
+  const usableHeight = window.innerHeight - bottomNavHeight - usableTop
+  const targetRect = target.getBoundingClientRect()
+  const overflow = Math.max(0, targetRect.height - usableHeight)
+
+  scrollContainer.scrollTo({
+    top: scrollContainer.scrollTop + (targetRect.top - usableTop) + overflow,
+    behavior: 'smooth',
+  })
 }
 
 function handleSelectMilestone(milestone) {
