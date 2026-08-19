@@ -72,7 +72,7 @@
               </div>
               <div class="ml-4 mt-2 h-1 overflow-hidden rounded-full bg-slate-200"><div class="h-full rounded-full bg-primary" :style="{ width: `${Math.min(100, Math.max(0, goal.progressRate))}%` }" /></div>
             </RouterLink>
-            <RouterLink :to="{ name: ROUTE_NAMES.GOAL_SELECT }" class="mt-2 flex items-center justify-center gap-1.5 rounded-2xl border border-dashed border-[#b9d3ff] py-2.5 text-xs font-bold text-primary transition hover:bg-[#f4f8ff]" @click="closeSidebar">
+            <RouterLink :to="{ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } }" class="mt-2 flex items-center justify-center gap-1.5 rounded-2xl border border-dashed border-[#b9d3ff] py-2.5 text-xs font-bold text-primary transition hover:bg-[#f4f8ff]" @click="closeSidebar">
               <span class="text-base">＋</span> 새 로드맵 만들기
             </RouterLink>
           </div>

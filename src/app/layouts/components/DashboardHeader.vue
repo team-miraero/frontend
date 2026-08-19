@@ -381,7 +381,7 @@
               </div>
 
               <RouterLink
-                :to="{ name: ROUTE_NAMES.GOAL_SELECT }"
+                :to="{ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } }"
                 class="mt-2 flex items-center gap-2 rounded-xl border border-dashed border-[#b9d3ff] px-3 py-3 text-sm font-bold text-primary transition hover:bg-[#f4f8ff]"
                 role="menuitem"
                 @click="isRoadmapDropdownOpen = false"
@@ -675,7 +675,7 @@
 
           <!-- 새 로드맵 추가 버튼 -->
           <RouterLink
-            :to="{ name: ROUTE_NAMES.GOAL_SELECT }"
+            :to="{ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } }"
             class="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#b9d3ff] bg-[#f4f8ff] py-3.5 text-sm font-bold text-primary transition active:scale-[0.99] hover:bg-blue-50"
             @click="isMobileRoadmapSheetOpen = false"
           >

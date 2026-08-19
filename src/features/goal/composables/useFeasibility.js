@@ -10,24 +10,23 @@
 /**
  * @typedef {Object} FeasibilityStatus
  * @property {number} ratio requiredMonthly / availableMonthly
+ * @property {number} rate (availableMonthly / requiredMonthly) * 100 (실현가능성 퍼센티지)
  * @property {'success' | 'warning' | 'danger'} status
  */
 
-const WARNING_RATIO_LIMIT = 1.2
 
 /**
  * @param {FeasibilityStatusInput} params
  * @returns {FeasibilityStatus}
  */
 export function resolveFeasibilityStatus({ requiredMonthly, availableMonthly }) {
-  const ratio = availableMonthly > 0 ? requiredMonthly / availableMonthly : Infinity
+  const req = Number(requiredMonthly) || 0
+  const avail = Number(availableMonthly) || 0
+  const ratio = avail > 0 ? req / avail : Infinity
+  const rate =
+    req <= 0 ? 100 : avail <= 0 ? 0 : Math.min(100, Math.max(0, Math.round((avail / req) * 100)))
 
-  let status = 'danger'
-  if (ratio <= 1) {
-    status = 'success'
-  } else if (ratio <= WARNING_RATIO_LIMIT) {
-    status = 'warning'
-  }
+  const status = rate >= 80 ? 'success' : 'danger'
 
-  return { ratio, status }
+  return { ratio, rate, status }
 }

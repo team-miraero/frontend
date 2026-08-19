@@ -76,7 +76,7 @@
         <button
           v-if="guideInfo"
           type="button"
-          class="inline-flex size-4 items-center justify-center rounded-full text-gray-400 transition-colors hover:text-[#0066FF] hover:bg-blue-50 focus:outline-none shrink-0"
+          class="inline-flex size-6 items-center justify-center -m-1 rounded-full text-gray-400 transition-colors hover:text-[#0066FF] hover:bg-blue-50 focus:outline-none shrink-0"
           :class="isTooltipOpen ? 'text-[#0066FF] bg-blue-50' : ''"
           title="목표 가이드 보기"
           @click.stop="isTooltipOpen = !isTooltipOpen"
