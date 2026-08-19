@@ -4,7 +4,7 @@
       <h2 id="spending-peer-title" class="sr-only">또래 지출과 비교</h2>
 
       <div
-        class="grid grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)_auto] items-center gap-1.5 sm:gap-2"
+        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 sm:gap-2"
         aria-label="또래 지출 비교 조건"
       >
         <div
@@ -29,35 +29,7 @@
           </button>
         </div>
 
-        <div
-          class="grid grid-cols-2 rounded-xl bg-[#F1F5F9] p-1"
-          role="group"
-          aria-label="지출 유형"
-        >
-          <button
-            v-for="type in categoryTypes"
-            :key="type.id"
-            type="button"
-            class="whitespace-nowrap rounded-lg px-1 py-2 text-[9px] font-semibold transition-all duration-150 sm:px-2 sm:text-xs"
-            :class="
-              selectedCategoryType === type.id
-                ? 'bg-white text-[#0066FF] shadow-sm font-bold'
-                : 'text-[#64748B]'
-            "
-            :aria-pressed="selectedCategoryType === type.id"
-            @click="selectedCategoryType = type.id"
-          >
-            {{ type.label }}
-          </button>
-        </div>
-
-        <span
-          v-if="usesConnectedPeerAverage"
-          class="flex h-[34px] items-center justify-center rounded-xl border border-[#D6E4FF] bg-[#F8FBFF] px-2 text-[10px] font-bold text-[#0A192F] sm:px-3 sm:text-xs"
-        >
-          내 또래
-        </span>
-        <div v-else class="relative min-w-0">
+        <div class="relative min-w-0">
           <label for="spending-peer-group-select" class="sr-only">비교 그룹</label>
           <select
             id="spending-peer-group-select"
@@ -85,14 +57,7 @@
         </div>
       </div>
 
-      <p
-        v-if="summary.peerAverageError"
-        class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
-      >
-        또래 평균을 불러오지 못했어요. 잠시 후 다시 확인해 주세요.
-      </p>
-
-      <template v-else-if="comparisonItems.length > 0">
+      <template v-if="comparisonItems.length > 0">
         <div
         class="mt-4 flex min-h-[64px] flex-col justify-center rounded-xl border border-primary/10 bg-[#F4F8FF] px-3.5 py-2.5 sm:px-4 sm:py-3"
       >
@@ -187,10 +152,7 @@
 import { computed, toRef } from 'vue'
 import SpendingCategoryIcon from '@/features/spending/components/SpendingCategoryIcon.vue'
 import { usePeerSpendingComparison } from '@/features/spending/composables/useSpendingComparisons'
-import {
-  SPENDING_CATEGORY_TYPES,
-  SPENDING_COMPARISON_BASES,
-} from '@/features/spending/constants/spending.constants'
+import { SPENDING_COMPARISON_BASES } from '@/features/spending/constants/spending.constants'
 import { formatKoreanNumber } from '@/shared/lib/money'
 
 const props = defineProps({
@@ -201,18 +163,12 @@ const props = defineProps({
 })
 
 const formatAmount = formatKoreanNumber
-const categoryTypes = [
-  { id: SPENDING_CATEGORY_TYPES.FIXED, label: '고정지출' },
-  { id: SPENDING_CATEGORY_TYPES.VARIABLE, label: '변동지출' },
-]
 
 const {
   selectedComparisonBasis,
-  selectedCategoryType,
   selectedPeerGroupId,
   selectedPeerGroupLabel,
   peerGroupOptions,
-  usesConnectedPeerAverage,
   comparisonItems,
   totalDifference,
   absoluteTotalDifference,
@@ -221,11 +177,7 @@ const {
 } = usePeerSpendingComparison(toRef(props, 'summary'))
 
 const peerComparisonLabel = computed(() =>
-  usesConnectedPeerAverage.value
-    ? ''
-    : selectedComparisonBasis.value === 'AGE'
-      ? '또래'
-      : '소득평균'
+  selectedComparisonBasis.value === 'AGE' ? '또래' : '소득평균'
 )
 
 const peerAverageLabel = computed(() =>

@@ -65,7 +65,7 @@ function scrollToPolicyList() {
 onMounted(() => {
   youthPolicyStore.fetchPolicies()
   youthPolicyStore.fetchRecommendedPolicies()
-  if (!mypageStore.profile) mypageStore.fetchProfile()
+  mypageStore.ensureProfile()
 
   scrollContainer = document.querySelector('main')
   scrollContainer?.addEventListener('scroll', handleScroll)

@@ -53,3 +53,29 @@ export function diffInMonths(targetDate) {
   const now = new Date()
   return (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth())
 }
+
+/**
+ * 생년월일로 만 나이를 계산한다.
+ * @param {string | null | undefined} birthDate yyyy-MM-dd
+ * @returns {number | null}
+ */
+export function calculateAge(birthDate) {
+  // new Date(birthDate)는 "yyyy-MM-dd"를 UTC 자정으로 해석하는데, 아래 getMonth/getDate는 로컬 시간대 기준이라
+  // UTC보다 느린 시간대(미국 등)에서는 생일 하루 전부터 날짜가 하루 당겨져 나이가 잘못 계산된다.
+  // 문자열을 직접 파싱해 시간대 변환을 아예 거치지 않는다.
+  const match = typeof birthDate === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate) : null
+  if (!match) return null
+
+  const birthYear = Number(match[1])
+  const birthMonth = Number(match[2])
+  const birthDay = Number(match[3])
+
+  const today = new Date()
+  let age = today.getFullYear() - birthYear
+  const hasHadBirthdayThisYear =
+    today.getMonth() + 1 > birthMonth ||
+    (today.getMonth() + 1 === birthMonth && today.getDate() >= birthDay)
+  if (!hasHadBirthdayThisYear) age -= 1
+
+  return age
+}

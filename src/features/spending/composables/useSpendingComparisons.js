@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue'
+import { useMypageStore } from '@/features/mypage'
 import {
   DEFAULT_SPENDING_AGE_GROUP_ID,
   DEFAULT_SPENDING_INCOME_GROUP_ID,
@@ -8,7 +9,19 @@ import {
   SPENDING_CATEGORIES,
   SPENDING_INCOME_GROUPS,
 } from '@/features/spending/constants/spending.constants'
+import { calculateAge } from '@/shared/lib/date'
 import { formatKoreanNumber } from '@/shared/lib/money'
+
+function matchAgeGroupId(age) {
+  if (age == null) return DEFAULT_SPENDING_AGE_GROUP_ID
+
+  const matched = SPENDING_AGE_GROUPS.find((group) => age >= group.minAge && age <= group.maxAge)
+  if (matched) return matched.id
+
+  const [firstGroup] = SPENDING_AGE_GROUPS
+  const lastGroup = SPENDING_AGE_GROUPS[SPENDING_AGE_GROUPS.length - 1]
+  return age < firstGroup.minAge ? firstGroup.id : lastGroup.id
+}
 
 export function useSpendingSummaryComparison(props) {
   const formattedTotalSpending = computed(() => formatKoreanNumber(props.totalSpending))
@@ -85,9 +98,24 @@ export function useSpendingSummaryComparison(props) {
 }
 
 export function usePeerSpendingComparison(summary) {
+  const mypageStore = useMypageStore()
+  mypageStore.ensureProfile()
+
   const selectedComparisonBasis = ref('AGE')
-  const selectedCategoryType = ref(SPENDING_CATEGORY_TYPES.VARIABLE)
-  const selectedAgeGroupId = ref(DEFAULT_SPENDING_AGE_GROUP_ID)
+
+  // 내 나이대에 맞는 구간을 기본으로 보여주되, 사용자가 직접 고른 값이 있으면 그것을 우선한다.
+  // (프로필은 나중에 도착하므로, 직접 고르기 전까지는 파생값으로 두어야 도착 시점에 자동으로 반영된다)
+  const matchedAgeGroupId = computed(() =>
+    matchAgeGroupId(calculateAge(mypageStore.profile?.birthDate))
+  )
+  const manualAgeGroupId = ref(null)
+  const selectedAgeGroupId = computed({
+    get: () => manualAgeGroupId.value ?? matchedAgeGroupId.value,
+    set: (value) => {
+      manualAgeGroupId.value = value
+    },
+  })
+
   const selectedIncomeGroupId = ref(DEFAULT_SPENDING_INCOME_GROUP_ID)
 
   const peerGroupOptions = computed(() =>
@@ -105,28 +133,13 @@ export function usePeerSpendingComparison(summary) {
     },
   })
 
-  const usesConnectedPeerAverage = computed(
-    () =>
-      selectedComparisonBasis.value === 'AGE' &&
-      selectedCategoryType.value === SPENDING_CATEGORY_TYPES.VARIABLE
-  )
-
   const selectedPeerGroupLabel = computed(
-    () => {
-      if (usesConnectedPeerAverage.value) return '내 또래 평균'
-
-      return peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
-    }
+    () =>
+      peerGroupOptions.value.find((group) => group.id === selectedPeerGroupId.value)?.label ?? ''
   )
 
   const peerSpending = computed(
-    () => {
-      if (usesConnectedPeerAverage.value) {
-        return summary.value.peerAverageSpending ?? {}
-      }
-
-      return PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value] ?? {}
-    }
+    () => PEER_SPENDING_BY_BASIS[selectedComparisonBasis.value][selectedPeerGroupId.value] ?? {}
   )
 
   const categorySpending = computed(() => summary.value.categorySpending ?? {})
@@ -136,7 +149,7 @@ export function usePeerSpendingComparison(summary) {
   const comparisonItems = computed(() => {
     return SPENDING_CATEGORIES.filter(
       (category) =>
-        category.type === selectedCategoryType.value &&
+        category.type === SPENDING_CATEGORY_TYPES.VARIABLE &&
         Object.hasOwn(categorySpending.value, category.id)
     )
       .map((category) => ({
@@ -194,11 +207,9 @@ export function usePeerSpendingComparison(summary) {
 
   return {
     selectedComparisonBasis,
-    selectedCategoryType,
     selectedPeerGroupId,
     selectedPeerGroupLabel,
     peerGroupOptions,
-    usesConnectedPeerAverage,
     comparisonItems,
     totalDifference,
     absoluteTotalDifference,

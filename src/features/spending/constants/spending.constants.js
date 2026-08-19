@@ -13,9 +13,9 @@ export const SPENDING_COMPARISON_BASES = [
 ]
 
 export const SPENDING_AGE_GROUPS = [
-  { id: '20-24', label: '20~24세' },
-  { id: '25-29', label: '25~29세' },
-  { id: '30-34', label: '30~34세' },
+  { id: '20-24', label: '20~24세', minAge: 20, maxAge: 24 },
+  { id: '25-29', label: '25~29세', minAge: 25, maxAge: 29 },
+  { id: '30-34', label: '30~34세', minAge: 30, maxAge: 34 },
 ]
 
 export const SPENDING_INCOME_GROUPS = [
