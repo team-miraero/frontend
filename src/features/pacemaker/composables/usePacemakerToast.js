@@ -1,10 +1,14 @@
 // src/features/pacemaker/composables/usePacemakerToast.js
 import { usePacemakerStore } from '@/features/pacemaker/store/pacemaker.store'
+import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pacemaker.constants'
 // 전역 싱글톤 상태는 로그아웃 시 초기화할 수 있도록 별도 모듈에서 관리한다.
 import {
+  cancelPendingToastTasks,
+  getToastSessionVersion,
   hasUnread,
   isBalanceModalOpen,
   notificationHistory,
+  scheduleToastTask,
   toastList,
 } from '@/features/pacemaker/composables/pacemakerToast.state'
 
@@ -30,7 +34,7 @@ export function usePacemakerToast() {
     hasUnread.value = true
 
     if (duration > 0) {
-      setTimeout(() => {
+      scheduleToastTask(() => {
         removeToast(id)
       }, duration)
     }
@@ -59,9 +63,11 @@ export function usePacemakerToast() {
   }
 
   /**
-   * 히스토리 알림 전체 비우기
+   * 히스토리 알림 전체 비우기.
+   * 아직 안 뜬(예약된) 다음 토스트도 같이 취소해야 지운 직후 다시 나타나지 않는다.
    */
   const clearHistory = () => {
+    cancelPendingToastTasks()
     notificationHistory.value = []
     toastList.value = []
     hasUnread.value = false
@@ -79,67 +85,96 @@ export function usePacemakerToast() {
   }
 
   /**
-   * 💰, 🔥 큼직한 이모지 뱃지 알림 2종 발송
+   * 💰, 🔥 큼직한 이모지 뱃지 알림 2종 발송.
+   * 문구에 실제 저축 금액이 들어가므로, 데이터를 확보한 뒤에만 발송한다.
+   * (예전에는 데이터가 없으면 예시 숫자를 그대로 노출했다)
+   * @returns {Promise<boolean | null>} true=발송함, false=정상적으로 알릴 내용이 없음,
+   *   null=일시적인 오류로 확인하지 못함 (호출부가 나중에 다시 시도할 수 있도록 구분해서 알려준다)
    */
-  const showDualNotifications = () => {
-    const viewData = usePacemakerStore().pacemakerView
+  const showDualNotifications = async () => {
+    const pacemakerStore = usePacemakerStore()
+    const sessionVersion = getToastSessionVersion()
 
-    const todayAmount = viewData?.todaySavingAmount || 40000
-    const monthlyRemaining = viewData?.monthlySecuredAmount || 350000
-    const streak = viewData?.currentStreak || 52
-    const moneyBoxBalance = viewData?.moneyBoxBalance || 270000
+    // 미개설 사용자에게는 알릴 자동 저축 내역 자체가 없다.
+    let status = pacemakerStore.pacemakerStatus
+    if (!status) {
+      try {
+        status = await pacemakerStore.fetchPacemakerStatus()
+      } catch {
+        return null
+      }
+    }
+    if (!status?.registered) return false
+
+    if (!pacemakerStore.pacemakerDashboard) {
+      try {
+        await pacemakerStore.fetchPacemakerDashboard()
+      } catch {
+        return null
+      }
+    }
+    if (!pacemakerStore.pacemakerDashboard) return null
+
+    // 서버 currentStreak가 이미 있으면 폴백 계산 자체가 필요 없다.
+    // null일 때만 저축 내역을 받아 계산하는데, 이때 조회가 실패하면 폴백이 조용히 0으로 깔려
+    // 실제로는 스트릭이 있는데도 🔥 알림이 빠질 수 있다 — 그 상태로 "오늘 확인함"을 기록하지
+    // 않도록 실패를 null로 알려 호출부가 나중에 다시 시도하게 한다.
+    if (pacemakerStore.pacemakerDashboard.currentStreak == null && !pacemakerStore.histories.length) {
+      try {
+        await pacemakerStore.fetchHistories({ page: 0, size: PACEMAKER_HISTORY_PAGE_SIZE })
+      } catch {
+        return null
+      }
+    }
+
+    const { todaySavingAmount, currentStreak, moneyBoxBalance } = pacemakerStore.pacemakerView
+
+    // 값이 0인 알림은 "0원 저축했어요"가 되므로 아예 띄우지 않는다.
+    const toasts = []
+    if (todaySavingAmount > 0) {
+      toasts.push({
+        type: 'SAVING',
+        badgeIcon: '💰',
+        title: `오늘의 여유자금 자동 저축: ${formatWon(todaySavingAmount)}`,
+        body: '오늘 쓰고 남은 여유자금을 저금통에 옮겨뒀어요!',
+      })
+    }
+    if (currentStreak > 0) {
+      toasts.push({
+        type: 'STREAK',
+        badgeIcon: '🔥',
+        title: `연속 ${currentStreak}일째 페이스 달성 중!`,
+        body: `오늘도 저금통에 여유자금 ${formatWon(moneyBoxBalance)} 확보 완료!`,
+      })
+    }
+    if (!toasts.length) return false
 
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
     const initialDelay = 1200 // 페이지 로드 후 실제 알림이 도착하듯 1.2초 뒤 첫 알림 팝업
 
     if (isMobile) {
-      // 📱 모바일: 첫 번째 알림이 뜨고 사라진 후, 두 번째 알림이 순차적으로 등장 (진짜 스마트폰 푸시 알림 형태)
-      const firstDuration = 3500
+      // 📱 모바일: 앞 알림이 완전히 퇴장한 뒤 다음 알림이 등장 (진짜 스마트폰 푸시 알림 형태)
+      const duration = 3500
       const transitionGap = 400
-
-      // 1. 첫 번째 알림: 페이지 진입 1.2초 후 도착
-      setTimeout(() => {
-        addToast({
-          type: 'SAVING',
-          badgeIcon: '💰',
-          title: `오늘의 권장 여유자금: ${formatWon(todayAmount)}`,
-          body: `안전한 완주를 위해 계산된 오늘 하루 지출 예산이에요!`,
-          duration: firstDuration,
-        })
-      }, initialDelay)
-
-      // 2. 두 번째 알림: 첫 번째 알림이 완전히 퇴장한 후 등장
-      setTimeout(() => {
-        addToast({
-          type: 'STREAK',
-          badgeIcon: '🔥',
-          title: `연속 ${streak}일째 페이스 달성 중!`,
-          body: `오늘도 저금통에 여유자금 ${formatWon(moneyBoxBalance)} 확보 완료!`,
-          duration: 4000,
-        })
-      }, initialDelay + firstDuration + transitionGap)
+      toasts.forEach((toast, index) => {
+        scheduleToastTask(
+          () => addToast({ ...toast, duration }),
+          initialDelay + index * (duration + transitionGap),
+          sessionVersion
+        )
+      })
     } else {
-      // 💻 데스크톱: 페이지 진입 1.2초 후 1번 알림 ➔ 1.2초 뒤 2번 알림 스택
-      setTimeout(() => {
-        addToast({
-          type: 'SAVING',
-          badgeIcon: '💰',
-          title: `오늘의 권장 여유자금: ${formatWon(todayAmount)}`,
-          body: `안전한 완주를 위해 계산된 오늘 하루 지출 예산이에요!`,
-          duration: 7000,
-        })
-      }, initialDelay)
-
-      setTimeout(() => {
-        addToast({
-          type: 'STREAK',
-          badgeIcon: '🔥',
-          title: `연속 ${streak}일째 페이스 달성 중!`,
-          body: `오늘도 저금통에 여유자금 ${formatWon(moneyBoxBalance)} 확보 완료!`,
-          duration: 8500,
-        })
-      }, initialDelay + 1200)
+      // 💻 데스크톱: 페이지 진입 1.2초 후부터 1.2초 간격으로 스택
+      toasts.forEach((toast, index) => {
+        scheduleToastTask(
+          () => addToast({ ...toast, duration: 7000 }),
+          initialDelay + index * 1200,
+          sessionVersion
+        )
+      })
     }
+
+    return true
   }
 
   return {

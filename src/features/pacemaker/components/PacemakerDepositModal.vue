@@ -1,4 +1,4 @@
-<!-- 페이스메이커 저금통 → 목표 연결계좌 입금 모달 -->
+<!-- 페이스메이커 저금통 → 목표 연결 자산(계좌·저금통) 직접 입금 모달 -->
 <template>
   <BaseModal :model-value="modelValue" hide-default-close @update:model-value="handleClose">
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
@@ -6,7 +6,7 @@
         <p class="inline-flex items-center gap-1 text-xs font-bold text-slate-400">
           <GoalTypeIcon :goal-type="target?.goalType" size="sm" /> {{ target?.goalName }} 목표
         </p>
-        <h3 class="pt-0.5 text-base font-black text-[#0a192f]">입금할 계좌에 입금하기</h3>
+        <h3 class="pt-0.5 text-base font-bold text-[#0a192f]">연결 자산에 입금하기</h3>
       </div>
       <button
         type="button"
@@ -24,7 +24,7 @@
         class="flex items-center justify-between rounded-2xl border border-primary/20 bg-[#eaf2ff] px-4 py-3"
       >
         <p class="text-sm font-bold text-[#0a192f]">사용 가능한 여유자금</p>
-        <p class="text-base font-black text-primary">{{ formatWon(availableBalance) }}</p>
+        <p class="text-base font-bold text-primary">{{ formatWon(availableBalance) }}</p>
       </div>
 
       <button
@@ -34,7 +34,7 @@
         @click="isAccountListOpen = !isAccountListOpen"
       >
         <div>
-          <p class="text-xs text-slate-400">입금할 계좌</p>
+          <p class="text-xs text-slate-400">입금할 자산</p>
           <p class="pt-0.5 text-sm font-bold text-[#0a192f]">
             {{ selectedOption?.icon }} {{ selectedOption?.accountNickname }}
           </p>
@@ -50,10 +50,10 @@
       <div v-if="isAccountListOpen" class="flex flex-col gap-2">
         <button
           v-for="option in target?.depositOptions ?? []"
-          :key="option.accountId"
+          :key="`${option.assetType}-${option.assetId}`"
           type="button"
           class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left"
-          :class="option.accountId === selectedOption?.accountId ? 'border-[#c5dcff]' : ''"
+          :class="isSameOption(option, selectedOption) ? 'border-[#c5dcff]' : ''"
           :disabled="isSubmitting"
           @click="selectOption(option)"
         >
@@ -63,7 +63,7 @@
             >
             <span class="block text-xs text-slate-400">{{ option.accountNumberMasked }}</span>
           </span>
-          <span class="text-sm font-black text-primary">{{
+          <span class="text-sm font-bold text-primary">{{
             formatWon(option.accountBalance)
           }}</span>
         </button>
@@ -75,7 +75,7 @@
           v-model="amountInput"
           type="text"
           inputmode="numeric"
-          class="w-full rounded-2xl border bg-[#f7faff] px-5 py-4 text-right text-xl font-black text-[#0a192f] outline-none"
+          class="w-full rounded-2xl border bg-[#f7faff] px-5 py-4 text-right text-xl font-bold text-[#0a192f] outline-none"
           :class="isOverLimit ? 'border-[#fbcfe8]' : 'border-[#9dc0f5]'"
           :disabled="isSubmitting"
           @input="handleAmountInput"
@@ -118,7 +118,7 @@
 
       <button
         type="button"
-        class="rounded-2xl py-3.5 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-70"
+        class="rounded-2xl py-3.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-70"
         :class="
           canSubmit ? 'shadow-[0_6px_10px_rgba(0,102,255,0.28)]' : 'bg-slate-200 !text-slate-400'
         "
@@ -148,7 +148,7 @@ const props = defineProps({
   },
   target: {
     type: Object,
-    default: null, // { goalId, goalName, icon, accountNickname, bankName, accountNumberMasked, accountBalance }
+    default: null, // { goalId, goalName, assetId, assetType, icon, accountNickname, bankName, accountNumberMasked, accountBalance }
   },
   availableBalance: {
     type: Number,
@@ -194,15 +194,17 @@ watch(
     if (isOpen) {
       amountInput.value = '0'
       selectedOption.value =
-        props.target?.depositOptions?.find(
-          (option) => option.accountId === props.target?.accountId
-        ) ??
+        props.target?.depositOptions?.find((option) => isSameOption(option, props.target)) ??
         props.target?.depositOptions?.[0] ??
         null
       isAccountListOpen.value = false
     }
   }
 )
+
+function isSameOption(a, b) {
+  return a != null && b != null && a.assetId === b.assetId && a.assetType === b.assetType
+}
 
 function selectOption(option) {
   selectedOption.value = option
@@ -225,7 +227,8 @@ function handleClose(value) {
 function handleSubmit() {
   if (!canSubmit.value || !selectedOption.value || props.isSubmitting) return
   emit('deposit', {
-    accountId: selectedOption.value.accountId,
+    assetId: selectedOption.value.assetId,
+    assetType: selectedOption.value.assetType,
     amount: amount.value,
     moneyBoxId: selectedOption.value.moneyBoxId,
     option: selectedOption.value,

@@ -18,7 +18,7 @@
         >
           <img :src="finishFlagIcon" alt="완주" class="size-8 brightness-0 invert" />
         </div>
-        <h2 class="mt-5 text-2xl font-black tracking-[-0.7px] text-[#0a192f]">
+        <h2 class="mt-5 text-2xl font-bold tracking-tight text-[#0a192f]">
           목표 달성 축하드립니다
         </h2>
         <p class="mt-2 text-sm font-medium text-slate-500">목표하신 미래로 한 발짝 가까워졌어요</p>

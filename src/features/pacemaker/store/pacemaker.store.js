@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as pacemakerApi from '@/features/pacemaker/api/pacemaker.api'
+import { getLocalDateKey } from '@/shared/lib/date'
 
 export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   /** @type {import('vue').Ref<import('@/features/pacemaker/api/pacemaker.api').PacemakerStatus | null>} */
@@ -41,22 +42,31 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     historiesRequestId += 1
   }
 
+  const DAY_OF_WEEK_NAMES = [
+    'SUNDAY',
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY',
+  ]
+
   // 기존 대시보드 컴포넌트가 최신 API 필드를 사용할 수 있도록 만든 화면용 모델
   const pacemakerView = computed(() => {
     const status = pacemakerStatus.value
     const dashboard = pacemakerDashboard.value
     const currentStatus = dashboard?.status ?? status?.status ?? null
-    const referenceDate = getLatestReferenceDate(
-      dashboard?.todaySaving?.savingDate,
-      histories.value
-    )
-    const referenceMonth = referenceDate?.slice(0, 7)
-    const monthlySecuredAmount = referenceMonth
-      ? histories.value.reduce((total, item) => {
-          const isSavedThisMonth = item.status === 'SAVED' && item.date?.startsWith(referenceMonth)
-          return isSavedThisMonth ? total + (item.amount ?? 0) : total
-        }, 0)
-      : 0
+    // 서버가 "오늘" 날짜를 내려주지 않으므로(saved 불리언만 옴) 로컬 오늘 날짜의 월을 기준으로 집계한다.
+    const referenceMonth = getLocalDateKey(new Date()).slice(0, 7)
+    let monthlySecuredAmount = 0
+    let monthlySuccessCountFromHistories = 0
+    histories.value.forEach((item) => {
+      if (item.status === 'SAVED' && item.date?.startsWith(referenceMonth)) {
+        monthlySecuredAmount += item.amount ?? 0
+        monthlySuccessCountFromHistories += 1
+      }
+    })
 
     return {
       registered: status?.registered ?? false,
@@ -65,12 +75,15 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
       moneyBoxBalance: dashboard?.moneyBox?.balance ?? 0,
       moneyBoxId: dashboard?.moneyBox?.moneyBoxId ?? null,
       maskedAccountNumber: dashboard?.moneyBox?.maskedAccountNumber ?? '',
-      todaySavingAmount:
-        dashboard?.todaySaving?.status === 'SUCCESS' ? (dashboard.todaySaving.amount ?? 0) : 0,
-      currentStreak: dashboard?.currentStreak ?? 0,
+      todaySavingAmount: dashboard?.todaySaving?.saved ? (dashboard.todaySaving.amount ?? 0) : 0,
+      // 서버가 아직 집계를 못 채워 null을 주는 계정이 있어(정상적으로 내려주는 0은 그대로 존중),
+      // null일 때만 이미 받아온 저축 내역(histories)으로 같은 값을 대신 계산한다. TODO: 서버가
+      // currentStreak/monthlySuccessCount/weeklyStreak를 항상 채워주게 되면 이 폴백은 제거한다.
+      currentStreak: dashboard?.currentStreak ?? computeStreakFromHistories(histories.value),
       maxAmount: dashboard?.maxAmount ?? 0,
       monthlySecuredAmount,
-      monthlySuccessCount: dashboard?.monthlySuccessCount ?? 0,
+      monthlySuccessCount: dashboard?.monthlySuccessCount ?? monthlySuccessCountFromHistories,
+      weeklyStreak: dashboard?.weeklyStreak ?? computeWeeklyStreakFromHistories(histories.value),
     }
   })
 
@@ -79,12 +92,53 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     return pacemakerStatus.value
   }
 
-  function getLatestReferenceDate(todaySavingDate, historyItems) {
-    const candidates = [todaySavingDate, ...historyItems.map((item) => item.date)]
-      .filter(Boolean)
-      .map((date) => String(date).slice(0, 10))
-      .sort()
-    return candidates.at(-1) ?? null
+  // 오늘 또는 어제부터 거꾸로 연속 여부를 센다. 오늘 배치는 아직 안 돌았을 수 있어 하루만 봐주지만,
+  // 어제도 기록이 없으면 이미 끊긴 것이므로 봐주지 않는다(과거의 마지막 저축일을 기준으로 삼지 않는다).
+  function computeStreakFromHistories(historyItems) {
+    const savedDates = new Set(
+      historyItems.filter((item) => item.status === 'SAVED').map((item) => item.date)
+    )
+    if (savedDates.size === 0) return 0
+
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(today.getDate() - 1)
+
+    let cursor
+    if (savedDates.has(getLocalDateKey(today))) {
+      cursor = today
+    } else if (savedDates.has(getLocalDateKey(yesterday))) {
+      cursor = yesterday
+    } else {
+      return 0
+    }
+
+    let streak = 0
+    while (savedDates.has(getLocalDateKey(cursor))) {
+      streak += 1
+      cursor.setDate(cursor.getDate() - 1)
+    }
+    return streak
+  }
+
+  function computeWeeklyStreakFromHistories(historyItems) {
+    const byDate = new Map(historyItems.map((item) => [item.date, item]))
+    const today = new Date()
+    const mondayOffset = today.getDay() === 0 ? -6 : 1 - today.getDay()
+    const monday = new Date(today)
+    monday.setDate(today.getDate() + mondayOffset)
+
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(monday)
+      date.setDate(monday.getDate() + index)
+      const item = byDate.get(getLocalDateKey(date))
+      const saved = item?.status === 'SAVED'
+      return {
+        dayOfWeek: DAY_OF_WEEK_NAMES[date.getDay()],
+        amount: saved ? (item.amount ?? 0) : 0,
+        saved,
+      }
+    })
   }
 
   /**
@@ -191,13 +245,23 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   }
 
   async function updateMaxAmount(maxAmount) {
-    const result = await pacemakerApi.updatePacemakerMaxAmount(maxAmount)
+    const autoSavingId =
+      pacemakerStatus.value?.autoSavingId ?? (await fetchPacemakerStatus()).autoSavingId
+    if (!autoSavingId) throw new Error('페이스메이커가 개설되지 않았어요.')
+
+    const result = await pacemakerApi.updatePacemakerMaxAmount(autoSavingId, maxAmount)
     if (pacemakerDashboard.value) pacemakerDashboard.value.maxAmount = result.maxAmount
     return result
   }
 
-  async function depositToGoal(accountId, amount, moneyBoxId) {
-    const result = await pacemakerApi.depositToGoalAccount(accountId, amount, moneyBoxId)
+  /**
+   * @param {number} assetId 목표 연결 자산 ID (`/pace-maker/goals`의 depositAssets[].assetId)
+   * @param {'ACCOUNT' | 'MONEY_BOX' | 'LOAN'} assetType
+   * @param {number} amount
+   * @param {number} moneyBoxId
+   */
+  async function depositToGoal(assetId, assetType, amount, moneyBoxId) {
+    const result = await pacemakerApi.depositToGoalAsset({ assetId, assetType, amount, moneyBoxId })
     if (pacemakerDashboard.value?.moneyBox) {
       pacemakerDashboard.value.moneyBox.balance = result.remainingBalance
     }

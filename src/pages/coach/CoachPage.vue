@@ -1,20 +1,27 @@
 <!-- AI 목표 코치 채팅 페이지 -->
 <template>
-  <div class="flex h-full">
-    <div class="flex h-full flex-1 flex-col bg-[#f8fbff]">
-      <!-- AI 코치 상단 채팅 헤더 바 -->
+  <div class="flex h-full w-full min-h-0 flex-1 overflow-hidden bg-[#f8fafc]">
+    <div class="flex h-full min-h-0 flex-1 flex-col bg-[#f8fafc] overflow-hidden">
+      <!-- AI 코치 상단 채팅 헤더 바 (PC/데스크톱 전용, 모바일은 상단 글로벌 헤더 사용) -->
       <div
-        class="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 sm:px-6 md:px-8"
+        class="hidden lg:flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 sm:px-6 md:px-8"
       >
         <div class="flex items-center gap-3">
-          <div
-            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#66b2ff] shadow-sm"
-          >
-            <img src="@/assets/icons/ai-coach-avatar.svg" alt="" class="size-4" />
+          <div class="flex size-7 shrink-0 items-center justify-center">
+            <svg
+              class="size-6 text-primary drop-shadow-xs"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 2L14.4 8.6L21 11L14.4 13.4L12 20L9.6 13.4L3 11L9.6 8.6L12 2Z" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round" />
+              <path d="M19 17L20.2 19.8L23 21L20.2 22.2L19 25L17.8 22.2L15 21L17.8 19.8L19 17Z" />
+              <path d="M19 2L19.8 4.2L22 5L19.8 5.8L19 8L18.2 5.8L16 5L18.2 4.2L19 2Z" />
+            </svg>
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2">
-              <h1 class="text-sm font-black tracking-[-0.3px] text-[#0a192f] sm:text-base">
+              <h1 class="text-sm font-bold tracking-tight text-[#0a192f] sm:text-base">
                 AI 목표 코치
               </h1>
               <span
@@ -28,33 +35,12 @@
             </p>
           </div>
         </div>
-
-        <!-- 모바일: 대화 목록 열기 버튼 -->
-        <button
-          type="button"
-          class="flex size-9 shrink-0 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 lg:hidden"
-          aria-label="대화 목록 열기"
-          @click="isCoachSidebarOpen = true"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="size-5"
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-        </button>
       </div>
 
-      <!-- 메시지 리스트 (반응형 패딩 및 스크롤) -->
+      <!-- 메시지 리스트 (반응형 패딩 및 내부 단독 스크롤) -->
       <div
         ref="messageListRef"
-        class="flex-1 space-y-3 overflow-y-auto px-3.5 py-4 sm:space-y-4 sm:px-6 sm:py-6 lg:px-10"
+        class="flex-1 min-h-0 space-y-3 overflow-y-auto px-3.5 py-4 sm:space-y-4 sm:px-6 sm:py-6 lg:px-10"
       >
         <LoadingSpinner
           v-if="coachStore.isLoadingMessages && coachStore.messages.length === 0"
@@ -69,35 +55,42 @@
             :message="message"
           />
 
-          <!-- AI 답변 생성 중 (생각 중 / 타이핑 인디케이터 말풍선) -->
+          <!-- AI 답변 생성 중 (생각 중 / 단정한 별 아이콘 + 텍스트 시머 그라데이션 말풍선) -->
           <div
             v-if="coachStore.isSending && coachStore.messages.at(-1)?.content.length === 0"
             class="flex w-full items-end gap-2.5 justify-start"
           >
-            <div class="mb-0.5 shrink-0">
-              <div
-                class="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#66b2ff] drop-shadow-[0_2px_5px_rgba(0,102,255,0.28)]"
+            <div class="mb-1 flex size-7 sm:size-8 shrink-0 items-center justify-center">
+              <!-- 단정하게 고정된 반짝 별 심볼 -->
+              <svg
+                class="size-5 sm:size-5.5 text-primary drop-shadow-xs"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
               >
-                <img src="@/assets/icons/ai-coach-avatar.svg" alt="" class="size-[13px]" />
-              </div>
+                <path d="M12 2L14.4 8.6L21 11L14.4 13.4L12 20L9.6 13.4L3 11L9.6 8.6L12 2Z" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round" />
+                <path d="M19 17L20.2 19.8L23 21L20.2 22.2L19 25L17.8 22.2L15 21L17.8 19.8L19 17Z" />
+                <path d="M19 2L19.8 4.2L22 5L19.8 5.8L19 8L18.2 5.8L16 5L18.2 4.2L19 2Z" />
+              </svg>
             </div>
             <div
-              class="flex items-center gap-1.5 rounded-[18px] rounded-tl-[4px] border border-[#dbeafe] bg-[#f4f8ff] px-4 py-3 shadow-xs text-[#0a192f]"
+              class="flex items-center rounded-[18px] rounded-tl-[4px] border border-slate-200/80 bg-white px-4 py-2.5 shadow-2xs"
             >
-              <span class="size-2 rounded-full bg-primary/70 animate-bounce" style="animation-delay: 0ms;" />
-              <span class="size-2 rounded-full bg-primary/70 animate-bounce" style="animation-delay: 150ms;" />
-              <span class="size-2 rounded-full bg-primary/70 animate-bounce" style="animation-delay: 300ms;" />
+              <!-- 옆으로 흘러가는 텍스트 그라데이션 시머 애니메이션 -->
+              <span class="text-shimmer text-xs font-semibold tracking-tight select-none">
+                답변을 작성하고 있어요
+              </span>
             </div>
           </div>
         </template>
       </div>
 
-      <!-- 입력 영역 -->
+      <!-- 입력 영역 (하단 고정 질문 프리셋 포함) -->
       <CoachChatInput />
     </div>
 
     <CoachConversationSidebar
-      v-model:is-open="isCoachSidebarOpen"
+      v-model:is-open="coachStore.isSidebarOpen"
       :conversations="coachStore.conversations"
       :active-conversation-id="coachStore.currentConversationId"
       @create="handleCreateConversation"
@@ -127,9 +120,14 @@ const coachStore = useCoachStore()
 
 const messageListRef = ref(null)
 
-// 대화 목록(모바일 오버레이) 열림 상태 — 데스크톱은 기본 펼침, 모바일은 기본 접힘
 const isDesktop = useMediaQuery('(min-width: 1024px)')
-const isCoachSidebarOpen = ref(isDesktop.value)
+
+// 데스크톱 진입 시 기본 펼침
+onMounted(() => {
+  if (isDesktop.value) {
+    coachStore.toggleSidebar(true)
+  }
+})
 
 const userName = computed(() => authStore.user?.name ?? '')
 const goalLabel = computed(
@@ -158,13 +156,13 @@ watch(
 
 async function handleCreateConversation() {
   await coachStore.createNewConversation(welcomeMessage.value)
-  if (!isDesktop.value) isCoachSidebarOpen.value = false
+  if (!isDesktop.value) coachStore.toggleSidebar(false)
   scrollToBottom()
 }
 
 async function handleSelectConversation(conversationId) {
   await coachStore.selectConversation(conversationId)
-  if (!isDesktop.value) isCoachSidebarOpen.value = false
+  if (!isDesktop.value) coachStore.toggleSidebar(false)
   scrollToBottom()
 }
 
@@ -201,3 +199,34 @@ onMounted(async () => {
   scrollToBottom()
 })
 </script>
+
+<style scoped>
+/* 애플/ChatGPT 스타일 텍스트 그라데이션 시머 애니메이션 */
+@keyframes textShimmerWave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #94a3b8 0%,
+    #94a3b8 20%,
+    #0a192f 50%,
+    #0066ff 55%,
+    #0a192f 60%,
+    #94a3b8 80%,
+    #94a3b8 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmerWave 2.2s linear infinite;
+  will-change: background-position;
+}
+</style>

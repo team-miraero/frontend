@@ -1,190 +1,169 @@
 <!-- 로드맵 메인 대시보드 -->
 <template>
-  <LoadingSpinner
-    v-if="isPageLoading || goalStore.areGoalsLoading || goalStore.isLoading"
-    message="로드맵을 불러오는 중이에요"
-  />
+  <div class="w-full">
+    <LoadingSpinner
+      v-if="isPageLoading || goalStore.areGoalsLoading || goalStore.isLoading"
+      message="로드맵을 불러오는 중이에요"
+    />
 
-  <div
-    v-else-if="goalStore.currentGoal"
-    class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fbff] pb-6"
-  >
-    <div class="page-container py-4 sm:py-6 space-y-4 sm:space-y-6">
-      <div
-        v-if="hasSupplementaryError"
-        class="flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"
-        role="status"
-      >
-        <p class="text-xs font-bold text-amber-700">일부 부가 정보를 불러오지 못했어요.</p>
-        <button
-          type="button"
-          class="text-xs font-black text-amber-800 disabled:opacity-50"
-          :disabled="goalStore.isSupplementaryLoading"
-          @click="retrySupplementaryData"
+    <div
+      v-else-if="goalStore.currentGoal"
+      class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fafc] pb-6"
+    >
+      <div class="page-container py-4 sm:py-6 space-y-4 sm:space-y-6">
+        <div
+          v-if="hasSupplementaryError"
+          class="flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"
+          role="status"
         >
-          {{ goalStore.isSupplementaryLoading ? '불러오는 중…' : '다시 시도' }}
-        </button>
-      </div>
-
-      <!-- 1. 상단 통합 현황 카드 (PaceBanner: 진행 중/일시정지 상태 및 재개 토글 내장) -->
-      <div>
-        <PaceBanner
-          :pace="displayedPace"
-          :progress-rate="goalStore.currentGoal.progressRate"
-          :goal-name="displayedGoal.goalName"
-          :disabled="isGoalPaused"
-          :current-amount="goalStore.currentGoal.currentAmount"
-          :goal-amount="goalStore.currentGoal.goalAmount"
-          :end-date="goalStore.currentGoal.period.endDate"
-          :daily-available-money="goalStore.dailyAvailableMoney"
-          :monthly-available-money="goalStore.monthlyAvailableMoney"
-          :pacemaker="displayedPacemaker"
-          :is-toggling="pacemakerStore.isToggling"
-          @cta-click="handlePacemakerCtaClick"
-          @toggle="handlePacemakerToggle"
-          @pause="openPauseConfirm"
-          @resume="openResumeConfirm"
-          @open-today="handleOpenTodayAvailableMoneyModal"
-          @open-month="handleOpenMonthlyAvailableMoneyModal"
-        />
-      </div>
-
-      <!-- 2. 목표 진행 로드맵 카드 (MilestoneProgressBar + MilestoneList) -->
-      <section
-        class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-7 md:p-8"
-        :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''"
-      >
-        <div class="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-2">
-          <div class="flex min-w-0 items-center gap-2.5">
-            <span
-              class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-2xs ring-1 ring-primary/20"
-            >
-              <svg
-                class="size-3.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-                <line x1="4" y1="22" x2="4" y2="15" />
-              </svg>
-            </span>
-            <div class="min-w-0 flex-1">
-              <h2 class="text-base font-bold tracking-tight text-[#0a192f] sm:text-lg">
-                나의 로드맵 여정
-              </h2>
-              <p class="text-xs font-normal text-slate-400">
-                목표 지점까지 달성한 마일스톤과 주행 현황이에요
-              </p>
-            </div>
-          </div>
+          <p class="text-xs font-bold text-amber-700">일부 부가 정보를 불러오지 못했어요.</p>
+          <button
+            type="button"
+            class="text-xs font-bold text-amber-800 disabled:opacity-50"
+            :disabled="goalStore.isSupplementaryLoading"
+            @click="retrySupplementaryData"
+          >
+            {{ goalStore.isSupplementaryLoading ? '불러오는 중…' : '다시 시도' }}
+          </button>
         </div>
 
-        <MilestoneProgressBar :goal="displayedGoal" :milestones="roadmapStore.milestones" />
-
-        <!-- 스플릿 기록 -->
-        <div class="mt-3.5 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:mt-4 sm:pt-5">
-          <MilestoneList
-            :milestones="roadmapStore.milestones"
-            :goal="displayedGoal"
-            @select-milestone="handleSelectMilestone"
+        <!-- 1. 상단 통합 현황 카드 (PaceBanner: 진행 중/일시정지 상태 및 재개 토글 내장) -->
+        <div>
+          <PaceBanner
+            :pace="displayedPace"
+            :progress-rate="goalStore.currentGoal.progressRate"
+            :goal-name="displayedGoal.goalName"
+            :disabled="isGoalPaused"
+            :current-amount="goalStore.currentGoal.currentAmount"
+            :goal-amount="goalStore.currentGoal.goalAmount"
+            :end-date="goalStore.currentGoal.period.endDate"
+            :daily-available-money="goalStore.dailyAvailableMoney"
+            :monthly-available-money="goalStore.monthlyAvailableMoney"
+            :pacemaker="displayedPacemaker"
+            :is-toggling="pacemakerStore.isToggling"
+            @cta-click="handlePacemakerCtaClick"
+            @toggle="handlePacemakerToggle"
+            @pause="openPauseConfirm"
+            @resume="openResumeConfirm"
+            @open-today="handleOpenTodayAvailableMoneyModal"
+            @open-month="handleOpenMonthlyAvailableMoneyModal"
           />
         </div>
-      </section>
 
-      <!-- 3. 요약 통계 그룹 (자산 현황 카드) -->
-      <div :class="isGoalPaused ? 'pointer-events-none opacity-45' : ''">
-        <RaceRecordSummary
-          :goal="displayedGoal"
-          :assets="goalStore.assets"
-          :pacemaker="displayedPacemaker"
-          :is-toggling="pacemakerStore.isToggling"
-          :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
-          :dashboard-error-message="dashboardErrorMessage"
-          @open-detail="handleOpenLinkedAssets"
-          @toggle="handlePacemakerToggle"
-          @open="handleOpenShareGoal"
-          @retry-dashboard="retryPacemakerDashboard"
-        />
+        <!-- 2. 목표 진행 로드맵 카드 (통합 카드 컨테이너) -->
+        <section
+          class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-6 md:p-7"
+          :class="isGoalPaused ? 'opacity-65' : ''"
+        >
+          <div class="mb-3.5 sm:mb-4 flex items-center justify-between">
+            <h2 class="text-base font-bold tracking-tight text-[#0a192f] sm:text-lg">
+              나의 로드맵 여정
+            </h2>
+          </div>
+
+          <MilestoneProgressBar :goal="displayedGoal" :milestones="roadmapStore.milestones" />
+
+          <!-- 스플릿 기록 -->
+          <div class="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:mt-5 sm:pt-5">
+            <MilestoneList
+              :milestones="roadmapStore.milestones"
+              :goal="displayedGoal"
+              @select-milestone="handleSelectMilestone"
+            />
+          </div>
+        </section>
+
+        <!-- 3. 요약 통계 그룹 (자산 현황 카드) -->
+        <div :class="isGoalPaused ? 'opacity-65' : ''">
+          <RaceRecordSummary
+            :goal="displayedGoal"
+            :assets="goalStore.assets ?? []"
+            :pacemaker="displayedPacemaker"
+            :is-toggling="pacemakerStore.isToggling"
+            :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
+            :dashboard-error-message="dashboardErrorMessage"
+            @open-detail="handleOpenLinkedAssets"
+            @toggle="handlePacemakerToggle"
+            @open="handleOpenShareGoal"
+            @retry-dashboard="retryPacemakerDashboard"
+          />
+        </div>
+      </div>
+
+      <!-- 모달 컴포넌트들 -->
+      <PacemakerSetupModal v-model="isPacemakerModalOpen" />
+      <TodayAvailableMoneyModal
+        v-model="isTodayAvailableMoneyModalOpen"
+        :daily="goalStore.dailyAvailableMoney ?? EMPTY_DAILY_AVAILABLE_MONEY"
+      />
+      <MonthlyAvailableMoneyModal
+        v-model="isMonthlyAvailableMoneyModalOpen"
+        :monthly="goalStore.monthlyAvailableMoney ?? EMPTY_MONTHLY_AVAILABLE_MONEY"
+      />
+      <LinkedAssetsModal v-model="isLinkedAssetsModalOpen" :assets="goalStore.assets" />
+      <MilestoneReportModal v-model="isMilestoneReportModalOpen" :milestone="selectedMilestone" />
+      <GoalStatusConfirmModal
+        v-model="isStatusConfirmModalOpen"
+        :mode="statusConfirmMode"
+        @confirm="handleStatusConfirm"
+      />
+      <ShareGoalModal
+        v-model="isShareGoalModalOpen"
+        :goal="goalStore.currentGoal"
+        :milestones="roadmapStore.milestones"
+      />
+      <GoalAchievementModal
+        v-model="isGoalAchievementModalOpen"
+        :goal="goalStore.currentGoal"
+        :is-adding="collectionStore.isAdding"
+        :error-message="achievementErrorMessage"
+        @add-to-collection="handleAddToCollection"
+        @later="handleAchievementLater"
+      />
+      <PacemakerAssistFlow
+        v-model="isPacemakerAssistFlowOpen"
+        :goal="assistFlowGoal"
+        @goal-adjusted="refreshAdjustedGoal"
+      />
+    </div>
+
+    <div
+      v-else-if="goalStore.dashboardError || goalStore.goalsError"
+      class="flex min-h-[420px] items-center justify-center px-6"
+    >
+      <div class="text-center" role="alert">
+        <p class="text-base font-bold text-[#0a192f]">로드맵을 불러오지 못했어요</p>
+        <p class="pt-2 text-sm text-slate-500">잠시 후 다시 시도해주세요.</p>
+        <button
+          type="button"
+          class="mt-5 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white"
+          @click="retryGoalDashboard"
+        >
+          다시 시도
+        </button>
       </div>
     </div>
 
-    <!-- 모달 컴포넌트들 -->
-    <PacemakerSetupModal v-model="isPacemakerModalOpen" />
-    <TodayAvailableMoneyModal
-      v-model="isTodayAvailableMoneyModalOpen"
-      :daily="goalStore.dailyAvailableMoney ?? EMPTY_DAILY_AVAILABLE_MONEY"
-    />
-    <MonthlyAvailableMoneyModal
-      v-model="isMonthlyAvailableMoneyModalOpen"
-      :monthly="goalStore.monthlyAvailableMoney ?? EMPTY_MONTHLY_AVAILABLE_MONEY"
-    />
-    <LinkedAssetsModal v-model="isLinkedAssetsModalOpen" :assets="goalStore.assets" />
-    <MilestoneReportModal v-model="isMilestoneReportModalOpen" :milestone="selectedMilestone" />
-    <GoalStatusConfirmModal
-      v-model="isStatusConfirmModalOpen"
-      :mode="statusConfirmMode"
-      @confirm="handleStatusConfirm"
-    />
-    <ShareGoalModal
-      v-model="isShareGoalModalOpen"
-      :goal="goalStore.currentGoal"
-      :milestones="roadmapStore.milestones"
-    />
-    <GoalAchievementModal
-      v-model="isGoalAchievementModalOpen"
-      :goal="goalStore.currentGoal"
-      :is-adding="collectionStore.isAdding"
-      :error-message="achievementErrorMessage"
-      @add-to-collection="handleAddToCollection"
-      @later="handleAchievementLater"
-    />
-    <PacemakerAssistFlow
-      v-model="isPacemakerAssistFlowOpen"
-      :goal="assistFlowGoal"
-      @goal-adjusted="refreshAdjustedGoal"
-    />
-  </div>
-
-  <div
-    v-else-if="goalStore.dashboardError || goalStore.goalsError"
-    class="flex min-h-[420px] items-center justify-center px-6"
-  >
-    <div class="text-center" role="alert">
-      <p class="text-base font-black text-[#0a192f]">로드맵을 불러오지 못했어요</p>
-      <p class="pt-2 text-sm text-slate-500">잠시 후 다시 시도해주세요.</p>
-      <button
-        type="button"
-        class="mt-5 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white"
-        @click="retryGoalDashboard"
-      >
-        다시 시도
-      </button>
-    </div>
-  </div>
-
-  <div v-else class="flex min-h-[420px] items-center justify-center px-6 text-center">
-    <div class="max-w-[320px]">
-      <div
-        class="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-primary"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-6">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
+    <div v-else class="flex min-h-[420px] items-center justify-center px-6 text-center">
+      <div class="max-w-[320px]">
+        <div
+          class="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-primary"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-6">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </div>
+        <p class="text-base font-bold text-[#0a192f]">아직 등록된 목표가 없어요</p>
+        <p class="pt-1.5 text-sm text-slate-500">
+          첫 번째 목표를 설정하고 맞춤 로드맵을 시작해보세요.
+        </p>
+        <RouterLink
+          :to="{ name: ROUTE_NAMES.GOAL_SELECT }"
+          class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-xs transition hover:opacity-90"
+        >
+          새 목표 만들기
+        </RouterLink>
       </div>
-      <p class="text-base font-black text-[#0a192f]">아직 등록된 목표가 없어요</p>
-      <p class="pt-1.5 text-sm text-slate-500">
-        첫 번째 목표를 설정하고 맞춤 로드맵을 시작해보세요.
-      </p>
-      <RouterLink
-        :to="{ name: ROUTE_NAMES.GOAL_SELECT }"
-        class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-xs transition hover:opacity-90"
-      >
-        새 목표 만들기
-      </RouterLink>
     </div>
   </div>
 </template>
@@ -211,6 +190,7 @@ import {
   GoalAchievementModal,
 } from '@/features/roadmap'
 import { usePacemakerStore, PacemakerSetupModal } from '@/features/pacemaker'
+import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pacemaker.constants'
 import PacemakerAssistFlow from '@/pages/dashboard/components/PacemakerAssistFlow.vue'
 import { useModal } from '@/shared/composables/useModal'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -484,7 +464,7 @@ onMounted(async () => {
     if (pacemakerStore.pacemakerStatus?.registered) {
       pacemakerRequests.push(
         pacemakerStore.fetchPacemakerDashboard(),
-        pacemakerStore.fetchHistories({ page: 0, size: 31 })
+        pacemakerStore.fetchHistories({ page: 0, size: PACEMAKER_HISTORY_PAGE_SIZE })
       )
     }
 

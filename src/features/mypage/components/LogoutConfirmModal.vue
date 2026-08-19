@@ -8,7 +8,7 @@
     :show-header="false"
   >
     <div class="px-7 pb-3 pt-7">
-      <h2 id="logout-modal-title" class="text-lg font-black text-[#0a192f]">
+      <h2 id="logout-modal-title" class="text-lg font-bold text-[#0a192f]">
         로그아웃하시겠습니까?
       </h2>
       <p id="logout-modal-description" class="mt-1.5 text-sm leading-relaxed text-slate-500">

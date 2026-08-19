@@ -23,7 +23,7 @@
             {{ isPaused(goal.status) ? '일시 정지' : '진행 중' }}
           </span>
         </div>
-        <p class="mt-0.5 text-sm font-black text-[#0a192f]">
+        <p class="mt-0.5 text-sm font-bold text-[#0a192f]">
           {{ goal.goalName }} {{ formatKRWCompact(goal.goalAmount) }} ·
           {{ goal.period.goalMonths }}개월
         </p>
@@ -33,7 +33,7 @@
         </p>
       </div>
       <div v-else class="min-w-0 flex-1">
-        <p class="text-sm font-black text-[#0a192f]">
+        <p class="text-sm font-bold text-[#0a192f]">
           {{
             loading
               ? '목표를 확인하고 있어요'

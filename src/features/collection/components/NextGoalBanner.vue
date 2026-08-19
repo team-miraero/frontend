@@ -5,7 +5,7 @@
   >
     <!-- 좌측 문구 영역 -->
     <div class="max-w-xl">
-      <h3 class="text-base sm:text-lg font-black tracking-tight text-[#0a192f]">
+      <h3 class="text-base sm:text-lg font-bold tracking-tight text-[#0a192f]">
         다음 목표도 페이스메이커와 함께 달려요
       </h3>
       <p class="mt-1 text-xs font-medium text-slate-500 sm:text-sm">

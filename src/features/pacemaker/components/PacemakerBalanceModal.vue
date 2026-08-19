@@ -8,7 +8,7 @@
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
       <div>
         <p class="text-xs font-bold text-slate-400">페이스메이커 전용 저금통</p>
-        <h3 class="pt-0.5 text-base font-black text-[#0a192f]">지금까지 모인 여유자금</h3>
+        <h3 class="pt-0.5 text-base font-bold text-[#0a192f]">지금까지 모인 여유자금</h3>
       </div>
       <button
         type="button"
@@ -29,7 +29,7 @@
       >
         <span class="absolute -right-6 -top-7 size-24 rounded-full bg-white/10" />
         <p class="relative text-xs font-bold text-white/80">페이스메이커 저금통 잔액</p>
-        <p class="relative pt-1 text-[28px] font-black tracking-[-0.84px] text-white">
+        <p class="relative pt-1 text-[28px] font-bold tracking-tight text-white">
           {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="text-base"> 원</span>
         </p>
         <div class="relative flex items-center gap-2 pt-2 text-xs text-white/70">
@@ -88,14 +88,14 @@
       </p>
 
       <div>
-        <p class="pb-2 text-xs font-bold text-slate-500">연동된 목표 계좌 · 입금 가능</p>
+        <p class="pb-2 text-xs font-bold text-slate-500">연동된 목표 자산 · 입금 가능</p>
         <div class="flex flex-col gap-2">
           <div
             v-if="depositTargetsError"
             class="rounded-2xl border border-red-200 bg-red-50 px-4 py-5 text-center"
             role="alert"
           >
-            <p class="text-xs font-bold text-red-600">입금 계좌를 불러오지 못했어요.</p>
+            <p class="text-xs font-bold text-red-600">입금 대상을 불러오지 못했어요.</p>
             <button
               type="button"
               class="mt-3 rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
@@ -110,7 +110,7 @@
             class="rounded-2xl border border-slate-200 px-4 py-5 text-center text-xs text-slate-400"
             role="status"
           >
-            입금 계좌를 불러오는 중이에요.
+            입금 대상을 불러오는 중이에요.
           </p>
           <div
             v-for="goal in depositTargetsError || isDepositTargetsLoading ? [] : depositTargets"
@@ -125,17 +125,21 @@
               </span>
               <div>
                 <p class="text-xs font-bold text-[#0a192f]">{{ goal.goalName }}</p>
-                <p v-if="goal.withdrawalAccounts?.[0]" class="text-xs text-slate-400">
-                  {{ goal.withdrawalAccounts[0].financialInstitutionName ?? '입금 계좌' }}
-                  {{ goal.withdrawalAccounts[0].maskedAccountNumber ?? '' }}
+                <p v-if="goal.depositAssets?.[0]" class="text-xs text-slate-400">
+                  {{
+                    goal.depositAssets[0].assetType === 'MONEY_BOX'
+                      ? '저금통'
+                      : (goal.depositAssets[0].financialInstitutionName ?? '연결 계좌')
+                  }}
+                  {{ goal.depositAssets[0].maskedAccountNumber ?? '' }}
                 </p>
-                <p v-else class="text-xs text-slate-400">연결된 입금 계좌 없음</p>
+                <p v-else class="text-xs text-slate-400">연결된 입금 자산 없음</p>
               </div>
             </div>
             <button
               type="button"
               class="rounded-full px-3 py-1.5 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="!goal.withdrawalAccounts?.length"
+              :disabled="!goal.depositAssets?.length"
               style="
                 background-image: linear-gradient(
                   149deg,
@@ -152,7 +156,7 @@
             v-if="!depositTargetsError && !isDepositTargetsLoading && depositTargets.length === 0"
             class="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-center text-xs text-slate-400"
           >
-            연결된 입금 계좌가 없어요.
+            연결된 입금 자산이 없어요.
           </p>
         </div>
       </div>
@@ -162,7 +166,7 @@
         class="rounded-2xl border border-primary/20 bg-primary/[0.06] py-3 text-sm font-bold text-primary"
         @click="$emit('view-history')"
       >
-        전체 자동 저축 내역 보기
+        최근 자동 저축 내역 보기
       </button>
     </div>
   </BaseModal>

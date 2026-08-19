@@ -4,7 +4,6 @@
       :goals="goals"
       :selected-goal-id="selectedGoalId"
       :disabled="areGoalsLoading"
-      :helper-text="roadmapHelperText"
       :trailing-text="myDataStatusText"
       @update:selected-goal-id="$emit('select-goal', $event)"
     />
@@ -99,10 +98,6 @@ const props = defineProps({
 })
 
 defineEmits(['select-goal'])
-
-const roadmapHelperText = computed(() =>
-  props.selectedGoal ? `‘${props.selectedGoal}’ 로드맵 기준으로 계산돼요` : ''
-)
 
 const hasNumericGoalId = computed(() => {
   const goalId = Number(props.selectedGoalId)

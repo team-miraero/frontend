@@ -15,7 +15,7 @@
       </div>
 
       <h1
-        class="text-xl font-black leading-tight tracking-[-0.6px] text-[#0a192f] sm:text-2xl sm:leading-snug md:text-3xl break-keep"
+        class="text-xl font-bold leading-tight tracking-tight text-[#0a192f] sm:text-2xl sm:leading-snug md:text-3xl break-keep"
       >
         총 <span class="text-primary">{{ totalCount }}개</span>의 로드맵을 성공적으로 완주했어요
       </h1>
@@ -28,14 +28,14 @@
       <div class="mt-1.5 grid w-full grid-cols-2 gap-2.5 sm:w-fit sm:flex sm:items-center sm:gap-3">
         <div class="flex flex-col rounded-2xl border border-slate-100 bg-[#f8fbff] px-4 py-2.5 shadow-2xs">
           <span class="text-[11px] font-bold text-slate-400">총 완주 금액</span>
-          <span class="mt-0.5 text-base sm:text-lg font-black tracking-tight text-[#0a192f]">
+          <span class="mt-0.5 text-base sm:text-lg font-bold tracking-tight text-[#0a192f]">
             {{ formatManwon(totalAmount) }}<span class="text-xs font-bold text-slate-400 ml-0.5">만원</span>
           </span>
         </div>
 
         <div class="flex flex-col rounded-2xl border border-slate-100 bg-[#f8fbff] px-4 py-2.5 shadow-2xs">
           <span class="text-[11px] font-bold text-slate-400">완주한 목표</span>
-          <span class="mt-0.5 text-base sm:text-lg font-black tracking-tight text-[#0a192f]">
+          <span class="mt-0.5 text-base sm:text-lg font-bold tracking-tight text-[#0a192f]">
             {{ totalCount }}<span class="text-xs font-bold text-slate-400 ml-0.5">개</span>
           </span>
         </div>

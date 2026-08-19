@@ -23,4 +23,5 @@ export const ROUTE_NAMES = {
   COACH: 'coach',
   MYPAGE: 'mypage',
   YOUTH_POLICY: 'youth-policy',
+  MENU: 'menu',
 }

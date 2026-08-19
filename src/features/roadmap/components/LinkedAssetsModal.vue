@@ -6,7 +6,7 @@
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-4 pt-6">
-      <h3 class="text-base font-black text-[#0a192f]">이 목표에 묶인 자금</h3>
+      <h3 class="text-base font-bold text-[#0a192f]">이 목표에 묶인 자금</h3>
       <button
         type="button"
         class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f8fbff]"
@@ -40,7 +40,7 @@
             </div>
           </div>
           <div class="text-right">
-            <p v-if="row.balance != null" class="text-sm font-black text-[#0a192f]">
+            <p v-if="row.balance != null" class="text-sm font-bold text-[#0a192f]">
               {{ formatKRWCompact(row.balance) }}
             </p>
             <p
@@ -89,11 +89,11 @@
     <div class="flex items-center justify-between border-t border-slate-100 bg-[#f8fbff] px-7 py-4">
       <div>
         <p class="text-xs text-slate-500">합계 잔액</p>
-        <p class="pt-0.5 text-sm font-black text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</p>
+        <p class="pt-0.5 text-sm font-bold text-[#0a192f]">{{ formatKRWCompact(totalBalance) }}</p>
       </div>
       <div class="text-right">
         <p class="text-xs text-slate-500">월 자동이체 합계</p>
-        <p class="pt-0.5 text-sm font-black text-primary">{{ formatKRW(totalAutoTransfer) }}</p>
+        <p class="pt-0.5 text-sm font-bold text-primary">{{ formatKRW(totalAutoTransfer) }}</p>
       </div>
     </div>
   </BaseModal>
@@ -156,8 +156,10 @@ const totalAutoTransfer = computed(() =>
 // 남은 개월수·일수: API가 만기일만 주고 가입일은 안 주기 때문에, Figma의 '가입일~만료일 진행바'는
 // 재현할 데이터가 없어 뺐다. 만기일 기준 카운트다운만 오늘 날짜로 계산한다.
 function computeMaturityCountdown(maturityDate) {
+  if (!maturityDate) return { months: 0, days: 0 }
   const today = new Date()
   const target = new Date(maturityDate)
+  if (Number.isNaN(target.getTime())) return { months: 0, days: 0 }
   const days = Math.max(0, Math.ceil((target - today) / (1000 * 60 * 60 * 24)))
   const months = Math.max(
     0,
@@ -167,6 +169,7 @@ function computeMaturityCountdown(maturityDate) {
 }
 
 function formatDate(yyyyMMdd) {
-  return yyyyMMdd.replaceAll('-', '.')
+  if (!yyyyMMdd) return ''
+  return String(yyyyMMdd).replace(/-/g, '.')
 }
 </script>

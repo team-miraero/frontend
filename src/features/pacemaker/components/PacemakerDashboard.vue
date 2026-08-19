@@ -1,15 +1,14 @@
 <template>
-  <div class="page-container-narrow pb-10 pt-4 sm:pb-14 sm:pt-6 flex flex-col gap-6 sm:gap-8">
+  <div class="page-container-narrow pb-10 pt-3 sm:pb-14 sm:pt-6 flex flex-col gap-4 sm:gap-6">
     <div class="flex items-center justify-between gap-2.5 sm:gap-4">
       <div class="min-w-0 flex-1">
-        <p class="mb-0.5 text-xs font-bold text-slate-400 sm:mb-1">페이스메이커 저금통</p>
-        <h2 class="text-xl font-black tracking-tight text-[#0a192f] whitespace-nowrap sm:text-2xl">
+        <h2 class="text-xl font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-2xl">
           오늘까지 모인 여유자금
         </h2>
       </div>
       <button
         type="button"
-        class="shrink-0 rounded-full border border-[#c5dcff] bg-[#eaf2ff] px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-[#dceaff] active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:px-4 sm:py-2 cursor-pointer select-none"
+        class="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition hover:bg-slate-50 active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:px-4 sm:py-2 cursor-pointer select-none"
         @click="$emit('edit-max-amount')"
       >
         ⚙ 상한선 수정
@@ -38,11 +37,11 @@
               {{ pacemaker.maskedAccountNumber }}
             </span>
           </p>
-          <span class="rounded-full bg-white/20 px-2 py-1 text-[10px] font-black">
+          <span class="rounded-full bg-white/20 px-2 py-1 text-[10px] font-bold">
             자동저축 {{ isActive ? 'ON' : 'OFF' }}
           </span>
         </div>
-        <p class="mt-1 text-[34px] font-black tracking-[-0.04em] sm:text-[36px]">
+        <p class="mt-1 text-[34px] font-bold tracking-tight sm:text-[36px]">
           {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="ml-1 text-xl">원</span>
         </p>
         <p class="mt-1 text-xs text-white/70">
@@ -75,7 +74,7 @@
     </section>
 
     <section
-      class="rounded-[20px] border border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5"
+      class="rounded-[20px] border border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 shadow-xs"
       aria-labelledby="streak-title"
     >
       <div class="mb-4 flex flex-col gap-1">
@@ -87,7 +86,7 @@
             :aria-label="isMonthlyStreak ? '주간 스트릭 보기로 전환' : '월간 달력 보기로 전환'"
             @click="isMonthlyStreak = !isMonthlyStreak"
           >
-            <h3 id="streak-title" class="truncate text-sm sm:text-base font-black text-[#0a192f] transition-colors group-hover:text-primary">
+            <h3 id="streak-title" class="truncate text-sm sm:text-base font-bold text-[#0a192f] transition-colors group-hover:text-primary">
               {{ isMonthlyStreak ? '이번 달 자동 저축 달력' : '이번 주 자동 저축 스트릭' }}
             </h3>
             <span
@@ -108,7 +107,7 @@
 
           <!-- 🔥 연속 일수 뱃지 -->
           <span
-            class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-black shadow-2xs whitespace-nowrap transition-colors"
+            class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold shadow-2xs whitespace-nowrap transition-colors"
             :class="
               pacemaker.currentStreak > 0
                 ? 'bg-orange-50 border border-orange-200/80 text-orange-600'
@@ -158,7 +157,7 @@
       <div v-if="!isMonthlyStreak" class="grid grid-cols-7 gap-1.5 sm:gap-2">
         <div v-for="day in weekDays" :key="day.label" class="flex flex-col items-center gap-1 sm:gap-1.5">
           <div
-            class="flex size-8 sm:size-10 items-center justify-center rounded-full text-xs font-black transition-all duration-150"
+            class="flex size-8 sm:size-10 items-center justify-center rounded-full text-xs font-bold transition-all duration-150"
             :class="
               day.status === 'SUCCESS'
                 ? 'bg-primary text-white shadow-xs scale-105'
@@ -203,20 +202,20 @@
 
       <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400 border-t border-slate-100 pt-3">
         <span>{{ monthLabel }} 자동 저축</span>
-        <span class="font-black text-primary">{{ formatNumber(monthlySuccessCount) }}회 성공</span>
+        <span class="font-bold text-primary">{{ formatNumber(monthlySuccessCount) }}회 성공</span>
       </div>
     </section>
 
     <section aria-labelledby="goal-accounts-title">
-      <h3 id="goal-accounts-title" class="mb-3 text-sm font-black text-[#0a192f]">
-        목표별 입금 계좌
+      <h3 id="goal-accounts-title" class="mb-2.5 px-0.5 text-base font-bold text-[#0a192f] sm:text-lg">
+        목표별 입금 자산
       </h3>
       <div
         v-if="pacemakerStore.depositTargetsError"
         class="rounded-[18px] border border-red-200 bg-red-50 px-5 py-6 text-center"
         role="alert"
       >
-        <p class="text-sm font-bold text-red-600">입금 계좌를 불러오지 못했어요.</p>
+        <p class="text-sm font-bold text-red-600">입금 대상을 불러오지 못했어요.</p>
         <button
           type="button"
           class="mt-3 rounded-full border border-red-200 bg-white px-4 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
@@ -231,13 +230,13 @@
         class="rounded-[18px] border border-slate-200 bg-white px-5 py-8 text-center text-sm text-slate-400"
         role="status"
       >
-        입금 계좌를 불러오는 중이에요.
+        입금 대상을 불러오는 중이에요.
       </div>
       <div v-else-if="accountGroups.length" class="flex flex-col gap-3">
         <article
           v-for="group in accountGroups"
           :key="group.goalId"
-          class="flex flex-col gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 sm:px-5"
+          class="flex flex-col gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 sm:px-5 shadow-xs"
         >
           <div class="flex items-center justify-between gap-3">
             <div class="flex min-w-0 items-center gap-3">
@@ -247,73 +246,55 @@
                 <GoalTypeIcon :goal-type="group.goalType" />
               </div>
               <div class="min-w-0">
-                <p class="truncate text-sm font-black text-[#0a192f]">{{ group.goalName }}</p>
+                <p class="truncate text-sm font-bold text-[#0a192f]">{{ group.goalName }}</p>
                 <p class="truncate text-xs text-slate-400">
-                  선택 계좌:
-                  {{ selectedWithdrawalAccount(group)?.financialInstitutionName ?? '출금계좌' }}
-                  {{ selectedWithdrawalAccount(group)?.maskedAccountNumber ?? '' }}
+                  목표에 바로 입금돼요
                 </p>
               </div>
             </div>
             <button
               type="button"
               class="shrink-0 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-[0_3px_10px_rgba(0,102,255,0.2)] transition hover:bg-[#0055dd] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
-              :disabled="!pacemaker.moneyBoxBalance || !selectedWithdrawalAccount(group)?.accountId"
+              :disabled="!pacemaker.moneyBoxBalance || !selectedDepositAsset(group)?.assetId"
               @click="openDeposit(group)"
             >
               입금하기
             </button>
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              class="rounded-xl border border-[#c5dcff] bg-[#f8fbff] px-3 py-2.5 text-left disabled:cursor-default"
-              :disabled="(group.depositAssets?.length ?? 0) < 2"
-              :aria-expanded="expandedGoalId === group.goalId"
-              @click="toggleAssetList(group.goalId)"
-            >
-              <span class="flex items-center justify-between gap-2">
-                <span class="truncate text-xs text-slate-400">
-                  {{ depositAssetName(selectedDepositAsset(group)) }}
-                </span>
-                <span v-if="(group.depositAssets?.length ?? 0) > 1" class="text-xs text-slate-400">
-                  {{ expandedGoalId === group.goalId ? '⌃' : '⌄' }}
-                </span>
+          <button
+            type="button"
+            class="rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-2.5 text-left disabled:cursor-default"
+            :disabled="(group.depositAssets?.length ?? 0) < 2"
+            :aria-expanded="expandedGoalId === group.goalId"
+            @click="toggleAssetList(group.goalId)"
+          >
+            <span class="flex items-center justify-between gap-2">
+              <span class="truncate text-xs text-slate-400">
+                {{ depositAssetName(selectedDepositAsset(group)) }}
               </span>
-              <span class="mt-0.5 block text-sm font-black text-primary">
-                {{ formatCompactWon(selectedDepositAsset(group)?.balance) }}
+              <span v-if="(group.depositAssets?.length ?? 0) > 1" class="text-xs text-slate-400">
+                {{ expandedGoalId === group.goalId ? '⌃' : '⌄' }}
               </span>
-            </button>
-            <div class="rounded-xl border border-[#c5dcff] bg-[#f8fbff] px-3 py-2.5">
-              <span class="block truncate text-xs text-slate-400">연동 출금계좌</span>
-              <span class="mt-0.5 block text-sm font-black text-[#0a192f]">
-                {{ formatCompactWon(selectedWithdrawalAccount(group)?.balance) }}
-              </span>
-            </div>
-          </div>
+            </span>
+            <span class="mt-0.5 block text-sm font-bold text-primary">
+              {{ formatCompactWon(selectedDepositAsset(group)?.balance) }}
+            </span>
+          </button>
 
           <div v-if="expandedGoalId === group.goalId" class="grid gap-2">
             <button
               v-for="asset in selectableAssets(group)"
-              :key="asset.assetId"
+              :key="`${asset.assetType}-${asset.assetId}`"
               type="button"
-              class="grid w-full grid-cols-2 gap-2 text-left"
-              @click="selectDepositAsset(group.goalId, asset.assetId)"
+              class="w-full rounded-xl border border-[#edf2ff] bg-white px-3 py-2.5 text-left"
+              @click="selectDepositAsset(group.goalId, asset)"
             >
-              <span class="rounded-xl border border-[#edf2ff] bg-white px-3 py-2.5">
-                <span class="block truncate text-xs text-slate-400">
-                  {{ depositAssetName(asset) }}
-                </span>
-                <span class="mt-0.5 block text-sm font-black text-primary">
-                  {{ formatCompactWon(asset.balance) }}
-                </span>
+              <span class="block truncate text-xs text-slate-400">
+                {{ depositAssetName(asset) }}
               </span>
-              <span class="rounded-xl border border-[#edf2ff] bg-white px-3 py-2.5">
-                <span class="block truncate text-xs text-slate-400">연동 출금계좌</span>
-                <span class="mt-0.5 block text-sm font-black text-[#0a192f]">
-                  {{ formatCompactWon(withdrawalForAsset(group, asset)?.balance) }}
-                </span>
+              <span class="mt-0.5 block text-sm font-bold text-primary">
+                {{ formatCompactWon(asset.balance) }}
               </span>
             </button>
           </div>
@@ -323,7 +304,7 @@
         v-else
         class="rounded-[18px] border border-dashed border-slate-300 bg-white px-5 py-8 text-center text-sm text-slate-400"
       >
-        입금할 수 있는 목표 계좌가 아직 없어요.
+        입금할 수 있는 목표 자산이 아직 없어요.
       </div>
     </section>
 
@@ -331,7 +312,7 @@
       class="rounded-[20px] border border-slate-200 bg-white px-5 py-5 sm:px-6"
       aria-labelledby="history-title"
     >
-      <h3 id="history-title" class="mb-4 text-sm font-black text-[#0a192f]">
+      <h3 id="history-title" class="mb-4 text-sm font-bold text-[#0a192f]">
         이번 달 자동 저축 내역
       </h3>
       <div
@@ -367,7 +348,7 @@
             <p class="mt-0.5 truncate text-xs text-slate-400">{{ describeHistory(item) }}</p>
           </div>
           <span
-            class="shrink-0 text-sm font-black"
+            class="shrink-0 text-sm font-bold"
             :class="item.status === 'SAVED' ? 'text-primary' : 'text-slate-300'"
           >
             {{ item.status === 'SAVED' ? `+${formatNumber(item.amount)}원` : '—' }}
@@ -400,6 +381,7 @@ import { usePacemakerDeposit } from '@/features/pacemaker/composables/usePacemak
 import PacemakerDepositModal from '@/features/pacemaker/components/PacemakerDepositModal.vue'
 import PacemakerDepositSuccessModal from '@/features/pacemaker/components/PacemakerDepositSuccessModal.vue'
 import { useModal } from '@/shared/composables/useModal'
+import { getLocalDateKey } from '@/shared/lib/date'
 import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
 defineEmits(['edit-max-amount'])
@@ -432,19 +414,19 @@ const isMonthlyStreak = ref(false)
 const { isOpen: isDepositModalOpen, open: openDepositModal } = useModal()
 const { isOpen: isDepositSuccessModalOpen, open: openDepositSuccessModal } = useModal()
 
-const dashboard = computed(() => pacemakerStore.pacemakerDashboard)
 const pacemaker = computed(() => pacemakerStore.pacemakerView)
 const isActive = computed(() => pacemaker.value.status === 'ACTIVE')
 const recentHistories = computed(() => pacemakerStore.histories.slice(0, 5))
-const weeklyStreak = computed(() => dashboard.value?.weeklyStreak ?? [])
-const referenceDate = computed(
-  () => dashboard.value?.todaySaving?.savingDate ?? getLocalDateKey(new Date())
-)
+const weeklyStreak = computed(() => pacemaker.value.weeklyStreak ?? [])
+// 서버는 오늘 날짜를 별도로 내려주지 않으므로 로컬 오늘 날짜를 기준일로 쓴다.
+const referenceDate = computed(() => getLocalDateKey(new Date()))
 const weekDays = computed(() => {
   const byDay = new Map(weeklyStreak.value.map((day) => [day.dayOfWeek, day]))
   return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].map(
     (dayOfWeek) => ({
-      ...(byDay.get(dayOfWeek) ?? { status: 'FAIL' }),
+      ...byDay.get(dayOfWeek),
+      // 서버는 saved(boolean)로 내려주므로 기존 화면 로직이 쓰는 SUCCESS/FAIL 표기로 맞춘다.
+      status: byDay.get(dayOfWeek)?.saved ? 'SUCCESS' : 'FAIL',
       label: DAY_OF_WEEK_LABEL[dayOfWeek],
     })
   )
@@ -479,27 +461,22 @@ const monthlySuccessCount = computed(() => pacemaker.value.monthlySuccessCount)
 
 const accountGroups = computed(() => pacemakerStore.depositTargets)
 
+// 계좌/저금통은 별도 ID 체계라 assetId만으로는 충돌할 수 있어 assetType까지 묶어 키로 쓴다.
+function assetKey(asset) {
+  return asset ? `${asset.assetType}-${asset.assetId}` : null
+}
+
 function selectedDepositAsset(group) {
-  const selectedId = selectedAssetIds.value[group.goalId] ?? group.depositAssets?.[0]?.assetId
+  const selectedKey = selectedAssetIds.value[group.goalId]
   return (
-    group.depositAssets?.find((asset) => asset.assetId === selectedId) ?? group.depositAssets?.[0]
+    group.depositAssets?.find((asset) => assetKey(asset) === selectedKey) ??
+    group.depositAssets?.[0]
   )
 }
 
 function selectableAssets(group) {
-  const selectedAssetId = selectedDepositAsset(group)?.assetId
-  return group.depositAssets?.filter((asset) => asset.assetId !== selectedAssetId) ?? []
-}
-
-function withdrawalForAsset(group, asset) {
-  const assetIndex = group.depositAssets?.findIndex((item) => item.assetId === asset?.assetId) ?? -1
-  return assetIndex >= 0
-    ? (group.withdrawalAccounts?.[assetIndex] ?? group.withdrawalAccounts?.[0])
-    : group.withdrawalAccounts?.[0]
-}
-
-function selectedWithdrawalAccount(group) {
-  return withdrawalForAsset(group, selectedDepositAsset(group))
+  const selectedKey = assetKey(selectedDepositAsset(group))
+  return group.depositAssets?.filter((asset) => assetKey(asset) !== selectedKey) ?? []
 }
 
 // 왼쪽 카드에 표시할 계좌명을 계좌 상세 API(/accounts/{accountId})에서 조회해 캐시해둠
@@ -517,9 +494,12 @@ watch(
   { immediate: true }
 )
 
+// LOAN/ACCOUNT/MONEY_BOX가 같은 숫자 assetId 공간을 공유할 수 있어(서버 스펙 확인됨),
+// ACCOUNT 전용 캐시(accountDetails)는 assetType이 ACCOUNT일 때만 조회한다.
 function depositAssetName(asset) {
   if (!asset) return '입금 자산'
   if (asset.assetType === 'MONEY_BOX') return '저금통'
+  if (asset.assetType === 'LOAN') return asset.financialInstitutionName ?? '대출 계좌'
   const accountName = pacemakerStore.accountDetails[asset.assetId]?.accountName
   return accountName ?? asset.financialInstitutionName ?? '입금 계좌'
 }
@@ -528,13 +508,13 @@ function toggleAssetList(goalId) {
   expandedGoalId.value = expandedGoalId.value === goalId ? null : goalId
 }
 
-function selectDepositAsset(goalId, assetId) {
-  selectedAssetIds.value = { ...selectedAssetIds.value, [goalId]: assetId }
+function selectDepositAsset(goalId, asset) {
+  selectedAssetIds.value = { ...selectedAssetIds.value, [goalId]: assetKey(asset) }
   expandedGoalId.value = null
 }
 
 function openDeposit(group) {
-  openDepositTarget(group, selectedWithdrawalAccount(group)?.accountId)
+  openDepositTarget(group, selectedDepositAsset(group))
   openDepositModal()
 }
 
@@ -547,13 +527,6 @@ function handleDeposit(payload) {
 
 function formatNumber(amount) {
   return Number(amount ?? 0).toLocaleString('ko-KR')
-}
-
-function getLocalDateKey(date) {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
 }
 
 function formatCompactWon(amount) {

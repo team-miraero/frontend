@@ -18,7 +18,7 @@
     </div>
 
     <div class="flex flex-col gap-1 max-w-xs px-4">
-      <p class="text-sm font-black text-[#0a192f]">{{ message }}</p>
+      <p class="text-sm font-bold text-[#0a192f]">{{ message }}</p>
       <p v-if="subMessage" class="text-xs font-medium text-slate-400">{{ subMessage }}</p>
     </div>
   </div>

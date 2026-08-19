@@ -7,7 +7,7 @@
   >
     <div class="flex flex-col gap-5 px-7 pb-6 pt-7">
       <div>
-        <h3 class="text-lg font-black tracking-[-0.36px] text-[#0a192f]">{{ copy.title }}</h3>
+        <h3 class="text-lg font-bold tracking-tight text-[#0a192f]">{{ copy.title }}</h3>
         <p class="pt-2.5 text-sm leading-[22.75px] text-[#4a5568]">
           {{ copy.descBefore }}<strong class="font-bold">{{ copy.descStrong }}</strong
           >{{ copy.descAfter }}

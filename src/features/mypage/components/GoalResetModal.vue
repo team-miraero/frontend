@@ -8,7 +8,7 @@
     <template #heading>
       <div>
         <p class="text-xs font-semibold text-slate-400">{{ goal?.goalName }} 목표</p>
-        <h2 id="goal-reset-modal-title" class="mt-0.5 text-base font-black text-[#0a192f]">
+        <h2 id="goal-reset-modal-title" class="mt-0.5 text-base font-bold text-[#0a192f]">
           목표 재설정
         </h2>
       </div>

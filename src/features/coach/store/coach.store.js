@@ -24,6 +24,11 @@ export const useCoachStore = defineStore('feature-coach', () => {
   const isSending = ref(false)
   const isLoadingConversations = ref(false)
   const isLoadingMessages = ref(false)
+  const isSidebarOpen = ref(false)
+
+  function toggleSidebar(val) {
+    isSidebarOpen.value = typeof val === 'boolean' ? val : !isSidebarOpen.value
+  }
 
   function $reset() {
     conversations.value = []
@@ -33,6 +38,7 @@ export const useCoachStore = defineStore('feature-coach', () => {
     isSending.value = false
     isLoadingConversations.value = false
     isLoadingMessages.value = false
+    isSidebarOpen.value = false
   }
 
   /**
@@ -191,6 +197,8 @@ export const useCoachStore = defineStore('feature-coach', () => {
     isSending,
     isLoadingConversations,
     isLoadingMessages,
+    isSidebarOpen,
+    toggleSidebar,
     fetchConversations,
     selectConversation,
     createNewConversation,
