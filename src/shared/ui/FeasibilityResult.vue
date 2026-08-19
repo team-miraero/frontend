@@ -363,7 +363,6 @@ const statusBoxClass = computed(() =>
 
 const availableValueLabel = computed(() => formatKRWCompact(props.availableAmount))
 const requiredValueLabel = computed(() => formatKRWCompact(props.requiredAmount))
-const differenceTitle = computed(() => `실현 가능성 ${feasibilityRate.value}%`)
 
 const RECALCULATED_BOX_CLASS = {
   success: { bg: 'border-emerald-200 bg-emerald-50/80', value: 'text-emerald-600' },

@@ -14,7 +14,6 @@
  * @property {'success' | 'warning' | 'danger'} status
  */
 
-const WARNING_RATIO_LIMIT = 1.2
 
 /**
  * @param {FeasibilityStatusInput} params
