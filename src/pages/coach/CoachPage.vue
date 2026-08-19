@@ -70,7 +70,10 @@
           />
 
           <!-- AI 답변 생성 중 (생각 중 / 타이핑 인디케이터 말풍선) -->
-          <div v-if="coachStore.isSending" class="flex w-full items-end gap-2.5 justify-start">
+          <div
+            v-if="coachStore.isSending && coachStore.messages.at(-1)?.content.length === 0"
+            class="flex w-full items-end gap-2.5 justify-start"
+          >
             <div class="mb-0.5 shrink-0">
               <div
                 class="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#66b2ff] drop-shadow-[0_2px_5px_rgba(0,102,255,0.28)]"

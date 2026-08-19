@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import * as coachApi from '@/features/coach/api/coach.api'
 import { CHAT_ROLES } from '@/features/coach/constants/coach.constants'
+import { useAuthStore } from '@/stores/auth.store'
 
 /**
  * @typedef {Object} ChatMessage
@@ -153,15 +154,30 @@ export const useCoachStore = defineStore('feature-coach', () => {
     if (!text || isSending.value || !currentConversationId.value) return
 
     messages.value.push(createLocalMessage(CHAT_ROLES.USER, text))
+    messages.value.push(createLocalMessage(CHAT_ROLES.ASSISTANT, ''))
+    const assistantMessage = messages.value[messages.value.length - 1]
     draftInput.value = ''
     isSending.value = true
 
     try {
-      const reply = await coachApi.sendMessage({
-        conversationId: currentConversationId.value,
-        message: text,
-      })
-      messages.value.push(createLocalMessage(CHAT_ROLES.ASSISTANT, reply.message))
+      const completedMessage = await coachApi.sendMessageStream(
+        {
+          conversationId: currentConversationId.value,
+          message: text,
+        },
+        useAuthStore().accessToken,
+        {
+          onDelta: (delta) => {
+            assistantMessage.content += delta
+          },
+        }
+      )
+      assistantMessage.id = completedMessage.aiCoachMessageId ?? assistantMessage.id
+      assistantMessage.content = completedMessage.content ?? assistantMessage.content
+      assistantMessage.createdAt = completedMessage.createdAt ?? assistantMessage.createdAt
+    } catch (err) {
+      messages.value = messages.value.filter((message) => message.id !== assistantMessage.id)
+      throw err
     } finally {
       isSending.value = false
     }
