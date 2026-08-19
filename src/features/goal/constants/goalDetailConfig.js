@@ -30,7 +30,7 @@ export const GOAL_DETAIL_CONFIG = {
   [GOAL_PRESET_IDS.INDEPENDENCE]: {
     title: '얼마를, 언제까지\n모을까요?',
     amountFieldType: 'input',
-    amountLabel: '보증금 목표금액',
+    amountLabel: '독립자금 마련 목표금액',
     amountPresets: [
       { label: '1,000만원', value: 10000000 },
       { label: '2,000만원', value: 20000000 },

@@ -24,9 +24,9 @@
             class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
           >
             <div class="flex items-center justify-between">
-              <label class="text-sm font-black text-gray-900">남은 대출 잔액 (원금)</label>
+              <label class="text-sm font-bold text-gray-900">남은 대출 잔액 (원금)</label>
               <span
-                class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-black text-emerald-600"
+                class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-600"
               >
                 <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 마이데이터 자동 연동
@@ -39,7 +39,7 @@
                 :value="formatInputNumber(amount)"
                 type="text"
                 inputmode="numeric"
-                class="w-full bg-transparent text-xl font-black text-gray-900 outline-none"
+                class="w-full bg-transparent text-xl font-bold text-gray-900 outline-none"
                 @input="handleAmountInput"
               />
               <span class="shrink-0 text-sm font-bold text-slate-400">원</span>
@@ -68,8 +68,8 @@
             class="rounded-3xl border border-primary/20 bg-white p-5 sm:p-6 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
           >
             <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
-              <h3 class="text-base font-black text-gray-900">이자 포함 상환 계획</h3>
-              <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-primary">
+              <h3 class="text-base font-bold text-gray-900">이자 포함 상환 계획</h3>
+              <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-primary">
                 연 1.7% 고정
               </span>
             </div>
@@ -99,11 +99,11 @@
               class="mt-4 rounded-2xl bg-blue-50/70 border border-blue-100 p-4 flex items-center justify-between"
             >
               <div>
-                <p class="text-xs font-black text-gray-900">총 갚아야 할 금액</p>
+                <p class="text-xs font-bold text-gray-900">총 갚아야 할 금액</p>
                 <p class="text-[11px] text-slate-400 mt-0.5">원금 + 이자 합계</p>
               </div>
               <div class="text-right">
-                <p class="text-lg sm:text-xl font-black text-primary">
+                <p class="text-lg sm:text-xl font-bold text-primary">
                   약 {{ formatKRWCompact(loanResult.totalPayment) }}
                 </p>
                 <p class="text-[11px] text-slate-400 mt-0.5">
@@ -125,7 +125,7 @@
             <!-- 1) 목표 금액 -->
             <div>
               <div class="flex items-center justify-between mb-2">
-                <label class="text-sm font-black text-gray-900">
+                <label class="text-sm font-bold text-gray-900">
                   {{ config.amountLabel }}
                 </label>
               </div>
@@ -140,7 +140,7 @@
                     type="text"
                     inputmode="numeric"
                     placeholder="0"
-                    class="w-full bg-transparent text-xl font-black text-gray-900 outline-none"
+                    class="w-full bg-transparent text-xl font-bold text-gray-900 outline-none"
                     @input="handleAmountInput"
                   />
                   <span class="shrink-0 text-sm font-bold text-slate-400">원</span>
@@ -182,7 +182,7 @@
                     type="text"
                     inputmode="numeric"
                     placeholder="0"
-                    class="w-full bg-transparent text-xl font-black text-gray-900 outline-none"
+                    class="w-full bg-transparent text-xl font-bold text-gray-900 outline-none"
                     @input="handleAmountInput"
                   />
                   <span class="shrink-0 text-sm font-bold text-slate-400">원</span>
@@ -220,10 +220,10 @@
             <!-- 2) 모으는 기간 -->
             <div>
               <div class="flex items-center justify-between mb-2">
-                <label class="text-sm font-black text-gray-900">
+                <label class="text-sm font-bold text-gray-900">
                   {{ config.periodLabel }}
                 </label>
-                <span class="text-sm font-black text-gray-900">
+                <span class="text-sm font-bold text-gray-900">
                   {{ formatPeriodHuman(months) }}
                 </span>
               </div>
@@ -316,11 +316,11 @@
 
           <!-- 카드 2: [매달 모을 돈 & 시뮬레이션 결과 카드] -->
           <div
-            class="rounded-3xl border border-primary/25 bg-gradient-to-br from-blue-50/90 via-white to-indigo-50/40 p-4 shadow-[0_4px_24px_rgba(15,35,70,0.04)] sm:p-5"
+            class="rounded-3xl border border-primary/25 bg-gradient-to-br from-blue-50/90 via-white to-indigo-50/40 p-5 shadow-[0_4px_24px_rgba(15,35,70,0.04)]"
           >
             <div>
               <p class="text-xs font-semibold text-slate-500">월 예상 저축액</p>
-              <p class="mt-1 text-2xl font-black text-primary sm:text-[26px]">
+              <p class="mt-1 text-2xl font-bold text-primary sm:text-[26px]">
                 매달 약 {{ monthlyAmountLabel }}
               </p>
               <p class="mt-1 text-xs font-medium text-slate-400">
