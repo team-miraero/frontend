@@ -69,14 +69,13 @@ function mapCategoryIds(items) {
  * Swagger DTO를 기존 Spending 화면 모델로 변환한다.
  * Swagger 금액은 원, 현재 화면 금액은 만원 단위다.
  */
-export function mapSpendingSummary({ dashboard, goal, availableMoney, peerAverage, peerAverageError }) {
+export function mapSpendingSummary({ dashboard, goal, availableMoney }) {
   const monthChanges = Array.isArray(dashboard?.categoryMonthChanges)
     ? dashboard.categoryMonthChanges
     : []
   const threeMonthAverages = Array.isArray(dashboard?.categoryThreeMonthAverages?.categories)
     ? dashboard.categoryThreeMonthAverages.categories
     : []
-  const peerAverageCategories = Array.isArray(peerAverage?.categories) ? peerAverage.categories : []
 
   const currentMonthTotal = monthChanges.reduce(
     (total, category) => total + toFiniteNumber(category?.currentMonthAmount),
@@ -109,8 +108,6 @@ export function mapSpendingSummary({ dashboard, goal, availableMoney, peerAverag
     categoryIds: mapCategoryIds(monthChanges),
     previousMonthCategorySpending: mapCategoryAmounts(monthChanges, 'previousMonthAmount'),
     recentThreeMonthAverageSpending: mapCategoryAmounts(threeMonthAverages, 'averageMonthlyAmount'),
-    peerAverageSpending: mapCategoryAmounts(peerAverageCategories, 'peerAverageAmount'),
-    peerAverageError: Boolean(peerAverageError),
     // TODO: Swagger에 마이데이터 연동 여부 필드 없음
     myDataLinked: null,
   }
@@ -129,23 +126,12 @@ export async function getSpendingSummary(goalId) {
     client.get(`/goals/${numericGoalId}/available-money/monthly`),
   ])
 
-  let peerAverage = null
-  let peerAverageError = false
-  try {
-    const { data: peerAverageResponse } = await client.get('/expense-analysis/peer-average')
-    peerAverage = unwrapApiData(peerAverageResponse)
-  } catch {
-    peerAverageError = true
-  }
-
   return mapSpendingSummary({
     dashboard: unwrapApiData(dashboardResponse.data),
     goal: unwrapApiData(goalResponse.data),
     // 현재 Swagger는 이 endpoint를 공통 wrapper 없이 직접 DTO로 정의한다.
     // 런타임 응답이 wrapper인 환경도 공통 유틸이 함께 처리한다.
     availableMoney: unwrapApiData(availableMoneyResponse.data),
-    peerAverage,
-    peerAverageError,
   })
 }
 
