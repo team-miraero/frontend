@@ -4,9 +4,7 @@
     <!-- 헤더 (모바일 한 줄 최적화 레이아웃) -->
     <div class="flex items-center justify-between gap-2 pb-3 sm:pb-3.5">
       <div class="flex min-w-0 items-baseline gap-2">
-        <h3
-          class="text-base font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-lg"
-        >
+        <h3 class="text-base font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-lg">
           스플릿 기록
         </h3>
         <p class="text-xs font-medium text-slate-400 truncate whitespace-nowrap sm:text-xs">
@@ -119,7 +117,7 @@
                 v-if="milestone.status === 'COMPLETED'"
                 class="font-semibold text-primary shrink-0"
               >
-                달성 완료 🎉
+                달성 완료
               </span>
               <span v-else class="transition-colors group-hover:text-slate-600 shrink-0"
                 >도전 대기 중</span
