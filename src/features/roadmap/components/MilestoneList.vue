@@ -124,9 +124,6 @@
               <span v-else class="transition-colors group-hover:text-slate-600 shrink-0"
                 >도전 대기 중</span
               >
-              <span v-if="milestone.targetDate" class="shrink-0 tabular-nums">{{
-                milestone.targetDate
-              }}</span>
             </div>
           </div>
         </button>
