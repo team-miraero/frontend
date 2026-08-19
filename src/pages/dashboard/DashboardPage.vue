@@ -37,6 +37,8 @@
             :current-amount="goalStore.currentGoal.currentAmount"
             :goal-amount="goalStore.currentGoal.goalAmount"
             :end-date="goalStore.currentGoal.period.endDate"
+            :goal-months="goalStore.currentGoal.period.goalMonths"
+            :remain-months="goalStore.currentGoal.period.remainMonths"
             :daily-available-money="goalStore.dailyAvailableMoney"
             :monthly-available-money="goalStore.monthlyAvailableMoney"
             :pacemaker="displayedPacemaker"
@@ -252,6 +254,7 @@ import {
   PACEMAKER_CHARACTER_IMAGE,
   getGoalCharacterImage,
 } from '@/features/roadmap/constants/goal-character.constants'
+import { PACE_STATE, derivePaceState } from '@/features/roadmap/constants/pace-state.constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -343,6 +346,10 @@ const dashboardErrorMessage = computed(() =>
 const paceLegendColiImage = PACEMAKER_CHARACTER_IMAGE
 const paceLegendGoalCharacterImage = computed(() => getGoalCharacterImage(displayedGoal.value?.goalType))
 
+// 화면 표시(배지/문구/CTA)와 클릭 동작이 서로 다른 상태값을 보고 어긋나지 않도록,
+// PaceBanner가 쓰는 것과 동일한 파생 상태를 여기서도 단일하게 계산해 재사용한다.
+const paceState = computed(() => derivePaceState(displayedGoal.value))
+
 function handleOpenTodayAvailableMoneyModal() {
   isTodayAvailableMoneyModalOpen.value = true
 }
@@ -414,8 +421,10 @@ async function retryPacemakerDashboard() {
 }
 
 // 뒤처진 목표는 대응전략으로 안내한다. 정상 페이스는 개설 여부에 따라 개설 안내 또는 메인 대시보드로 분기한다.
+// (화면에 "첫 저축 시작하기"라고 표시해놓고 클릭 시 BEHIND 대응 모달이 열리는 일이 없도록,
+//  버튼 문구를 정한 것과 동일한 paceState를 그대로 사용한다.)
 function handlePacemakerCtaClick() {
-  if (displayedPace.value?.paceStatus === 'BEHIND') {
+  if (paceState.value === PACE_STATE.BEHIND) {
     openPacemakerAssistFlow()
     return
   }

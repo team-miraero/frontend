@@ -37,6 +37,10 @@ defineProps({
     type: Array,
     required: true,
   },
+  pacemaker: {
+    type: Object,
+    default: null,
+  },
 })
 
 defineEmits(['open', 'open-detail'])

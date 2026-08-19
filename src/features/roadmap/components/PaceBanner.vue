@@ -87,27 +87,27 @@
             @click="$emit('view-roadmap')"
           >
             <div class="grid grid-cols-3 divide-x divide-slate-200/80 items-center">
-              <!-- 1. 현재 페이스 -->
+              <!-- 1. 현재 페이스: 누적 저축액이 아니라 실제 월평균 저축 속도(currentAmount ÷ 경과 개월) -->
               <div class="px-2 text-center sm:text-left sm:pl-3 sm:pr-2">
                 <span class="block text-[11px] font-medium text-slate-500">현재 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
                     class="text-xs font-bold tabular-nums text-[#0a192f] sm:text-sm md:text-base"
                   >
-                    {{ formatManwon(currentAmount) }}만원
+                    {{ formatManwon(paceMetrics.currentMonthlyPace) }}만원
                   </strong>
                   <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
               </div>
 
-              <!-- 2. 목표 페이스 -->
+              <!-- 2. 목표 페이스: 목표 금액 ÷ 전체 목표 개월 -->
               <div class="px-2 text-center sm:text-left sm:pl-4 sm:pr-2">
                 <span class="block text-[11px] font-medium text-slate-500">목표 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
                     class="text-xs font-bold tabular-nums text-slate-700 sm:text-sm md:text-base"
                   >
-                    {{ formatManwon(pace.expectedAmount) }}만원
+                    {{ formatManwon(paceMetrics.targetMonthlyPace) }}만원
                   </strong>
                   <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
@@ -123,7 +123,11 @@
                   >
                     {{ paceDifferenceLabel }}
                   </strong>
-                  <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
+                  <span
+                    v-if="paceState !== PACE_STATE.NOT_STARTED"
+                    class="text-[10px] font-normal text-slate-400 sm:text-xs"
+                    >/월</span
+                  >
                 </div>
               </div>
             </div>
@@ -288,7 +292,11 @@
 
 <script setup>
 import { computed } from 'vue'
-import { PACE_STATE, derivePaceState } from '@/features/roadmap/constants/pace-state.constants'
+import {
+  PACE_STATE,
+  derivePaceState,
+  deriveGoalPaceMetrics,
+} from '@/features/roadmap/constants/pace-state.constants'
 import { useCountUp } from '@/shared/composables/useCountUp'
 
 const props = defineProps({
@@ -299,11 +307,22 @@ const props = defineProps({
   currentAmount: { type: Number, default: 0 },
   goalAmount: { type: Number, default: 0 },
   endDate: { type: String, default: '' },
+  goalMonths: { type: Number, default: 0 },
+  remainMonths: { type: Number, default: 0 },
   dailyAvailableMoney: { type: Object, default: null },
   monthlyAvailableMoney: { type: Object, default: null },
   pacemaker: { type: Object, default: null },
   isToggling: { type: Boolean, default: false },
 })
+
+// 월 페이스/누적 진행률 계산에 필요한 원본 데이터를 하나로 묶은 goal-like 객체
+// (PaceBanner는 개별 scalar prop으로 받기 때문에, 공용 유틸이 기대하는 모양으로 조립한다)
+const goalLike = computed(() => ({
+  currentAmount: props.currentAmount,
+  goalAmount: props.goalAmount,
+  pace: props.pace,
+  period: { goalMonths: props.goalMonths, remainMonths: props.remainMonths },
+}))
 
 defineEmits([
   'cta-click',
@@ -323,20 +342,25 @@ const PACE_CTA_CONTENT = {
   [PACE_STATE.BEHIND]: { title: '목표 페이스 따라잡기', description: '페이스메이커가 도와줄게요' },
 }
 
-const paceState = computed(() =>
-  derivePaceState({ currentAmount: props.currentAmount, paceStatus: props.pace?.paceStatus })
-)
+const paceMetrics = computed(() => deriveGoalPaceMetrics(goalLike.value))
+const paceState = computed(() => derivePaceState(goalLike.value))
 const primaryCtaTitle = computed(() => PACE_CTA_CONTENT[paceState.value].title)
 const primaryCtaDescription = computed(() => PACE_CTA_CONTENT[paceState.value].description)
 
-// 페이스 차이: 현재<목표 -X만원, 현재>목표 +X만원, 동일 시 부호 없이 X만원(0만원)만 표시
+// 페이스 차이: 월 페이스끼리 비교(currentMonthlyPace - targetMonthlyPace).
+// 아직 저축을 시작하지 않았다면 비교 대상 자체가 없으므로 숫자 대신 "—"로 표시한다.
+// 시작 후에는 현재<목표 -X만원, 현재>목표 +X만원, 동일(반올림 시 0만원) 시 부호 없이 표시
 const paceDifferenceLabel = computed(() => {
-  const magnitude = formatManwon(Math.abs(props.pace?.differenceAmount ?? 0))
-  if (props.pace?.paceStatus === 'BEHIND') return `-${magnitude}만원`
-  if (props.pace?.paceStatus === 'AHEAD') return `+${magnitude}만원`
+  if (paceState.value === PACE_STATE.NOT_STARTED) return '—'
+  const magnitude = formatManwon(Math.abs(paceMetrics.value.paceDifference))
+  if (paceState.value === PACE_STATE.BEHIND) return `-${magnitude}만원`
+  if (paceState.value === PACE_STATE.AHEAD) return `+${magnitude}만원`
   return `${magnitude}만원`
 })
-const paceDifferenceColor = computed(() => (props.pace?.paceStatus === 'BEHIND' ? '#be185d' : '#0066FF'))
+const paceDifferenceColor = computed(() => {
+  if (paceState.value === PACE_STATE.NOT_STARTED) return '#94a3b8'
+  return paceState.value === PACE_STATE.BEHIND ? '#be185d' : '#0066FF'
+})
 
 const formattedEndDate = computed(() => props.endDate?.replace('-', '.') ?? '')
 

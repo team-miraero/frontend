@@ -74,7 +74,11 @@
 
 <script setup>
 import { computed } from 'vue'
-import { PACE_STATE, derivePaceState } from '@/features/roadmap/constants/pace-state.constants'
+import {
+  PACE_STATE,
+  derivePaceState,
+  deriveGoalPaceMetrics,
+} from '@/features/roadmap/constants/pace-state.constants'
 
 const props = defineProps({
   goal: {
@@ -83,59 +87,49 @@ const props = defineProps({
   },
 })
 
-const paceState = computed(() =>
-  derivePaceState({
-    currentAmount: props.goal?.currentAmount,
-    paceStatus: props.goal?.pace?.paceStatus,
-  })
+const paceState = computed(() => derivePaceState(props.goal))
+const paceMetrics = computed(() => deriveGoalPaceMetrics(props.goal))
+const paceDifferenceManwon = computed(() =>
+  formatManwon(Math.abs(paceMetrics.value.paceDifference))
 )
+const targetMonthlyPaceManwon = computed(() => formatManwon(paceMetrics.value.targetMonthlyPace))
 
-const expectedAmount = computed(() => Number(props.goal?.pace?.expectedAmount ?? 0))
-const differenceAmount = computed(() => Math.abs(Number(props.goal?.pace?.differenceAmount ?? 0)))
-const remainingAmount = computed(() =>
-  Math.max(0, Number(props.goal?.goalAmount ?? 0) - Number(props.goal?.currentAmount ?? 0))
-)
-
-// 앞선 페이스일 때 현재 속도를 유지하면 몇 개월 먼저 도착하는지 (남은 금액 ÷ 페이스, 보수적으로 반올림)
+// 앞선 페이스일 때 "지금 속도를 유지하면 목표를 몇 개월 일찍 달성하는지"는
+// 남은 금액을 목표 페이스/현재 페이스 각각으로 나눈 개월 수 차이로 계산한다.
+// 두 페이스 중 하나라도 0 이하라 계산이 성립하지 않으면 숫자를 임의로 지어내지 않는다.
 const monthsSaved = computed(() => {
-  if (paceState.value !== PACE_STATE.AHEAD || expectedAmount.value <= 0) return 0
-  const currentMonthlyPace = expectedAmount.value + differenceAmount.value
-  if (currentMonthlyPace <= 0) return 0
-  const monthsAtExpectedPace = remainingAmount.value / expectedAmount.value
-  const monthsAtCurrentPace = remainingAmount.value / currentMonthlyPace
-  return Math.max(0, Math.round(monthsAtExpectedPace - monthsAtCurrentPace))
-})
+  if (paceState.value !== PACE_STATE.AHEAD) return null
+  const { targetMonthlyPace, currentMonthlyPace } = paceMetrics.value
+  if (targetMonthlyPace <= 0 || currentMonthlyPace <= 0) return null
 
-const formattedEndDate = computed(() => {
-  const [year, month] = String(props.goal?.period?.endDate ?? '').split('-')
-  if (!year || !month) return ''
-  return `${year}년 ${Number(month)}월`
+  const remainingAmount = Math.max(0, Number(props.goal?.goalAmount ?? 0) - Number(props.goal?.currentAmount ?? 0))
+  const monthsAtTargetPace = remainingAmount / targetMonthlyPace
+  const monthsAtCurrentPace = remainingAmount / currentMonthlyPace
+  const saved = Math.round(monthsAtTargetPace - monthsAtCurrentPace)
+  return saved >= 1 ? saved : null
 })
 
 const headline = computed(() => {
-  if (paceState.value === PACE_STATE.NOT_STARTED) return '첫 저축을 시작해볼까요?'
-  if (paceState.value === PACE_STATE.AHEAD) return '목표보다 빠르게 달리고 있어요!'
-  if (paceState.value === PACE_STATE.BEHIND) {
-    return `목표보다 ${formatManwon(differenceAmount.value)}만원/월 뒤처졌어요`
-  }
-  return '지금처럼만 모으면 돼요!'
+  if (paceState.value === PACE_STATE.NOT_STARTED)
+    return `목표를 위해 월 ${targetMonthlyPaceManwon.value}만원씩 모으면 돼요!`
+  if (paceState.value === PACE_STATE.AHEAD) return `목표보다 월 ${paceDifferenceManwon.value}만원 빠른 페이스예요.`
+  if (paceState.value === PACE_STATE.BEHIND) return `목표보다 월 ${paceDifferenceManwon.value}만원 느린 페이스예요.`
+  return '목표 페이스에 맞춰 잘 달리고 있어요.'
 })
 
 const description = computed(() => {
   if (paceState.value === PACE_STATE.NOT_STARTED) {
-    return '다음 달부터 설정한 금액이 자동으로 모일 예정이에요.'
+    return '첫 저축을 시작하면 나의 페이스를 비교해드릴게요.'
   }
   if (paceState.value === PACE_STATE.AHEAD) {
-    return monthsSaved.value >= 1
-      ? `현재 페이스라면 목표를 ${monthsSaved.value}개월 먼저 달성할 수 있어요.`
-      : '현재 속도를 유지하면 목표를 기존 예상보다 더 빠르게 달성할 수 있어요.'
+    return monthsSaved.value
+      ? `이 속도를 유지하면 목표를 약 ${monthsSaved.value}개월 빨리 달성할 수 있어요.`
+      : '지금의 저축 속도를 잘 유지하고 있어요.'
   }
   if (paceState.value === PACE_STATE.BEHIND) {
-    return `앞으로 매달 약 ${formatManwon(differenceAmount.value)}만원씩 더 모으면 다시 목표 페이스에 도달할 수 있어요.`
+    return `매달 ${paceDifferenceManwon.value}만원을 더 모으면 목표 페이스에 맞출 수 있어요.`
   }
-  return formattedEndDate.value
-    ? `현재 페이스를 유지하면 ${formattedEndDate.value} 목표 달성이 가능해요.`
-    : '현재 페이스를 유지하면 목표를 예정대로 달성할 수 있어요.'
+  return '지금처럼 꾸준히 이어가보세요.'
 })
 
 function formatManwon(amount) {
