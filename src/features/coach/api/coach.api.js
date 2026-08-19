@@ -97,3 +97,68 @@ export async function sendMessage(payload) {
     message: assistantText,
   }
 }
+
+/**
+ * AI 코치 답변을 SSE로 수신한다.
+ * @param {SendChatMessagePayload} payload
+ * @param {string} accessToken
+ * @param {{ onDelta?: (content: string) => void }} [handlers]
+ * @returns {Promise<ChatMessageDto>}
+ */
+export async function sendMessageStream(payload, accessToken, handlers = {}) {
+  const baseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
+  const response = await fetch(
+    `${baseUrl}/ai-coach/conversations/${payload.conversationId}/messages/stream`,
+    {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
+      },
+      body: JSON.stringify({ content: payload.message }),
+    }
+  )
+
+  if (!response.ok || !response.body) {
+    throw new Error('AI 응답 스트림을 시작하지 못했습니다.')
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let completedMessage = null
+
+  function processEvent(block) {
+    const lines = block.split('\n')
+    const eventName = lines.find((line) => line.startsWith('event:'))?.slice(6).trim()
+    const data = lines
+      .filter((line) => line.startsWith('data:'))
+      .map((line) => line.slice(5).trim())
+      .join('\n')
+    if (!eventName || !data) return
+
+    const payloadData = JSON.parse(data)
+    if (eventName === 'delta') handlers.onDelta?.(payloadData.content ?? '')
+    if (eventName === 'completed') completedMessage = payloadData.message ?? null
+    if (eventName === 'error') throw new Error(payloadData.message ?? 'AI 응답을 생성하지 못했습니다.')
+  }
+
+  let isStreamDone = false
+  while (!isStreamDone) {
+    const { done, value } = await reader.read()
+    buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done }).replace(/\r/g, '')
+
+    let separatorIndex = buffer.indexOf('\n\n')
+    while (separatorIndex >= 0) {
+      processEvent(buffer.slice(0, separatorIndex))
+      buffer = buffer.slice(separatorIndex + 2)
+      separatorIndex = buffer.indexOf('\n\n')
+    }
+    isStreamDone = done
+  }
+
+  if (!completedMessage) throw new Error('AI 응답이 완료되지 않았습니다.')
+  return completedMessage
+}
