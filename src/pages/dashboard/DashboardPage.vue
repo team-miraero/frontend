@@ -58,9 +58,61 @@
           :class="isGoalPaused ? 'opacity-65' : ''"
         >
           <div class="mb-3.5 sm:mb-4 flex items-center justify-between">
-            <h2 class="text-base font-bold tracking-tight text-[#0a192f] sm:text-lg">
-              나의 로드맵 여정
-            </h2>
+            <div class="flex items-center gap-1">
+              <h2 class="text-base font-bold tracking-tight text-[#0a192f] sm:text-lg">
+                나의 로드맵 여정
+              </h2>
+
+              <!-- (i) 캐릭터 범례 설명 버튼: 클릭했을 때만 상세 설명 팝오버가 열림 (hover 트리거 없음) -->
+              <button
+                type="button"
+                class="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-primary focus:outline-none cursor-pointer"
+                :class="isPaceLegendTooltipOpen ? 'bg-slate-100 text-primary' : ''"
+                aria-label="목표 페이스와 나의 현재 페이스 설명 보기"
+                :aria-expanded="isPaceLegendTooltipOpen"
+                @click.stop="togglePaceLegendTooltip"
+              >
+                <svg
+                  class="size-3.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 캐릭터 범례 설명 팝오버: 겹치지 않도록 일반 흐름에 배치해 아래 로드맵을 밀어내림 (기본 상태는 닫힘) -->
+          <div
+            v-if="isPaceLegendTooltipOpen"
+            class="mb-3.5 sm:mb-4 w-full rounded-2xl border border-slate-200 bg-white p-3.5 shadow-[0_8px_20px_rgba(15,35,70,0.08)]"
+            @click.stop
+          >
+            <div class="flex items-start gap-2.5">
+              <img :src="paceLegendColiImage" alt="" class="size-8 shrink-0 object-contain" />
+              <div class="min-w-0">
+                <strong class="block text-xs font-bold text-[#0a192f]">목표 페이스</strong>
+                <p class="mt-0.5 text-[11px] leading-relaxed text-slate-500">
+                  목표일까지 계획대로 모았을 때의 위치예요.
+                </p>
+              </div>
+            </div>
+            <div class="mt-2.5 flex items-start gap-2.5 border-t border-slate-100 pt-2.5">
+              <img :src="paceLegendGoalCharacterImage" alt="" class="size-8 shrink-0 object-contain" />
+              <div class="min-w-0">
+                <strong class="block text-xs font-bold text-[#0a192f]">나의 현재 페이스</strong>
+                <p class="mt-0.5 text-[11px] leading-relaxed text-slate-500">
+                  지금까지 모은 금액을 기준으로 한 나의 위치예요.
+                </p>
+              </div>
+            </div>
           </div>
 
           <MilestoneProgressBar :goal="displayedGoal" :milestones="roadmapStore.milestones" />
@@ -171,7 +223,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
 import { useCollectionStore } from '@/features/collection'
@@ -196,6 +248,10 @@ import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pace
 import PacemakerAssistFlow from '@/pages/dashboard/components/PacemakerAssistFlow.vue'
 import { useModal } from '@/shared/composables/useModal'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import {
+  PACEMAKER_CHARACTER_IMAGE,
+  getGoalCharacterImage,
+} from '@/features/roadmap/constants/goal-character.constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -227,6 +283,7 @@ const selectedMilestone = ref(null)
 const achievementErrorMessage = ref('')
 const previousProgressRate = ref(null)
 const roadmapSectionRef = ref(null)
+const isPaceLegendTooltipOpen = ref(false)
 
 const EMPTY_DAILY_AVAILABLE_MONEY = Object.freeze({
   todayAvailableMoney: 0,
@@ -283,6 +340,8 @@ const hasSupplementaryError = computed(
 const dashboardErrorMessage = computed(() =>
   pacemakerStore.dashboardError ? '정보를 불러오지 못했어요' : ''
 )
+const paceLegendColiImage = PACEMAKER_CHARACTER_IMAGE
+const paceLegendGoalCharacterImage = computed(() => getGoalCharacterImage(displayedGoal.value?.goalType))
 
 function handleOpenTodayAvailableMoneyModal() {
   isTodayAvailableMoneyModalOpen.value = true
@@ -294,6 +353,14 @@ function handleOpenMonthlyAvailableMoneyModal() {
 
 function handleOpenLinkedAssets() {
   openLinkedAssetsModal()
+}
+
+function closePaceLegendTooltip() {
+  isPaceLegendTooltipOpen.value = false
+}
+
+function togglePaceLegendTooltip() {
+  isPaceLegendTooltipOpen.value = !isPaceLegendTooltipOpen.value
 }
 
 // 페이스 비교 영역 클릭: 페이지 내 '나의 로드맵 여정' 카드가 고정 헤더~하단 네비게이션 사이
@@ -476,6 +543,18 @@ async function retrySupplementaryData() {
     roadmapStore.error ? roadmapStore.fetchMilestones(goalId).catch(() => undefined) : null,
   ])
 }
+
+function handlePaceLegendOutsideClick() {
+  closePaceLegendTooltip()
+}
+
+onMounted(() => {
+  document.addEventListener('click', handlePaceLegendOutsideClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handlePaceLegendOutsideClick)
+})
 
 onMounted(async () => {
   try {
