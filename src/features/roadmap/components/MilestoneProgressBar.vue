@@ -152,6 +152,23 @@
           </template>
         </div>
 
+        <!-- 캐릭터 범례: 로드맵과 다음 마일스톤 요약 사이, 어떤 캐릭터가 목표 페이스이고 어떤 캐릭터가 나의 현재 페이스인지 한눈에 -->
+        <div class="flex justify-center px-4 py-2">
+          <div
+            class="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-slate-50/80 px-2.5 py-1"
+          >
+            <span class="inline-flex items-center gap-1">
+              <img :src="coliBottomImage" alt="" class="size-3.5 shrink-0 object-contain" />
+              <span class="whitespace-nowrap text-[9px] font-bold text-slate-500">목표 페이스</span>
+            </span>
+            <span class="h-2.5 w-px shrink-0 bg-slate-300" />
+            <span class="inline-flex items-center gap-1">
+              <img :src="goalCharacterImage" alt="" class="size-3.5 shrink-0 object-contain" />
+              <span class="whitespace-nowrap text-[9px] font-bold text-slate-500">나의 현재 페이스</span>
+            </span>
+          </div>
+        </div>
+
         <!-- 마일스톤 정보는 별도 카드 대신 같은 카드의 요약 영역으로 통합 -->
         <div class="flex items-center justify-between gap-3 border-t border-slate-100 px-4 py-3.5">
           <div class="min-w-0 flex-1">
@@ -378,16 +395,32 @@
         </template>
       </div>
     </div>
+
+    <!-- 캐릭터 범례 (태블릿/데스크톱): 로드맵 트랙 바로 아래, 어떤 캐릭터가 목표 페이스이고 어떤 캐릭터가 나의 현재 페이스인지 한눈에 -->
+    <div class="mt-2 hidden justify-center sm:flex">
+      <div
+        class="inline-flex items-center gap-2.5 rounded-full border border-slate-200/70 bg-slate-50/80 px-3 py-1.5"
+      >
+        <span class="inline-flex items-center gap-1.5">
+          <img :src="coliBottomImage" alt="" class="size-4 shrink-0 object-contain" />
+          <span class="whitespace-nowrap text-[11px] font-bold text-slate-500">목표 페이스</span>
+        </span>
+        <span class="h-3 w-px shrink-0 bg-slate-300" />
+        <span class="inline-flex items-center gap-1.5">
+          <img :src="goalCharacterImage" alt="" class="size-4 shrink-0 object-contain" />
+          <span class="whitespace-nowrap text-[11px] font-bold text-slate-500">나의 현재 페이스</span>
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import rabbitImage from '@/assets/images/rabbit_3d.png'
-import lamaImage from '@/assets/images/lama_new.png'
-import bearImage from '@/assets/images/bear_new.png'
-import duckImage from '@/assets/images/duck_new.png'
-import coliBottomImage from '@/assets/images/coli_new.png'
+import {
+  PACEMAKER_CHARACTER_IMAGE as coliBottomImage,
+  getGoalCharacterImage,
+} from '@/features/roadmap/constants/goal-character.constants'
 
 const props = defineProps({
   goal: {
@@ -401,14 +434,7 @@ const props = defineProps({
 })
 
 // 목표 종류(goal.goalType)에 따라 로드맵 메인 캐릭터 매핑
-const GOAL_TYPE_CHARACTER = {
-  INDEPENDENCE: duckImage,
-  WEDDING: lamaImage,
-  EMERGENCY: bearImage,
-  LOAN: rabbitImage,
-}
-
-const goalCharacterImage = computed(() => GOAL_TYPE_CHARACTER[props.goal?.goalType] ?? rabbitImage)
+const goalCharacterImage = computed(() => getGoalCharacterImage(props.goal?.goalType))
 
 // 페이스 상태 (실제 데이터 및 differenceAmount 연동)
 const paceStatus = computed(() => {
@@ -420,8 +446,12 @@ const paceStatus = computed(() => {
   return 'ON_TRACK'
 })
 
+// 아직 실제 저축 진행이 없는 시작 단계는 캐릭터 위치 계산과 무관하게 말풍선 문구만 별도 처리
+const isNotStarted = computed(() => !(Number(props.goal?.currentAmount) > 0))
+
 // 페이스 상태에 따른 스마트 말풍선 메시지 (간결하고 임팩트 있는 숏 문구)
 const paceMessage = computed(() => {
+  if (isNotStarted.value) return '이제 출발해볼까요!'
   if (paceStatus.value === 'AHEAD') return '폭풍 질주 중!'
   if (paceStatus.value === 'BEHIND') return '조금만 힘내요!'
   return '나이스 페이스!'

@@ -119,10 +119,9 @@
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
                     class="text-xs font-bold tabular-nums sm:text-sm md:text-base"
-                    :style="{ color: theme.badgeText }"
+                    :style="{ color: paceDifferenceColor }"
                   >
-                    {{ pace.paceStatus === 'BEHIND' ? '-' : '+'
-                    }}{{ formatManwon(Math.abs(pace.differenceAmount)) }}만원
+                    {{ paceDifferenceLabel }}
                   </strong>
                   <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
@@ -175,28 +174,16 @@
         </div>
 
         <div class="flex flex-1 flex-col justify-between gap-2.5 pt-2.5">
-          <!-- 1. 알아서 모으기 -->
+          <!-- 1. 알아서 모으기: 페이스 상태(시작 전/적정/앞섬/뒤처짐)에 따라 문구만 바뀌고, 항상 서비스 메인 블루 톤 유지 -->
           <button
             type="button"
-            class="group flex w-full items-center gap-3.5 rounded-xl text-left transition active:scale-[0.98] cursor-pointer select-none"
-            :class="[
-              disabled ? 'pointer-events-none opacity-45' : '',
-              isAssistMode ? 'px-3 py-2.5 shadow-sm' : 'py-1 sm:py-1.5',
-            ]"
-            :style="
-              isAssistMode
-                ? {
-                    backgroundImage: theme.ctaGradient,
-                    boxShadow: `0 4px 16px ${theme.ctaShadow}`,
-                  }
-                : undefined
-            "
+            class="group flex w-full items-center gap-3.5 rounded-xl py-1 text-left transition active:scale-[0.98] cursor-pointer select-none sm:py-1.5"
+            :class="disabled ? 'pointer-events-none opacity-45' : ''"
             :disabled="disabled"
             @click="$emit('cta-click')"
           >
             <span
-              class="flex size-8 sm:size-8.5 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105"
-              :class="isAssistMode ? 'bg-white/20 text-white' : 'bg-primary text-white shadow-sm'"
+              class="flex size-8 sm:size-8.5 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 1. 알아서 모으기 선명한 번개 SVG -->
               <svg
@@ -214,25 +201,16 @@
             </span>
             <span class="min-w-0 flex-1">
               <strong
-                class="block text-xs sm:text-sm font-bold transition-colors duration-200"
-                :class="isAssistMode ? 'text-white' : 'text-[#0a192f] group-hover:text-primary'"
+                class="block text-xs sm:text-sm font-bold text-[#0a192f] transition-colors duration-200 group-hover:text-primary"
               >
                 {{ primaryCtaTitle }}
               </strong>
-              <span
-                class="mt-0.5 block text-[11px] sm:text-xs font-medium"
-                :class="isAssistMode ? 'text-white/80' : 'text-[#73809c]'"
-              >
+              <span class="mt-0.5 block text-[11px] sm:text-xs font-medium text-[#73809c]">
                 {{ primaryCtaDescription }}
               </span>
             </span>
             <span
-              class="text-xl leading-none transition-all duration-200 group-hover:translate-x-1"
-              :class="
-                isAssistMode
-                  ? 'text-white/80 group-hover:text-white'
-                  : 'text-slate-300 group-hover:text-primary'
-              "
+              class="text-xl leading-none text-slate-300 transition-all duration-200 group-hover:translate-x-1 group-hover:text-primary"
               >›</span
             >
           </button>
@@ -310,7 +288,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
+import { PACE_STATE, derivePaceState } from '@/features/roadmap/constants/pace-state.constants'
 import { useCountUp } from '@/shared/composables/useCountUp'
 
 const props = defineProps({
@@ -337,17 +315,29 @@ defineEmits([
   'view-roadmap',
 ])
 
-const theme = computed(() => PACE_THEME[props.pace.paceStatus] ?? PACE_THEME.ON_TRACK)
-const isAssistMode = computed(() => props.pace.paceStatus === 'BEHIND')
-const isPacemakerRegistered = computed(() => props.pacemaker?.registered === true)
-const primaryCtaTitle = computed(() => {
-  if (isAssistMode.value) return '페이스메이커가 도와줄게요'
-  return isPacemakerRegistered.value ? '알아서 모으기' : '페이스메이커가 알아서 모아줄게요'
+// 페이스 상태(시작 전/적정/앞섬/뒤처짐)별 CTA 문구 — 항상 서비스 메인 블루 톤 유지
+const PACE_CTA_CONTENT = {
+  [PACE_STATE.NOT_STARTED]: { title: '첫 저축 시작하기', description: '페이스메이커가 도와드릴게요' },
+  [PACE_STATE.ON_TRACK]: { title: '지금 페이스 유지하기', description: '이번 달 목표 금액을 자동으로 모아요' },
+  [PACE_STATE.AHEAD]: { title: '더 빨리 달성하는 방법 보기', description: '페이스메이커가 알아서 모아줄게요' },
+  [PACE_STATE.BEHIND]: { title: '목표 페이스 따라잡기', description: '페이스메이커가 도와줄게요' },
+}
+
+const paceState = computed(() =>
+  derivePaceState({ currentAmount: props.currentAmount, paceStatus: props.pace?.paceStatus })
+)
+const primaryCtaTitle = computed(() => PACE_CTA_CONTENT[paceState.value].title)
+const primaryCtaDescription = computed(() => PACE_CTA_CONTENT[paceState.value].description)
+
+// 페이스 차이: 현재<목표 -X만원, 현재>목표 +X만원, 동일 시 부호 없이 X만원(0만원)만 표시
+const paceDifferenceLabel = computed(() => {
+  const magnitude = formatManwon(Math.abs(props.pace?.differenceAmount ?? 0))
+  if (props.pace?.paceStatus === 'BEHIND') return `-${magnitude}만원`
+  if (props.pace?.paceStatus === 'AHEAD') return `+${magnitude}만원`
+  return `${magnitude}만원`
 })
-const primaryCtaDescription = computed(() => {
-  if (isAssistMode.value) return theme.value.ctaAction
-  return isPacemakerRegistered.value ? '이번 달 목표 금액을 자동으로 모아요' : '다음달 자금마련 →'
-})
+const paceDifferenceColor = computed(() => (props.pace?.paceStatus === 'BEHIND' ? '#be185d' : '#0066FF'))
+
 const formattedEndDate = computed(() => props.endDate?.replace('-', '.') ?? '')
 
 // 메인 금액 부드러운 카운트업 (1초 감속 롤링)
