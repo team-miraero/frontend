@@ -30,6 +30,20 @@ export function formatDateTime(date) {
 }
 
 /**
+ * Date를 로컬 타임존 기준 "YYYY-MM-DD" 키로 변환한다.
+ * API 날짜 문자열 비교, localStorage 키 등 UTC와 어긋나면 안 되는 곳에 사용한다.
+ * (Date.toISOString()은 UTC 기준이라 자정 근처 KST 사용자에게 하루 밀린 날짜를 준다)
+ * @param {Date} date
+ * @returns {string}
+ */
+export function getLocalDateKey(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+/**
  * 오늘 기준 목표일까지 남은 개월 수를 계산한다.
  * @param {Date | string} targetDate
  * @returns {number}

@@ -190,6 +190,7 @@ import {
   GoalAchievementModal,
 } from '@/features/roadmap'
 import { usePacemakerStore, PacemakerSetupModal } from '@/features/pacemaker'
+import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pacemaker.constants'
 import PacemakerAssistFlow from '@/pages/dashboard/components/PacemakerAssistFlow.vue'
 import { useModal } from '@/shared/composables/useModal'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -463,7 +464,7 @@ onMounted(async () => {
     if (pacemakerStore.pacemakerStatus?.registered) {
       pacemakerRequests.push(
         pacemakerStore.fetchPacemakerDashboard(),
-        pacemakerStore.fetchHistories({ page: 0, size: 31 })
+        pacemakerStore.fetchHistories({ page: 0, size: PACEMAKER_HISTORY_PAGE_SIZE })
       )
     }
 

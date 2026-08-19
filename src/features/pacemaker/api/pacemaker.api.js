@@ -20,16 +20,15 @@ import { client } from '@/shared/api/client'
 
 /**
  * @typedef {Object} PacemakerTodaySaving
- * @property {string} savingDate 'yyyy-MM-dd'
- * @property {number} amount
- * @property {'SUCCESS' | 'FAIL'} status
+ * @property {number | null} amount saved가 false면 null로 온다
+ * @property {boolean} saved
  */
 
 /**
  * @typedef {Object} PacemakerWeeklyStreakItem
- * @property {string} savingDate 'yyyy-MM-dd'
  * @property {'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'} dayOfWeek
- * @property {'SUCCESS' | 'FAIL'} status
+ * @property {number} amount
+ * @property {boolean} saved
  */
 
 /**
@@ -39,9 +38,9 @@ import { client } from '@/shared/api/client'
  * @property {number} maxAmount 하루 최대 자동 저축 금액
  * @property {PacemakerMoneyBox | null} moneyBox
  * @property {PacemakerTodaySaving | null} todaySaving
- * @property {number} currentStreak
- * @property {PacemakerWeeklyStreakItem[]} weeklyStreak
- * @property {number} monthlySuccessCount
+ * @property {number | null} currentStreak 서버가 아직 집계를 못 채운 계정은 null로 온다
+ * @property {PacemakerWeeklyStreakItem[] | null} weeklyStreak 서버가 아직 집계를 못 채운 계정은 null로 온다
+ * @property {number | null} monthlySuccessCount 서버가 아직 집계를 못 채운 계정은 null로 온다
  */
 
 /**
@@ -149,23 +148,27 @@ export async function updatePacemakerStatus(autoSavingId, status) {
 }
 
 /**
- * 백엔드에서 전달된 경로 표기(max-mount)를 그대로 사용합니다.
+ * @param {number} autoSavingId
  * @param {number} maxAmount
  * @returns {Promise<{ autoSavingId: number, maxAmount: number }>}
  */
-export async function updatePacemakerMaxAmount(maxAmount) {
-  const { data } = await client.patch('/pace-maker/max-mount', { maxAmount })
+export async function updatePacemakerMaxAmount(autoSavingId, maxAmount) {
+  const { data } = await client.patch(`/pace-maker/${autoSavingId}/max-amount`, { maxAmount })
   return unwrapApiResponse(data)
 }
 
 /**
- * @param {number} accountId
- * @param {number} amount
- * @param {number} moneyBoxId
- * @returns {Promise<{ goalId: number, depositedAmount: number, remainingBalance: number }>}
+ * 목표에 연결된 자산(예적금 계좌 또는 저금통)에 직접 입금합니다.
+ * @param {{ assetId: number, assetType: 'ACCOUNT' | 'MONEY_BOX' | 'LOAN', amount: number, moneyBoxId: number }} payload
+ * @returns {Promise<{ assetId: number, assetType: string, depositedAmount: number, remainingBalance: number }>}
  */
-export async function depositToGoalAccount(accountId, amount, moneyBoxId) {
-  const { data } = await client.post('/pace-maker/deposits', { accountId, amount, moneyBoxId })
+export async function depositToGoalAsset({ assetId, assetType, amount, moneyBoxId }) {
+  const { data } = await client.post('/pace-maker/deposits', {
+    assetId,
+    assetType,
+    amount,
+    moneyBoxId,
+  })
   return unwrapApiResponse(data)
 }
 

@@ -694,7 +694,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui.store'
 import { useGoalStore } from '@/features/goal'
 import { useCoachStore } from '@/features/coach'
-import { usePacemakerToast } from '@/features/pacemaker'
+import { usePacemakerToast, usePacemakerDeposit } from '@/features/pacemaker'
 import { NAV_ITEMS } from '@/shared/constants/navigation'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import AppIcon from '@/shared/ui/AppIcon.vue'
@@ -741,6 +741,7 @@ const {
   clearHistory,
   openBalanceModal,
 } = usePacemakerToast()
+const { retryDepositTargets } = usePacemakerDeposit()
 
 const isDropdownOpen = ref(false)
 const dropdownRef = ref(null)
@@ -836,6 +837,9 @@ function handleNotificationClick(item) {
   isDropdownOpen.value = false
 
   if (item.type === 'SAVING') {
+    // 모달을 열자마자 대상 목록이 비어 보이지 않도록, 조회를 먼저 시작해두고
+    // 모달은 즉시 연다 (로딩 중에는 모달 자체가 "불러오는 중" 상태를 보여준다).
+    retryDepositTargets()
     openBalanceModal()
     if (route.name !== ROUTE_NAMES.PACEMAKER) {
       router.push({ name: ROUTE_NAMES.PACEMAKER })

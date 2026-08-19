@@ -1,5 +1,51 @@
 // 페이스메이커 API 최신 예시 응답 기반 MSW 핸들러
 import { http, HttpResponse } from 'msw'
+import { getLocalDateKey } from '@/shared/lib/date'
+
+// 오늘 기준 며칠 전 날짜를 구한다. 히스토리 목데이터가 특정 달에 고정되지 않고
+// 항상 "오늘"을 기준으로 최신처럼 보이도록 상대 날짜로 생성한다.
+function daysAgo(offset) {
+  const date = new Date()
+  date.setDate(date.getDate() - offset)
+  return getLocalDateKey(date)
+}
+
+// 대시보드(monthlySuccessCount)와 내역 목록이 같은 데이터를 보고 있어야 숫자가 어긋나지 않는다.
+const HISTORY_PATTERN = [
+  { status: 'SAVED', amount: 10000, description: '오늘의 여유자금 자동 저축' },
+  { status: 'SAVED', amount: 20000, description: null },
+  { status: 'SAVED', amount: 15000, description: null },
+  { status: 'SAVED', amount: 12000, description: null },
+  { status: 'SAVED', amount: 18000, description: null },
+  { status: 'SAVED', amount: 9000, description: null },
+  { status: 'SAVED', amount: 13000, description: null },
+  { status: 'SAVED', amount: 11000, description: null },
+  { status: 'SAVED', amount: 16000, description: null },
+  { status: 'SAVED', amount: 7000, description: null },
+  { status: 'SAVED', amount: 14000, description: null },
+  { status: 'SAVED', amount: 8000, description: null },
+  { status: 'SKIPPED', amount: null, description: '여유자금 없음' },
+  { status: 'SAVED', amount: 6000, description: null },
+  { status: 'SKIPPED', amount: null, description: '지출 초과' },
+  { status: 'SAVED', amount: 5000, description: null },
+  { status: 'SKIPPED', amount: null, description: '여유자금 없음' },
+  { status: 'SAVED', amount: 12000, description: null },
+  { status: 'SAVED', amount: 4000, description: null },
+  { status: 'SKIPPED', amount: null, description: '지출 초과' },
+  { status: 'SAVED', amount: 10000, description: null },
+  { status: 'SAVED', amount: 3000, description: null },
+]
+
+function getMockHistories() {
+  return HISTORY_PATTERN.map((item, offset) => ({ date: daysAgo(offset), ...item }))
+}
+
+function getMockMonthlySuccessCount() {
+  const currentMonth = getLocalDateKey(new Date()).slice(0, 7)
+  return getMockHistories().filter(
+    (item) => item.status === 'SAVED' && item.date.startsWith(currentMonth)
+  ).length
+}
 
 let mockRegistered = false
 let mockPacemakerStatus = null // 'ACTIVE' | 'PAUSED' | null
@@ -90,19 +136,15 @@ export const pacemakerHandlers = [
         maskedAccountNumber: '123-****-7890',
       },
       todaySaving: {
-        savingDate: '2026-07-22',
         amount: 10000,
-        status: 'SUCCESS',
+        saved: true,
       },
       currentStreak: 12,
-      weeklyStreak: [
-        { savingDate: '2026-07-20', dayOfWeek: 'MONDAY', status: 'SUCCESS' },
-        { savingDate: '2026-07-21', dayOfWeek: 'TUESDAY', status: 'SUCCESS' },
-        { savingDate: '2026-07-22', dayOfWeek: 'WEDNESDAY', status: 'SUCCESS' },
-        { savingDate: '2026-07-23', dayOfWeek: 'THURSDAY', status: 'FAIL' },
-        { savingDate: '2026-07-24', dayOfWeek: 'FRIDAY', status: 'FAIL' },
-      ],
-      monthlySuccessCount: 18,
+      // 요일로 고정하면 실행하는 요일에 따라 히스토리(날짜 기준)와 어긋난다.
+      // null로 둬서 프런트의 히스토리 기반 폴백(computeWeeklyStreakFromHistories)이
+      // 항상 실행 시점 기준으로 계산하게 한다 — 폴백 자체도 같이 검증된다.
+      weeklyStreak: null,
+      monthlySuccessCount: getMockMonthlySuccessCount(),
     })
   }),
 
@@ -154,92 +196,45 @@ export const pacemakerHandlers = [
     })
   }),
 
-  // 전달받은 최신 경로 표기(max-mount)를 그대로 사용합니다.
-  http.patch('*/api/pace-maker/max-mount', async ({ request }) => {
+  http.patch('*/api/pace-maker/:autoSavingId/max-amount', async ({ request, params }) => {
     const { maxAmount } = await request.json()
     mockMaxAmount = maxAmount
 
     return HttpResponse.json({
-      autoSavingId: 21,
+      autoSavingId: Number(params.autoSavingId),
       maxAmount,
     })
   }),
 
   http.post('*/api/pace-maker/deposits', async ({ request }) => {
-    const { accountId, amount, moneyBoxId } = await request.json()
-    const targetAccount = mockGoals
-      .flatMap((goal) => goal.withdrawalAccounts)
-      .find((account) => account.accountId === accountId)
+    const { assetId, assetType, amount, moneyBoxId } = await request.json()
+    const targetAsset = mockGoals
+      .flatMap((goal) => goal.depositAssets)
+      .find((asset) => asset.assetId === assetId && asset.assetType === assetType)
 
-    if (!targetAccount || moneyBoxId !== 31 || amount <= 0 || amount > mockBalance) {
+    if (!targetAsset || moneyBoxId !== 31 || amount <= 0 || amount > mockBalance) {
       return HttpResponse.json({ message: '입금 요청 정보를 확인해 주세요.' }, { status: 400 })
     }
 
     mockBalance -= amount
-    targetAccount.balance += amount
+    targetAsset.balance += amount
 
     return HttpResponse.json({
-      accountId,
-      moneyBoxId,
+      assetId,
+      assetType,
       depositedAmount: amount,
       remainingBalance: mockBalance,
     })
   }),
 
   http.get('*/api/pace-maker/histories', () => {
+    const content = getMockHistories()
+
     return HttpResponse.json({
-      content: [
-        {
-          date: '2026-07-22',
-          status: 'SAVED',
-          amount: 10000,
-          description: '오늘의 여유자금 자동 저축',
-        },
-        { date: '2026-07-21', status: 'SAVED', amount: 20000, description: null },
-        { date: '2026-07-20', status: 'SAVED', amount: 15000, description: null },
-        { date: '2026-07-19', status: 'SAVED', amount: 12000, description: null },
-        { date: '2026-07-18', status: 'SAVED', amount: 18000, description: null },
-        { date: '2026-07-17', status: 'SAVED', amount: 9000, description: null },
-        { date: '2026-07-16', status: 'SAVED', amount: 13000, description: null },
-        { date: '2026-07-15', status: 'SAVED', amount: 11000, description: null },
-        { date: '2026-07-14', status: 'SAVED', amount: 16000, description: null },
-        { date: '2026-07-13', status: 'SAVED', amount: 7000, description: null },
-        { date: '2026-07-12', status: 'SAVED', amount: 14000, description: null },
-        { date: '2026-07-11', status: 'SAVED', amount: 8000, description: null },
-        {
-          date: '2026-07-10',
-          status: 'SKIPPED',
-          amount: null,
-          description: '여유자금 없음',
-        },
-        { date: '2026-07-09', status: 'SAVED', amount: 6000, description: null },
-        {
-          date: '2026-07-08',
-          status: 'SKIPPED',
-          amount: null,
-          description: '지출 초과',
-        },
-        { date: '2026-07-07', status: 'SAVED', amount: 5000, description: null },
-        {
-          date: '2026-07-06',
-          status: 'SKIPPED',
-          amount: null,
-          description: '여유자금 없음',
-        },
-        { date: '2026-07-05', status: 'SAVED', amount: 12000, description: null },
-        { date: '2026-07-04', status: 'SAVED', amount: 4000, description: null },
-        {
-          date: '2026-07-03',
-          status: 'SKIPPED',
-          amount: null,
-          description: '지출 초과',
-        },
-        { date: '2026-07-02', status: 'SAVED', amount: 10000, description: null },
-        { date: '2026-07-01', status: 'SAVED', amount: 3000, description: null },
-      ],
+      content,
       page: 0,
-      size: 31,
-      totalElements: 22,
+      size: content.length,
+      totalElements: content.length,
       totalPages: 1,
       first: true,
       last: true,

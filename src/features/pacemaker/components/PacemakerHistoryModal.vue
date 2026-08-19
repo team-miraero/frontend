@@ -6,7 +6,7 @@
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
-      <h3 class="text-base font-bold text-[#0a192f]">자동 저축 내역</h3>
+      <h3 class="text-base font-bold text-[#0a192f]">최근 자동 저축 내역</h3>
       <button
         type="button"
         class="flex size-8 items-center justify-center rounded-full bg-[#f8fbff]"
