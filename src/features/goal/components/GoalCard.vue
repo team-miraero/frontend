@@ -18,10 +18,10 @@
     <div class="flex items-center justify-between gap-2 mb-3">
       <!-- 아이콘 둥근 박스 -->
       <div
-        class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all shrink-0"
-        :class="isSelected ? 'bg-white shadow-xs' : 'bg-[#EBF3FF]'"
+        class="flex size-10 shrink-0 items-center justify-center rounded-[14px] transition-colors"
+        :class="iconBackgroundClass"
       >
-        <GoalTypeIcon :goal-type="id" size="lg" class="text-[#0066FF]" />
+        <GoalTypeIcon :goal-type="id" size="lg" :class="iconToneClass" />
       </div>
 
       <!-- 우측 동그라미 선택 체크마크 -->
@@ -105,11 +105,11 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import AppIcon from '@/shared/ui/AppIcon.vue'
 import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
-defineProps({
+const props = defineProps({
   id: { type: String, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -121,6 +121,18 @@ defineProps({
 defineEmits(['select'])
 
 const isTooltipOpen = ref(false)
+
+const ICON_STYLES = {
+  EMERGENCY: { tone: 'text-[#00A878]', soft: 'bg-[#F3FBF7]', selected: 'bg-[#E7F8F0]' },
+  INDEPENDENCE: { tone: 'text-[#3182F6]', soft: 'bg-[#F2F7FF]', selected: 'bg-[#E5F0FF]' },
+  STUDENT_LOAN: { tone: 'text-[#6366F1]', soft: 'bg-[#F5F6FF]', selected: 'bg-[#EAECFF]' },
+  MARRIAGE: { tone: 'text-[#E66A84]', soft: 'bg-[#FFF6F8]', selected: 'bg-[#FFECEF]' },
+}
+const iconStyle = computed(() => ICON_STYLES[props.id] || ICON_STYLES.INDEPENDENCE)
+const iconToneClass = computed(() => iconStyle.value.tone)
+const iconBackgroundClass = computed(() =>
+  props.isSelected ? iconStyle.value.selected : iconStyle.value.soft
+)
 
 function handleDocumentClick() {
   if (isTooltipOpen.value) {

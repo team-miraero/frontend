@@ -1,4 +1,4 @@
-<!-- 지출 카테고리 공통 라인 아이콘: 동일한 크기와 선 굵기, 카테고리별 강조색 사용 -->
+<!-- 지출 카테고리 공통 채움형 아이콘: 회색 받침 + 카테고리 컬러 + 흰색 디테일 -->
 <template>
   <span
     class="inline-flex shrink-0 select-none items-center justify-center transition-all duration-200"
@@ -9,67 +9,75 @@
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
       :class="[sizeClasses.icon, active ? 'scale-105' : '']"
     >
       <template v-if="normalizedId === 'housing'">
-        <path d="m3 11 9-8 9 8" />
-        <path d="M5 10v10h14V10M9 20v-6h6v6" />
+        <path fill="currentColor" d="M3 10.4 10.7 3a1.8 1.8 0 0 1 2.6 0l7.7 7.4c.9.9.3 2.5-1 2.5h-.8v7A2.1 2.1 0 0 1 17.1 22H6.9a2.1 2.1 0 0 1-2.1-2.1v-7H4c-1.3 0-1.9-1.6-1-2.5Z" />
+        <path fill="#fff" fill-opacity=".78" d="M9.3 15.1c0-.7.5-1.2 1.2-1.2h3c.7 0 1.2.5 1.2 1.2V22H9.3v-6.9Z" />
       </template>
       <template v-else-if="normalizedId === 'telecommunication'">
-        <rect x="6.5" y="2" width="11" height="20" rx="2.5" />
-        <path d="M10 5h4M11 18.5h2" />
+        <rect x="6" y="1.5" width="12" height="21" rx="3.2" fill="currentColor" />
+        <rect x="8" y="4" width="8" height="14" rx="1.5" fill="#fff" fill-opacity=".72" />
+        <circle cx="12" cy="20.2" r="1" fill="#fff" />
       </template>
       <template v-else-if="normalizedId === 'insurance'">
-        <path d="M12 3 5 6v5c0 4.5 2.8 8.3 7 10 4.2-1.7 7-5.5 7-10V6l-7-3Z" />
-        <path d="m9 12 2 2 4-4" />
+        <path fill="currentColor" d="m12 2 8 3.5v5.3c0 5.3-3.2 9.5-8 11.2-4.8-1.7-8-5.9-8-11.2V5.5L12 2Z" />
+        <path d="m8.6 12 2.1 2.1 4.8-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
       </template>
       <template v-else-if="normalizedId === 'subscription'">
-        <rect x="3" y="5" width="18" height="14" rx="3" />
-        <path d="m10 9 5 3-5 3V9Z" />
+        <rect x="2" y="4" width="20" height="16" rx="4" fill="currentColor" />
+        <path fill="#fff" d="m10 8.5 6 3.5-6 3.5v-7Z" />
       </template>
       <template v-else-if="normalizedId === 'loanrepayment'">
-        <path d="m3 9 9-5 9 5M5 10v7M9 10v7M15 10v7M19 10v7M3 20h18" />
+        <path fill="currentColor" d="m12 2 10 5.2v2.3H2V7.2L12 2ZM3 19h18v3H3v-3Zm1.5-8h3v6.5h-3V11Zm6 0h3v6.5h-3V11Zm6 0h3v6.5h-3V11Z" />
       </template>
       <template v-else-if="normalizedId === 'savings'">
-        <path
-          d="M6 10a7 7 0 0 1 12.5 1H21v5h-2.5a7 7 0 0 1-3.5 3v2h-3v-2H9v2H6v-3.5A6 6 0 0 1 6 10Z"
-        />
-        <path d="M9 8V5h5M16.5 12h.01" />
+        <path fill="currentColor" d="M4.7 10.2A7.7 7.7 0 0 1 18.6 11H22v5.2h-3.1a7.8 7.8 0 0 1-3.2 2.7V22h-3v-2.2H9V22H6v-3.7a6.9 6.9 0 0 1-1.3-8.1Z" />
+        <rect x="9" y="7" width="6" height="1.8" rx=".9" fill="#fff" fill-opacity=".8" />
+        <circle cx="16.8" cy="12.3" r="1" fill="#fff" />
       </template>
       <template v-else-if="normalizedId === 'investment'">
-        <path d="M4 19V5M4 19h16M7 15l4-4 3 2 5-6" />
-        <path d="M15 7h4v4" />
+        <rect x="3" y="14" width="4" height="7" rx="1.2" fill="currentColor" fill-opacity=".55" />
+        <rect x="10" y="10" width="4" height="11" rx="1.2" fill="currentColor" fill-opacity=".75" />
+        <rect x="17" y="4" width="4" height="17" rx="1.2" fill="currentColor" />
+        <path d="m4.5 11 6-5 4 2 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
       </template>
       <template v-else-if="normalizedId === 'food'">
-        <path d="M7 3v7M4 3v4a3 3 0 0 0 6 0V3M7 10v11M16 3v18M16 3c3 2 4 5 4 8h-4" />
+        <path fill="currentColor" d="M3 2.5h2v6h1v-6h2v6h1v-6h2v6.2a4 4 0 0 1-3 3.9V22H5V12.6a4 4 0 0 1-3-3.9V2.5h1Z" />
+        <path fill="currentColor" d="M17.7 2c2.4 0 4.3 2.5 4.3 5.7 0 2.6-1.2 4.7-3 5.4V22h-3v-8.9c-1.8-.7-3-2.8-3-5.4C13 4.5 15 2 17.7 2Z" />
+        <path fill="#fff" fill-opacity=".5" d="M16.2 4.4c.5-.6 1-.9 1.6-.9.5 0 .9.2 1.3.6-1 .4-1.8 1.2-2.2 2.3-.3.8-.4 1.7-.3 2.5-.5-.6-.8-1.5-.8-2.5 0-.8.1-1.5.4-2Z" />
       </template>
       <template v-else-if="normalizedId === 'cafe'">
-        <path d="M5 8h12v6a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5V8Z" />
-        <path d="M17 10h1a3 3 0 0 1 0 6h-2M8 3v2M12 3v2" />
+        <path fill="currentColor" d="M3 7h14.5v2H19a4 4 0 0 1 0 8h-3a7 7 0 0 1-5.5 2.7H10A7 7 0 0 1 3 13V7Zm14.5 4v2c0 .7-.1 1.3-.3 2H19a2 2 0 1 0 0-4h-1.5Z" />
+        <path fill="#fff" fill-opacity=".48" d="M5.5 9.2h9.6v3.5a4.8 4.8 0 0 1-4.8 4.8 4.8 4.8 0 0 1-4.8-4.8V9.2Z" />
+        <path d="M7.8 2.3c-1 1-.9 2 0 3M12.5 2.3c-1 1-.9 2 0 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
       </template>
       <template v-else-if="normalizedId === 'transportation'">
-        <rect x="5" y="3" width="14" height="16" rx="3" />
-        <path d="M5 11h14M8 7h8M8 19v2M16 19v2M8 15h.01M16 15h.01" />
+        <rect x="4" y="2" width="16" height="18" rx="4" fill="currentColor" />
+        <rect x="6.5" y="5" width="11" height="6" rx="1.5" fill="#fff" fill-opacity=".75" />
+        <circle cx="8" cy="16" r="1.4" fill="#fff" /><circle cx="16" cy="16" r="1.4" fill="#fff" />
+        <path d="M7 20v2M17 20v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
       </template>
       <template v-else-if="normalizedId === 'shopping'">
-        <path d="M5 8h14l-1 13H6L5 8Z" />
-        <path d="M9 10V6a3 3 0 0 1 6 0v4" />
+        <path fill="currentColor" d="M3.5 7.5h17L19.2 22H4.8L3.5 7.5Z" />
+        <path fill="currentColor" fill-opacity=".62" d="M7.5 7.5V6a4.5 4.5 0 0 1 9 0v1.5h-2.7V6a1.8 1.8 0 1 0-3.6 0v1.5H7.5Z" />
+        <path d="M9 12.2c.8 1 1.8 1.5 3 1.5s2.2-.5 3-1.5" stroke="#fff" stroke-opacity=".72" stroke-width="1.8" stroke-linecap="round" />
       </template>
       <template v-else-if="normalizedId === 'culture'">
-        <path d="M4 7h16v13H4zM4 7l3-4h4L8 7M12 7l3-4h4l-3 4" />
-        <path d="m10 11 5 3-5 3v-6Z" />
+        <path fill="currentColor" d="M3 8h18v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Zm1-6h17v4.5H4V2Z" />
+        <path fill="#fff" fill-opacity=".82" d="m10 11 5.5 3.5L10 18v-7Z" />
+        <path d="m8.5 2-3 4.5M15.5 2l-3 4.5" stroke="#fff" stroke-opacity=".65" stroke-width="1.5" />
       </template>
       <template v-else-if="normalizedId === 'medical'">
-        <path d="M9 3v5a3 3 0 0 0 6 0V3M7 3h4M13 3h4M12 11v3a5 5 0 0 0 5 5" />
-        <circle cx="19" cy="17" r="2" />
+        <path fill="currentColor" d="M9.5 2h5v6.5H21v5h-6.5V20h-5v-6.5H3v-5h6.5V2Z" />
+        <path fill="currentColor" fill-opacity=".6" d="M15.8 15.7a3.7 3.7 0 0 1 5.2 5.2 3.7 3.7 0 0 1-5.2-5.2Z" />
+        <path d="m17.1 19.6 2.5-2.5" stroke="#fff" stroke-opacity=".78" stroke-width="1.4" stroke-linecap="round" />
       </template>
       <template v-else>
-        <rect x="2" y="5" width="20" height="14" rx="3" />
-        <path d="M2 10h20M6 15h3" />
+        <rect x="2" y="2" width="20" height="20" rx="6" fill="currentColor" />
+        <circle cx="7" cy="12" r="1.7" fill="#fff" />
+        <circle cx="12" cy="12" r="1.7" fill="#fff" />
+        <circle cx="17" cy="12" r="1.7" fill="#fff" />
       </template>
     </svg>
   </span>
