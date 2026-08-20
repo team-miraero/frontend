@@ -24,7 +24,7 @@
       </div>
 
       <p ref="simulatorInstructionRef" class="mt-2 scroll-mt-2 text-center text-xs text-[#64748B]">
-        카테고리를 선택하고 지출을 조절해보세요.
+        카테고리를 선택하고 지출을 조절해보세요
       </p>
     </div>
 
@@ -105,7 +105,7 @@
         <template v-if="hasAdjustedInCurrentView">
           {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }} 단축
         </template>
-        <template v-else> 슬라이더를 조절하면 전체 단축 기간이 표시돼요. </template>
+        <template v-else> 슬라이더를 조절하면 전체 단축 기간이 표시돼요 </template>
       </div>
     </div>
 

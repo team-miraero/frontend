@@ -19,7 +19,7 @@
           <p id="spending-simulator-info-description" class="mt-2 text-sm leading-6 text-[#64748B]">
             카테고리별 지출을 조정해<br />
             목표 달성까지 얼마나 단축할 수 있는지<br />
-            확인해보는 기능이에요.
+            확인해보는 기능이에요
           </p>
         </div>
 
@@ -47,7 +47,7 @@
           </svg>
         </span>
         <p class="text-xs font-semibold leading-5 text-[#475569]">
-          기준 지출은 최근 3개월 평균 소비예요.
+          기준 지출은 최근 3개월 평균 소비예요
         </p>
       </div>
 

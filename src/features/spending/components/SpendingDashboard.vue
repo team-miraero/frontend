@@ -16,14 +16,14 @@
         class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700"
         role="alert"
       >
-        지출 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
+        지출 정보를 불러오지 못했어요 잠시 후 다시 시도해 주세요
       </p>
 
       <p
         v-else-if="!hasNumericGoalId && !areGoalsLoading"
         class="rounded-2xl border border-[#E2E8F0] bg-white px-5 py-8 text-center text-sm text-[#64748B]"
       >
-        지출관리에 사용할 목표를 먼저 만들어 주세요.
+        지출관리에 사용할 목표를 먼저 만들어 주세요
       </p>
 
       <template v-else-if="spendingSummary">

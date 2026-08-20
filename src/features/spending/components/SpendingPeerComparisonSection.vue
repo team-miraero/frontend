@@ -77,7 +77,7 @@
           </p>
 
           <p class="mt-1 text-[11px] text-[#64748B] break-keep sm:text-xs">
-            가장 차이가 큰 항목은 {{ largestDifferenceCategoryNames }}{{ categoryNamesEnding }}.
+            가장 차이가 큰 항목은 {{ largestDifferenceCategoryNames }}{{ categoryNamesEnding }}
           </p>
         </div>
 
@@ -145,7 +145,7 @@
       </template>
 
       <p v-else class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]">
-        비교할 또래 지출 데이터가 없어요.
+        비교할 또래 지출 데이터가 없어요
       </p>
     </article>
   </section>
