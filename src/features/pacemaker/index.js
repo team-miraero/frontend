@@ -11,5 +11,6 @@ export { default as PacemakerDepositModal } from '@/features/pacemaker/component
 export { default as PacemakerHistoryModal } from '@/features/pacemaker/components/PacemakerHistoryModal.vue'
 export { default as PacemakerDepositSuccessModal } from '@/features/pacemaker/components/PacemakerDepositSuccessModal.vue'
 export { default as PacemakerLimitStep } from '@/features/pacemaker/components/PacemakerLimitStep.vue'
+export { default as PacemakerAccountStep } from '@/features/pacemaker/components/PacemakerAccountStep.vue'
 export { default as PacemakerSetupCompleteStep } from '@/features/pacemaker/components/PacemakerSetupCompleteStep.vue'
 export { default as PacemakerDashboard } from '@/features/pacemaker/components/PacemakerDashboard.vue'

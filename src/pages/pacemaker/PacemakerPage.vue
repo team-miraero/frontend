@@ -1,9 +1,13 @@
 <template>
-  <div class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fafc] pb-6">
-    <section
-      v-if="isLoading"
-      class="w-full"
-    >
+  <div
+    class="flex justify-center bg-[#f8fafc]"
+    :class="
+      pacemakerStore.pacemakerStatus?.registered === false
+        ? 'h-[calc(100dvh_-_122px_-_env(safe-area-inset-bottom))] sm:h-[calc(100dvh_-_130px_-_env(safe-area-inset-bottom))] md:h-auto md:min-h-[calc(100vh-80px)] md:pb-6'
+        : 'min-h-[calc(100vh-80px)] pb-6'
+    "
+  >
+    <section v-if="isLoading" class="w-full">
       <LoadingSpinner
         message="페이스메이커를 확인하고 있어요"
         container-class="min-h-[calc(100dvh-122px)] md:min-h-[calc(100dvh-80px)]"
@@ -70,106 +74,58 @@
 
     <div
       v-else-if="pacemakerStore.pacemakerStatus?.registered === false"
-      class="page-container-narrow flex flex-col gap-3 pb-10 pt-4 sm:gap-8 sm:pb-14 sm:pt-6"
+      class="page-container-narrow grid h-full grid-rows-[auto_minmax(0,1fr)_auto] gap-3 py-3 md:flex md:h-auto md:flex-col md:gap-5 md:pb-0 md:pt-5"
     >
-      <!-- 와이어프레임 Hero card -->
+      <!-- 페이스메이커 핵심 설명 -->
       <section
-        class="relative overflow-hidden rounded-[28px] px-6 py-7 text-white shadow-[0_16px_48px_rgba(0,102,255,0.22)] motion-safe:animate-fade-in-up sm:px-8 sm:py-8"
-        style="background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%)"
+        class="px-1 py-3 motion-safe:animate-fade-in-up sm:px-2 sm:py-4"
         aria-labelledby="pacemaker-intro-title"
       >
-        <div
-          class="pointer-events-none absolute right-0 top-0 size-48 translate-x-[30%] -translate-y-[30%] rounded-full bg-white opacity-10"
-          aria-hidden="true"
-        />
-        <div
-          class="pointer-events-none absolute bottom-0 right-12 size-28 translate-y-[40%] rounded-full bg-white opacity-10"
-          aria-hidden="true"
-        />
-
-        <div class="relative z-[1]">
-          <div class="mb-4 flex items-center gap-2">
-            <span
-              class="flex size-8 items-center justify-center rounded-xl bg-white/20"
-              aria-hidden="true"
-            >
-              <svg
-                class="size-4"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M2.7 9.3 9.3 2.5 8 6.7h5.3l-6.6 6.8L8 9.3H2.7Z" />
-              </svg>
-            </span>
-            <span class="text-sm font-bold text-white/90">페이스메이커</span>
-          </div>
+        <div>
           <h2
             id="pacemaker-intro-title"
-            class="text-[26px] font-bold leading-[1.2] tracking-tight"
+            class="text-[22px] font-bold leading-[1.25] tracking-[-0.02em] text-[#0a192f] sm:text-2xl"
           >
-            다음달 자금,<br />자동으로 마련해드려요
+            목표까지<br />차곡차곡 모아요
           </h2>
-          <p class="mt-3 text-sm leading-relaxed text-white/80">
-            오늘 하루 발생한 여유자금을 분석해<br class="hidden sm:block" />
-            목표 달성을 위한 자금을 자동으로 저축해요
+          <p class="mt-3 text-xs leading-[18px] text-slate-500 sm:text-sm sm:leading-5">
+            매일 남은 돈을 계산해 자동으로 저축해요
           </p>
         </div>
       </section>
 
-      <!-- 와이어프레임 Feature cards -->
-      <section aria-labelledby="pacemaker-feature-title">
-        <h2 id="pacemaker-feature-title" class="sr-only">페이스메이커 주요 기능</h2>
-        <ul class="grid gap-3 sm:gap-4 md:grid-cols-3">
+      <!-- 페이스메이커 서비스 흐름 -->
+      <section
+        class="flex min-h-0 flex-col rounded-[20px] border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
+        aria-labelledby="pacemaker-how-title"
+      >
+        <h2 id="pacemaker-how-title" class="mb-2 text-base font-bold text-[#0a192f]">
+          어떻게 모으나요?
+        </h2>
+        <ul class="flex min-h-0 flex-1 flex-col divide-y divide-slate-100">
           <li
-            v-for="(feature, index) in featureItems"
-            :key="feature.title"
-            class="flex gap-4 rounded-[20px] border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] motion-safe:animate-fade-in-up md:flex-col md:gap-3"
-            :style="{ animationDelay: `${100 + index * 80}ms` }"
+            v-for="step in savingFlow"
+            :key="step.title"
+            class="flex min-h-0 flex-1 items-center gap-3 py-3"
           >
             <span
-              class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#F2F4F6] text-primary"
+              class="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-blue-50 text-primary"
+              aria-hidden="true"
             >
-              <AppIcon :name="feature.icon" />
+              <AppIcon :name="step.icon" size="sm" />
             </span>
-            <div>
-              <h3 class="mb-1 text-sm font-bold text-[#0a192f]">{{ feature.title }}</h3>
-              <p class="text-xs leading-relaxed text-slate-500">{{ feature.description }}</p>
+            <div class="min-w-0">
+              <h3 class="text-sm font-semibold text-[#0a192f]">{{ step.title }}</h3>
+              <p class="mt-0.5 text-[11px] leading-[15px] text-slate-500">
+                {{ step.description }}
+              </p>
             </div>
           </li>
         </ul>
-      </section>
 
-      <!-- 와이어프레임 How it works -->
-      <section
-        class="rounded-[20px] border border-slate-200 bg-white px-5 py-5 sm:px-6"
-        aria-labelledby="pacemaker-how-title"
-      >
-        <h2 id="pacemaker-how-title" class="mb-4 text-sm font-bold text-[#0a192f]">
-          어떻게 작동하나요?
-        </h2>
-        <ol class="flex flex-col gap-3.5">
-          <li v-for="step in howItWorks" :key="step.step" class="flex items-start gap-4">
-            <span
-              class="flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
-              style="background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%)"
-              aria-hidden="true"
-            >
-              {{ step.step }}
-            </span>
-            <div>
-              <h3 class="text-sm font-semibold text-[#0a192f]">{{ step.title }}</h3>
-              <p class="mt-0.5 text-xs text-slate-400">{{ step.description }}</p>
-            </div>
-          </li>
-        </ol>
-
-        <div class="mt-5 flex items-start gap-2 border-t border-slate-100 pt-4">
+        <div class="mt-2 flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2.5">
           <svg
-            class="mt-0.5 size-4 shrink-0 text-primary"
+            class="size-3.5 shrink-0 text-slate-400"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -181,35 +137,33 @@
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
             <path d="m9 12 2 2 4-4" />
           </svg>
-          <p class="text-xs leading-relaxed text-slate-500">
-            하루 상한선은 언제든 수정할 수 있고, 필요하면 자동저축을 바로 일시정지할 수 있어요.
+          <p class="text-[10px] leading-[14px] text-slate-500 sm:text-[11px]">
+            하루 상한선은 언제든 수정할 수 있고,<br />
+            필요하면 자동저축을 바로 일시정지할 수 있어요.
           </p>
         </div>
       </section>
 
-      <!-- 와이어프레임 CTA -->
+      <!-- 저금통 개설 CTA -->
       <button
         type="button"
-        class="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-[18px] px-5 text-base font-bold tracking-tight text-white shadow-[0_8px_28px_rgba(0,102,255,0.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:animate-fade-in-up motion-safe:transition motion-safe:hover:scale-[1.01] motion-safe:active:scale-[0.98]"
-        style="
-          background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%);
-          animation-delay: 400ms;
-        "
+        class="inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-primary px-5 text-[15px] font-bold tracking-tight text-white shadow-[0_7px_20px_rgba(0,102,255,0.24)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:animate-fade-in-up motion-safe:transition motion-safe:hover:bg-[#0055dd] motion-safe:active:scale-[0.98]"
+        style="animation-delay: 300ms"
         @click="goToSetup"
       >
+        페이스메이커 전용 저금통 개설하기
         <svg
-          class="size-[18px]"
-          viewBox="0 0 16 16"
+          class="size-4"
+          viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="1.5"
+          stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
           aria-hidden="true"
         >
-          <path d="M2.7 9.3 9.3 2.5 8 6.7h5.3l-6.6 6.8L8 9.3H2.7Z" />
+          <path d="m9 18 6-6-6-6" />
         </svg>
-        페이스메이커 전용 저금통 개설하기
       </button>
     </div>
 
@@ -223,47 +177,29 @@ import { useRouter } from 'vue-router'
 import { PacemakerDashboard, usePacemakerStore } from '@/features/pacemaker'
 import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pacemaker.constants'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 import AppIcon from '@/shared/ui/AppIcon.vue'
+import LoadingSpinner from '@/shared/ui/LoadingSpinner.vue'
 
 const router = useRouter()
 const pacemakerStore = usePacemakerStore()
 const isLoading = ref(true)
 const errorMessage = ref('')
 
-const featureItems = [
+const savingFlow = [
   {
-    icon: '💡',
-    title: '여유자금 자동 감지',
-    description: '매일 오전 8시, 어제의 일일 한도에서 실제 지출을 뺀 여유자금을 계산해요.',
+    icon: 'lightbulb',
+    title: '남은 돈 계산',
+    description: '오늘 쓸 수 있는 여유자금을 계산해요',
   },
   {
-    icon: '💰',
-    title: '자동 저금통 저축',
-    description: '설정한 상한선 이내에서 매일 자동으로 저금통에 저축해요.',
+    icon: 'money',
+    title: '자동으로 모으기',
+    description: '설정한 한도 안에서 자동으로 저축해요',
   },
   {
-    icon: '🎯',
-    title: '목표 연동 입금',
-    description: '쌓인 여유자금을 목표와 연결된 자산에 원하는 시점에 입금해요.',
-  },
-]
-
-const howItWorks = [
-  {
-    step: '01',
-    title: '매일 오전 8시, 어제 하루 여유자금 계산',
-    description: '일일 한도 − 실제 지출 = 여유자금',
-  },
-  {
-    step: '02',
-    title: '설정 상한선 이내 금액을 자동으로 저금통에 저축',
-    description: '최대 상한선 초과 시 상한선 금액만 저축',
-  },
-  {
-    step: '03',
-    title: '쌓인 금액을 목표 연결 자산에 직접 입금',
-    description: '원하는 목표의 연결 자산으로 즉시 이동',
+    icon: 'target',
+    title: '목표 자산으로 이동',
+    description: '원하는 목표 자산에 쌓아서 관리해요',
   },
 ]
 
