@@ -1,34 +1,83 @@
 <template>
   <div class="page-container-narrow pb-10 pt-3 sm:pb-14 sm:pt-6 flex flex-col gap-4 sm:gap-6">
-    <div class="flex items-center justify-between gap-2.5 sm:gap-4">
-      <div class="min-w-0 flex-1">
-        <h2 class="text-xl font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-2xl">
-          오늘까지 모인 여유자금
-        </h2>
-      </div>
-      <button
-        type="button"
-        class="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition hover:bg-slate-50 active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:px-4 sm:py-2 cursor-pointer select-none"
-        @click="$emit('edit-max-amount')"
-      >
-        ⚙ 상한선 수정
-      </button>
-    </div>
-
+    <!-- 1. 페이스메이커 전용 저금통 카드 -->
     <section
-      class="flex items-center justify-between gap-3 rounded-[20px] border border-slate-200 bg-white px-4 py-3.5 shadow-xs sm:px-6"
-      aria-labelledby="auto-saving-toggle-title"
+      class="rounded-[20px] px-5 py-5 text-white shadow-[0_12px_40px_rgba(0,102,255,0.22)] sm:px-6 sm:py-6"
+      style="background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%)"
+      aria-labelledby="pacemaker-balance-title"
+    >
+      <p id="pacemaker-balance-title" class="text-xs font-bold text-white/80">
+        페이스메이커 전용 저금통
+      </p>
+      <p v-if="pacemaker.maskedAccountNumber" class="mt-0.5 text-xs font-medium text-white/60">
+        {{ pacemaker.maskedAccountNumber }}
+      </p>
+
+      <p class="mt-4 text-[32px] font-bold leading-none tracking-tight sm:text-[34px]">
+        {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="ml-1 text-lg font-semibold">원</span>
+      </p>
+      <p class="mt-1.5 text-xs text-white/70">현재 모인 금액</p>
+
+      <div class="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-3">
+        <div>
+          <p class="text-[11px] font-medium text-white/60">오늘 자동저축</p>
+          <p class="text-sm font-bold">
+            +{{ formatNumber(pacemaker.todaySavingAmount) }}원
+          </p>
+        </div>
+        <!-- 하루 한도: 영역 자체가 상한선 변경 진입점 -->
+        <button
+          type="button"
+          class="group -my-0.5 -mr-2 flex items-center justify-between gap-2 rounded-xl px-2 py-0.5 text-left transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 cursor-pointer select-none"
+          aria-label="하루 한도 변경하기"
+          @click="$emit('edit-max-amount')"
+        >
+          <span class="min-w-0">
+            <span class="block text-[11px] font-medium text-white/60">하루 한도</span>
+            <span class="block text-sm font-bold">
+              {{ formatNumber(pacemaker.maxAmount) }}원
+            </span>
+          </span>
+          <svg
+            class="size-3.5 shrink-0 text-white/50 transition group-hover:text-white/80"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. 자동저축 상태 카드: 별도 제목 없이 상태 문구가 가장 먼저 보이도록 구성 -->
+    <section
+      class="flex items-center justify-between gap-3 rounded-[20px] border border-slate-200 bg-white px-4 py-4 shadow-xs sm:px-6"
+      aria-label="자동저축 상태"
     >
       <div class="min-w-0">
-        <p id="auto-saving-toggle-title" class="text-xs font-bold text-slate-400">자동저축 상태</p>
         <p
-          class="mt-0.5 flex items-center gap-1.5 text-sm font-bold"
+          class="flex items-center gap-1.5 text-sm font-bold"
           :class="isActive ? 'text-primary' : 'text-slate-500'"
         >
-          <span class="size-1.5 shrink-0 rounded-full" :class="isActive ? 'bg-primary' : 'bg-slate-300'" />
-          {{ isActive ? '활성화 중' : '일시정지됨' }}
+          <span
+            class="size-1.5 shrink-0 rounded-full"
+            :class="isActive ? 'bg-primary' : 'bg-slate-300'"
+          />
+          {{ isActive ? '자동저축 진행 중' : '자동저축 일시정지' }}
         </p>
-        <p v-if="pacemakerStore.toggleError" class="mt-1 text-xs font-bold text-red-500" role="alert">
+        <p class="mt-1 truncate text-xs text-slate-400">
+          {{ statusDescription }}
+        </p>
+        <p
+          v-if="pacemakerStore.toggleError"
+          class="mt-1 text-xs font-bold text-red-500"
+          role="alert"
+        >
           상태를 변경하지 못했어요. 다시 시도해 주세요.
         </p>
       </div>
@@ -43,62 +92,31 @@
         :disabled="pacemakerStore.isToggling"
         @click="handleToggle"
       >
-        {{ pacemakerStore.isToggling ? '변경 중...' : isActive ? '일시정지' : '다시 활성화' }}
+        {{ pacemakerStore.isToggling ? '변경 중...' : isActive ? '일시정지' : '다시 시작' }}
       </button>
     </section>
 
-    <section
-      class="rounded-[20px] px-5 py-4 text-white shadow-[0_12px_40px_rgba(0,102,255,0.22)] sm:px-6 sm:py-5"
-      style="background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%)"
-      aria-labelledby="pacemaker-balance-title"
-    >
-      <div class="flex items-center justify-between gap-2">
-        <p id="pacemaker-balance-title" class="truncate text-xs font-bold text-white/80">
-          페이스메이커 전용 저금통
-          <span v-if="pacemaker.maskedAccountNumber" class="ml-1 font-medium text-white/60">
-            {{ pacemaker.maskedAccountNumber }}
-          </span>
-        </p>
-        <span class="shrink-0 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold">
-          자동저축 {{ isActive ? 'ON' : 'OFF' }}
-        </span>
-      </div>
-
-      <div class="mt-3 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
-        <p class="text-[28px] font-bold tracking-tight sm:text-[30px]">
-          {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="ml-1 text-base font-semibold">원</span>
-        </p>
-        <div class="flex items-center gap-4 text-xs">
-          <div>
-            <p class="text-white/60">오늘 자동 저축</p>
-            <p class="font-bold">+{{ formatNumber(pacemaker.todaySavingAmount) }}원</p>
-          </div>
-          <div>
-            <p class="text-white/60">하루 상한선</p>
-            <p class="font-bold">{{ formatNumber(pacemaker.maxAmount) }}원</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
+    <!-- 3. 이번 주 자동 저축 기록 -->
     <section
       class="rounded-[20px] border border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 shadow-xs"
       aria-labelledby="streak-title"
     >
       <div class="mb-4 flex flex-col gap-1">
-        <!-- 상단 헤더 행: 타이틀/전환 버튼 + 연속 일수 뱃지 수직 중앙 정렬 -->
         <div class="flex items-center justify-between gap-2">
           <button
             type="button"
-            class="group inline-flex min-w-0 items-center gap-1.5 sm:gap-2 text-left outline-none cursor-pointer select-none"
-            :aria-label="isMonthlyStreak ? '주간 스트릭 보기로 전환' : '월간 달력 보기로 전환'"
+            class="group inline-flex min-w-0 items-center gap-1.5 text-left outline-none cursor-pointer select-none"
+            :aria-label="isMonthlyStreak ? '주간 기록 보기로 전환' : '월간 기록 보기로 전환'"
             @click="isMonthlyStreak = !isMonthlyStreak"
           >
-            <h3 id="streak-title" class="truncate text-sm sm:text-base font-bold text-[#0a192f] transition-colors group-hover:text-primary">
-              {{ isMonthlyStreak ? '이번 달 자동 저축 달력' : '이번 주 자동 저축 스트릭' }}
+            <h3
+              id="streak-title"
+              class="truncate text-sm sm:text-base font-bold text-[#0a192f] transition-colors group-hover:text-primary"
+            >
+              {{ isMonthlyStreak ? '이번 달 자동 저축 기록' : '이번 주 자동 저축 기록' }}
             </h3>
             <span
-              class="flex size-5 sm:size-6 shrink-0 items-center justify-center rounded-full bg-slate-100/90 text-slate-500 transition-all duration-200 group-hover:bg-primary/10 group-hover:text-primary shadow-2xs"
+              class="flex size-5 sm:size-6 shrink-0 items-center justify-center rounded-full bg-slate-100/90 text-slate-500 transition-all duration-200 group-hover:bg-primary/10 group-hover:text-primary"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -112,64 +130,34 @@
               </svg>
             </span>
           </button>
-
-          <!-- 🔥 연속 일수 뱃지 -->
           <span
-            class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold shadow-2xs whitespace-nowrap transition-colors"
+            class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap"
             :class="
               pacemaker.currentStreak > 0
-                ? 'bg-orange-50 border border-orange-200/80 text-orange-600'
-                : 'bg-slate-100 border border-slate-200/80 text-slate-500'
+                ? 'bg-accent-light text-primary'
+                : 'bg-slate-100 text-slate-500'
             "
           >
-            <!-- 선명한 듀오톤 SVG 불꽃 -->
-            <svg
-              v-if="pacemaker.currentStreak > 0"
-              class="size-3.5 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M12 22C16.4183 22 20 18.4183 20 14C20 10.5 17.5 7.5 15 4C15 7 13.5 8 12.5 9C11.5 6 9 3 9 2C5.5 6.5 4 10 4 14C4 18.4183 7.58172 22 12 22Z"
-                fill="#FF6B00"
-              />
-              <path
-                d="M12 20C14.2091 20 16 18.2091 16 16C16 13.8 14.5 12 13 10.5C12.5 12 11.5 12.5 11 13C10.5 11.5 9 10 9 9.5C7.5 11.5 7 13.5 7 16C7 18.2091 8.79086 20 12 20Z"
-                fill="#FFD233"
-              />
-            </svg>
-            <svg
-              v-else
-              class="size-3.5 shrink-0 text-slate-400"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M12 22c4 0 7-3 7-7 0-3-2-6-5-9 0 3-1 4-2 5-1-3-3-5-5-7 1 5-2 7-2 11 0 4 3 7 7 7Z" />
-            </svg>
-            <span>{{ formatNumber(pacemaker.currentStreak) }}일 연속</span>
+            연속 {{ formatNumber(pacemaker.currentStreak) }}일
           </span>
         </div>
-
-        <!-- 하단 안내 문구 -->
         <p class="text-[11px] font-medium text-slate-400">
-          {{ isMonthlyStreak ? '클릭하여 주간 스트릭으로 접기' : '클릭하여 월간 달력으로 펼치기' }} · {{ formatTodayLabel }} 기준
+          {{ isMonthlyStreak ? '클릭하여 이번 주 기록으로 접기' : '클릭하여 이번 달 기록으로 펼치기' }} · {{ formatTodayLabel }} 기준
         </p>
       </div>
 
       <div v-if="!isMonthlyStreak" class="grid grid-cols-7 gap-1.5 sm:gap-2">
-        <div v-for="day in weekDays" :key="day.label" class="flex flex-col items-center gap-1 sm:gap-1.5">
+        <div
+          v-for="day in weekDays"
+          :key="day.label"
+          class="flex flex-col items-center gap-1 sm:gap-1.5"
+        >
           <div
             class="flex size-8 sm:size-10 items-center justify-center rounded-full text-xs font-bold transition-all duration-150"
             :class="weekDayClass(day)"
           >
             <svg
-              v-if="day.status === 'SUCCESS'"
+              v-if="day.saved"
               class="size-3.5 sm:size-4 stroke-[3]"
               fill="none"
               viewBox="0 0 24 24"
@@ -181,7 +169,7 @@
           </div>
           <span
             class="text-[11px] sm:text-xs font-bold"
-            :class="day.status === 'SUCCESS' ? 'text-[#0a192f]' : 'text-slate-400'"
+            :class="day.saved ? 'text-[#0a192f]' : 'text-slate-400'"
           >
             {{ day.label }}
           </span>
@@ -204,14 +192,30 @@
         </div>
       </div>
 
-      <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400 border-t border-slate-100 pt-3">
-        <span>{{ monthLabel }} 자동 저축</span>
-        <span class="font-bold text-primary">{{ formatNumber(monthlySuccessCount) }}회 성공</span>
+      <div
+        class="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs text-slate-400"
+      >
+        <span>{{ isMonthlyStreak ? '이번 달 자동 저축' : '이번 주 자동 저축' }}</span>
+        <span class="font-bold text-primary">
+          {{ isMonthlyStreak ? monthlySuccessCount : weeklySuccessCount }}회 성공
+        </span>
       </div>
+
+      <button
+        type="button"
+        class="mt-3 w-full rounded-xl border border-slate-200 bg-white py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-50 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 cursor-pointer select-none"
+        @click="openHistoryModal"
+      >
+        자동저축 내역 보기
+      </button>
     </section>
 
+    <!-- 4. 목표별 입금 자산 -->
     <section aria-labelledby="goal-accounts-title">
-      <h3 id="goal-accounts-title" class="mb-2.5 px-0.5 text-base font-bold text-[#0a192f] sm:text-lg">
+      <h3
+        id="goal-accounts-title"
+        class="mb-2.5 px-0.5 text-base font-bold text-[#0a192f] sm:text-lg"
+      >
         목표별 입금 자산
       </h3>
       <div
@@ -240,21 +244,17 @@
         <article
           v-for="group in accountGroups"
           :key="group.goalId"
-          class="flex flex-col gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 sm:px-5 shadow-xs"
+          class="flex flex-col gap-3.5 rounded-[18px] border border-slate-200 bg-white px-4 py-4 sm:px-5 shadow-xs"
         >
-          <div class="flex items-center justify-between gap-3">
+          <!-- 상단: 목표 아이콘 + 목표명 / 우측 상단 입금하기 -->
+          <div class="flex items-start justify-between gap-3">
             <div class="flex min-w-0 items-center gap-3">
               <div
                 class="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-[#F2F4F6] text-primary"
               >
                 <GoalTypeIcon :goal-type="group.goalType" />
               </div>
-              <div class="min-w-0">
-                <p class="truncate text-sm font-bold text-[#0a192f]">{{ group.goalName }}</p>
-                <p class="truncate text-xs text-slate-400">
-                  목표에 바로 입금돼요
-                </p>
-              </div>
+              <p class="truncate text-sm font-bold text-[#0a192f]">{{ group.goalName }}</p>
             </div>
             <button
               type="button"
@@ -266,6 +266,7 @@
             </button>
           </div>
 
+          <!-- 연결된 자산 (여러 개면 선택 가능) -->
           <button
             type="button"
             class="rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-2.5 text-left disabled:cursor-default"
@@ -273,16 +274,14 @@
             :aria-expanded="expandedGoalId === group.goalId"
             @click="toggleAssetList(group.goalId)"
           >
-            <span class="flex items-center justify-between gap-2">
-              <span class="truncate text-xs text-slate-400">
+            <span class="block text-[11px] font-medium text-slate-400">연결된 자산</span>
+            <span class="mt-0.5 flex items-center justify-between gap-2">
+              <span class="truncate text-sm font-bold text-[#0a192f]">
                 {{ depositAssetName(selectedDepositAsset(group)) }}
               </span>
               <span v-if="(group.depositAssets?.length ?? 0) > 1" class="text-xs text-slate-400">
                 {{ expandedGoalId === group.goalId ? '⌃' : '⌄' }}
               </span>
-            </span>
-            <span class="mt-0.5 block text-sm font-bold text-primary">
-              {{ formatCompactWon(selectedDepositAsset(group)?.balance) }}
             </span>
           </button>
 
@@ -302,6 +301,35 @@
               </span>
             </button>
           </div>
+
+          <!-- 현재 금액 / 목표 금액 / 진행률 -->
+          <div>
+            <div class="flex items-end justify-between gap-3">
+              <div class="flex min-w-0 items-end gap-4">
+                <div class="min-w-0">
+                  <p class="text-[11px] font-medium text-slate-400">현재 금액</p>
+                  <p class="mt-0.5 truncate text-sm font-bold text-[#0a192f]">
+                    {{ formatNumber(group.totalSavedAmount) }}원
+                  </p>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[11px] font-medium text-slate-400">목표 금액</p>
+                  <p class="mt-0.5 truncate text-sm font-bold text-slate-500">
+                    {{ formatNumber(group.goalAmount) }}원
+                  </p>
+                </div>
+              </div>
+              <p class="shrink-0 text-lg font-bold tabular-nums text-primary">
+                {{ goalProgressRate(group) }}%
+              </p>
+            </div>
+            <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <div
+                class="h-full rounded-full bg-primary transition-all"
+                :style="{ width: `${goalProgressRate(group)}%` }"
+              />
+            </div>
+          </div>
         </article>
       </div>
       <div
@@ -312,56 +340,14 @@
       </div>
     </section>
 
-    <section
-      class="rounded-[20px] border border-slate-200 bg-white px-5 py-5 sm:px-6"
-      aria-labelledby="history-title"
-    >
-      <h3 id="history-title" class="mb-4 text-sm font-bold text-[#0a192f]">
-        이번 달 자동 저축 내역
-      </h3>
-      <div
-        v-if="pacemakerStore.historiesError"
-        class="rounded-xl border border-red-200 bg-red-50 px-5 py-6 text-center"
-        role="alert"
-      >
-        <p class="text-sm font-bold text-red-600">자동 저축 내역을 불러오지 못했어요.</p>
-        <button
-          type="button"
-          class="mt-3 rounded-full border border-red-200 bg-white px-4 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
-          :disabled="pacemakerStore.isHistoriesLoading"
-          @click="retryHistories"
-        >
-          {{ pacemakerStore.isHistoriesLoading ? '불러오는 중...' : '다시 시도' }}
-        </button>
-      </div>
-      <p
-        v-else-if="pacemakerStore.isHistoriesLoading"
-        class="py-6 text-center text-sm text-slate-400"
-        role="status"
-      >
-        자동 저축 내역을 불러오는 중이에요.
-      </p>
-      <div v-else-if="recentHistories.length" class="divide-y divide-slate-100">
-        <div
-          v-for="item in recentHistories"
-          :key="item.date"
-          class="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
-        >
-          <div class="min-w-0">
-            <p class="text-xs font-bold text-[#0a192f]">{{ formatHistoryDate(item.date) }}</p>
-            <p class="mt-0.5 truncate text-xs text-slate-400">{{ describeHistory(item) }}</p>
-          </div>
-          <span
-            class="shrink-0 text-sm font-bold"
-            :class="item.status === 'SAVED' ? 'text-primary' : 'text-slate-300'"
-          >
-            {{ item.status === 'SAVED' ? `+${formatNumber(item.amount)}원` : '—' }}
-          </span>
-        </div>
-      </div>
-      <p v-else class="py-6 text-center text-sm text-slate-400">아직 자동 저축 내역이 없어요.</p>
-    </section>
-
+    <PacemakerHistoryModal
+      v-model="isHistoryModalOpen"
+      :histories="pacemakerStore.histories"
+      :current-balance="pacemaker.moneyBoxBalance"
+      :is-loading="pacemakerStore.isHistoriesLoading"
+      :error="pacemakerStore.historiesError"
+      @retry="retryHistories"
+    />
     <PacemakerDepositModal
       v-model="isDepositModalOpen"
       :target="selectedDepositTarget"
@@ -384,6 +370,7 @@ import { usePacemakerStore } from '@/features/pacemaker/store/pacemaker.store'
 import { usePacemakerDeposit } from '@/features/pacemaker/composables/usePacemakerDeposit'
 import PacemakerDepositModal from '@/features/pacemaker/components/PacemakerDepositModal.vue'
 import PacemakerDepositSuccessModal from '@/features/pacemaker/components/PacemakerDepositSuccessModal.vue'
+import PacemakerHistoryModal from '@/features/pacemaker/components/PacemakerHistoryModal.vue'
 import { useModal } from '@/shared/composables/useModal'
 import { getLocalDateKey } from '@/shared/lib/date'
 import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
@@ -399,7 +386,18 @@ const DAY_OF_WEEK_LABEL = {
   SATURDAY: '토',
   SUNDAY: '일',
 }
+const WEEK_ORDER = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일']
+// JS Date#getDay()는 일요일이 0이라 dayOfWeek 이름과 매칭하기 위한 순서.
+const DAY_OF_WEEK_BY_INDEX = [
+  'SUNDAY',
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY',
+]
 
 const pacemakerStore = usePacemakerStore()
 const {
@@ -417,41 +415,30 @@ const expandedGoalId = ref(null)
 const isMonthlyStreak = ref(false)
 const { isOpen: isDepositModalOpen, open: openDepositModal } = useModal()
 const { isOpen: isDepositSuccessModalOpen, open: openDepositSuccessModal } = useModal()
+const { isOpen: isHistoryModalOpen, open: openHistoryModal } = useModal()
 
 const pacemaker = computed(() => pacemakerStore.pacemakerView)
 const isActive = computed(() => pacemaker.value.status === 'ACTIVE')
-const recentHistories = computed(() => pacemakerStore.histories.slice(0, 5))
 const weeklyStreak = computed(() => pacemaker.value.weeklyStreak ?? [])
 // 서버는 오늘 날짜를 별도로 내려주지 않으므로 로컬 오늘 날짜를 기준일로 쓴다.
 const referenceDate = computed(() => getLocalDateKey(new Date()))
-// JS Date#getDay()는 일요일이 0이라 dayOfWeek 이름과 매칭하기 위한 순서.
-const DAY_OF_WEEK_BY_INDEX = [
-  'SUNDAY',
-  'MONDAY',
-  'TUESDAY',
-  'WEDNESDAY',
-  'THURSDAY',
-  'FRIDAY',
-  'SATURDAY',
-]
 const todayDayOfWeek = computed(() => DAY_OF_WEEK_BY_INDEX[new Date().getDay()])
+
 const weekDays = computed(() => {
   const byDay = new Map(weeklyStreak.value.map((day) => [day.dayOfWeek, day]))
-  return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].map(
-    (dayOfWeek) => ({
-      ...byDay.get(dayOfWeek),
-      // 서버는 saved(boolean)로 내려주므로 기존 화면 로직이 쓰는 SUCCESS/FAIL 표기로 맞춘다.
-      status: byDay.get(dayOfWeek)?.saved ? 'SUCCESS' : 'FAIL',
-      label: DAY_OF_WEEK_LABEL[dayOfWeek],
-      isToday: dayOfWeek === todayDayOfWeek.value,
-    })
-  )
+  return WEEK_ORDER.map((dayOfWeek) => ({
+    saved: byDay.get(dayOfWeek)?.saved === true,
+    label: DAY_OF_WEEK_LABEL[dayOfWeek],
+    isToday: dayOfWeek === todayDayOfWeek.value,
+  }))
 })
+const weeklySuccessCount = computed(() => weekDays.value.filter((day) => day.saved).length)
+
+// 서버 히스토리는 SAVED/SKIPPED만 내려주고, 그 외 날짜(시작 전이거나 아직 기록이 없는 날)는
+// 실제 실패가 아니므로 별도 상태(NO_DATA)로 구분해 실패처럼 보이지 않게 한다.
 const monthDays = computed(() => {
   const [year, month] = referenceDate.value.split('-').map(Number)
   const lastDay = new Date(year, month, 0).getDate()
-  // 서버 히스토리는 SAVED/SKIPPED만 내려주고, 그 외 날짜(시작 전이거나 아직 기록이 없는 날)는
-  // 실제 실패가 아니므로 별도 상태(NO_DATA)로 구분해 실패처럼 보이지 않게 한다.
   const historyByDate = new Map(pacemakerStore.histories.map((item) => [item.date, item.status]))
   const days = Array.from({ length: lastDay }, (_, index) => {
     const day = index + 1
@@ -471,14 +458,31 @@ const monthDays = computed(() => {
   const mondayOffset = firstDay === 0 ? 6 : firstDay - 1
   return [...Array(mondayOffset).fill(null), ...days]
 })
+
+const monthlySuccessCount = computed(() => {
+  const currentMonth = referenceDate.value.slice(0, 7)
+  return pacemakerStore.histories.filter(
+    (item) => item.status === 'SAVED' && item.date?.startsWith(currentMonth)
+  ).length
+})
+
 const formatTodayLabel = computed(() => {
   const [, month, day] = referenceDate.value.split('-')
   return `${month}월 ${day}일`
 })
-const monthLabel = computed(() => `${referenceDate.value.split('-')[1]}월`)
-const monthlySuccessCount = computed(() => pacemaker.value.monthlySuccessCount)
+
+const statusDescription = computed(() =>
+  isActive.value ? '꾸준히 목표를 향해 모으고 있어요' : '다시 시작하면 모으기를 이어가요'
+)
 
 const accountGroups = computed(() => pacemakerStore.depositTargets)
+
+function goalProgressRate(group) {
+  const goalAmount = Number(group?.goalAmount ?? 0)
+  if (goalAmount <= 0) return 0
+  const saved = Number(group?.totalSavedAmount ?? 0)
+  return Math.min(100, Math.max(0, Math.round((saved / goalAmount) * 100)))
+}
 
 // 계좌/저금통은 별도 ID 체계라 assetId만으로는 충돌할 수 있어 assetType까지 묶어 키로 쓴다.
 function assetKey(asset) {
@@ -498,7 +502,7 @@ function selectableAssets(group) {
   return group.depositAssets?.filter((asset) => assetKey(asset) !== selectedKey) ?? []
 }
 
-// 왼쪽 카드에 표시할 계좌명을 계좌 상세 API(/accounts/{accountId})에서 조회해 캐시해둠
+// 카드에 표시할 계좌명을 계좌 상세 API(/accounts/{accountId})에서 조회해 캐시해둠
 watch(
   accountGroups,
   (groups) => {
@@ -559,22 +563,9 @@ function formatCompactWon(amount) {
   return `${formatNumber(value)}원`
 }
 
-function formatHistoryDate(isoDate) {
-  if (!isoDate) return '-'
-  const [, month, day] = isoDate.split('-')
-  return `${month}.${day}`
-}
-
-function describeHistory(item) {
-  if (item.status === 'SAVED') {
-    return item.description ?? '하루 여유자금 자동 저축'
-  }
-  return item.description ?? '여유자금 없음 — 저축 건너뜀'
-}
-
-// 월간 달력의 오늘 표시(테두리)와 동일한 규칙을 이번 주 스트릭에도 적용한다.
+// 오늘 날짜는 저축 여부와 무관하게 테두리로 구분해 "오늘이 어디인지" 바로 보이게 한다.
 function weekDayClass(day) {
-  if (day.status === 'SUCCESS') {
+  if (day.saved) {
     return day.isToday
       ? 'bg-primary text-white shadow-xs scale-105 ring-2 ring-offset-2 ring-primary/40'
       : 'bg-primary text-white shadow-xs scale-105'
