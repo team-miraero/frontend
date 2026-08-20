@@ -33,7 +33,7 @@
           <p class="text-base font-bold text-[#0a192f]">여유자금이 아직 없어요</p>
           <p class="text-xs leading-[19.5px] text-slate-500">
             페이스메이커 기능을 활성화하면<br />
-            오늘부터 자동으로 여유자금을 모아드려요
+            다음 날 오전 8시부터 자동으로 여유자금을 모아드려요
           </p>
         </div>
       </div>

@@ -16,59 +16,67 @@
     </div>
 
     <section
-      class="relative overflow-hidden rounded-[24px] px-6 py-6 text-white shadow-[0_12px_40px_rgba(0,102,255,0.22)] sm:px-7"
+      class="flex items-center justify-between gap-3 rounded-[20px] border border-slate-200 bg-white px-4 py-3.5 shadow-xs sm:px-6"
+      aria-labelledby="auto-saving-toggle-title"
+    >
+      <div class="min-w-0">
+        <p id="auto-saving-toggle-title" class="text-xs font-bold text-slate-400">자동저축 상태</p>
+        <p
+          class="mt-0.5 flex items-center gap-1.5 text-sm font-bold"
+          :class="isActive ? 'text-primary' : 'text-slate-500'"
+        >
+          <span class="size-1.5 shrink-0 rounded-full" :class="isActive ? 'bg-primary' : 'bg-slate-300'" />
+          {{ isActive ? '활성화 중' : '일시정지됨' }}
+        </p>
+        <p v-if="pacemakerStore.toggleError" class="mt-1 text-xs font-bold text-red-500" role="alert">
+          상태를 변경하지 못했어요. 다시 시도해 주세요.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="shrink-0 min-w-[92px] rounded-full px-4 py-2.5 text-xs font-bold shadow-2xs transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        :class="
+          isActive
+            ? 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+            : 'bg-primary text-white shadow-[0_3px_10px_rgba(0,102,255,0.2)] hover:bg-[#0055dd]'
+        "
+        :disabled="pacemakerStore.isToggling"
+        @click="handleToggle"
+      >
+        {{ pacemakerStore.isToggling ? '변경 중...' : isActive ? '일시정지' : '다시 활성화' }}
+      </button>
+    </section>
+
+    <section
+      class="rounded-[20px] px-5 py-4 text-white shadow-[0_12px_40px_rgba(0,102,255,0.22)] sm:px-6 sm:py-5"
       style="background: linear-gradient(135deg, #0066ff 0%, #66b2ff 100%)"
       aria-labelledby="pacemaker-balance-title"
     >
-      <span
-        class="pointer-events-none absolute right-0 top-0 size-40 translate-x-[30%] -translate-y-[30%] rounded-full bg-white/10"
-        aria-hidden="true"
-      />
-      <span
-        class="pointer-events-none absolute -bottom-16 right-28 size-32 rounded-full border-[18px] border-white/10"
-        aria-hidden="true"
-      />
-
-      <div class="relative z-[1]">
-        <div class="flex flex-wrap items-center gap-2">
-          <p id="pacemaker-balance-title" class="text-sm font-bold text-white/80">
-            페이스메이커 전용 저금통
-            <span v-if="pacemaker.maskedAccountNumber" class="ml-1 font-medium text-white/60">
-              {{ pacemaker.maskedAccountNumber }}
-            </span>
-          </p>
-          <span class="rounded-full bg-white/20 px-2 py-1 text-[10px] font-bold">
-            자동저축 {{ isActive ? 'ON' : 'OFF' }}
+      <div class="flex items-center justify-between gap-2">
+        <p id="pacemaker-balance-title" class="truncate text-xs font-bold text-white/80">
+          페이스메이커 전용 저금통
+          <span v-if="pacemaker.maskedAccountNumber" class="ml-1 font-medium text-white/60">
+            {{ pacemaker.maskedAccountNumber }}
           </span>
-        </div>
-        <p class="mt-1 text-[34px] font-bold tracking-tight sm:text-[36px]">
-          {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="ml-1 text-xl">원</span>
         </p>
-        <p class="mt-1 text-xs text-white/70">
-          오늘 자동 저축: +{{ formatNumber(pacemaker.todaySavingAmount) }}원
-        </p>
+        <span class="shrink-0 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold">
+          자동저축 {{ isActive ? 'ON' : 'OFF' }}
+        </span>
+      </div>
 
-        <div class="mt-4 flex flex-wrap items-center gap-2 sm:gap-3">
-          <span
-            class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold"
-          >
-            <svg
-              class="size-3"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M2.7 9.3 9.3 2.5 8 6.7h5.3l-6.6 6.8L8 9.3H2.7Z" />
-            </svg>
-            연속 {{ formatNumber(pacemaker.currentStreak) }}일 저축 중
-          </span>
-          <span class="rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold">
-            하루 상한선 {{ formatNumber(pacemaker.maxAmount) }}원/일
-          </span>
+      <div class="mt-3 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <p class="text-[28px] font-bold tracking-tight sm:text-[30px]">
+          {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="ml-1 text-base font-semibold">원</span>
+        </p>
+        <div class="flex items-center gap-4 text-xs">
+          <div>
+            <p class="text-white/60">오늘 자동 저축</p>
+            <p class="font-bold">+{{ formatNumber(pacemaker.todaySavingAmount) }}원</p>
+          </div>
+          <div>
+            <p class="text-white/60">하루 상한선</p>
+            <p class="font-bold">{{ formatNumber(pacemaker.maxAmount) }}원</p>
+          </div>
         </div>
       </div>
     </section>
@@ -434,18 +442,21 @@ const weekDays = computed(() => {
 const monthDays = computed(() => {
   const [year, month] = referenceDate.value.split('-').map(Number)
   const lastDay = new Date(year, month, 0).getDate()
-  const savedDates = new Set(
-    pacemakerStore.histories.filter((item) => item.status === 'SAVED').map((item) => item.date)
-  )
+  // 서버 히스토리는 SAVED/SKIPPED만 내려주고, 그 외 날짜(시작 전이거나 아직 기록이 없는 날)는
+  // 실제 실패가 아니므로 별도 상태(NO_DATA)로 구분해 실패처럼 보이지 않게 한다.
+  const historyByDate = new Map(pacemakerStore.histories.map((item) => [item.date, item.status]))
   const days = Array.from({ length: lastDay }, (_, index) => {
     const day = index + 1
     const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    const isFuture = date > referenceDate.value
+    const historyStatus = historyByDate.get(date)
+    const status = isFuture ? 'FUTURE' : (historyStatus ?? 'NO_DATA')
     return {
       day,
       date,
-      status: savedDates.has(date) ? 'SUCCESS' : 'FAIL',
+      status,
       isToday: date === referenceDate.value,
-      isFuture: date > referenceDate.value,
+      isFuture,
     }
   })
   const firstDay = new Date(year, month - 1, 1).getDay()
@@ -525,6 +536,10 @@ function handleDeposit(payload) {
   })
 }
 
+async function handleToggle() {
+  await pacemakerStore.togglePacemaker()
+}
+
 function formatNumber(amount) {
   return Number(amount ?? 0).toLocaleString('ko-KR')
 }
@@ -550,9 +565,12 @@ function describeHistory(item) {
 }
 
 function monthDayClass(day) {
-  if (day.status === 'SUCCESS') return 'bg-primary text-white'
+  if (day.status === 'SAVED') return 'bg-primary text-white'
   if (day.isToday) return 'border border-primary text-primary'
-  if (day.isFuture) return 'text-slate-300'
-  return 'bg-slate-100 text-slate-400'
+  if (day.status === 'FUTURE') return 'text-slate-300'
+  // SKIPPED: 조건상 저축하지 않은 정상 케이스라 실패(NO_DATA)와 다른 점선 스타일로 구분한다.
+  if (day.status === 'SKIPPED') return 'border border-dashed border-slate-300 text-slate-400'
+  // NO_DATA: 시작 전이거나 기록이 없는 날 — 실패처럼 보이지 않도록 옅게만 표시한다.
+  return 'text-slate-300'
 }
 </script>
