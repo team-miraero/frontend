@@ -92,6 +92,7 @@
         :value="sliderValue"
         :style="rangeStyle"
         @input="handleRangeInput"
+        @change="$emit('adjustment-complete')"
       />
 
       <div
@@ -122,9 +123,7 @@
       v-else
       class="mt-4 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-[#F4F8FF] px-3 py-2.5 text-xs transition-all"
     >
-      <span class="shrink-0 font-bold text-primary">
-        {{ formattedShortenedMonths }} 단축
-      </span>
+      <span class="shrink-0 font-bold text-primary"> {{ formattedShortenedMonths }} 단축 </span>
 
       <span class="min-w-0 text-right font-medium text-[#64748B]">
         월
@@ -166,7 +165,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update-target'])
+const emit = defineEmits(['update-target', 'adjustment-complete'])
 
 const formatAmount = formatKoreanNumber
 
