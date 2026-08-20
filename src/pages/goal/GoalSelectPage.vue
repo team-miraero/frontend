@@ -20,19 +20,19 @@
       </p>
 
       <!-- 1) 로딩 스켈레톤 UI -->
-      <div v-if="isLoading" class="mt-4 sm:mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3">
+      <div v-if="isLoading" class="mt-4 sm:mt-5 grid grid-cols-2 gap-2.5 sm:gap-3">
         <div
           v-for="i in 4"
           :key="i"
-          class="h-[120px] rounded-2xl bg-[#F4F7FA] p-5 animate-pulse flex flex-col justify-between"
+          class="h-[120px] sm:h-[130px] rounded-2xl bg-[#F4F7FA] p-3.5 sm:p-5 animate-pulse flex flex-col justify-between"
         >
           <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-2xl bg-slate-200/70" />
-            <div class="w-6 h-6 rounded-full bg-slate-200/70" />
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-200/70" />
+            <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-200/70" />
           </div>
-          <div class="space-y-2">
-            <div class="h-4 w-24 rounded bg-slate-200/70" />
-            <div class="h-3 w-40 rounded bg-slate-200/50" />
+          <div class="space-y-1.5 sm:space-y-2">
+            <div class="h-3.5 sm:h-4 w-16 sm:w-24 rounded bg-slate-200/70" />
+            <div class="h-2.5 sm:h-3 w-28 sm:w-40 rounded bg-slate-200/50" />
           </div>
         </div>
       </div>
@@ -65,20 +65,95 @@
         </button>
       </div>
 
-      <!-- 3) 목표 카드 그리드 (모바일 1열 세로 스크롤, 태블릿/PC 2열) -->
-      <div v-else class="mt-4 sm:mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3">
+      <!-- 3) 목표 카드 그리드 (모바일 2열 2x2, 태블릿/PC 2열) -->
+      <div v-else class="mt-4 sm:mt-5 grid grid-cols-2 gap-2.5 sm:gap-3">
         <GoalCard
           v-for="preset in presets"
           :key="preset.id"
           v-bind="preset"
           :is-selected="goalStore.selectedGoalPresetId === preset.id"
           @select="selectGoal(preset.id)"
+          @guide="openGuideModal(preset)"
         />
       </div>
     </div>
 
     <!-- 하단 반응형 CTA (모바일: 화면 고정 / 데스크톱: 카드 아래 인라인) -->
     <BottomCTA :label="buttonText" :disabled="!selectedGoal" desktop-static @click="handleNext" />
+
+    <!-- 목표 상세 안내 바텀시트 / 모달 -->
+    <BaseModal v-model="isGuideModalOpen" hide-default-close>
+      <div v-if="selectedGuidePreset" class="p-5 sm:p-6">
+        <!-- 상단 헤더: 아이콘 + 제목 + 닫기 버튼 -->
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div
+              class="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-[#EBF3FF] text-[#0066FF] shrink-0"
+            >
+              <GoalTypeIcon :goal-type="selectedGuidePreset.id" size="lg" />
+            </div>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-[#0a192f]">
+                {{ selectedGuidePreset.title }}
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">
+                {{ selectedGuidePreset.description }}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="flex size-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition cursor-pointer"
+            aria-label="닫기"
+            @click="isGuideModalOpen = false"
+          >
+            <svg
+              class="size-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+            >
+              <path d="m6 6 12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 본문: 누구에게 맞을까요? 안내 박스 -->
+        <div class="mt-4 sm:mt-5 rounded-2xl border border-blue-100 bg-[#F8FAFC] p-4">
+          <div class="flex items-center gap-1.5 font-bold text-[#0066FF] text-xs mb-2">
+            <AppIcon name="lightbulb" size="sm" />
+            <span>누구에게 맞을까요?</span>
+          </div>
+          <p class="text-xs sm:text-sm font-medium leading-relaxed text-slate-700 break-keep">
+            {{ selectedGuidePreset.guideInfo }}
+          </p>
+        </div>
+
+        <!-- 태그 목록 -->
+        <div v-if="selectedGuidePreset.tags?.length" class="mt-3.5 flex flex-wrap gap-1.5">
+          <span
+            v-for="tag in selectedGuidePreset.tags"
+            :key="tag"
+            class="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-slate-600"
+          >
+            #{{ tag }}
+          </span>
+        </div>
+
+        <!-- 하단 액션 버튼 -->
+        <div class="mt-6 flex gap-2">
+          <button
+            type="button"
+            class="w-full rounded-xl bg-primary py-3 sm:py-3.5 text-center text-sm font-bold text-white shadow-[0_4px_14px_rgba(0,102,255,0.25)] transition hover:bg-primary/90 active:scale-[0.98] cursor-pointer"
+            @click="handleSelectFromGuide(selectedGuidePreset.id)"
+          >
+            이 목표로 시작하기
+          </button>
+        </div>
+      </div>
+    </BaseModal>
   </HeroBackground>
 </template>
 
@@ -89,6 +164,9 @@ import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import StepHeader from '@/shared/ui/StepHeader.vue'
 import ProgressBar from '@/shared/ui/ProgressBar.vue'
 import BottomCTA from '@/shared/ui/BottomCTA.vue'
+import BaseModal from '@/shared/ui/BaseModal.vue'
+import AppIcon from '@/shared/ui/AppIcon.vue'
+import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 import GoalCard from '@/features/goal/components/GoalCard.vue'
 import { useGoalStore } from '@/features/goal/store/goal.store'
 import { getGoalPresets } from '@/features/goal/api/goal.api'
@@ -100,6 +178,20 @@ const goalStore = useGoalStore()
 const presets = ref([])
 const isLoading = ref(true)
 const isError = ref(false)
+
+const isGuideModalOpen = ref(false)
+const selectedGuidePreset = ref(null)
+
+function openGuideModal(preset) {
+  selectedGuidePreset.value = preset
+  isGuideModalOpen.value = true
+}
+
+function handleSelectFromGuide(presetId) {
+  selectGoal(presetId)
+  isGuideModalOpen.value = false
+  goalStore.moveToNextStep()
+}
 
 const selectedGoal = computed(() => {
   return presets.value.find((p) => p.id === goalStore.selectedGoalPresetId)

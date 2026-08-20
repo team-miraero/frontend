@@ -3,7 +3,7 @@
     role="radio"
     tabindex="0"
     :aria-checked="isSelected"
-    class="group relative flex w-full flex-col justify-between p-5 rounded-2xl transition-all duration-200 ease-out text-left select-none border-2 cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[#0066FF] focus-visible:ring-offset-2 active:scale-[0.98]"
+    class="group relative flex w-full flex-col justify-between p-3.5 sm:p-5 rounded-2xl transition-all duration-200 ease-out text-left select-none border-2 cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[#0066FF] focus-visible:ring-offset-2 active:scale-[0.98]"
     style="-webkit-tap-highlight-color: transparent"
     :class="[
       isSelected
@@ -14,72 +14,25 @@
     @keydown.space.prevent="$emit('select')"
     @keydown.enter.prevent="$emit('select')"
   >
-    <!-- 상단 영역: 아이콘 / 우측 동그라미 체크마크 (일렬 정렬) -->
-    <div class="flex items-center justify-between gap-2 mb-3">
+    <!-- 상단 영역: 아이콘 / 우측 (i) 가이드 버튼 및 동그라미 체크마크 -->
+    <div class="flex items-center justify-between gap-1.5 sm:gap-2 mb-2 sm:mb-3">
       <!-- 아이콘 둥근 박스 -->
       <div
-        class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all shrink-0"
+        class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center transition-all shrink-0"
         :class="isSelected ? 'bg-white shadow-xs' : 'bg-[#EBF3FF]'"
       >
-        <GoalTypeIcon :goal-type="id" size="lg" class="text-[#0066FF]" />
+        <GoalTypeIcon :goal-type="id" size="lg" class="text-[#0066FF] size-5 sm:size-6" />
       </div>
 
-      <!-- 우측 동그라미 선택 체크마크 -->
-      <div
-        class="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shrink-0"
-        :class="
-          isSelected
-            ? 'bg-[#0066FF] text-white shadow-xs scale-100'
-            : 'border-2 border-gray-300 bg-white text-transparent scale-90 group-hover:border-gray-400'
-        "
-      >
-        <svg class="w-3.5 h-3.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-    </div>
-
-    <!-- (i) 툴팁 팝오버 (산뜻한 화이트 카드) -->
-    <div
-      v-if="isTooltipOpen"
-      class="absolute left-3 right-3 top-3 z-30 animate-fade-in-up rounded-2xl border border-blue-200 bg-white p-3.5 text-xs leading-relaxed text-gray-800 shadow-xl ring-1 ring-black/5"
-      @click.stop
-    >
-      <div class="flex items-start justify-between gap-2">
-        <p class="text-xs font-medium leading-relaxed text-gray-700 break-keep">
-          <span class="inline-flex items-center gap-1 font-bold text-[#0066FF]">
-            <AppIcon name="lightbulb" size="sm" /> 누구에게 맞을까요? </span
-          ><br />
-          {{ guideInfo }}
-        </p>
-        <button
-          type="button"
-          class="shrink-0 text-gray-400 hover:text-gray-700 text-xs font-bold px-1"
-          @click.stop="isTooltipOpen = false"
-        >
-          ✕
-        </button>
-      </div>
-    </div>
-
-    <!-- 텍스트 영역: 타이틀 + i 버튼 + 1줄 설명 -->
-    <div class="mt-1">
-      <div class="flex items-center gap-1.5 mb-1">
-        <h3
-          class="text-base sm:text-lg font-bold transition-colors"
-          :class="isSelected ? 'text-[#0066FF]' : 'text-gray-900'"
-        >
-          {{ title }}
-        </h3>
-
+      <!-- 우측 영역: (i) 가이드 버튼 + 선택 체크마크 -->
+      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <!-- (i) 정보 가이드 버튼 -->
         <button
           v-if="guideInfo"
           type="button"
-          class="inline-flex size-6 items-center justify-center -m-1 rounded-full text-gray-400 transition-colors hover:text-[#0066FF] hover:bg-blue-50 focus:outline-none shrink-0"
-          :class="isTooltipOpen ? 'text-[#0066FF] bg-blue-50' : ''"
+          class="inline-flex size-6 items-center justify-center rounded-full text-slate-400 transition-colors hover:text-[#0066FF] hover:bg-blue-50 focus:outline-none cursor-pointer"
           title="목표 가이드 보기"
-          @click.stop="isTooltipOpen = !isTooltipOpen"
+          @click.stop="$emit('guide')"
         >
           <svg
             class="size-3.5"
@@ -95,9 +48,33 @@
             <line x1="12" y1="8" x2="12.01" y2="8" />
           </svg>
         </button>
-      </div>
 
-      <p class="text-xs sm:text-sm text-gray-500 font-medium leading-snug line-clamp-1">
+        <!-- 우측 동그라미 선택 체크마크 -->
+        <div
+          class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all duration-200"
+          :class="
+            isSelected
+              ? 'bg-[#0066FF] text-white shadow-xs scale-100'
+              : 'border-2 border-gray-300 bg-white text-transparent scale-90 group-hover:border-gray-400'
+          "
+        >
+          <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 텍스트 영역: 타이틀 + 1줄 설명 -->
+    <div class="mt-1 min-w-0">
+      <h3
+        class="text-sm sm:text-base md:text-lg font-bold transition-colors truncate whitespace-nowrap mb-0.5 sm:mb-1"
+        :class="isSelected ? 'text-[#0066FF]' : 'text-gray-900'"
+      >
+        {{ title }}
+      </h3>
+
+      <p class="text-[11px] sm:text-xs md:text-sm text-gray-500 font-medium leading-tight sm:leading-snug truncate whitespace-nowrap">
         {{ description }}
       </p>
     </div>
@@ -105,8 +82,6 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
-import AppIcon from '@/shared/ui/AppIcon.vue'
 import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
 defineProps({
@@ -118,21 +93,5 @@ defineProps({
   guideInfo: { type: String, default: '' },
 })
 
-defineEmits(['select'])
-
-const isTooltipOpen = ref(false)
-
-function handleDocumentClick() {
-  if (isTooltipOpen.value) {
-    isTooltipOpen.value = false
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleDocumentClick)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleDocumentClick)
-})
+defineEmits(['select', 'guide'])
 </script>
