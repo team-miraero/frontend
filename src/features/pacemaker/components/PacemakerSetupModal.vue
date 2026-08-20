@@ -40,10 +40,7 @@
 
       <button
         type="button"
-        class="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)]"
-        style="
-          background-image: linear-gradient(173deg, rgb(0, 102, 255) 0%, rgb(102, 178, 255) 100%);
-        "
+        class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-sm font-bold text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)] transition hover:bg-[#005ce6] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99]"
         @click="goToPacemakerSetup"
       >
         <img src="@/assets/icons/pacemaker-setup-cta.svg" alt="" class="size-[15px]" />
