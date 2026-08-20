@@ -654,7 +654,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui.store'
 import { useGoalStore } from '@/features/goal'
 import { useCoachStore } from '@/features/coach'
-import { usePacemakerToast, usePacemakerDeposit } from '@/features/pacemaker'
+import { usePacemakerToast } from '@/features/pacemaker'
 import { NAV_ITEMS } from '@/shared/constants/navigation'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import AppIcon from '@/shared/ui/AppIcon.vue'
@@ -699,9 +699,7 @@ const {
   markAllAsRead,
   removeHistoryItem,
   clearHistory,
-  openBalanceModal,
 } = usePacemakerToast()
-const { retryDepositTargets } = usePacemakerDeposit()
 
 const isDropdownOpen = ref(false)
 const dropdownRef = ref(null)
@@ -796,14 +794,13 @@ function toggleDropdown() {
 function handleNotificationClick(item) {
   isDropdownOpen.value = false
 
-  if (item.type === 'SAVING') {
-    // 모달을 열자마자 대상 목록이 비어 보이지 않도록, 조회를 먼저 시작해두고
-    // 모달은 즉시 연다 (로딩 중에는 모달 자체가 "불러오는 중" 상태를 보여준다).
-    retryDepositTargets()
-    openBalanceModal()
-    if (route.name !== ROUTE_NAMES.PACEMAKER) {
-      router.push({ name: ROUTE_NAMES.PACEMAKER })
-    }
+  if (item.type === 'AVAILABLE_MONEY') {
+    const goalId = goalStore.selectedGoalId
+    router.push({
+      name: goalId ? ROUTE_NAMES.DASHBOARD_GOAL : ROUTE_NAMES.DASHBOARD,
+      ...(goalId ? { params: { goalId } } : {}),
+      query: { modal: 'today-available-money' },
+    })
   } else if (item.type === 'STREAK') {
     if (route.name !== ROUTE_NAMES.PACEMAKER) {
       router.push({ name: ROUTE_NAMES.PACEMAKER })

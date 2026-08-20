@@ -93,7 +93,6 @@ const {
   removeToast,
   showDualNotifications,
   isBalanceModalOpen,
-  openBalanceModal,
   closeBalanceModal,
 } = usePacemakerToast()
 const { isOpen: isDepositModalOpen, open: openDepositModal, close: closeDepositModal } = useModal()
@@ -147,14 +146,13 @@ function handleViewHistory() {
 }
 
 function handleNotificationClick(item) {
-  if (item.type === 'SAVING') {
-    // 모달을 열자마자 대상 목록이 비어 보이지 않도록, 조회를 먼저 시작해두고
-    // 모달은 즉시 연다 (로딩 중에는 모달 자체가 "불러오는 중" 상태를 보여준다).
-    retryDepositTargets()
-    openBalanceModal()
-    if (route.name !== ROUTE_NAMES.PACEMAKER) {
-      router.push({ name: ROUTE_NAMES.PACEMAKER })
-    }
+  if (item.type === 'AVAILABLE_MONEY') {
+    const goalId = goalStore.value.selectedGoalId
+    router.push({
+      name: goalId ? ROUTE_NAMES.DASHBOARD_GOAL : ROUTE_NAMES.DASHBOARD,
+      ...(goalId ? { params: { goalId } } : {}),
+      query: { modal: 'today-available-money' },
+    })
   } else if (item.type === 'STREAK') {
     if (route.name !== ROUTE_NAMES.PACEMAKER) {
       router.push({ name: ROUTE_NAMES.PACEMAKER })

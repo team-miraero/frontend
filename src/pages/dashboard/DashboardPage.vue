@@ -295,6 +295,21 @@ function handleOpenTodayAvailableMoneyModal() {
   isTodayAvailableMoneyModalOpen.value = true
 }
 
+// 전역 여유자금 알림에서 진입한 경우 해당 상세 모달을 열고,
+// 같은 알림을 다시 눌러도 동작하도록 일회성 쿼리는 즉시 정리한다.
+watch(
+  () => route.query.modal,
+  (modal) => {
+    if (modal !== 'today-available-money') return
+
+    handleOpenTodayAvailableMoneyModal()
+    const query = { ...route.query }
+    delete query.modal
+    router.replace({ query })
+  },
+  { immediate: true }
+)
+
 function handleOpenMonthlyAvailableMoneyModal() {
   isMonthlyAvailableMoneyModalOpen.value = true
 }

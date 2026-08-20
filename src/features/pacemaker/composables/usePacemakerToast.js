@@ -137,7 +137,7 @@ export function usePacemakerToast() {
     const toasts = []
     if (todayAvailableMoney > 0) {
       toasts.push({
-        type: 'SAVING',
+        type: 'AVAILABLE_MONEY',
         badgeIcon: '💰',
         title: `오늘의 여유자금: ${formatWon(todayAvailableMoney)}`,
         body: '오늘 사용 가능한 금액을 계산했어요!',
