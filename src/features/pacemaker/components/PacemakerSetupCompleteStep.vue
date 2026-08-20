@@ -17,7 +17,7 @@
     </h2>
     <p class="mt-2 text-sm leading-6 text-slate-500">
       페이스메이커 전용 저금통이 개설됐어요.<br />
-      내일 오전 8시부터 자동 저축이 시작돼요.
+      다음 날 오전 8시부터 자동 저축이 시작돼요.
     </p>
 
     <dl
@@ -30,6 +30,12 @@
       <div class="flex items-center justify-between gap-4">
         <dt class="text-slate-500">시작일</dt>
         <dd class="font-bold text-[#0a192f]">{{ savingStartDate }} 오전 8시</dd>
+      </div>
+      <div v-if="account" class="flex items-center justify-between gap-4">
+        <dt class="text-slate-500">연결 계좌</dt>
+        <dd class="truncate font-bold text-[#0a192f]">
+          {{ account.institutionName }} {{ account.maskedAccountNumber }}
+        </dd>
       </div>
     </dl>
 
@@ -50,6 +56,10 @@ const props = defineProps({
   maxAmount: {
     type: Number,
     required: true,
+  },
+  account: {
+    type: Object,
+    default: null,
   },
 })
 

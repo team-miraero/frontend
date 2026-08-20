@@ -6,13 +6,13 @@
   >
     <div class="border-b border-slate-100 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
       <p class="text-xs font-bold tracking-wider text-primary">
-        {{ isEditMode ? '페이스메이커 상한선 변경' : '페이스메이커 설정 2/2' }}
+        {{ isEditMode ? '페이스메이커 상한선 변경' : '페이스메이커 설정' }}
       </p>
       <h2
         id="limit-title"
         class="mt-2 text-xl font-bold leading-7 tracking-tight text-[#0a192f]"
       >
-        자동 저축 상한선을<br />설정해주세요
+        매일 최대 얼마까지<br />자동저축할까요?
       </h2>
     </div>
 
@@ -24,6 +24,9 @@
         <p class="text-xs font-semibold text-slate-500">하루 최대 자동 저축 금액</p>
         <p class="mt-1 text-[32px] font-bold tracking-tight text-primary">
           {{ formatNumber(selectedMaxAmount) }}<span class="ml-1 text-lg">원</span>
+        </p>
+        <p class="mt-2 text-xs font-semibold text-primary/80">
+          예상 효과 · 이 상한선대로면 한 달에 최대 {{ formatNumber(selectedMaxAmount * 30) }}원까지 모을 수 있어요
         </p>
       </div>
 
@@ -180,7 +183,7 @@
       <button
         type="button"
         class="min-h-12 w-full rounded-2xl bg-gradient-to-br from-primary to-[#66b2ff] px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgba(0,102,255,0.28)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
-        :disabled="isSubmitting"
+        :disabled="isSubmitting || (!isEditMode && !selectedAccountId)"
         @click="$emit('complete')"
       >
         {{
@@ -192,14 +195,6 @@
               ? '변경 완료'
               : '개설 완료'
         }}
-      </button>
-      <button
-        type="button"
-        class="min-h-11 w-full rounded-2xl text-sm font-semibold text-slate-400 transition hover:bg-slate-50 hover:text-slate-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-60"
-        :disabled="isSubmitting"
-        @click="$emit('back')"
-      >
-        {{ isEditMode ? '취소' : '이전으로' }}
       </button>
     </div>
   </section>
@@ -237,7 +232,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue', 'update:selectedAccountId', 'complete', 'back'])
+const emit = defineEmits(['update:modelValue', 'update:selectedAccountId', 'complete'])
 
 // 페이스메이커용 저금통과 연동할 주 입출금계좌 선택: 기존 목표 설정(GOAL-04)에서 쓰는
 // 계좌 조회 스토어·API를 그대로 재사용한다.
@@ -248,14 +243,10 @@ const checkingAccounts = computed(() =>
   accounts.value.filter((account) => account.accountType === 'CHECKING')
 )
 
+// 금융 서비스 특성상 출금 계좌는 사용자가 직접 확인하고 선택해야 하므로 자동 선택하지 않는다.
 async function loadAccounts() {
   try {
     await goalStore.fetchAccounts('CHECKING')
-    // 화면에 실제로 보이는 목록에서 골라야 선택 상태와 표시가 어긋나지 않는다.
-    const [firstAccount] = checkingAccounts.value
-    if (props.selectedAccountId == null && firstAccount) {
-      emit('update:selectedAccountId', firstAccount.accountId)
-    }
   } catch {
     // accountsError는 store에서 세팅됨. 화면은 위 재시도 블록으로 안내.
   }

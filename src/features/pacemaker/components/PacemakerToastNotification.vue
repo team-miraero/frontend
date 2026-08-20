@@ -107,33 +107,4 @@ const emit = defineEmits(['remove', 'click-toast'])
 function onToastClick(toast) {
   emit('click-toast', toast)
 }
-
-function getIconTheme(type, badgeIcon) {
-  if (type === 'STREAK' || badgeIcon === '🔥') {
-    return {
-      container: 'bg-amber-50 border border-amber-200/80 text-amber-500 shadow-amber-500/10',
-      icon: 'fire',
-      iconColor: 'text-amber-500',
-    }
-  }
-  if (type === 'SAVING' || badgeIcon === '💰' || badgeIcon === '💸') {
-    return {
-      container: 'bg-blue-50 border border-blue-200/80 text-primary shadow-blue-500/10',
-      icon: 'money',
-      iconColor: 'text-primary',
-    }
-  }
-  if (type === 'ACHIEVE' || badgeIcon === '🎯') {
-    return {
-      container: 'bg-emerald-50 border border-emerald-200/80 text-emerald-600 shadow-emerald-500/10',
-      icon: 'target',
-      iconColor: 'text-emerald-600',
-    }
-  }
-  return {
-    container: 'bg-[#f0f6ff] border border-blue-100 text-primary shadow-blue-500/10',
-    icon: badgeIcon || 'check',
-    iconColor: 'text-primary',
-  }
-}
 </script>

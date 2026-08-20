@@ -149,7 +149,13 @@
         <div
           class="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-primary"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-6">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="size-6"
+          >
             <path d="M12 5v14M5 12h14" />
           </svg>
         </div>
