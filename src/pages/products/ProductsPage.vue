@@ -209,11 +209,12 @@
 
           <div v-else class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ProductCard
-              v-for="product in sortedProducts"
+              v-for="(product, productIndex) in sortedProducts"
               :key="`${product.productType}-${getProductId(product)}`"
               :product="product"
               :product-type="product.productType"
               :is-highest-rate="Number(product.maximumInterestRate) === bestRate"
+              :is-top-recommended="productIndex === 0"
               :goal-name="selectedGoalName"
               :eligible-maturity-terms="product.eligibleMaturityTerms"
               :recommendation-impact="product.recommendationImpact"
@@ -261,6 +262,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { goalApi, useGoalStore } from '@/features/goal'
 import {
+  CALCULATION_STATUS,
   ProductCard,
   ProductDetailModal,
   calculateRecommendationImpact,
@@ -351,10 +353,28 @@ const filteredProducts = computed(() => {
   )
 })
 
-const sortedProducts = computed(() =>
-  [...filteredProducts.value].sort(
-    (a, b) => Number(b.maximumInterestRate) - Number(a.maximumInterestRate)
+function needsLongerPeriod(product) {
+  const termCount = new Set([
+    ...(product.saveTerms ?? []),
+    ...(product.options ?? []).map((option) => option.saveTerm),
+  ]).size
+
+  return (
+    product.recommendationImpact?.calculationStatus === CALCULATION_STATUS.NOT_APPLICABLE &&
+    (product.eligibleMaturityTerms?.length ?? 0) === 0 &&
+    termCount > 0
   )
+}
+
+const sortedProducts = computed(() =>
+  [...filteredProducts.value].sort((a, b) => {
+    const aNeedsLongerPeriod = needsLongerPeriod(a)
+    const bNeedsLongerPeriod = needsLongerPeriod(b)
+    if (aNeedsLongerPeriod !== bNeedsLongerPeriod) {
+      return aNeedsLongerPeriod ? 1 : -1
+    }
+    return Number(b.maximumInterestRate) - Number(a.maximumInterestRate)
+  })
 )
 
 const bestProduct = computed(() =>

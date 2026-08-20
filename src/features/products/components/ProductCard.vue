@@ -1,7 +1,7 @@
 <template>
   <article
     class="group flex h-full min-h-[310px] cursor-pointer flex-col overflow-hidden rounded-2xl sm:rounded-3xl border bg-white shadow-xs transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary/40 hover:shadow-md active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/30 select-none"
-    :class="isHighestRate ? 'border-primary ring-1 ring-primary/40' : 'border-slate-200/80'"
+    :class="isTopRecommended ? 'border-primary ring-1 ring-primary/40' : 'border-slate-200/80'"
     role="button"
     tabindex="0"
     :aria-label="`${product.productName} 상품 상세 정보 보기`"
@@ -28,6 +28,12 @@
               class="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-600"
             >
               최고금리
+            </span>
+            <span
+              v-if="isTopRecommended"
+              class="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold text-primary"
+            >
+              추천
             </span>
           </div>
           <h3
@@ -117,6 +123,7 @@ const props = defineProps({
   product: { type: Object, required: true },
   productType: { type: String, required: true },
   isHighestRate: { type: Boolean, default: false },
+  isTopRecommended: { type: Boolean, default: false },
   goalName: { type: String, default: '선택한 목표' },
   eligibleMaturityTerms: { type: Array, default: () => [] },
   recommendationImpact: { type: Object, default: null },
