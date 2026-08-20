@@ -49,7 +49,7 @@
       <dl class="mt-4 grid grid-cols-2 gap-2">
         <div class="rounded-xl border border-slate-100 bg-[#f8fbff] px-3.5 py-2.5">
           <dt class="text-[11px] font-bold text-slate-400">납입 기간</dt>
-          <dd class="mt-1 text-xs sm:text-[13px] font-bold text-slate-700 tabular-nums" :title="fullTermLabel">
+          <dd class="mt-1 whitespace-nowrap text-[11px] font-bold tracking-tight text-slate-700 tabular-nums sm:text-[13px]" :title="fullTermLabel">
             {{ termLabel }}
           </dd>
         </div>
@@ -144,7 +144,7 @@ const termLabel = computed(() => {
   if (terms.value.length === 0) return '상품별 확인'
   if (terms.value.length === 1) return `${terms.value[0]}개월`
   if (terms.value.length >= 4) {
-    return `${terms.value.slice(0, 3).join(' · ')}개월 외 ${terms.value.length - 3}개`
+    return `${terms.value[0]}~${terms.value.at(-1)}개월 외 ${terms.value.length - 2}개`
   }
   return `${terms.value.join(' · ')}개월`
 })
