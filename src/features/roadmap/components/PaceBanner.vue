@@ -31,7 +31,7 @@
             <button
               v-if="!disabled"
               type="button"
-              class="flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0a192f] active:scale-95 cursor-pointer select-none"
+              class="flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0a192f] active:scale-95 cursor-pointer select-none"
               @click="$emit('pause')"
             >
               <img src="@/assets/icons/goal-pause.svg" alt="" class="size-2.5 opacity-60" />
@@ -82,7 +82,7 @@
         <div class="mt-5 sm:mt-6">
           <button
             type="button"
-            class="w-full rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:scale-[0.98] cursor-pointer select-none sm:p-3.5"
+            class="w-full rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] cursor-pointer select-none sm:p-3.5"
             aria-label="나의 로드맵 여정으로 이동"
             @click="$emit('view-roadmap')"
           >
@@ -137,7 +137,7 @@
 
       <!-- 우측: 스마트 자동 저축 카드 (슬림형 슬레이트 인셋 패널) -->
       <div
-        class="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 sm:p-4 shadow-2xs"
+        class="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 sm:p-4 shadow-[0_1px_0_rgba(0,0,0,0.05)]"
       >
         <div
           v-if="dailyAvailableMoney || monthlyAvailableMoney"
@@ -146,7 +146,7 @@
           <button
             v-if="dailyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!monthlyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-today')"
@@ -162,7 +162,7 @@
           <button
             v-if="monthlyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!dailyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-month')"
@@ -187,11 +187,11 @@
             @click="$emit('cta-click')"
           >
             <span
-              class="flex size-8 sm:size-8.5 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
+              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 1. 알아서 모으기 선명한 번개 SVG -->
               <svg
-                class="size-4 sm:size-4.5"
+                class="size-4 sm:size-[18px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -231,11 +231,11 @@
             @click="$emit('toggle')"
           >
             <span
-              class="flex size-8 sm:size-8.5 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
+              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 2. 다음 달 자금마련 선명한 캘린더 SVG -->
               <svg
-                class="size-4 sm:size-4.5"
+                class="size-4 sm:size-[18px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -302,9 +302,9 @@ import { useCountUp } from '@/shared/composables/useCountUp'
 const props = defineProps({
   pace: { type: Object, required: true },
   progressRate: { type: Number, required: true },
-  goalName: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
   currentAmount: { type: Number, default: 0 },
+  startAmount: { type: Number, default: 0 },
   goalAmount: { type: Number, default: 0 },
   endDate: { type: String, default: '' },
   goalMonths: { type: Number, default: 0 },
@@ -319,6 +319,7 @@ const props = defineProps({
 // (PaceBanner는 개별 scalar prop으로 받기 때문에, 공용 유틸이 기대하는 모양으로 조립한다)
 const goalLike = computed(() => ({
   currentAmount: props.currentAmount,
+  startAmount: props.startAmount,
   goalAmount: props.goalAmount,
   pace: props.pace,
   period: { goalMonths: props.goalMonths, remainMonths: props.remainMonths },
