@@ -78,12 +78,12 @@
               <p class="mt-1 text-xs text-slate-400">{{ product.productCode }}</p>
 
               <div
-                class="mt-5 rounded-2xl bg-gradient-to-br from-[#0066ff] to-[#0047b3] px-6 py-5 text-white shadow-md shadow-primary/20"
+                class="mt-5 rounded-2xl border border-primary/15 bg-gradient-to-br from-[#F4F8FF] to-[#EAF2FF] px-6 py-5 shadow-[0_6px_18px_rgba(15,35,70,0.08)]"
               >
                 <div class="flex items-end justify-between gap-4">
                   <div>
-                    <p class="text-xs font-bold text-white/80">최고 금리</p>
-                    <p class="mt-1 text-sm font-bold">
+                    <p class="text-xs font-bold text-[#64748B]">최고 금리</p>
+                    <p class="mt-1 text-sm font-bold text-primary">
                       연
                       <strong class="ml-1 text-3xl sm:text-4xl font-bold tabular-nums">
                         {{ formatRate(product.maximumInterestRate) }}
@@ -91,7 +91,7 @@
                       %
                     </p>
                   </div>
-                  <p class="pb-1 text-xs font-bold text-white/80">
+                  <p class="pb-1 text-xs font-bold text-[#64748B]">
                     기본 연 {{ formatRate(product.minimumBaseInterestRate) }}~{{
                       formatRate(product.maximumBaseInterestRate)
                     }}%

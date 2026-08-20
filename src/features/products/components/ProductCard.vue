@@ -125,11 +125,11 @@ const impactTitle = computed(() => {
 
   if (status === CALCULATION_STATUS.CALCULATED) {
     if (impact.estimatedMonthsSaved > 0) {
-      return `이 상품 활용 시 목표 ${impact.estimatedMonthsSaved}개월 단축`
+      return `현재보다 목표 ${impact.estimatedMonthsSaved}개월 단축`
     }
 
     if (impact.estimatedAdditionalAmount > 0) {
-      return `이 상품 활용 시 ${impact.estimatedAdditionalAmount.toLocaleString()}원 더 모을 수 있어요`
+      return `현재보다 ${impact.estimatedAdditionalAmount.toLocaleString()}원 더 모을 수 있어요`
     }
   }
 
