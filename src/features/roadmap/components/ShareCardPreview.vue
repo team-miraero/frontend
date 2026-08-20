@@ -43,7 +43,7 @@
         v-model="titleText"
         type="text"
         maxlength="20"
-        class="w-44 whitespace-nowrap border-b-2 border-primary bg-white/90 px-2 py-0.5 text-center text-sm font-bold text-[#0a192f] outline-none shadow-2xs rounded"
+        class="w-44 whitespace-nowrap border-b-2 border-primary bg-white/90 px-2 py-0.5 text-center text-sm font-bold text-[#0a192f] outline-none shadow-[0_1px_0_rgba(0,0,0,0.05)] rounded"
         @blur="isEditingTitle = false"
         @keyup.enter="isEditingTitle = false"
       />
@@ -128,7 +128,7 @@
       <div class="relative h-16">
         <div class="absolute left-[5%] right-[5%] top-4 h-1.5 rounded-full bg-slate-200/80" />
         <div
-          class="absolute left-[5%] top-4 h-1.5 rounded-full bg-gradient-to-r from-primary to-[#54a3ff] shadow-xs transition-[width] duration-500"
+          class="absolute left-[5%] top-4 h-1.5 rounded-full bg-gradient-to-r from-primary to-[#54a3ff] shadow-sm transition-[width] duration-500"
           :style="{ width: `${progressFillWidth}%` }"
         />
 
@@ -142,7 +142,7 @@
             class="flex size-5 items-center justify-center rounded-full border-2 transition-all"
             :class="
               milestone.completed
-                ? '!border-primary !bg-primary text-white shadow-2xs'
+                ? '!border-primary !bg-primary text-white shadow-[0_1px_0_rgba(0,0,0,0.05)]'
                 : milestone.current
                   ? 'border-primary bg-white shadow-[0_0_0_3px_rgba(0,102,255,0.18)] scale-110'
                   : 'border-slate-300 bg-white'
@@ -186,7 +186,7 @@
       </div>
 
       <p
-        class="mt-2 inline-flex items-center rounded-full border border-blue-200/80 bg-white/90 px-4 py-1.5 text-xs font-bold text-[#0a192f] shadow-2xs backdrop-blur-xs"
+        class="mt-2 inline-flex items-center rounded-full border border-blue-200/80 bg-white/90 px-4 py-1.5 text-xs font-bold text-[#0a192f] shadow-[0_1px_0_rgba(0,0,0,0.05)] backdrop-blur-sm"
       >
         <span>{{ achievementMessage }}</span>
       </p>

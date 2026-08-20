@@ -13,7 +13,7 @@
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-2">
             <span
-              class="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-extrabold text-white shadow-2xs"
+              class="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-extrabold text-white shadow-[0_1px_0_rgba(0,0,0,0.05)]"
             >
               SPLIT {{ milestone.order || Math.round(milestone.percentage / 20) || 1 }}
             </span>
@@ -26,7 +26,7 @@
           </div>
           <button
             type="button"
-            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-2xs transition hover:bg-white hover:text-slate-700 active:scale-95 cursor-pointer"
+            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition hover:bg-white hover:text-slate-700 active:scale-95 cursor-pointer"
             aria-label="닫기"
             @click="$emit('update:modelValue', false)"
           >
@@ -65,7 +65,7 @@
         <section v-if="reportContent" class="mt-5" aria-label="AI 분석 내용">
           <div class="mb-2.5 flex items-center gap-1.5">
             <span
-              class="flex size-4.5 items-center justify-center rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-600"
+              class="flex size-[18px] items-center justify-center rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-600"
             >
               ✓
             </span>
@@ -160,7 +160,7 @@ const formattedReportContent = computed(() => {
   let text = escapeHtml(reportContent.value)
   text = text.replace(
     /(?:\*\*)?(\[[^\]]+\])(?:\*\*)?/g,
-    '<span class="inline-flex items-center rounded-md bg-blue-50 border border-blue-200/70 px-2 py-0.5 font-bold text-primary text-[12px] sm:text-[13px] my-1 shadow-2xs">$1</span>'
+    '<span class="inline-flex items-center rounded-md bg-blue-50 border border-blue-200/70 px-2 py-0.5 font-bold text-primary text-[12px] sm:text-[13px] my-1 shadow-[0_1px_0_rgba(0,0,0,0.05)]">$1</span>'
   )
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-[#0a192f]">$1</strong>')
   return text

@@ -2,7 +2,7 @@
 <template>
   <button
     type="button"
-    class="group flex flex-col justify-between rounded-xl border border-slate-100 bg-[#f8fbff] p-4 text-left transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary/40 hover:bg-white hover:shadow-xs active:scale-[0.98] cursor-pointer break-keep select-none"
+    class="group flex flex-col justify-between rounded-xl border border-slate-100 bg-[#f8fbff] p-4 text-left transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary/40 hover:bg-white hover:shadow-sm active:scale-[0.98] cursor-pointer break-keep select-none"
     @click="$emit('open-detail')"
   >
     <div>
@@ -19,7 +19,7 @@
           :key="asset.assetId"
           class="flex items-center gap-2.5"
         >
-          <div class="flex size-7 items-center justify-center rounded-lg bg-white shadow-2xs">
+          <div class="flex size-7 items-center justify-center rounded-lg bg-white shadow-[0_1px_0_rgba(0,0,0,0.05)]">
             <img :src="assetIcon(asset.assetType)" alt="" class="size-3.5" />
           </div>
           <div class="min-w-0 flex-1">

@@ -11,7 +11,7 @@
     >
       <div
         v-if="modelValue"
-        class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-xs sm:items-center sm:p-4"
+        class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
         @mousedown.self="handleBackdropClick"
       >
         <Transition

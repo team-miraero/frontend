@@ -19,7 +19,7 @@
           class="relative flex size-8 items-center justify-center rounded-xl transition-all duration-200"
           :class="
             isRoadmapActiveTab
-              ? 'bg-blue-50 text-primary shadow-2xs ring-1 ring-blue-200/60'
+              ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60'
               : ''
           "
         >
@@ -52,7 +52,7 @@
       >
         <span
           class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="isActive(ROUTE_NAMES.SPENDING) ? 'bg-blue-50 text-primary shadow-2xs ring-1 ring-blue-200/60' : ''"
+          :class="isActive(ROUTE_NAMES.SPENDING) ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60' : ''"
         >
           <!-- 활성: Solid Primary Blue Fill 카드 / 비활성: Outline 카드 -->
           <svg
@@ -78,7 +78,7 @@
       >
         <span
           class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="isActive(ROUTE_NAMES.PACEMAKER) ? 'bg-blue-50 text-primary shadow-2xs ring-1 ring-blue-200/60' : ''"
+          :class="isActive(ROUTE_NAMES.PACEMAKER) ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60' : ''"
         >
           <!-- 활성: Solid Primary Blue Fill 시계 / 비활성: Outline 시계 -->
           <svg
@@ -105,7 +105,7 @@
       >
         <span
           class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="isActive(ROUTE_NAMES.COACH) ? 'bg-blue-50 text-primary shadow-2xs ring-1 ring-blue-200/60' : ''"
+          :class="isActive(ROUTE_NAMES.COACH) ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60' : ''"
         >
           <!-- 활성: Solid Primary Blue Fill Sparkle / 비활성: Outline Sparkle -->
           <svg
@@ -131,7 +131,7 @@
       >
         <span
           class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="isActive(ROUTE_NAMES.MENU) ? 'bg-blue-50 text-primary shadow-2xs ring-1 ring-blue-200/60' : ''"
+          :class="isActive(ROUTE_NAMES.MENU) ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60' : ''"
         >
           <svg
             viewBox="0 0 24 24"

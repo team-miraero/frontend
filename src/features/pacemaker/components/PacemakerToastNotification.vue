@@ -23,17 +23,17 @@
           <!-- 좌측: 3D 페이스메이커 콜리 아바타 + 미니 테마 뱃지 -->
           <div class="relative mr-3.5 shrink-0">
             <div
-              class="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-gradient-to-br from-[#eaf2ff] via-[#f4f8ff] to-white p-1 shadow-xs transition-transform group-hover:scale-105"
+              class="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-gradient-to-br from-[#eaf2ff] via-[#f4f8ff] to-white p-1 shadow-sm transition-transform group-hover:scale-105"
             >
               <img
                 src="@/assets/images/coli_new.png"
                 alt="페이스메이커 콜리"
-                class="size-9 object-contain drop-shadow-xs"
+                class="size-9 object-contain drop-shadow-sm"
               />
             </div>
             <!-- 우측 하단 미니 테마 뱃지 -->
             <span
-              class="absolute -bottom-1 -right-1 flex size-4.5 items-center justify-center rounded-full text-[10px] shadow-2xs"
+              class="absolute -bottom-1 -right-1 flex size-[18px] items-center justify-center rounded-full text-[10px] shadow-[0_1px_0_rgba(0,0,0,0.05)]"
               :class="toast.type === 'STREAK' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-primary'"
             >
               <AppIcon :name="toast.type === 'STREAK' ? 'fire' : 'money'" size="sm" class="size-3" />
