@@ -62,24 +62,33 @@
 
         <div class="bottom-action">
           <Transition name="cta-rise" mode="out-in">
-            <RouterLink v-if="activeScene === 5 && finaleProgress > .62" v-slot="{ navigate }" :to="{ name: ROUTE_NAMES.SIGNUP }" custom><button type="button" class="primary-cta" @click="navigate">미래로 시작하기 →</button></RouterLink>
+            <button v-if="activeScene === 5 && finaleProgress > .62" type="button" class="primary-cta" :disabled="isStarting" @click="handleStart">시작하기 →</button>
             <button v-else type="button" class="scroll-guide" :class="{ invisible: activeScene === 0 && !typingFinished }" @click="scrollToNextScene"><span>{{ activeScene === 0 ? '스크롤해서 시작하기' : '계속 내려보기' }}</span><span aria-hidden="true">⌄</span></button>
           </Transition>
         </div>
       </section>
     </main>
+
+    <Teleport to="body">
+      <Transition name="start-cover">
+        <div v-if="isStarting" class="start-transition" aria-live="polite">
+          <div class="start-transition__copy"><span>미래로</span><strong>이제, 당신만의 페이스를<br />찾아볼까요?</strong></div>
+        </div>
+      </Transition>
+    </Teleport>
   </HeroBackground>
 </template>
 
 <script setup>
 import { computed, onBeforeMount, onMounted, onUnmounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import StepHeader from '@/shared/ui/StepHeader.vue'
 import BaseButton from '@/shared/ui/BaseButton.vue'
 import HeroBackground from '@/shared/ui/HeroBackground.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
-const scrollSectionRef = ref(null), scrollProgress = ref(0), rawScrollProgress = ref(0), typedLine1 = ref(''), typedPart1 = ref(''), typedMiraero = ref(''), typedPart2 = ref(''), typingLine = ref(0), showDot = ref(false), typingFinished = ref(false)
+const router = useRouter()
+const scrollSectionRef = ref(null), scrollProgress = ref(0), rawScrollProgress = ref(0), typedLine1 = ref(''), typedPart1 = ref(''), typedMiraero = ref(''), typedPart2 = ref(''), typingLine = ref(0), showDot = ref(false), typingFinished = ref(false), isStarting = ref(false)
 const timers = []
 let progressFrameId = null
 const floatingNumbers = [{ label:'월 수입 3,200,000',x:-118,y:-150,r:-10 },{ label:'고정지출 -920,000',x:112,y:-118,r:8 },{ label:'생활비 -1,680,000',x:-128,y:92,r:7 },{ label:'오늘 지출 -28,000',x:120,y:118,r:-8 },{ label:'목표 5,000만원',x:4,y:-205,r:4 }]
@@ -106,6 +115,7 @@ function animateProgress(){const difference=rawScrollProgress.value-scrollProgre
 function updateScrollProgress(){const s=scrollSectionRef.value;if(!s)return;const d=Math.max(s.offsetHeight-window.innerHeight,1);rawScrollProgress.value=Math.min(Math.max(-s.getBoundingClientRect().top/d,0),1);if(progressFrameId===null)progressFrameId=window.requestAnimationFrame(animateProgress)}
 function resetToIntro(){scrollProgress.value=0;rawScrollProgress.value=0;window.scrollTo({top:0,left:0,behavior:'auto'});document.documentElement.scrollTop=0;document.body.scrollTop=0}
 function scrollToNextScene(){const s=scrollSectionRef.value;if(!s)return;if(activeScene.value===5&&finaleProgress.value<=.62){window.scrollTo({top:s.offsetTop+(s.offsetHeight-window.innerHeight)*.96,behavior:'smooth'});return}const targets=[0,.18,.36,.56,.73,.91],next=Math.min(activeScene.value+1,5);window.scrollTo({top:s.offsetTop+(s.offsetHeight-window.innerHeight)*targets[next],behavior:'smooth'})}
+async function handleStart(){if(isStarting.value)return;isStarting.value=true;await wait(1240);window.sessionStorage.setItem('miraero-onboarding-transition','1');await router.push({name:ROUTE_NAMES.SIGNUP})}
 onBeforeMount(()=>{if('scrollRestoration'in window.history)window.history.scrollRestoration='manual';resetToIntro()})
 onMounted(()=>{resetToIntro();window.addEventListener('scroll',updateScrollProgress,{passive:true});window.addEventListener('resize',updateScrollProgress);window.requestAnimationFrame(()=>window.requestAnimationFrame(resetToIntro));runTyping()})
 onUnmounted(()=>{window.removeEventListener('scroll',updateScrollProgress);window.removeEventListener('resize',updateScrollProgress);timers.forEach(clearTimeout);if(progressFrameId!==null)window.cancelAnimationFrame(progressFrameId)})
@@ -138,5 +148,6 @@ onUnmounted(()=>{window.removeEventListener('scroll',updateScrollProgress);windo
 :deep(.onboarding-header){position:fixed!important;top:0;right:0;left:0;border-bottom-color:transparent!important;background:rgba(248,251,255,.82)!important;box-shadow:none!important;backdrop-filter:blur(14px);transition:transform .42s cubic-bezier(.16,1,.3,1),opacity .28s ease!important;will-change:transform,opacity}:deep(.onboarding-header--hidden){opacity:0;pointer-events:none;transform:translateY(-105%)}
 .ai-coach-panel{display:flex;flex-direction:column;align-items:center;width:100%;opacity:var(--ai-opacity);pointer-events:calc(var(--ai-opacity));transform:translateY(var(--ai-y));will-change:transform,opacity}.finale-closing{position:absolute;top:50%;right:20px;left:20px;display:flex;flex-direction:column;align-items:center;text-align:center;opacity:var(--closing-opacity);transform:translateY(calc(-50% + var(--closing-y)));will-change:transform,opacity}.finale-closing>span{font-size:10px;font-weight:900;letter-spacing:.2em;color:#60a5fa}.finale-closing h1{margin-top:12px;font-size:clamp(30px,8vw,43px);font-weight:900;line-height:1.28;letter-spacing:-.055em;color:#111827}.finale-closing p{margin-top:16px;font-size:16px;font-weight:900;color:#0066ff}
 .intro-scene{transform:none}.bottom-action{bottom:calc(26px + env(safe-area-inset-bottom))}
+.start-transition{position:fixed;inset:-12%;z-index:9999;display:grid;place-items:center;background:radial-gradient(circle at 50% 48%,#66b2ff 0%,#1677ff 34%,#0066ff 62%,#0054d6 100%);color:#fff;will-change:transform,filter,opacity}.start-transition__copy{display:flex;flex-direction:column;align-items:center;text-align:center;animation:start-copy-in .42s .22s cubic-bezier(.16,1,.3,1) both}.start-transition__copy span{font-size:14px;font-weight:900;letter-spacing:.14em;color:rgba(255,255,255,.72)}.start-transition__copy strong{margin-top:13px;font-size:clamp(27px,7.5vw,38px);font-weight:900;line-height:1.35;letter-spacing:-.045em}.start-cover-enter-active{transition:opacity .56s ease,transform .58s cubic-bezier(.16,1,.3,1),filter .56s ease}.start-cover-enter-from{opacity:0;filter:blur(24px);transform:scale(.66)}@keyframes start-copy-in{from{opacity:0;filter:blur(8px);transform:translateY(14px)}to{opacity:1;filter:blur(0);transform:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
 </style>
