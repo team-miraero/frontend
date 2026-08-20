@@ -2,12 +2,11 @@
   <div class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fafc] pb-6">
     <section
       v-if="isLoading"
-      class="mx-auto flex min-h-[calc(100vh-89px)] w-full max-w-[800px] items-center justify-center px-5 py-16"
+      class="w-full"
     >
       <LoadingSpinner
         message="페이스메이커를 확인하고 있어요"
-        sub-message="나에게 맞는 화면을 준비할게요."
-        size="lg"
+        container-class="min-h-[calc(100dvh-122px)] md:min-h-[calc(100dvh-80px)]"
       />
     </section>
 
