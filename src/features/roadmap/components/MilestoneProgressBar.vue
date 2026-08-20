@@ -112,8 +112,11 @@
           <template v-else>
             <!-- 1. 주인공 캐릭터 (항상 맨 앞 z-20으로 절대 가려지지 않음) -->
             <div
-              class="absolute bottom-[28px] flex -translate-x-1/2 items-end transition-[left] duration-500 pointer-events-none z-20"
-              :style="{ left: `${Math.max(20, Math.min(76, mobilePlayerPosition))}%` }"
+              class="absolute flex -translate-x-1/2 items-end transition-[left,bottom] duration-500 pointer-events-none z-20"
+              :style="{
+                left: `${mobilePlayerClampedPosition}%`,
+                bottom: isMobileCharactersTied ? `${28 - MOBILE_TIE_VERTICAL_OFFSET / 2}px` : '28px',
+              }"
             >
               <img
                 :src="goalCharacterImage"
@@ -124,13 +127,23 @@
             </div>
 
             <!-- 2. 페이스메이커 콜리 + 말풍선 (주인공 뒤 레이어 z-10) -->
+            <!-- 말풍선을 flex 흐름에 두면 말풍선 텍스트 폭만큼 이 wrapper 자체가 넓어져서,
+                 -translate-x-1/2가 이미지가 아니라 그 넓은 박스를 기준으로 중앙정렬되어 버린다.
+                 그러면 캐릭터 사이에 가로 최소 간격을 둬도 실제 이미지 위치는 예상과 다르게
+                 어긋나 겹칠 수 있다. 말풍선을 absolute로 빼서 wrapper 너비가 이미지 너비만큼만
+                 되도록 하고, left%가 항상 실제 이미지 위치를 정확히 가리키게 한다. -->
             <div
-              class="absolute bottom-[28px] flex -translate-x-1/2 flex-col transition-[left] duration-500 pointer-events-none z-10"
-              :class="isMobileColiPastMidpoint ? 'items-end pr-1' : 'items-start pl-1'"
-              :style="{ left: `${Math.max(20, Math.min(76, mobileColiPosition))}%` }"
+              class="absolute -translate-x-1/2 pointer-events-none z-10 transition-[left,bottom] duration-500"
+              :style="{
+                left: `${mobileColiClampedPosition}%`,
+                bottom: isMobileCharactersTied ? `${28 + MOBILE_TIE_VERTICAL_OFFSET / 2}px` : '28px',
+              }"
             >
               <!-- 콜리 머리 위 스마트 말풍선 (화면 우측에 가까우면 세모 오른쪽, 좌측에 가까우면 세모 왼쪽 — 화면 밖으로 잘리지 않도록) -->
-              <div class="relative -mb-1 flex flex-col" :class="isMobileColiPastMidpoint ? 'items-end' : 'items-start'">
+              <div
+                class="absolute bottom-full -mb-1 flex w-max flex-col"
+                :class="isMobileColiPastMidpoint ? 'right-0 items-end' : 'left-0 items-start'"
+              >
                 <div
                   class="relative rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 py-0.5 text-[10px] font-bold text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap"
                 >
@@ -147,7 +160,7 @@
                 </div>
               </div>
 
-              <img :src="coliBottomImage" alt="페이스메이커 콜리" class="h-10 w-auto drop-shadow-md" :class="isMobileColiPastMidpoint ? 'mr-0.5' : 'ml-0.5'" />
+              <img :src="coliBottomImage" alt="페이스메이커 콜리" class="h-10 w-auto drop-shadow-md" />
             </div>
           </template>
         </div>
@@ -367,7 +380,7 @@
           <!-- 2. 페이스메이커 콜리 (주인공 뒤 레이어 z-10) -->
           <div
             class="absolute flex -translate-x-1/2 -translate-y-full items-end transition-all duration-500 z-10"
-            :style="characterMarkerStyle(coliProgress)"
+            :style="desktopTargetStyle"
           >
             <div class="relative flex flex-col" :class="isColiPastMidpoint ? 'items-end' : 'items-start'">
               <!-- 브로콜리 스마트 말풍선 (화면 우측에 가까우면 세모 오른쪽, 좌측에 가까우면 세모 왼쪽 — 화면 밖으로 잘리지 않도록) -->
@@ -476,9 +489,35 @@ const DESKTOP_MIN_GAP = 5
 const coliProgress = computed(() =>
   withMinimumGap(currentProgress.value, expectedProgressRaw.value, DESKTOP_MIN_GAP)
 )
+
+// progress(%) 값에 고정 gap을 더하는 것만으로는 부족하다 — 도로 곡선이 압축된 구간(특히
+// 시작 지점)에서는 그 gap이 실제로는 몇 픽셀 차이로만 반영되고, 컨테이너 폭이 넓어질수록
+// 같은 %가 훨씬 큰 픽셀 간격이 되어 캐릭터 이미지 크기 대비 간격이 요동친다. 그래서 원본
+// 진행률이 같거나 매우 가까우면(TIE) 컨테이너 폭과 무관하게 항상 같은 만큼 벌어지는 고정
+// 픽셀 오프셋(가로+세로)을 콜리 쪽에 추가로 적용해, 캐릭터 이미지가 절대 겹치지 않게 한다.
+const DESKTOP_TIE_THRESHOLD = DESKTOP_MIN_GAP
+const DESKTOP_TIE_HORIZONTAL_PX = 56
+const DESKTOP_TIE_VERTICAL_PX = 22
+
+const isDesktopCharactersTied = computed(
+  () => Math.abs(expectedProgressRaw.value - currentProgress.value) < DESKTOP_TIE_THRESHOLD
+)
+
+const desktopTargetPoint = computed(() => characterPointOnRoad(coliProgress.value))
+const desktopTargetStyle = computed(() => {
+  const point = desktopTargetPoint.value
+  if (!isDesktopCharactersTied.value) {
+    return { left: `${point.left}%`, top: `${point.top}%` }
+  }
+
+  return {
+    left: `calc(${point.left}% + ${DESKTOP_TIE_HORIZONTAL_PX}px)`,
+    top: `calc(${point.top}% - ${DESKTOP_TIE_VERTICAL_PX}px)`,
+  }
+})
 // 말풍선이 화면 밖으로 잘리지 않도록, 콜리가 도로의 어느 쪽 절반에 있는지로만 방향을 정한다
 // (페이스 상태가 아니라 실제 렌더링 위치 기준)
-const isColiPastMidpoint = computed(() => coliProgress.value > 50)
+const isColiPastMidpoint = computed(() => desktopTargetPoint.value.left > 50)
 
 const activeMilestoneIndex = computed(() => {
   const inProgressIndex = props.milestones.findIndex(
@@ -541,6 +580,10 @@ const mobileExpectedSegmentProgress = computed(() => {
 const MOBILE_POSITION_START = 25
 const MOBILE_POSITION_RANGE = 47
 const MOBILE_MIN_GAP = 10
+// 카드 폭 자체가 좁은 모바일에서는 "10% 가로 간격"이 실제 픽셀로는 캐릭터 이미지 폭보다도
+// 작아서 겹쳐 보일 수 있다. 그래서 가로 간격이 실제로 충분한지 따지지 않고, 두 캐릭터의
+// 원본 진행률(보정 전)이 같거나 매우 가까우면 곧바로 세로로도 추가 분리한다.
+const MOBILE_TIE_VERTICAL_OFFSET = 16
 
 const mobilePlayerPosition = computed(
   () => MOBILE_POSITION_START + (mobileSegmentProgress.value / 100) * MOBILE_POSITION_RANGE
@@ -551,8 +594,15 @@ const mobileExpectedPositionRaw = computed(
 const mobileColiPosition = computed(() =>
   withMinimumGap(mobilePlayerPosition.value, mobileExpectedPositionRaw.value, MOBILE_MIN_GAP)
 )
+const mobilePlayerClampedPosition = computed(() =>
+  Math.max(20, Math.min(76, mobilePlayerPosition.value))
+)
+const mobileColiClampedPosition = computed(() => Math.max(20, Math.min(76, mobileColiPosition.value)))
+const isMobileCharactersTied = computed(
+  () => Math.abs(mobileExpectedPositionRaw.value - mobilePlayerPosition.value) < MOBILE_MIN_GAP
+)
 const isMobileColiPastMidpoint = computed(
-  () => mobileColiPosition.value > MOBILE_POSITION_START + MOBILE_POSITION_RANGE / 2
+  () => mobileColiClampedPosition.value > MOBILE_POSITION_START + MOBILE_POSITION_RANGE / 2
 )
 
 // 모바일 도로 파란 게이지: 달성률 0%면 파란 선 미표시(0), 1% 이상부터 메인 캐릭터 발밑까지 채움
