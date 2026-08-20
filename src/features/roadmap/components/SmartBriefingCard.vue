@@ -34,8 +34,8 @@
       </span>
 
       <div class="min-w-0 pt-0.5">
-        <p class="text-sm font-bold text-[#0a192f] break-keep">{{ headline }}</p>
-        <p class="mt-1 text-xs font-medium leading-relaxed text-slate-500 break-keep">
+        <p class="truncate text-xs font-bold tracking-tight text-[#0a192f] sm:text-sm">{{ headline }}</p>
+        <p class="mt-1 truncate text-[11px] font-medium leading-relaxed tracking-tight text-slate-500 sm:text-xs">
           {{ description }}
         </p>
       </div>
@@ -83,25 +83,25 @@ const monthsSaved = computed(() => {
 
 const headline = computed(() => {
   if (paceState.value === PACE_STATE.NOT_STARTED)
-    return `목표를 위해 월 ${targetMonthlyPaceManwon.value}만원씩 모으면 돼요!`
-  if (paceState.value === PACE_STATE.AHEAD) return `목표보다 월 ${paceDifferenceManwon.value}만원 빠른 페이스예요.`
-  if (paceState.value === PACE_STATE.BEHIND) return `목표보다 월 ${paceDifferenceManwon.value}만원 느린 페이스예요.`
-  return '목표 페이스에 맞춰 잘 달리고 있어요.'
+    return `월 ${targetMonthlyPaceManwon.value}만원씩 모으면 목표에 도착해요`
+  if (paceState.value === PACE_STATE.AHEAD) return `목표보다 월 ${paceDifferenceManwon.value}만원 앞서고 있어요`
+  if (paceState.value === PACE_STATE.BEHIND) return `목표보다 월 ${paceDifferenceManwon.value}만원 부족해요`
+  return '목표 페이스를 잘 지키고 있어요'
 })
 
 const description = computed(() => {
   if (paceState.value === PACE_STATE.NOT_STARTED) {
-    return '첫 저축을 시작하면 나의 페이스를 비교해드릴게요.'
+    return '첫 저축 후 나의 페이스를 비교해드릴게요'
   }
   if (paceState.value === PACE_STATE.AHEAD) {
     return monthsSaved.value
-      ? `이 속도를 유지하면 목표를 약 ${monthsSaved.value}개월 빨리 달성할 수 있어요.`
-      : '지금의 저축 속도를 잘 유지하고 있어요.'
+      ? `이대로면 약 ${monthsSaved.value}개월 빨리 달성해요`
+      : '지금의 저축 속도를 잘 유지하고 있어요'
   }
   if (paceState.value === PACE_STATE.BEHIND) {
-    return `매달 ${paceDifferenceManwon.value}만원을 더 모으면 목표 페이스에 맞출 수 있어요.`
+    return `매달 ${paceDifferenceManwon.value}만원 더 모으면 페이스를 맞춰요`
   }
-  return '지금처럼 꾸준히 이어가보세요.'
+  return '지금처럼 꾸준히 이어가보세요'
 })
 
 function formatManwon(amount) {

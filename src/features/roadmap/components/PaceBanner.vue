@@ -187,7 +187,7 @@
             @click="$emit('cta-click')"
           >
             <span
-              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-[#EAF3FF] text-[#3182f6] shadow-[inset_0_0_0_1px_rgba(49,130,246,0.08)] transition-transform duration-200 group-hover:scale-105"
+              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-[#D8E9FF] text-[#3182f6] shadow-[inset_0_0_0_1px_rgba(49,130,246,0.12)] transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 1. 알아서 모으기 선명한 번개 SVG -->
               <DashboardIcon
@@ -223,7 +223,7 @@
             @click="$emit('toggle')"
           >
             <span
-              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-[#EAF9F3] text-[#00a878] shadow-[inset_0_0_0_1px_rgba(0,168,120,0.08)] transition-transform duration-200 group-hover:scale-105"
+              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-[#D7F5E8] text-[#00a878] shadow-[inset_0_0_0_1px_rgba(0,168,120,0.12)] transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 2. 다음 달 자금마련 선명한 캘린더 SVG -->
               <DashboardIcon

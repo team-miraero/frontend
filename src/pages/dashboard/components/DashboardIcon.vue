@@ -37,6 +37,33 @@
       <path fill="currentColor" d="M11.2 2.4a1.5 1.5 0 0 1 1.6 0l8 5.2c.8.5.4 1.8-.5 1.8H3.7c-.9 0-1.3-1.2-.5-1.8l8-5.2ZM4 11h3v6H4v-6Zm6.5 0h3v6h-3v-6Zm6.5 0h3v6h-3v-6ZM2.5 19h19v3h-19v-3Z" />
       <circle cx="12" cy="6.2" r="1.3" fill="#fff" fill-opacity=".65" />
     </template>
+    <template v-else-if="name === 'loan'">
+      <rect x="2" y="5" width="20" height="15" rx="4" fill="currentColor" />
+      <path fill="#fff" fill-opacity=".65" d="M2 8.5h20v3H2z" />
+      <circle cx="17.5" cy="16" r="2.2" fill="#fff" fill-opacity=".82" />
+      <path d="m16.5 16 1 1 1.8-2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+    <template v-else-if="name === 'clock'">
+      <circle cx="12" cy="13" r="9" fill="currentColor" />
+      <path d="M9 2h6M12 8.5V13l3 2" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M12 8.5V13l3 2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="12" cy="13" r="1.1" fill="#fff" />
+    </template>
+    <template v-else-if="name === 'lock'">
+      <rect x="3" y="9" width="18" height="13" rx="4" fill="currentColor" />
+      <path d="M7.5 9V6.8a4.5 4.5 0 0 1 9 0V9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+      <circle cx="12" cy="15" r="2" fill="#fff" fill-opacity=".82" />
+      <rect x="11.2" y="16" width="1.6" height="2.4" rx=".8" fill="#fff" fill-opacity=".82" />
+    </template>
+    <template v-else-if="name === 'report-ready'">
+      <path fill="currentColor" d="M5 2h11l4 4v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" />
+      <path fill="#fff" fill-opacity=".55" d="M16 2v5h4" />
+      <path d="m7.5 14 2.5 2.5 6-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+    <template v-else-if="name === 'refresh'">
+      <circle cx="12" cy="12" r="9.5" fill="currentColor" fill-opacity=".2" />
+      <path d="M18.5 9A7 7 0 1 0 19 14M18.5 5.5V9H15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
     <template v-else-if="name === 'plus'">
       <circle cx="12" cy="12" r="10" fill="currentColor" />
       <path d="M12 7v10M7 12h10" stroke="#fff" stroke-width="2.2" stroke-linecap="round" />
