@@ -13,8 +13,6 @@
       <div
         class="absolute inset-0 animate-spin rounded-full border-[3.5px] border-transparent border-t-primary"
       />
-      <!-- 중앙 펄스 점 -->
-      <div class="size-2 rounded-full bg-primary/30 animate-pulse" />
     </div>
 
     <div class="flex flex-col gap-1 max-w-xs px-4">

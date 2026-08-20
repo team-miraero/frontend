@@ -3,7 +3,8 @@
   <div class="w-full">
     <LoadingSpinner
       v-if="isPageLoading || goalStore.areGoalsLoading || goalStore.isLoading"
-      message="로드맵을 불러오는 중이에요"
+      message="홈 화면을 준비하고 있어요"
+      container-class="min-h-[calc(100dvh-122px)] md:min-h-[calc(100dvh-80px)]"
     />
 
     <div
