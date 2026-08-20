@@ -166,11 +166,7 @@
         <div v-for="day in weekDays" :key="day.label" class="flex flex-col items-center gap-1 sm:gap-1.5">
           <div
             class="flex size-8 sm:size-10 items-center justify-center rounded-full text-xs font-bold transition-all duration-150"
-            :class="
-              day.status === 'SUCCESS'
-                ? 'bg-primary text-white shadow-xs scale-105'
-                : 'bg-slate-100 text-slate-300'
-            "
+            :class="weekDayClass(day)"
           >
             <svg
               v-if="day.status === 'SUCCESS'"
@@ -428,6 +424,17 @@ const recentHistories = computed(() => pacemakerStore.histories.slice(0, 5))
 const weeklyStreak = computed(() => pacemaker.value.weeklyStreak ?? [])
 // 서버는 오늘 날짜를 별도로 내려주지 않으므로 로컬 오늘 날짜를 기준일로 쓴다.
 const referenceDate = computed(() => getLocalDateKey(new Date()))
+// JS Date#getDay()는 일요일이 0이라 dayOfWeek 이름과 매칭하기 위한 순서.
+const DAY_OF_WEEK_BY_INDEX = [
+  'SUNDAY',
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY',
+]
+const todayDayOfWeek = computed(() => DAY_OF_WEEK_BY_INDEX[new Date().getDay()])
 const weekDays = computed(() => {
   const byDay = new Map(weeklyStreak.value.map((day) => [day.dayOfWeek, day]))
   return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].map(
@@ -436,6 +443,7 @@ const weekDays = computed(() => {
       // 서버는 saved(boolean)로 내려주므로 기존 화면 로직이 쓰는 SUCCESS/FAIL 표기로 맞춘다.
       status: byDay.get(dayOfWeek)?.saved ? 'SUCCESS' : 'FAIL',
       label: DAY_OF_WEEK_LABEL[dayOfWeek],
+      isToday: dayOfWeek === todayDayOfWeek.value,
     })
   )
 })
@@ -562,6 +570,17 @@ function describeHistory(item) {
     return item.description ?? '하루 여유자금 자동 저축'
   }
   return item.description ?? '여유자금 없음 — 저축 건너뜀'
+}
+
+// 월간 달력의 오늘 표시(테두리)와 동일한 규칙을 이번 주 스트릭에도 적용한다.
+function weekDayClass(day) {
+  if (day.status === 'SUCCESS') {
+    return day.isToday
+      ? 'bg-primary text-white shadow-xs scale-105 ring-2 ring-offset-2 ring-primary/40'
+      : 'bg-primary text-white shadow-xs scale-105'
+  }
+  if (day.isToday) return 'border-2 border-primary bg-white text-primary'
+  return 'bg-slate-100 text-slate-300'
 }
 
 function monthDayClass(day) {
