@@ -138,7 +138,7 @@
         <div ref="mobileDropdownRef" class="relative">
           <button
             type="button"
-            class="relative flex size-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-600 shadow-sm transition hover:bg-white focus:outline-none"
+            class="relative flex size-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 focus:outline-none active:scale-95"
             aria-label="알림 센터 열기"
             @click="toggleDropdown"
           >
@@ -257,26 +257,6 @@
           </Transition>
         </div>
 
-        <!-- 마이페이지 바로가기 아이콘 버튼 (알림 종과 통일된 단정한 라인 룩) -->
-        <RouterLink
-          :to="{ name: ROUTE_NAMES.MYPAGE }"
-          class="flex size-9 shrink-0 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-600 shadow-sm transition hover:bg-white active:scale-95"
-          :class="currentRouteName === ROUTE_NAMES.MYPAGE ? 'border-primary/40 bg-blue-50 text-primary ring-1 ring-blue-200/60' : ''"
-          aria-label="마이페이지로 이동"
-        >
-          <svg
-            class="size-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </RouterLink>
       </div>
     </div>
 
@@ -413,7 +393,7 @@
         <div ref="dropdownRef" class="relative">
           <button
             type="button"
-            class="relative flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 focus:outline-none"
+            class="relative flex size-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 focus:outline-none active:scale-95"
             aria-label="알림 센터 열기"
             @click="toggleDropdown"
           >
@@ -544,26 +524,6 @@
           </Transition>
         </div>
 
-        <!-- 마이페이지 바로가기 아이콘 버튼 (데스크톱 알림 종과 통일) -->
-        <RouterLink
-          :to="{ name: ROUTE_NAMES.MYPAGE }"
-          class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50"
-          :class="isActive(ROUTE_NAMES.MYPAGE) ? 'border-primary/40 bg-blue-50 text-primary' : ''"
-          aria-label="마이페이지로 이동"
-        >
-          <svg
-            class="size-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </RouterLink>
       </div>
     </div>
 

@@ -14,65 +14,41 @@
     @keydown.space.prevent="$emit('select')"
     @keydown.enter.prevent="$emit('select')"
   >
-    <!-- 상단 영역: 아이콘 / 우측 (i) 가이드 버튼 및 동그라미 체크마크 -->
-    <div class="flex items-center justify-between gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+    <!-- 상단 영역: 목표 유형 아이콘 -->
+    <div class="mb-2 flex items-center sm:mb-3">
       <!-- 아이콘 둥근 박스 -->
       <div
-        class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center transition-all shrink-0"
-        :class="isSelected ? 'bg-white shadow-xs' : 'bg-[#EBF3FF]'"
+        class="flex size-10 shrink-0 items-center justify-center rounded-[14px] transition-colors"
+        :class="iconBackgroundClass"
       >
-        <GoalTypeIcon :goal-type="id" size="lg" class="text-[#0066FF] size-5 sm:size-6" />
-      </div>
-
-      <!-- 우측 영역: (i) 가이드 버튼 + 선택 체크마크 -->
-      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
-        <!-- (i) 정보 가이드 버튼 -->
-        <button
-          v-if="guideInfo"
-          type="button"
-          class="inline-flex size-6 items-center justify-center rounded-full text-slate-400 transition-colors hover:text-[#0066FF] hover:bg-blue-50 focus:outline-none cursor-pointer"
-          title="목표 가이드 보기"
-          @click.stop="$emit('guide')"
-        >
-          <svg
-            class="size-3.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="16" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12.01" y2="8" />
-          </svg>
-        </button>
-
-        <!-- 우측 동그라미 선택 체크마크 -->
-        <div
-          class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all duration-200"
-          :class="
-            isSelected
-              ? 'bg-[#0066FF] text-white shadow-xs scale-100'
-              : 'border-2 border-gray-300 bg-white text-transparent scale-90 group-hover:border-gray-400'
-          "
-        >
-          <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
+        <GoalTypeIcon :goal-type="id" size="lg" :class="iconToneClass" />
       </div>
     </div>
 
     <!-- 텍스트 영역: 타이틀 + 1줄 설명 -->
     <div class="mt-1 min-w-0">
-      <h3
-        class="text-sm sm:text-base md:text-lg font-bold transition-colors truncate whitespace-nowrap mb-0.5 sm:mb-1"
-        :class="isSelected ? 'text-[#0066FF]' : 'text-gray-900'"
-      >
-        {{ title }}
-      </h3>
+      <div class="mb-0.5 flex min-w-0 items-center gap-1 sm:mb-1">
+        <h3
+          class="min-w-0 truncate whitespace-nowrap text-sm font-bold transition-colors sm:text-base md:text-lg"
+          :class="isSelected ? 'text-[#0066FF]' : 'text-gray-900'"
+        >
+          {{ title }}
+        </h3>
+        <button
+          v-if="guideInfo"
+          type="button"
+          class="inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-500 transition-colors hover:text-[#0066FF] focus:outline-none"
+          title="목표 가이드 보기"
+          aria-label="목표 가이드 보기"
+          @click.stop="$emit('guide')"
+        >
+          <svg class="size-[15px]" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" />
+            <path d="M12 11v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            <circle cx="12" cy="7.5" r="1.25" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
 
       <p class="text-[11px] sm:text-xs md:text-sm text-gray-500 font-medium leading-tight sm:leading-snug truncate whitespace-nowrap">
         {{ description }}
@@ -82,9 +58,10 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
-defineProps({
+const props = defineProps({
   id: { type: String, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -94,4 +71,16 @@ defineProps({
 })
 
 defineEmits(['select', 'guide'])
+
+const ICON_STYLES = {
+  EMERGENCY: { tone: 'text-[#3182F6]', soft: 'bg-[#F2F7FF]', selected: 'bg-[#E5F0FF]' },
+  INDEPENDENCE: { tone: 'text-[#3182F6]', soft: 'bg-[#F2F7FF]', selected: 'bg-[#E5F0FF]' },
+  STUDENT_LOAN: { tone: 'text-[#3182F6]', soft: 'bg-[#F2F7FF]', selected: 'bg-[#E5F0FF]' },
+  MARRIAGE: { tone: 'text-[#3182F6]', soft: 'bg-[#F2F7FF]', selected: 'bg-[#E5F0FF]' },
+}
+const iconStyle = computed(() => ICON_STYLES[props.id] || ICON_STYLES.INDEPENDENCE)
+const iconToneClass = computed(() => iconStyle.value.tone)
+const iconBackgroundClass = computed(() =>
+  props.isSelected ? iconStyle.value.selected : iconStyle.value.soft
+)
 </script>

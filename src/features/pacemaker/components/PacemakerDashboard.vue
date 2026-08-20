@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container-narrow pb-10 pt-3 sm:pb-14 sm:pt-6 flex flex-col gap-4 sm:gap-6">
+  <div class="page-container-narrow flex flex-col gap-3 pb-10 pt-3 sm:gap-6 sm:pb-14 sm:pt-6">
     <!-- 1. 페이스메이커 전용 저금통 카드 -->
     <section
       class="rounded-[20px] px-5 py-5 text-white shadow-[0_12px_40px_rgba(0,102,255,0.22)] sm:px-6 sm:py-6"

@@ -83,10 +83,8 @@
           class="mt-5 rounded-2xl border border-dashed border-blue-200 bg-[#f8fbff] px-5 py-8 text-center"
           aria-live="polite"
         >
-          <div
-            class="mx-auto flex size-11 items-center justify-center rounded-2xl bg-blue-100 text-xl"
-          >
-            {{ emptyState.icon }}
+          <div class="mx-auto flex size-11 items-center justify-center rounded-2xl bg-slate-100">
+            <DashboardIcon :name="emptyState.icon" class="size-6 text-primary" />
           </div>
           <p class="mt-3 text-sm font-bold text-[#0a192f]">{{ emptyState.title }}</p>
           <p class="mt-1.5 text-xs leading-5 text-slate-500">{{ emptyState.description }}</p>
@@ -111,6 +109,7 @@
 <script setup>
 import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import DashboardIcon from '@/pages/dashboard/components/DashboardIcon.vue'
 import { formatKRWCompact } from '@/shared/lib/money'
 
 const props = defineProps({
@@ -169,7 +168,7 @@ const formattedReportContent = computed(() => {
 const emptyState = computed(() => {
   if (['FAILED', 'ERROR'].includes(reportStatus.value)) {
     return {
-      icon: '↻',
+      icon: 'refresh',
       title: '리포트를 불러오지 못했어요',
       description: 'AI 분석이 다시 완료되면 이곳에서 내용을 확인할 수 있어요.',
     }
@@ -177,14 +176,14 @@ const emptyState = computed(() => {
 
   if (props.milestone?.status === 'COMPLETED') {
     return {
-      icon: '✨',
+      icon: 'report-ready',
       title: 'AI 리포트를 준비하고 있어요',
       description: '달성 데이터를 분석 중이에요. 잠시 후 다시 확인해 주세요.',
     }
   }
 
   return {
-    icon: '🔒',
+    icon: 'lock',
     title: '달성 후 리포트가 열려요',
     description: '이 마일스톤에 도달하면 AI가 진행 과정을 분석해 드려요.',
   }

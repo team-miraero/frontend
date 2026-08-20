@@ -30,7 +30,17 @@
               class="flex size-8 shrink-0 items-center justify-center rounded-[10px]"
               :class="row.highlighted ? 'bg-[#eaf2ff]' : 'bg-slate-100'"
             >
-              <img :src="row.icon" alt="" class="size-3.5" />
+              <DashboardIcon
+                :name="row.assetType === 'MONEY_BOX' ? 'piggy-bank' : row.isLoan ? 'loan' : 'bank'"
+                class="size-[18px]"
+                :class="
+                  row.assetType === 'MONEY_BOX'
+                    ? 'text-[#3182f6]'
+                    : row.isLoan
+                      ? 'text-[#D86F79]'
+                      : 'text-[#7c5ce7]'
+                "
+              />
             </div>
             <div>
               <p class="text-sm font-bold text-[#0a192f]">{{ row.assetName }}</p>
@@ -72,7 +82,7 @@
             <span
               class="flex items-center gap-1.5 rounded-full border border-[#c5dcff] bg-[#eaf2ff] px-2.5 py-1"
             >
-              <img src="@/assets/icons/asset-maturity-clock.svg" alt="" class="size-2.5" />
+              <DashboardIcon name="clock" class="size-3 text-primary" />
               <span class="text-xs font-bold text-primary">
                 만료까지 {{ row.countdown.months }}개월 ({{ row.countdown.days }}일)
               </span>
@@ -102,8 +112,7 @@
 <script setup>
 import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
-import moneyBoxIcon from '@/assets/icons/money-box.svg'
-import bankAccountIcon from '@/assets/icons/bank-account.svg'
+import DashboardIcon from '@/pages/dashboard/components/DashboardIcon.vue'
 import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
 
 const props = defineProps({
@@ -137,7 +146,6 @@ const rows = computed(() =>
       ...asset,
       isLoan,
       highlighted,
-      icon: asset.assetType === 'MONEY_BOX' ? moneyBoxIcon : bankAccountIcon,
       caption: CAPTION_BY_TYPE[asset.assetType] ?? '목표적금 · 만기 시 자동 해지',
       countdown: asset.assetDetail?.maturityDate
         ? computeMaturityCountdown(asset.assetDetail.maturityDate)

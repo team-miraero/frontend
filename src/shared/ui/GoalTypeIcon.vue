@@ -3,33 +3,31 @@
   <svg
     viewBox="0 0 24 24"
     fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
     :class="sizeClass"
     aria-hidden="true"
   >
-    <path
-      v-if="normalizedType === 'INDEPENDENCE'"
-      d="M3 12l2-2m0 0 7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m10-11 2 2m-2-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6"
-    />
-    <path
-      v-else-if="normalizedType === 'EMERGENCY'"
-      d="M17 9V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2m2 4h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Zm7-5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"
-    />
-    <path
-      v-else-if="normalizedType === 'MARRIAGE'"
-      d="M4.318 6.318a4.5 4.5 0 0 0 0 6.364L12 20.364l7.682-7.682a4.5 4.5 0 0 0-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 0 0-6.364 0Z"
-    />
-    <template v-else-if="normalizedType === 'STUDENT_LOAN'">
-      <path d="m12 14 9-5-9-5-9 5 9 5Z" />
-      <path
-        d="m12 14 6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 1 12 20.055a11.952 11.952 0 0 1-6.824-2.998 12.078 12.078 0 0 1 .665-6.479L12 14Z"
-      />
-      <path d="M12 14v6.5" />
+    <template v-if="normalizedType === 'INDEPENDENCE'">
+      <path fill="currentColor" d="M2.8 10.3 10.8 3a1.8 1.8 0 0 1 2.4 0l8 7.3c1 .9.4 2.5-1 2.5H19V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7.2H4c-1.5 0-2.1-1.7-1.2-2.5Z" />
+      <path fill="#fff" fill-opacity=".72" d="M9.2 14.2a1.2 1.2 0 0 1 1.2-1.2h3.2a1.2 1.2 0 0 1 1.2 1.2V22H9.2v-7.8Z" />
     </template>
-    <circle v-else cx="12" cy="12" r="8" />
+    <template v-else-if="normalizedType === 'EMERGENCY'">
+      <rect x="2" y="5" width="20" height="15" rx="4" fill="currentColor" />
+      <path fill="#fff" fill-opacity=".55" d="M2 8.5h20v3H2z" />
+      <circle cx="17.5" cy="15.5" r="2" fill="#fff" fill-opacity=".82" />
+      <path d="M17.5 13.9v3.2M16.4 14.5h1.6a.7.7 0 0 1 0 1.4h-1a.7.7 0 0 0 0 1.4h1.6" stroke="currentColor" stroke-width=".9" stroke-linecap="round" />
+    </template>
+    <template v-else-if="normalizedType === 'MARRIAGE'">
+      <path fill="currentColor" d="M12 21 4.1 13.5A5.5 5.5 0 0 1 12 5.8a5.5 5.5 0 0 1 7.9 7.7L12 21Z" />
+      <path fill="#fff" fill-opacity=".68" d="m12 5.8 2.2-3.5h3.3l2.1 3.5-3.8 4.1L12 5.8Z" />
+      <circle cx="12" cy="12.2" r="3.2" stroke="#fff" stroke-opacity=".72" stroke-width="1.6" />
+    </template>
+    <template v-else-if="normalizedType === 'STUDENT_LOAN'">
+      <path fill="currentColor" d="m12 3 10.5 5.5L12 14 1.5 8.5 12 3Z" />
+      <path fill="currentColor" fill-opacity=".7" d="M5 11.4 12 15l7-3.6v5.2c-1.8 2.2-4.1 3.4-7 3.4s-5.2-1.2-7-3.4v-5.2Z" />
+      <path d="M21 9v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      <circle cx="21" cy="17.5" r="1.5" fill="currentColor" />
+    </template>
+    <circle v-else cx="12" cy="12" r="9" fill="currentColor" />
   </svg>
 </template>
 

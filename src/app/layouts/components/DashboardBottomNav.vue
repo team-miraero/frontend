@@ -15,14 +15,7 @@
         "
         @click="handleRoadmapClick"
       >
-        <span
-          class="relative flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="
-            isRoadmapActiveTab
-              ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60'
-              : ''
-          "
-        >
+        <span class="relative flex size-8 items-center justify-center transition-all duration-200">
           <!-- 활성: Solid Primary Blue Fill 집 / 비활성: Outline 집 -->
           <svg
             viewBox="0 0 24 24"
@@ -50,10 +43,7 @@
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95"
         :class="isActive(ROUTE_NAMES.SPENDING) ? 'text-primary font-bold' : 'text-slate-400 font-medium hover:text-slate-600'"
       >
-        <span
-          class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="isActive(ROUTE_NAMES.SPENDING) ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60' : ''"
-        >
+        <span class="flex size-8 items-center justify-center transition-all duration-200">
           <!-- 활성: Solid Primary Blue Fill 카드 / 비활성: Outline 카드 -->
           <svg
             viewBox="0 0 24 24"
@@ -76,10 +66,7 @@
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95"
         :class="isActive(ROUTE_NAMES.PACEMAKER) ? 'text-primary font-bold' : 'text-slate-400 font-medium hover:text-slate-600'"
       >
-        <span
-          class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="isActive(ROUTE_NAMES.PACEMAKER) ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60' : ''"
-        >
+        <span class="flex size-8 items-center justify-center transition-all duration-200">
           <!-- 활성: Solid Primary Blue Fill 시계 / 비활성: Outline 시계 -->
           <svg
             viewBox="0 0 24 24"
@@ -103,10 +90,7 @@
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95"
         :class="isActive(ROUTE_NAMES.COACH) ? 'text-primary font-bold' : 'text-slate-400 font-medium hover:text-slate-600'"
       >
-        <span
-          class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="isActive(ROUTE_NAMES.COACH) ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60' : ''"
-        >
+        <span class="flex size-8 items-center justify-center transition-all duration-200">
           <!-- 활성: Solid Primary Blue Fill Sparkle / 비활성: Outline Sparkle -->
           <svg
             viewBox="0 0 24 24"
@@ -129,10 +113,7 @@
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95"
         :class="isActive(ROUTE_NAMES.MENU) ? 'text-primary font-bold' : 'text-slate-400 font-medium hover:text-slate-600'"
       >
-        <span
-          class="flex size-8 items-center justify-center rounded-xl transition-all duration-200"
-          :class="isActive(ROUTE_NAMES.MENU) ? 'bg-blue-50 text-primary shadow-[0_1px_0_rgba(0,0,0,0.05)] ring-1 ring-blue-200/60' : ''"
-        >
+        <span class="flex size-8 items-center justify-center transition-all duration-200">
           <svg
             viewBox="0 0 24 24"
             fill="none"

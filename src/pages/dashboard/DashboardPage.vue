@@ -10,7 +10,7 @@
       v-else-if="goalStore.currentGoal"
       class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fafc] pb-6"
     >
-      <div class="page-container py-4 sm:py-6 space-y-4 sm:space-y-6">
+      <div class="page-container space-y-3 py-4 sm:space-y-6 sm:py-6">
         <div
           v-if="hasSupplementaryError"
           class="flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"
@@ -147,17 +147,12 @@
     <div v-else class="flex min-h-[420px] items-center justify-center px-6 text-center">
       <div class="max-w-[320px]">
         <div
-          class="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-primary"
+          class="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.08)]"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="size-6"
-          >
-            <path d="M12 5v14M5 12h14" />
-          </svg>
+          <DashboardIcon
+            name="plus"
+            class="size-6 text-[#3182f6] drop-shadow-[0_3px_5px_rgba(49,130,246,0.22)]"
+          />
         </div>
         <p class="text-base font-bold text-[#0a192f]">아직 등록된 목표가 없어요</p>
         <p class="pt-1.5 text-sm text-slate-500">
@@ -198,6 +193,7 @@ import {
 import { usePacemakerStore, PacemakerSetupModal } from '@/features/pacemaker'
 import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pacemaker.constants'
 import PacemakerAssistFlow from '@/pages/dashboard/components/PacemakerAssistFlow.vue'
+import DashboardIcon from '@/pages/dashboard/components/DashboardIcon.vue'
 import { useModal } from '@/shared/composables/useModal'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { PACE_STATE, derivePaceState } from '@/features/roadmap/constants/pace-state.constants'

@@ -38,7 +38,7 @@
         />
 
         <SpendingContentTabs
-          class="mt-5 md:mt-7"
+          class="mt-3 sm:mt-5 md:mt-7"
           :summary="spendingSummary"
           :selected-goal="selectedGoal"
         />

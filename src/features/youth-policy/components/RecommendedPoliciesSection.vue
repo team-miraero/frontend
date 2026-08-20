@@ -38,7 +38,7 @@
 
     <div
       v-if="youthPolicyStore.isRecommendedLoading"
-      class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+      class="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3"
     >
       <div
         v-for="index in 3"
@@ -54,7 +54,7 @@
 
     <div
       v-else-if="youthPolicyStore.recommendedPolicies.length > 0"
-      class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+      class="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3"
     >
       <RecommendedPolicyCard
         v-for="policy in visiblePolicies"
