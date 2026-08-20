@@ -71,7 +71,7 @@
 
     <div
       v-else-if="pacemakerStore.pacemakerStatus?.registered === false"
-      class="page-container-narrow pb-10 pt-4 sm:pb-14 sm:pt-6 flex flex-col gap-6 sm:gap-8"
+      class="page-container-narrow flex flex-col gap-3 pb-10 pt-4 sm:gap-8 sm:pb-14 sm:pt-6"
     >
       <!-- 와이어프레임 Hero card -->
       <section

@@ -10,7 +10,7 @@
       v-else-if="goalStore.currentGoal"
       class="flex min-h-[calc(100vh-80px)] justify-center bg-[#f8fafc] pb-6"
     >
-      <div class="page-container py-4 sm:py-6 space-y-4 sm:space-y-6">
+      <div class="page-container space-y-3 py-4 sm:space-y-6 sm:py-6">
         <div
           v-if="hasSupplementaryError"
           class="flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"

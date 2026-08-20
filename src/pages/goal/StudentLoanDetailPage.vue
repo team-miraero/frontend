@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto max-w-md px-4 space-y-6 pb-32">
+  <div class="mx-auto max-w-md space-y-3 px-4 pb-32 sm:space-y-6">
     <!-- <div class="space-y-6 pb-32"> -->
     <!-- 상단 텍스트 -->
     <header class="space-y-2">

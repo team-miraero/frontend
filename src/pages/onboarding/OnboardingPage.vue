@@ -23,7 +23,7 @@
     >
       <h2 class="text-sm font-bold text-primary">미래로가 도와드리는 것들</h2>
 
-      <div class="mt-6 grid gap-6 sm:grid-cols-3">
+      <div class="mt-6 grid gap-3 sm:grid-cols-3 sm:gap-6">
         <div
           v-for="feature in FEATURES"
           :key="feature.title"

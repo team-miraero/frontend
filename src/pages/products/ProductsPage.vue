@@ -109,7 +109,7 @@
         </div>
       </section>
 
-      <section class="mt-5" aria-labelledby="product-list-title">
+      <section class="mt-3 sm:mt-5" aria-labelledby="product-list-title">
         <div class="flex items-end justify-between gap-4">
           <div
             class="no-scrollbar -my-1.5 flex min-w-0 items-center gap-2 overflow-x-auto py-1.5 px-0.5"
@@ -153,7 +153,7 @@
         >
           <div
             v-if="isRecommendationLoading"
-            class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+            class="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3"
             aria-label="상품 목록을 불러오는 중"
           >
             <div
@@ -207,7 +207,7 @@
             </button>
           </div>
 
-          <div v-else class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div v-else class="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ProductCard
               v-for="product in sortedProducts"
               :key="`${product.productType}-${getProductId(product)}`"
@@ -227,7 +227,7 @@
       </section>
 
       <div
-        class="mt-6 flex items-start gap-2.5 rounded-2xl border border-slate-200/60 bg-slate-50/80 p-4 text-[11px] leading-relaxed text-slate-400 shadow-xs"
+        class="mt-3 flex items-start gap-2.5 rounded-2xl border border-slate-200/60 bg-slate-50/80 p-4 text-[11px] leading-relaxed text-slate-400 shadow-xs sm:mt-6"
       >
         <span
           class="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-slate-200/80 text-[10px] font-bold text-slate-600"

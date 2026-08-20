@@ -12,7 +12,7 @@
 
     <div
       v-if="youthPolicyStore.isLoading && youthPolicyStore.policies.length === 0"
-      class="mt-4 grid gap-4 sm:grid-cols-2"
+      class="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4"
     >
       <div
         v-for="index in 6"
@@ -47,7 +47,7 @@
       <p class="mt-1 text-xs text-gray-400">검색어나 필터를 바꿔서 다시 찾아보세요.</p>
     </div>
 
-    <div v-else class="mt-4 grid gap-4 sm:grid-cols-2">
+    <div v-else class="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4">
       <PolicyListCard
         v-for="policy in youthPolicyStore.policies"
         :key="policy.youthPolicyId"

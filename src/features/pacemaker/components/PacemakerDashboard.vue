@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container-narrow pb-10 pt-3 sm:pb-14 sm:pt-6 flex flex-col gap-4 sm:gap-6">
+  <div class="page-container-narrow flex flex-col gap-3 pb-10 pt-3 sm:gap-6 sm:pb-14 sm:pt-6">
     <div class="flex items-center justify-between gap-2.5 sm:gap-4">
       <div class="min-w-0 flex-1">
         <h2 class="text-xl font-bold tracking-tight text-[#0a192f] whitespace-nowrap sm:text-2xl">
