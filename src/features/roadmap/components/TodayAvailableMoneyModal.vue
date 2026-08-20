@@ -49,8 +49,8 @@
         <p class="text-lg font-bold text-primary">{{ formatKRW(daily.todayAvailableMoney) }}</p>
       </div>
 
-      <p class="text-xs leading-[19.5px] text-slate-400">
-        이 금액 안에서 오늘 자유롭게 써도 이 목표의 저축 계획은 지켜져요.
+      <p class="text-[11px] sm:text-xs tracking-tight text-slate-400">
+        이 금액 내에서 지출하면 목표 저축 계획이 지켜져요
       </p>
     </div>
   </BaseModal>

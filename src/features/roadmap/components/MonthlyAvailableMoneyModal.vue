@@ -62,8 +62,8 @@
         <div class="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-200">
           <div class="h-2 rounded-full bg-primary" :style="{ width: `${progress.percent}%` }" />
         </div>
-        <p class="pt-1.5 text-xs leading-[19.5px] text-slate-400">
-          남은 {{ monthly.remainingDays }}일 동안 이 페이스를 유지하면 목표 저축이 지켜져요.
+        <p class="pt-1.5 text-[11px] sm:text-xs tracking-tight text-slate-400">
+          남은 {{ monthly.remainingDays }}일간 이 페이스를 유지하면 목표 저축이 지켜져요
         </p>
       </div>
     </div>
@@ -83,7 +83,7 @@ const props = defineProps({
   },
   monthly: {
     type: Object,
-    required: true, // { income, fixedExpense, targetGoalAutoTransfer, otherGoalAutoTransfer, variableExpense, availableMoney }
+    required: true, // { income, fixedExpense, variableExpense, availableMoney }
   },
 })
 defineEmits(['update:modelValue'])
@@ -94,18 +94,6 @@ const rows = computed(() => [
     caption: '마이데이터 연동 기준',
     amount: props.monthly.income,
     sign: '+',
-  },
-  {
-    label: '목표 저축 (자동이체)',
-    caption: '이 목표 자동이체 합계',
-    amount: props.monthly.targetGoalAutoTransfer,
-    sign: '−',
-  },
-  {
-    label: '다른 목표 저축',
-    caption: '다른 목표 자동이체 합계',
-    amount: props.monthly.otherGoalAutoTransfer,
-    sign: '−',
   },
   {
     label: '고정지출',

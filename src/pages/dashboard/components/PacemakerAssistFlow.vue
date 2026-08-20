@@ -13,12 +13,23 @@
           <button
             v-if="canGoBack"
             type="button"
-            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f8fbff] text-sm font-bold text-slate-500 transition hover:bg-blue-50 hover:text-primary"
+            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f8fbff] text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
             aria-label="이전 단계"
             :disabled="isSubmitting"
             @click="goBack"
           >
-            ←
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-[15px]"
+              aria-hidden="true"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
           </button>
           <div class="min-w-0">
             <p class="text-xs font-bold text-slate-400">{{ eyebrow }}</p>
@@ -29,7 +40,7 @@
         </div>
         <button
           type="button"
-          class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f8fbff] transition hover:bg-slate-100"
+          class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f8fbff] transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
           aria-label="닫기"
           :disabled="isSubmitting"
           @click="closeFlow(false)"
@@ -38,37 +49,37 @@
         </button>
       </header>
 
-      <div v-if="step === 'strategy'" class="flex flex-col gap-3 px-6 py-5 sm:px-7">
+      <div v-if="step === 'strategy'" class="flex flex-col gap-2.5 px-6 py-5 sm:gap-3 sm:px-7">
         <div class="rounded-2xl border border-pink-200 bg-pink-50 px-4 py-3.5">
-          <p class="text-sm leading-relaxed text-slate-700">
+          <p class="text-sm leading-relaxed text-slate-700 break-keep">
             현재 목표 페이스가
             <strong class="font-bold text-[#be185d]">{{ shortageLabel }} 부족해요.</strong>
-            지금 상황에 맞는 대응 방법을 골라보세요.
           </p>
+          <p class="mt-0.5 text-sm leading-relaxed text-slate-700 break-keep">지금 상황에 맞는 대응 방법을 골라보세요.</p>
         </div>
 
         <button
           v-for="option in strategyOptions"
           :key="option.id"
           type="button"
-          class="group flex w-full items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-left transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-100/80 hover:shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 cursor-pointer"
+          class="group flex w-full items-center gap-3.5 rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 text-left transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-100/80 hover:shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 cursor-pointer sm:p-4"
           @click="selectStrategy(option.id)"
         >
           <span
             class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-[#0a192f]"
           >
-            <AppIcon :name="option.icon" />
+            <DashboardIcon :name="option.icon" class="size-[21px] text-primary" />
           </span>
           <span class="min-w-0 flex-1">
             <strong class="block text-sm font-bold text-[#0a192f]">
               {{ option.title }}
             </strong>
-            <span class="mt-0.5 block text-xs leading-relaxed text-slate-500">
+            <span class="mt-0.5 block whitespace-nowrap text-[11px] leading-relaxed tracking-tight text-slate-500 sm:text-xs">
               {{ option.description }}
             </span>
           </span>
           <span
-            class="pt-1 text-lg text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500"
+            class="text-lg text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-600"
             aria-hidden="true"
             >›</span
           >
@@ -186,12 +197,17 @@
           >
         </div>
 
-        <div class="mt-2.5 flex flex-wrap gap-2">
+        <div class="mt-2.5 grid grid-cols-4 gap-2">
           <button
             v-for="amount in quickAmounts"
             :key="amount"
             type="button"
-            class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition hover:border-slate-300 hover:bg-slate-50 cursor-pointer"
+            class="flex items-center justify-center rounded-full border py-2 text-xs transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            :class="
+              pullAmount === amount
+                ? 'border-primary bg-[#ebf3ff] font-bold text-primary shadow-sm'
+                : 'border-slate-200 bg-white font-bold text-slate-700 shadow-[0_1px_0_rgba(0,0,0,0.05)] hover:border-slate-300 hover:bg-slate-50'
+            "
             :disabled="isPullLocked"
             @click="setPullAmount(amount)"
           >
@@ -246,7 +262,7 @@
               :disabled="isSubmitting"
               @click="goBack"
             >
-              취소
+              이전
             </button>
             <button
               type="submit"
@@ -320,7 +336,7 @@
             :disabled="isSubmitting"
             @click="goBack"
           >
-            취소
+            이전
           </button>
           <button
             type="submit"
@@ -374,6 +390,7 @@ import {
 } from '@/features/goal/lib/goal-months'
 import BaseModal from '@/shared/ui/BaseModal.vue'
 import AppIcon from '@/shared/ui/AppIcon.vue'
+import DashboardIcon from '@/pages/dashboard/components/DashboardIcon.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
 import { deriveGoalPaceMetrics } from '@/features/roadmap/constants/pace-state.constants'
@@ -411,21 +428,21 @@ const successState = ref({
 const strategyOptions = Object.freeze([
   {
     id: 'spending',
-    icon: '✂️',
+    icon: 'scissors',
     title: '지출 줄이기',
-    description: '지출 관리에서 이번 달 소비 내역을 확인하고 직접 조절해요.',
+    description: '이번 달 소비를 확인하고 조절해요',
   },
   {
     id: 'pull',
-    icon: '💸',
+    icon: 'coin',
     title: '끌어쓰기',
-    description: '다른 여유 통장에서 이번 달 부족한 자금을 채워요.',
+    description: '여유 통장에서 부족한 금액을 채워요',
   },
   {
     id: 'goal',
-    icon: '📅',
+    icon: 'calendar-edit',
     title: '목표 조정하기',
-    description: '목표 금액이나 목표 월을 수정해서 로드맵을 다시 맞춰요.',
+    description: '목표 금액이나 기간을 조정해요',
   },
 ])
 

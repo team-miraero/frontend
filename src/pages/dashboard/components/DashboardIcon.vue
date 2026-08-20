@@ -64,6 +64,45 @@
       <circle cx="12" cy="12" r="9.5" fill="currentColor" fill-opacity=".2" />
       <path d="M18.5 9A7 7 0 1 0 19 14M18.5 5.5V9H15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
     </template>
+    <template v-else-if="name === 'scissors'">
+      <circle cx="5.5" cy="7" r="3.5" fill="currentColor" />
+      <circle cx="5.5" cy="17" r="3.5" fill="currentColor" />
+      <circle cx="5.5" cy="7" r="1.3" fill="#fff" fill-opacity=".8" />
+      <circle cx="5.5" cy="17" r="1.3" fill="#fff" fill-opacity=".8" />
+      <path d="m8.3 9 11.5 7M8.3 15l11.5-7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+    </template>
+    <template v-else-if="name === 'wallet'">
+      <rect x="2" y="5" width="20" height="15" rx="4" fill="currentColor" />
+      <path fill="#fff" fill-opacity=".55" d="M2 8.5h20v3H2z" />
+      <rect x="14" y="13" width="6" height="4" rx="2" fill="#fff" fill-opacity=".8" />
+      <circle cx="17" cy="15" r=".8" fill="currentColor" />
+    </template>
+    <template v-else-if="name === 'transfer-coin'">
+      <circle cx="15" cy="12" r="7.5" fill="currentColor" />
+      <circle cx="15" cy="12" r="4.8" fill="#fff" fill-opacity=".2" />
+      <path d="M2.5 12h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+      <path d="m8.5 8.8 3.2 3.2-3.2 3.2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M11.2 12h3.3" stroke="#fff" stroke-opacity=".82" stroke-width="2.4" stroke-linecap="round" />
+      <path d="M15 9.2v5.6M13.8 10.2h1.8a1 1 0 0 1 0 2h-1.2a1 1 0 0 0 0 2h1.8" stroke="#fff" stroke-width="1" stroke-linecap="round" />
+    </template>
+    <template v-else-if="name === 'hand-coin'">
+      <circle cx="15.5" cy="7.5" r="5.5" fill="currentColor" />
+      <circle cx="15.5" cy="7.5" r="3.3" fill="#fff" fill-opacity=".2" />
+      <path d="M15.5 4.8v5.4M14.2 5.8h2a.9.9 0 0 1 0 1.8h-1.3a.9.9 0 0 0 0 1.8h2" stroke="#fff" stroke-width="1" stroke-linecap="round" />
+      <path fill="currentColor" fill-opacity=".78" d="M2 13.2h4.2l2.4 2.1h5.2c1.1 0 1.9.8 1.9 1.8h1.1l3.7-2c1.4-.8 2.8 1 1.7 2.1l-5.1 4.3c-.4.3-.8.5-1.3.5H8.2c-.5 0-1-.2-1.4-.5L4.9 20H2v-6.8Z" />
+      <path d="M8.5 17.1h7.2" stroke="#fff" stroke-opacity=".7" stroke-width="1.5" stroke-linecap="round" />
+    </template>
+    <template v-else-if="name === 'coin'">
+      <circle cx="12" cy="12" r="9.5" fill="currentColor" />
+      <circle cx="12" cy="12" r="6.5" fill="#fff" fill-opacity=".18" />
+      <path d="m7.7 8.3 1.5 7.4 2.8-5.6 2.8 5.6 1.5-7.4M8.2 11h7.6M8.6 13.2h6.8" stroke="#fff" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+    <template v-else-if="name === 'calendar-edit'">
+      <rect x="3" y="4.5" width="18" height="16.5" rx="4" fill="currentColor" />
+      <path d="M3 9h18" stroke="#fff" stroke-opacity=".65" stroke-width="1.7" />
+      <path d="M8 3v3M16 3v3" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" />
+      <path d="m9 16 5.7-5.7 2 2L11 18H9v-2Z" fill="#fff" fill-opacity=".82" />
+    </template>
     <template v-else-if="name === 'plus'">
       <circle cx="12" cy="12" r="10" fill="currentColor" />
       <path d="M12 7v10M7 12h10" stroke="#fff" stroke-width="2.2" stroke-linecap="round" />
