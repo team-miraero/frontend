@@ -31,10 +31,10 @@
           class="group relative flex min-w-[170px] sm:min-w-[175px] flex-1 cursor-pointer flex-col justify-between rounded-xl border p-3 text-left sm:p-3.5 transition-all duration-200 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-0 active:scale-[0.97] select-none snap-start"
           :class="[
             milestone.status === 'COMPLETED'
-              ? 'border-slate-200/80 bg-slate-50/70 hover:border-slate-300 hover:bg-white hover:shadow-2xs'
+              ? 'border-slate-200/80 bg-slate-50/70 hover:border-slate-300 hover:bg-white hover:shadow-[0_1px_0_rgba(0,0,0,0.05)]'
               : milestone.status === 'IN_PROGRESS'
-                ? 'border-primary/80 bg-white shadow-2xs hover:border-primary hover:shadow-xs'
-                : 'border-slate-200/60 bg-slate-50/40 opacity-70 hover:border-slate-300 hover:bg-white hover:opacity-100 hover:shadow-2xs',
+                ? 'border-primary/80 bg-white shadow-[0_1px_0_rgba(0,0,0,0.05)] hover:border-primary hover:shadow-sm'
+                : 'border-slate-200/60 bg-slate-50/40 opacity-70 hover:border-slate-300 hover:bg-white hover:opacity-100 hover:shadow-[0_1px_0_rgba(0,0,0,0.05)]',
           ]"
           @click="$emit('select-milestone', milestone)"
         >
@@ -47,7 +47,7 @@
                   milestone.status === 'COMPLETED'
                     ? 'bg-slate-200/80 text-slate-700'
                     : milestone.status === 'IN_PROGRESS'
-                      ? 'bg-primary text-white shadow-2xs'
+                      ? 'bg-primary text-white shadow-[0_1px_0_rgba(0,0,0,0.05)]'
                       : 'bg-slate-200/60 text-slate-400'
                 "
               >
@@ -161,6 +161,18 @@ const props = defineProps({
 })
 
 let hasScrolledToInProgress = false
+
+// 목표가 바뀌면(goalId 변경) 이전 목표에서 이미 스크롤했다는 플래그를 초기화해
+// 새 목표의 진행 중인 마일스톤으로 다시 자동 스크롤되게 한다. 같은 목표 안에서
+// 마일스톤 목록만 갱신되는 경우(goalId 동일)에는 초기화하지 않아 스크롤이
+// 불필요하게 반복 실행되지 않는다.
+watch(
+  () => props.goal?.goalId,
+  (goalId, previousGoalId) => {
+    if (goalId === previousGoalId) return
+    hasScrolledToInProgress = false
+  }
+)
 
 watch(
   () => props.milestones,

@@ -183,7 +183,12 @@
             </p>
           </div>
           <div class="shrink-0 text-right">
-            <span class="block text-[11px] font-semibold text-slate-400">도착 예정</span>
+            <!-- 이 마일스톤의 실제 예상 도착일 계산 로직이 없어 targetDate가 비어 있으면(완료
+                 전 마일스톤은 항상 비어 있음) 목표 종료일로 대체하되, "도착 예정"이 아니라
+                 "목표 예정일"로 라벨을 구분해 이 마일스톤만의 날짜로 오해하지 않게 한다. -->
+            <span class="block text-[11px] font-semibold text-slate-400">
+              {{ activeMilestone.targetDate ? '도착 예정' : '목표 예정일' }}
+            </span>
             <strong class="mt-0.5 block text-xs font-bold text-primary">
               {{ activeMilestone.targetDate || formatEndDate(goal.period.endDate) }}
             </strong>
@@ -339,7 +344,7 @@
             <img
               :src="coliBottomImage"
               alt="페이스메이커 콜리"
-              class="h-6 w-auto drop-shadow-md sm:h-14 md:h-17 lg:h-20 xl:h-24 transition-transform hover:scale-105"
+              class="h-6 w-auto drop-shadow-md sm:h-14 md:h-[68px] lg:h-20 xl:h-24 transition-transform hover:scale-105"
             />
           </div>
         </div>
@@ -388,7 +393,7 @@
               <img
                 :src="coliBottomImage"
                 alt="페이스메이커 콜리"
-                class="h-6 w-auto drop-shadow-md sm:h-14 md:h-17 lg:h-20 xl:h-24 transition-transform hover:scale-105"
+                class="h-6 w-auto drop-shadow-md sm:h-14 md:h-[68px] lg:h-20 xl:h-24 transition-transform hover:scale-105"
               />
             </div>
           </div>

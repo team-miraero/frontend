@@ -32,9 +32,9 @@
           <PaceBanner
             :pace="displayedGoal.pace"
             :progress-rate="goalStore.currentGoal.progressRate"
-            :goal-name="displayedGoal.goalName"
             :disabled="isGoalPaused"
             :current-amount="displayedGoal.currentAmount"
+            :start-amount="displayedGoal.startAmount"
             :goal-amount="goalStore.currentGoal.goalAmount"
             :end-date="goalStore.currentGoal.period.endDate"
             :goal-months="goalStore.currentGoal.period.goalMonths"
@@ -54,67 +54,17 @@
         </div>
 
         <!-- 2. 목표 진행 로드맵 카드 (통합 카드 컨테이너) -->
+        <!-- 페이스 비교 클릭 시 이 카드의 제목이 화면 위로 잘리지 않도록 여유를 두고(scroll-mt),
+             모바일 하단 네비게이션에 카드 끝부분이 가려지지 않도록 여유를 둔다(scroll-mb). -->
         <section
           ref="roadmapSectionRef"
-          class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-6 md:p-7"
+          class="scroll-mt-4 scroll-mb-24 overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-6 md:p-7"
           :class="isGoalPaused ? 'opacity-65' : ''"
         >
           <div class="mb-3.5 sm:mb-4 flex items-center justify-between">
-            <div class="flex items-center gap-1">
-              <h2 class="text-base font-bold tracking-tight text-[#0a192f] sm:text-lg">
-                나의 로드맵 여정
-              </h2>
-
-              <!-- (i) 캐릭터 범례 설명 버튼: 클릭했을 때만 상세 설명 팝오버가 열림 (hover 트리거 없음) -->
-              <button
-                type="button"
-                class="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-primary focus:outline-none cursor-pointer"
-                :class="isPaceLegendTooltipOpen ? 'bg-slate-100 text-primary' : ''"
-                aria-label="목표 페이스와 나의 현재 페이스 설명 보기"
-                :aria-expanded="isPaceLegendTooltipOpen"
-                @click.stop="togglePaceLegendTooltip"
-              >
-                <svg
-                  class="size-3.5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="16" x2="12" y2="12" />
-                  <line x1="12" y1="8" x2="12.01" y2="8" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- 캐릭터 범례 설명 팝오버: 겹치지 않도록 일반 흐름에 배치해 아래 로드맵을 밀어내림 (기본 상태는 닫힘) -->
-          <div
-            v-if="isPaceLegendTooltipOpen"
-            class="mb-3.5 sm:mb-4 w-full rounded-2xl border border-slate-200 bg-white p-3.5 shadow-[0_8px_20px_rgba(15,35,70,0.08)]"
-            @click.stop
-          >
-            <div class="flex items-start gap-2.5">
-              <img :src="paceLegendColiImage" alt="" class="size-8 shrink-0 object-contain" />
-              <div class="min-w-0">
-                <strong class="block text-xs font-bold text-[#0a192f]">목표 페이스</strong>
-                <p class="mt-0.5 text-[11px] leading-relaxed text-slate-500">
-                  목표일까지 계획대로 모았을 때의 위치예요.
-                </p>
-              </div>
-            </div>
-            <div class="mt-2.5 flex items-start gap-2.5 border-t border-slate-100 pt-2.5">
-              <img :src="paceLegendGoalCharacterImage" alt="" class="size-8 shrink-0 object-contain" />
-              <div class="min-w-0">
-                <strong class="block text-xs font-bold text-[#0a192f]">나의 현재 페이스</strong>
-                <p class="mt-0.5 text-[11px] leading-relaxed text-slate-500">
-                  지금까지 모은 금액을 기준으로 한 나의 위치예요.
-                </p>
-              </div>
-            </div>
+            <h2 class="text-base font-bold tracking-tight text-[#0a192f] sm:text-lg">
+              나의 로드맵 여정
+            </h2>
           </div>
 
           <MilestoneProgressBar :goal="displayedGoal" :milestones="roadmapStore.milestones" />
@@ -134,14 +84,8 @@
           <RaceRecordSummary
             :goal="displayedGoal"
             :assets="goalStore.assets ?? []"
-            :pacemaker="displayedPacemaker"
-            :is-toggling="pacemakerStore.isToggling"
-            :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
-            :dashboard-error-message="dashboardErrorMessage"
             @open-detail="handleOpenLinkedAssets"
-            @toggle="handlePacemakerToggle"
             @open="handleOpenShareGoal"
-            @retry-dashboard="retryPacemakerDashboard"
           />
         </div>
       </div>
@@ -215,7 +159,7 @@
         </p>
         <RouterLink
           :to="{ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } }"
-          class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-xs transition hover:opacity-90"
+          class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
         >
           새 목표 만들기
         </RouterLink>
@@ -225,7 +169,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useGoalStore } from '@/features/goal'
 import { useCollectionStore } from '@/features/collection'
@@ -250,10 +194,6 @@ import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pace
 import PacemakerAssistFlow from '@/pages/dashboard/components/PacemakerAssistFlow.vue'
 import { useModal } from '@/shared/composables/useModal'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import {
-  PACEMAKER_CHARACTER_IMAGE,
-  getGoalCharacterImage,
-} from '@/features/roadmap/constants/goal-character.constants'
 import { PACE_STATE, derivePaceState } from '@/features/roadmap/constants/pace-state.constants'
 
 const route = useRoute()
@@ -286,7 +226,6 @@ const selectedMilestone = ref(null)
 const achievementErrorMessage = ref('')
 const previousProgressRate = ref(null)
 const roadmapSectionRef = ref(null)
-const isPaceLegendTooltipOpen = ref(false)
 
 const EMPTY_DAILY_AVAILABLE_MONEY = Object.freeze({
   todayAvailableMoney: 0,
@@ -323,30 +262,27 @@ const displayedPacemaker = computed(() => {
 })
 // 개발 중 BEHIND 화면 미리보기(?scenario=shortage): 화면 전체가 바라보는 단일 파생 상태
 // (derivePaceState/deriveGoalPaceMetrics)는 pace.paceStatus/differenceAmount가 아니라
-// currentAmount·period·pace.expectedAmount로 월평균 페이스를 직접 계산하므로,
-// 그 계산에 실제로 영향을 주는 currentAmount를 목표 페이스의 절반 수준으로 낮춰
-// BEHIND가 실제로 재현되게 한다.
+// currentAmount·startAmount·period·pace.expectedAmount로 월평균 페이스를 직접 계산하므로,
+// 그 계산에 실제로 영향을 주는 currentAmount를 "시작 금액 + 목표 페이스 절반만큼만 추가 저축"한
+// 것으로 낮춰 BEHIND가 실제로 재현되게 한다.
 const displayedGoal = computed(() => {
   const goal = goalStore.currentGoal
   if (!goal || !isShortagePreview.value) return goal
 
   const { goalMonths = 0, remainMonths = 0 } = goal.period ?? {}
+  const startAmount = Number(goal.startAmount ?? 0)
   const elapsedMonths = Math.max(1, goalMonths - remainMonths)
-  const targetMonthlyPace = goalMonths > 0 ? goal.goalAmount / goalMonths : 0
-  const shortageCurrentAmount = Math.max(0, Math.round(targetMonthlyPace * elapsedMonths * 0.5))
+  const remainingToSave = Math.max(0, Number(goal.goalAmount ?? 0) - startAmount)
+  const targetMonthlyPace = goalMonths > 0 ? remainingToSave / goalMonths : 0
+  const shortageSavedSinceStart = Math.max(0, Math.round(targetMonthlyPace * elapsedMonths * 0.5))
 
-  return { ...goal, currentAmount: shortageCurrentAmount }
+  return { ...goal, currentAmount: startAmount + shortageSavedSinceStart }
 })
 const assistFlowGoal = displayedGoal
 const hasSupplementaryError = computed(
   () =>
     Object.keys(goalStore.dashboardSupplementaryErrors).length > 0 || Boolean(roadmapStore.error)
 )
-const dashboardErrorMessage = computed(() =>
-  pacemakerStore.dashboardError ? '정보를 불러오지 못했어요' : ''
-)
-const paceLegendColiImage = PACEMAKER_CHARACTER_IMAGE
-const paceLegendGoalCharacterImage = computed(() => getGoalCharacterImage(displayedGoal.value?.goalType))
 
 // 화면 표시(배지/문구/CTA)와 클릭 동작이 서로 다른 상태값을 보고 어긋나지 않도록,
 // PaceBanner가 쓰는 것과 동일한 파생 상태를 여기서도 단일하게 계산해 재사용한다.
@@ -364,39 +300,11 @@ function handleOpenLinkedAssets() {
   openLinkedAssetsModal()
 }
 
-function closePaceLegendTooltip() {
-  isPaceLegendTooltipOpen.value = false
-}
-
-function togglePaceLegendTooltip() {
-  isPaceLegendTooltipOpen.value = !isPaceLegendTooltipOpen.value
-}
-
-// 페이스 비교 영역 클릭: 페이지 내 '나의 로드맵 여정' 카드가 고정 헤더~하단 네비게이션 사이
-// 실제 보이는 영역에 (잘리지 않고) 가득 차도록 스크롤 위치를 직접 계산해 이동한다.
-// (카드가 화면보다 커서 둘 다 만족 못하면 하단이 가려지지 않는 쪽을 우선한다.)
+// 페이스 비교 영역 클릭: '나의 로드맵 여정' 카드로 스크롤 이동.
+// 헤더가 가리는 여백/하단 네비게이션에 가려지지 않는 여백은 CSS scroll-margin(section의
+// scroll-mt/scroll-mb)이 담당하므로, 여기서는 브라우저 기본 동작만 호출하면 된다.
 function scrollToRoadmapSection() {
-  const target = roadmapSectionRef.value
-  if (!target) return
-
-  const scrollContainer = target.closest('main')
-  if (!scrollContainer) {
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    return
-  }
-
-  const bottomNav = document.querySelector('nav[aria-label="모바일 주요 메뉴"]')
-  const bottomNavHeight = bottomNav?.offsetHeight ?? 0
-
-  const usableTop = scrollContainer.getBoundingClientRect().top
-  const usableHeight = window.innerHeight - bottomNavHeight - usableTop
-  const targetRect = target.getBoundingClientRect()
-  const overflow = Math.max(0, targetRect.height - usableHeight)
-
-  scrollContainer.scrollTo({
-    top: scrollContainer.scrollTop + (targetRect.top - usableTop) + overflow,
-    behavior: 'smooth',
-  })
+  roadmapSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 function handleSelectMilestone(milestone) {
@@ -415,11 +323,6 @@ function handlePacemakerToggle() {
   } else {
     openPacemakerModal()
   }
-}
-
-// 페이스메이커 카드의 "다시 시도": 대시보드 조회만 다시 시도
-async function retryPacemakerDashboard() {
-  await pacemakerStore.fetchPacemakerDashboard().catch(() => undefined)
 }
 
 // 뒤처진 목표는 대응전략으로 안내한다. 정상 페이스는 개설 여부에 따라 개설 안내 또는 메인 대시보드로 분기한다.
@@ -530,7 +433,7 @@ async function loadGoalDashboard(goalId) {
 
   if (!goal || String(goalStore.selectedGoalId) !== String(goalId)) return false
 
-  roadmapStore.fetchMilestones(goalId).catch(() => undefined)
+  await roadmapStore.fetchMilestones(goalId).catch(() => undefined)
   previousProgressRate.value = Number(goal?.progressRate) || 0
   showAchievementOnce(goal)
   return true
@@ -555,18 +458,9 @@ async function retrySupplementaryData() {
   ])
 }
 
-function handlePaceLegendOutsideClick() {
-  closePaceLegendTooltip()
-}
-
-onMounted(() => {
-  document.addEventListener('click', handlePaceLegendOutsideClick)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handlePaceLegendOutsideClick)
-})
-
+// 목표/로드맵/페이스메이커 상태를 모두 확인한 뒤에야 메인 로딩을 끝낸다 — 페이스메이커 상태
+// 확인이 끝나기 전에 화면부터 보이면, 이미 등록된 사용자에게도 잠깐 "미등록"처럼 보이거나
+// 그 순간 버튼을 누르면 잘못된 설정 모달이 열릴 수 있다.
 onMounted(async () => {
   try {
     await goalStore.fetchGoals()
@@ -576,7 +470,6 @@ onMounted(async () => {
 
     const hasGoal = await loadGoalDashboard(goalId)
     if (!hasGoal) return
-    isPageLoading.value = false
 
     await pacemakerStore.fetchPacemakerStatus().catch(() => undefined)
 
