@@ -136,7 +136,7 @@
             class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
           >
             <img :src="iconMap.roadmap" alt="" class="size-5 object-contain" />
-            <span>목표 로드맵</span>
+            <span>홈</span>
           </RouterLink>
 
           <RouterLink

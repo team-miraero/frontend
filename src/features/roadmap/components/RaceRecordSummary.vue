@@ -11,7 +11,7 @@
       </div>
 
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <GoalSummaryCard :goal="goal" />
+        <SmartBriefingCard :goal="goal" />
         <ConnectedAssetsCard :assets="assets" @open-detail="$emit('open-detail')" />
       </div>
     </section>
@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import GoalSummaryCard from '@/features/roadmap/components/GoalSummaryCard.vue'
+import SmartBriefingCard from '@/features/roadmap/components/SmartBriefingCard.vue'
 import ConnectedAssetsCard from '@/features/roadmap/components/ConnectedAssetsCard.vue'
 import ShareWithFriendsCard from '@/features/roadmap/components/ShareWithFriendsCard.vue'
 

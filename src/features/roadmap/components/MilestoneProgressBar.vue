@@ -74,7 +74,7 @@
 
           <!-- A. 모바일 순항 중 (ON_TRACK): 주인공 항상 최상위(z-20), 콜리 뒤쪽(z-10) -->
           <div
-            v-if="paceStatus === 'ON_TRACK'"
+            v-if="paceState === PACE_STATE.ON_TRACK"
             class="absolute bottom-[28px] flex -translate-x-1/2 items-end transition-[left] duration-500 pointer-events-none z-20"
             :style="{ left: `${Math.max(24, Math.min(74, mobilePlayerPosition))}%` }"
           >
@@ -112,8 +112,11 @@
           <template v-else>
             <!-- 1. 주인공 캐릭터 (항상 맨 앞 z-20으로 절대 가려지지 않음) -->
             <div
-              class="absolute bottom-[28px] flex -translate-x-1/2 items-end transition-[left] duration-500 pointer-events-none z-20"
-              :style="{ left: `${Math.max(20, Math.min(76, mobilePlayerPosition))}%` }"
+              class="absolute flex -translate-x-1/2 items-end transition-[left,bottom] duration-500 pointer-events-none z-20"
+              :style="{
+                left: `${mobilePlayerClampedPosition}%`,
+                bottom: isMobileCharactersTied ? `${28 - MOBILE_TIE_VERTICAL_OFFSET / 2}px` : '28px',
+              }"
             >
               <img
                 :src="goalCharacterImage"
@@ -124,32 +127,59 @@
             </div>
 
             <!-- 2. 페이스메이커 콜리 + 말풍선 (주인공 뒤 레이어 z-10) -->
+            <!-- 말풍선을 flex 흐름에 두면 말풍선 텍스트 폭만큼 이 wrapper 자체가 넓어져서,
+                 -translate-x-1/2가 이미지가 아니라 그 넓은 박스를 기준으로 중앙정렬되어 버린다.
+                 그러면 캐릭터 사이에 가로 최소 간격을 둬도 실제 이미지 위치는 예상과 다르게
+                 어긋나 겹칠 수 있다. 말풍선을 absolute로 빼서 wrapper 너비가 이미지 너비만큼만
+                 되도록 하고, left%가 항상 실제 이미지 위치를 정확히 가리키게 한다. -->
             <div
-              class="absolute bottom-[28px] flex -translate-x-1/2 flex-col transition-[left] duration-500 pointer-events-none z-10"
-              :class="paceStatus === 'AHEAD' ? 'items-end pr-1' : 'items-start pl-1'"
-              :style="{ left: `${Math.max(20, Math.min(76, mobileColiPosition))}%` }"
+              class="absolute -translate-x-1/2 pointer-events-none z-10 transition-[left,bottom] duration-500"
+              :style="{
+                left: `${mobileColiClampedPosition}%`,
+                bottom: isMobileCharactersTied ? `${28 + MOBILE_TIE_VERTICAL_OFFSET / 2}px` : '28px',
+              }"
             >
-              <!-- 콜리 머리 위 스마트 말풍선 (콜리 앞일 때 세모 왼쪽, 콜리 뒤일 때 세모 오른쪽) -->
-              <div class="relative -mb-1 flex flex-col" :class="paceStatus === 'AHEAD' ? 'items-end' : 'items-start'">
+              <!-- 콜리 머리 위 스마트 말풍선 (화면 우측에 가까우면 세모 오른쪽, 좌측에 가까우면 세모 왼쪽 — 화면 밖으로 잘리지 않도록) -->
+              <div
+                class="absolute bottom-full -mb-1 flex w-max flex-col"
+                :class="isMobileColiPastMidpoint ? 'right-0 items-end' : 'left-0 items-start'"
+              >
                 <div
                   class="relative rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 py-0.5 text-[10px] font-bold text-[#0a192f] shadow-[0_4px_12px_rgba(10,25,47,0.08)] whitespace-nowrap"
                 >
                   {{ paceMessage }}
-                  <!-- 말풍선 꼬리 (콜리가 앞이면 세모 왼쪽, 콜리가 뒤면 세모 오른쪽) -->
+                  <!-- 말풍선 꼬리 -->
                   <div
                     class="absolute -bottom-1 h-0 w-0 border-x-[3.5px] border-t-[4px] border-x-transparent border-t-white"
-                    :class="paceStatus === 'AHEAD' ? 'right-2.5' : 'left-2.5'"
+                    :class="isMobileColiPastMidpoint ? 'right-2.5' : 'left-2.5'"
                   />
                   <div
                     class="absolute -bottom-[5px] -z-10 h-0 w-0 border-x-[3.5px] border-t-[4px] border-x-transparent border-t-slate-200"
-                    :class="paceStatus === 'AHEAD' ? 'right-2.5' : 'left-2.5'"
+                    :class="isMobileColiPastMidpoint ? 'right-2.5' : 'left-2.5'"
                   />
                 </div>
               </div>
 
-              <img :src="coliBottomImage" alt="페이스메이커 콜리" class="h-10 w-auto drop-shadow-md" :class="paceStatus === 'AHEAD' ? 'mr-0.5' : 'ml-0.5'" />
+              <img :src="coliBottomImage" alt="페이스메이커 콜리" class="h-10 w-auto drop-shadow-md" />
             </div>
           </template>
+        </div>
+
+        <!-- 캐릭터 범례: 로드맵과 다음 마일스톤 요약 사이, 어떤 캐릭터가 목표 페이스이고 어떤 캐릭터가 나의 현재 페이스인지 한눈에 -->
+        <div class="flex justify-center px-4 py-2">
+          <div
+            class="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-slate-50/80 px-2.5 py-1"
+          >
+            <span class="inline-flex items-center gap-1">
+              <img :src="coliBottomImage" alt="" class="size-3.5 shrink-0 object-contain" />
+              <span class="whitespace-nowrap text-[9px] font-bold text-slate-500">목표 페이스</span>
+            </span>
+            <span class="h-2.5 w-px shrink-0 bg-slate-300" />
+            <span class="inline-flex items-center gap-1">
+              <img :src="goalCharacterImage" alt="" class="size-3.5 shrink-0 object-contain" />
+              <span class="whitespace-nowrap text-[9px] font-bold text-slate-500">나의 현재 페이스</span>
+            </span>
+          </div>
         </div>
 
         <!-- 마일스톤 정보는 별도 카드 대신 같은 카드의 요약 영역으로 통합 -->
@@ -166,7 +196,12 @@
             </p>
           </div>
           <div class="shrink-0 text-right">
-            <span class="block text-[11px] font-semibold text-slate-400">도착 예정</span>
+            <!-- 이 마일스톤의 실제 예상 도착일 계산 로직이 없어 targetDate가 비어 있으면(완료
+                 전 마일스톤은 항상 비어 있음) 목표 종료일로 대체하되, "도착 예정"이 아니라
+                 "목표 예정일"로 라벨을 구분해 이 마일스톤만의 날짜로 오해하지 않게 한다. -->
+            <span class="block text-[11px] font-semibold text-slate-400">
+              {{ activeMilestone.targetDate ? '도착 예정' : '목표 예정일' }}
+            </span>
             <strong class="mt-0.5 block text-xs font-bold text-primary">
               {{ activeMilestone.targetDate || formatEndDate(goal.period.endDate) }}
             </strong>
@@ -231,7 +266,7 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             class="transition-all duration-700 ease-out"
-            :stroke-dasharray="`${playerProgress} 100`"
+            :stroke-dasharray="`${currentProgress} 100`"
           />
         </svg>
 
@@ -288,9 +323,9 @@
 
         <!-- A. 데스크톱 순항 중 (ON_TRACK): 완벽하게 나란히 어깨를 맞대고 함께 위치 (주인공 z-20, 콜리 z-10) -->
         <div
-          v-if="paceStatus === 'ON_TRACK'"
+          v-if="paceState === PACE_STATE.ON_TRACK"
           class="absolute flex -translate-x-1/2 -translate-y-full items-end z-20 transition-all duration-500"
-          :style="characterMarkerStyle(playerProgress)"
+          :style="characterMarkerStyle(currentProgress)"
         >
           <!-- 1. 주인공 캐릭터 (항상 앞 z-20) -->
           <img
@@ -322,7 +357,7 @@
             <img
               :src="coliBottomImage"
               alt="페이스메이커 콜리"
-              class="h-6 w-auto drop-shadow-md sm:h-14 md:h-17 lg:h-20 xl:h-24 transition-transform hover:scale-105"
+              class="h-6 w-auto drop-shadow-md sm:h-14 md:h-[68px] lg:h-20 xl:h-24 transition-transform hover:scale-105"
             />
           </div>
         </div>
@@ -332,7 +367,7 @@
           <!-- 1. 주인공 캐릭터 (항상 맨 앞 z-20으로 절대 가려지지 않음) -->
           <div
             class="absolute flex -translate-x-1/2 -translate-y-full items-end transition-all duration-500 z-20"
-            :style="characterMarkerStyle(playerProgress)"
+            :style="characterMarkerStyle(currentProgress)"
           >
             <img
               :src="goalCharacterImage"
@@ -345,37 +380,54 @@
           <!-- 2. 페이스메이커 콜리 (주인공 뒤 레이어 z-10) -->
           <div
             class="absolute flex -translate-x-1/2 -translate-y-full items-end transition-all duration-500 z-10"
-            :style="characterMarkerStyle(coliProgress)"
+            :style="desktopTargetStyle"
           >
-            <div class="relative flex flex-col" :class="paceStatus === 'AHEAD' ? 'items-end' : 'items-start'">
-              <!-- 브로콜리 스마트 말풍선 (콜리 앞일 때 세모 왼쪽, 콜리 뒤일 때 세모 오른쪽) -->
+            <div class="relative flex flex-col" :class="isColiPastMidpoint ? 'items-end' : 'items-start'">
+              <!-- 브로콜리 스마트 말풍선 (화면 우측에 가까우면 세모 오른쪽, 좌측에 가까우면 세모 왼쪽 — 화면 밖으로 잘리지 않도록) -->
               <div
                 class="absolute -top-7 z-30 flex w-max flex-col sm:-top-11 md:-top-13 lg:-top-15"
-                :class="paceStatus === 'AHEAD' ? 'right-0 items-end' : 'left-0 items-start'"
+                :class="isColiPastMidpoint ? 'right-0 items-end' : 'left-0 items-start'"
               >
                 <div
                   class="relative rounded-2xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-bold text-[#0a192f] shadow-[0_6px_16px_rgba(10,25,47,0.1)] whitespace-nowrap"
                 >
                   {{ paceMessage }}
-                  <!-- 말풍선 꼬리 (콜리가 앞이면 세모 왼쪽, 콜리가 뒤면 세모 오른쪽) -->
+                  <!-- 말풍선 꼬리 -->
                   <div
                     class="absolute -bottom-1.5 h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-white sm:-bottom-2 sm:border-x-[6px] sm:border-t-[7px]"
-                    :class="paceStatus === 'AHEAD' ? 'right-3.5' : 'left-3.5'"
+                    :class="isColiPastMidpoint ? 'right-3.5' : 'left-3.5'"
                   />
                   <div
                     class="absolute -bottom-[7px] -z-10 h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-slate-200 sm:-bottom-[9px] sm:border-x-[6px] sm:border-t-[7px]"
-                    :class="paceStatus === 'AHEAD' ? 'right-3.5' : 'left-3.5'"
+                    :class="isColiPastMidpoint ? 'right-3.5' : 'left-3.5'"
                   />
                 </div>
               </div>
               <img
                 :src="coliBottomImage"
                 alt="페이스메이커 콜리"
-                class="h-6 w-auto drop-shadow-md sm:h-14 md:h-17 lg:h-20 xl:h-24 transition-transform hover:scale-105"
+                class="h-6 w-auto drop-shadow-md sm:h-14 md:h-[68px] lg:h-20 xl:h-24 transition-transform hover:scale-105"
               />
             </div>
           </div>
         </template>
+      </div>
+    </div>
+
+    <!-- 캐릭터 범례 (태블릿/데스크톱): 로드맵 트랙 바로 아래, 어떤 캐릭터가 목표 페이스이고 어떤 캐릭터가 나의 현재 페이스인지 한눈에 -->
+    <div class="mt-2 hidden justify-center sm:flex">
+      <div
+        class="inline-flex items-center gap-2.5 rounded-full border border-slate-200/70 bg-slate-50/80 px-3 py-1.5"
+      >
+        <span class="inline-flex items-center gap-1.5">
+          <img :src="coliBottomImage" alt="" class="size-4 shrink-0 object-contain" />
+          <span class="whitespace-nowrap text-[11px] font-bold text-slate-500">목표 페이스</span>
+        </span>
+        <span class="h-3 w-px shrink-0 bg-slate-300" />
+        <span class="inline-flex items-center gap-1.5">
+          <img :src="goalCharacterImage" alt="" class="size-4 shrink-0 object-contain" />
+          <span class="whitespace-nowrap text-[11px] font-bold text-slate-500">나의 현재 페이스</span>
+        </span>
       </div>
     </div>
   </div>
@@ -383,11 +435,15 @@
 
 <script setup>
 import { computed } from 'vue'
-import rabbitImage from '@/assets/images/rabbit_3d.png'
-import lamaImage from '@/assets/images/lama_new.png'
-import bearImage from '@/assets/images/bear_new.png'
-import duckImage from '@/assets/images/duck_new.png'
-import coliBottomImage from '@/assets/images/coli_new.png'
+import {
+  PACEMAKER_CHARACTER_IMAGE as coliBottomImage,
+  getGoalCharacterImage,
+} from '@/features/roadmap/constants/goal-character.constants'
+import {
+  PACE_STATE,
+  derivePaceState,
+  deriveGoalPaceMetrics,
+} from '@/features/roadmap/constants/pace-state.constants'
 
 const props = defineProps({
   goal: {
@@ -401,47 +457,67 @@ const props = defineProps({
 })
 
 // 목표 종류(goal.goalType)에 따라 로드맵 메인 캐릭터 매핑
-const GOAL_TYPE_CHARACTER = {
-  INDEPENDENCE: duckImage,
-  WEDDING: lamaImage,
-  EMERGENCY: bearImage,
-  LOAN: rabbitImage,
-}
+const goalCharacterImage = computed(() => getGoalCharacterImage(props.goal?.goalType))
 
-const goalCharacterImage = computed(() => GOAL_TYPE_CHARACTER[props.goal?.goalType] ?? rabbitImage)
-
-// 페이스 상태 (실제 데이터 및 differenceAmount 연동)
-const paceStatus = computed(() => {
-  const status = String(props.goal?.pace?.paceStatus ?? '').toUpperCase()
-  if (status === 'AHEAD' || status === 'BEHIND' || status === 'ON_TRACK') return status
-  const diff = Number(props.goal?.pace?.differenceAmount ?? 0)
-  if (diff > 0) return 'AHEAD'
-  if (diff < 0) return 'BEHIND'
-  return 'ON_TRACK'
-})
+// 배너/CTA/말풍선이 전부 바라보는 것과 같은 단일 파생 상태 (시작 전/적정/앞섬/뒤처짐)
+const paceState = computed(() => derivePaceState(props.goal))
 
 // 페이스 상태에 따른 스마트 말풍선 메시지 (간결하고 임팩트 있는 숏 문구)
 const paceMessage = computed(() => {
-  if (paceStatus.value === 'AHEAD') return '폭풍 질주 중!'
-  if (paceStatus.value === 'BEHIND') return '조금만 힘내요!'
+  if (paceState.value === PACE_STATE.NOT_STARTED) return '이제 출발해볼까요!'
+  if (paceState.value === PACE_STATE.AHEAD) return '폭풍 질주 중!'
+  if (paceState.value === PACE_STATE.BEHIND) return '조금만 힘내요!'
   return '나이스 페이스!'
 })
 
-// 주인공 캐릭터 위치 (실제 달성 진행률 그대로 반영, 3%면 3% 위치)
-const playerProgress = computed(() =>
-  Math.min(100, Math.max(0, Number(props.goal?.progressRate ?? 0)))
+// 누적 진행률(로드맵 = "지금 어디까지 왔는가")은 월 페이스와 절대 섞지 않고,
+// currentAmount/goalAmount, expectedAmount/goalAmount 그대로 계산한다.
+const paceMetrics = computed(() => deriveGoalPaceMetrics(props.goal))
+const currentProgress = computed(() => paceMetrics.value.currentProgress)
+// 목표 페이스 캐릭터의 "진짜" 위치 (겹침 방지 보정 전) — (i) 설명의 "계획대로 모았을 때의 위치"와 일치
+const expectedProgressRaw = computed(() => paceMetrics.value.expectedProgress)
+
+// 두 캐릭터가 겹치지 않도록 하는 최소 시각 간격만 별도로 적용한다 (데이터 자체는 왜곡하지 않음)
+function withMinimumGap(anchorProgress, targetProgress, minGap) {
+  const diff = targetProgress - anchorProgress
+  if (Math.abs(diff) >= minGap) return targetProgress
+  const direction = diff >= 0 ? 1 : -1
+  return Math.min(100, Math.max(0, anchorProgress + direction * minGap))
+}
+
+const DESKTOP_MIN_GAP = 5
+const coliProgress = computed(() =>
+  withMinimumGap(currentProgress.value, expectedProgressRaw.value, DESKTOP_MIN_GAP)
 )
 
-// 페이스메이커 콜리 위치 (AHEAD일 때 주인공보다 확실하게 뒤, BEHIND일 때 주인공보다 확실하게 앞)
-const coliProgress = computed(() => {
-  if (paceStatus.value === 'BEHIND') {
-    return Math.min(100, playerProgress.value + 10)
+// progress(%) 값에 고정 gap을 더하는 것만으로는 부족하다 — 도로 곡선이 압축된 구간(특히
+// 시작 지점)에서는 그 gap이 실제로는 몇 픽셀 차이로만 반영되고, 컨테이너 폭이 넓어질수록
+// 같은 %가 훨씬 큰 픽셀 간격이 되어 캐릭터 이미지 크기 대비 간격이 요동친다. 그래서 원본
+// 진행률이 같거나 매우 가까우면(TIE) 컨테이너 폭과 무관하게 항상 같은 만큼 벌어지는 고정
+// 픽셀 오프셋(가로+세로)을 콜리 쪽에 추가로 적용해, 캐릭터 이미지가 절대 겹치지 않게 한다.
+const DESKTOP_TIE_THRESHOLD = DESKTOP_MIN_GAP
+const DESKTOP_TIE_HORIZONTAL_PX = 56
+const DESKTOP_TIE_VERTICAL_PX = 22
+
+const isDesktopCharactersTied = computed(
+  () => Math.abs(expectedProgressRaw.value - currentProgress.value) < DESKTOP_TIE_THRESHOLD
+)
+
+const desktopTargetPoint = computed(() => characterPointOnRoad(coliProgress.value))
+const desktopTargetStyle = computed(() => {
+  const point = desktopTargetPoint.value
+  if (!isDesktopCharactersTied.value) {
+    return { left: `${point.left}%`, top: `${point.top}%` }
   }
-  if (paceStatus.value === 'AHEAD') {
-    return playerProgress.value - 10
+
+  return {
+    left: `calc(${point.left}% + ${DESKTOP_TIE_HORIZONTAL_PX}px)`,
+    top: `calc(${point.top}% - ${DESKTOP_TIE_VERTICAL_PX}px)`,
   }
-  return playerProgress.value
 })
+// 말풍선이 화면 밖으로 잘리지 않도록, 콜리가 도로의 어느 쪽 절반에 있는지로만 방향을 정한다
+// (페이스 상태가 아니라 실제 렌더링 위치 기준)
+const isColiPastMidpoint = computed(() => desktopTargetPoint.value.left > 50)
 
 const activeMilestoneIndex = computed(() => {
   const inProgressIndex = props.milestones.findIndex(
@@ -487,32 +563,47 @@ const mobileOverallProgress = computed(() => {
   )
 })
 
-// 모바일 위치 계산 (ON_TRACK은 어깨 맞댐 밀착, BEHIND는 콜리가 26% 확실하게 앞장서서 리드)
-const mobilePlayerPosition = computed(() => {
-  const progress = mobileSegmentProgress.value / 100
-  if (paceStatus.value === 'BEHIND') {
-    // 뒤처질 때: 주인공은 20% ~ 50%
-    return 20 + progress * 30
-  }
-  if (paceStatus.value === 'AHEAD') {
-    // 앞서갈 때: 주인공은 46% ~ 76%
-    return 46 + progress * 30
-  }
-  // 나란히 달릴 때 (어깨 맞댐): 25% ~ 72%
-  return 25 + progress * 47
+// 목표 페이스 캐릭터의 세그먼트 내 위치도 같은 방식(구간 시작~끝 금액 대비)으로 계산한다.
+// expectedAmount가 현재 보이는 구간 범위를 벗어나면(이미 지났거나 아직 안 왔으면) 구간 끝/시작에 고정된다.
+const mobileExpectedSegmentProgress = computed(() => {
+  const segmentAmount = (activeMilestone.value.targetAmount ?? 0) - previousMilestoneAmount.value
+  if (segmentAmount <= 0) return 100
+  const expectedAmount = Number(props.goal?.pace?.expectedAmount ?? 0)
+  return Math.min(
+    100,
+    Math.max(0, ((expectedAmount - previousMilestoneAmount.value) / segmentAmount) * 100)
+  )
 })
 
-const mobileColiPosition = computed(() => {
-  if (paceStatus.value === 'BEHIND') {
-    // 뒤처질 때: 콜리는 저 앞에서 확실하게 리드 (46% ~ 76%) -> 간격 26%!
-    return mobilePlayerPosition.value + 26
-  }
-  if (paceStatus.value === 'AHEAD') {
-    // 앞서갈 때: 콜리는 저 뒤에서 쫓아옴 (20% ~ 50%) -> 간격 26%!
-    return mobilePlayerPosition.value - 26
-  }
-  return mobilePlayerPosition.value
-})
+// 모바일 위치 계산: 두 캐릭터 모두 같은 구간 내 실제 진행률을 25%~72% 시각 범위에 매핑한다
+// (기존처럼 페이스 상태별로 서로 다른 임의 구간에 밀어넣지 않는다)
+const MOBILE_POSITION_START = 25
+const MOBILE_POSITION_RANGE = 47
+const MOBILE_MIN_GAP = 10
+// 카드 폭 자체가 좁은 모바일에서는 "10% 가로 간격"이 실제 픽셀로는 캐릭터 이미지 폭보다도
+// 작아서 겹쳐 보일 수 있다. 그래서 가로 간격이 실제로 충분한지 따지지 않고, 두 캐릭터의
+// 원본 진행률(보정 전)이 같거나 매우 가까우면 곧바로 세로로도 추가 분리한다.
+const MOBILE_TIE_VERTICAL_OFFSET = 16
+
+const mobilePlayerPosition = computed(
+  () => MOBILE_POSITION_START + (mobileSegmentProgress.value / 100) * MOBILE_POSITION_RANGE
+)
+const mobileExpectedPositionRaw = computed(
+  () => MOBILE_POSITION_START + (mobileExpectedSegmentProgress.value / 100) * MOBILE_POSITION_RANGE
+)
+const mobileColiPosition = computed(() =>
+  withMinimumGap(mobilePlayerPosition.value, mobileExpectedPositionRaw.value, MOBILE_MIN_GAP)
+)
+const mobilePlayerClampedPosition = computed(() =>
+  Math.max(20, Math.min(76, mobilePlayerPosition.value))
+)
+const mobileColiClampedPosition = computed(() => Math.max(20, Math.min(76, mobileColiPosition.value)))
+const isMobileCharactersTied = computed(
+  () => Math.abs(mobileExpectedPositionRaw.value - mobilePlayerPosition.value) < MOBILE_MIN_GAP
+)
+const isMobileColiPastMidpoint = computed(
+  () => mobileColiClampedPosition.value > MOBILE_POSITION_START + MOBILE_POSITION_RANGE / 2
+)
 
 // 모바일 도로 파란 게이지: 달성률 0%면 파란 선 미표시(0), 1% 이상부터 메인 캐릭터 발밑까지 채움
 const mobileTrackProgress = computed(() => {

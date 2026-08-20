@@ -104,7 +104,7 @@
             v-for="account in availableAccounts"
             :key="account.accountId"
             type="button"
-            class="group flex items-center justify-between gap-4 rounded-2xl border border-slate-200/90 bg-white p-4 text-left shadow-2xs transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50/50 hover:shadow-xs focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 cursor-pointer"
+            class="group flex items-center justify-between gap-4 rounded-2xl border border-slate-200/90 bg-white p-4 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50/50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 cursor-pointer"
             @click="selectAccount(account)"
           >
             <span class="min-w-0">
@@ -139,7 +139,7 @@
         @submit.prevent="confirmPull"
       >
         <!-- 상단 계좌 정보 카드 (깨끗한 화이트 카드) -->
-        <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-[0_1px_0_rgba(0,0,0,0.05)]">
           <div class="flex items-center gap-3">
             <span
               class="flex size-9 items-center justify-center rounded-xl bg-slate-100 text-lg"
@@ -191,7 +191,7 @@
             v-for="amount in quickAmounts"
             :key="amount"
             type="button"
-            class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50 cursor-pointer"
+            class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition hover:border-slate-300 hover:bg-slate-50 cursor-pointer"
             :disabled="isPullLocked"
             @click="setPullAmount(amount)"
           >
@@ -376,6 +376,7 @@ import BaseModal from '@/shared/ui/BaseModal.vue'
 import AppIcon from '@/shared/ui/AppIcon.vue'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { formatKRW, formatKRWCompact } from '@/shared/lib/money'
+import { deriveGoalPaceMetrics } from '@/features/roadmap/constants/pace-state.constants'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -434,8 +435,9 @@ const availableAccounts = computed(() =>
     (account) => account.accountType === 'CHECKING' && Number(account.balance) > 0
   )
 )
-const shortageLabel = computed(() =>
-  formatKRW(Math.abs(Number(props.goal?.pace?.differenceAmount ?? 0)))
+// 이 화면은 BEHIND일 때만 열리므로, 메인 카드와 같은 월평균 페이스 차이(누적 금액 아님)로 부족분을 안내한다
+const shortageLabel = computed(
+  () => `월 ${formatKRWCompact(Math.abs(deriveGoalPaceMetrics(props.goal).paceDifference))}`
 )
 const formattedPullAmount = computed(() =>
   pullAmount.value ? pullAmount.value.toLocaleString('ko-KR') : ''

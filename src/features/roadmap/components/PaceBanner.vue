@@ -31,7 +31,7 @@
             <button
               v-if="!disabled"
               type="button"
-              class="flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0a192f] active:scale-95 cursor-pointer select-none"
+              class="flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0a192f] active:scale-95 cursor-pointer select-none"
               @click="$emit('pause')"
             >
               <img src="@/assets/icons/goal-pause.svg" alt="" class="size-2.5 opacity-60" />
@@ -78,31 +78,36 @@
           </div>
         </div>
 
-        <!-- 하단: 페이스 정보 인셋 카드 (슬레이트 톤앤매너) -->
+        <!-- 하단: 페이스 정보 인셋 카드 (슬레이트 톤앤매너) — 클릭 시 '나의 로드맵 여정' 섹션으로 스크롤 이동 -->
         <div class="mt-5 sm:mt-6">
-          <div class="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 sm:p-3.5 shadow-2xs">
+          <button
+            type="button"
+            class="w-full rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] cursor-pointer select-none sm:p-3.5"
+            aria-label="나의 로드맵 여정으로 이동"
+            @click="$emit('view-roadmap')"
+          >
             <div class="grid grid-cols-3 divide-x divide-slate-200/80 items-center">
-              <!-- 1. 현재 페이스 -->
+              <!-- 1. 현재 페이스: 누적 저축액이 아니라 실제 월평균 저축 속도(currentAmount ÷ 경과 개월) -->
               <div class="px-2 text-center sm:text-left sm:pl-3 sm:pr-2">
                 <span class="block text-[11px] font-medium text-slate-500">현재 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
                     class="text-xs font-bold tabular-nums text-[#0a192f] sm:text-sm md:text-base"
                   >
-                    {{ formatManwon(currentAmount) }}만원
+                    {{ formatManwon(paceMetrics.currentMonthlyPace) }}만원
                   </strong>
                   <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
               </div>
 
-              <!-- 2. 목표 페이스 -->
+              <!-- 2. 목표 페이스: 목표 금액 ÷ 전체 목표 개월 -->
               <div class="px-2 text-center sm:text-left sm:pl-4 sm:pr-2">
                 <span class="block text-[11px] font-medium text-slate-500">목표 페이스</span>
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
                     class="text-xs font-bold tabular-nums text-slate-700 sm:text-sm md:text-base"
                   >
-                    {{ formatManwon(pace.expectedAmount) }}만원
+                    {{ formatManwon(paceMetrics.targetMonthlyPace) }}만원
                   </strong>
                   <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
@@ -114,22 +119,25 @@
                 <div class="mt-0.5 flex items-baseline justify-center sm:justify-start gap-0.5">
                   <strong
                     class="text-xs font-bold tabular-nums sm:text-sm md:text-base"
-                    :style="{ color: theme.badgeText }"
+                    :style="{ color: paceDifferenceColor }"
                   >
-                    {{ pace.paceStatus === 'BEHIND' ? '-' : '+'
-                    }}{{ formatManwon(Math.abs(pace.differenceAmount)) }}만원
+                    {{ paceDifferenceLabel }}
                   </strong>
-                  <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
+                  <span
+                    v-if="paceState !== PACE_STATE.NOT_STARTED"
+                    class="text-[10px] font-normal text-slate-400 sm:text-xs"
+                    >/월</span
+                  >
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 
       <!-- 우측: 스마트 자동 저축 카드 (슬림형 슬레이트 인셋 패널) -->
       <div
-        class="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 sm:p-4 shadow-2xs"
+        class="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 sm:p-4 shadow-[0_1px_0_rgba(0,0,0,0.05)]"
       >
         <div
           v-if="dailyAvailableMoney || monthlyAvailableMoney"
@@ -138,7 +146,7 @@
           <button
             v-if="dailyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!monthlyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-today')"
@@ -154,7 +162,7 @@
           <button
             v-if="monthlyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-2xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!dailyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-month')"
@@ -170,32 +178,20 @@
         </div>
 
         <div class="flex flex-1 flex-col justify-between gap-2.5 pt-2.5">
-          <!-- 1. 알아서 모으기 -->
+          <!-- 1. 알아서 모으기: 페이스 상태(시작 전/적정/앞섬/뒤처짐)에 따라 문구만 바뀌고, 항상 서비스 메인 블루 톤 유지 -->
           <button
             type="button"
-            class="group flex w-full items-center gap-3.5 rounded-xl text-left transition active:scale-[0.98] cursor-pointer select-none"
-            :class="[
-              disabled ? 'pointer-events-none opacity-45' : '',
-              isAssistMode ? 'px-3 py-2.5 shadow-sm' : 'py-1 sm:py-1.5',
-            ]"
-            :style="
-              isAssistMode
-                ? {
-                    backgroundImage: theme.ctaGradient,
-                    boxShadow: `0 4px 16px ${theme.ctaShadow}`,
-                  }
-                : undefined
-            "
+            class="group flex w-full items-center gap-3.5 rounded-xl py-1 text-left transition active:scale-[0.98] cursor-pointer select-none sm:py-1.5"
+            :class="disabled ? 'pointer-events-none opacity-45' : ''"
             :disabled="disabled"
             @click="$emit('cta-click')"
           >
             <span
-              class="flex size-8 sm:size-8.5 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105"
-              :class="isAssistMode ? 'bg-white/20 text-white' : 'bg-primary text-white shadow-sm'"
+              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 1. 알아서 모으기 선명한 번개 SVG -->
               <svg
-                class="size-4 sm:size-4.5"
+                class="size-4 sm:size-[18px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -209,25 +205,16 @@
             </span>
             <span class="min-w-0 flex-1">
               <strong
-                class="block text-xs sm:text-sm font-bold transition-colors duration-200"
-                :class="isAssistMode ? 'text-white' : 'text-[#0a192f] group-hover:text-primary'"
+                class="block text-xs sm:text-sm font-bold text-[#0a192f] transition-colors duration-200 group-hover:text-primary"
               >
                 {{ primaryCtaTitle }}
               </strong>
-              <span
-                class="mt-0.5 block text-[11px] sm:text-xs font-medium"
-                :class="isAssistMode ? 'text-white/80' : 'text-[#73809c]'"
-              >
+              <span class="mt-0.5 block text-[11px] sm:text-xs font-medium text-[#73809c]">
                 {{ primaryCtaDescription }}
               </span>
             </span>
             <span
-              class="text-xl leading-none transition-all duration-200 group-hover:translate-x-1"
-              :class="
-                isAssistMode
-                  ? 'text-white/80 group-hover:text-white'
-                  : 'text-slate-300 group-hover:text-primary'
-              "
+              class="text-xl leading-none text-slate-300 transition-all duration-200 group-hover:translate-x-1 group-hover:text-primary"
               >›</span
             >
           </button>
@@ -244,11 +231,11 @@
             @click="$emit('toggle')"
           >
             <span
-              class="flex size-8 sm:size-8.5 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
+              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 2. 다음 달 자금마련 선명한 캘린더 SVG -->
               <svg
-                class="size-4 sm:size-4.5"
+                class="size-4 sm:size-[18px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -305,36 +292,77 @@
 
 <script setup>
 import { computed } from 'vue'
-import { PACE_THEME } from '@/features/roadmap/constants/pace.constants'
+import {
+  PACE_STATE,
+  derivePaceState,
+  deriveGoalPaceMetrics,
+} from '@/features/roadmap/constants/pace-state.constants'
 import { useCountUp } from '@/shared/composables/useCountUp'
 
 const props = defineProps({
   pace: { type: Object, required: true },
   progressRate: { type: Number, required: true },
-  goalName: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
   currentAmount: { type: Number, default: 0 },
+  startAmount: { type: Number, default: 0 },
   goalAmount: { type: Number, default: 0 },
   endDate: { type: String, default: '' },
+  goalMonths: { type: Number, default: 0 },
+  remainMonths: { type: Number, default: 0 },
   dailyAvailableMoney: { type: Object, default: null },
   monthlyAvailableMoney: { type: Object, default: null },
   pacemaker: { type: Object, default: null },
   isToggling: { type: Boolean, default: false },
 })
 
-defineEmits(['cta-click', 'pause', 'resume', 'open-today', 'open-month', 'toggle'])
+// 월 페이스/누적 진행률 계산에 필요한 원본 데이터를 하나로 묶은 goal-like 객체
+// (PaceBanner는 개별 scalar prop으로 받기 때문에, 공용 유틸이 기대하는 모양으로 조립한다)
+const goalLike = computed(() => ({
+  currentAmount: props.currentAmount,
+  startAmount: props.startAmount,
+  goalAmount: props.goalAmount,
+  pace: props.pace,
+  period: { goalMonths: props.goalMonths, remainMonths: props.remainMonths },
+}))
 
-const theme = computed(() => PACE_THEME[props.pace.paceStatus] ?? PACE_THEME.ON_TRACK)
-const isAssistMode = computed(() => props.pace.paceStatus === 'BEHIND')
-const isPacemakerRegistered = computed(() => props.pacemaker?.registered === true)
-const primaryCtaTitle = computed(() => {
-  if (isAssistMode.value) return '페이스메이커가 도와줄게요'
-  return isPacemakerRegistered.value ? '알아서 모으기' : '페이스메이커가 알아서 모아줄게요'
+defineEmits([
+  'cta-click',
+  'pause',
+  'resume',
+  'open-today',
+  'open-month',
+  'toggle',
+  'view-roadmap',
+])
+
+// 페이스 상태(시작 전/적정/앞섬/뒤처짐)별 CTA 문구 — 항상 서비스 메인 블루 톤 유지
+const PACE_CTA_CONTENT = {
+  [PACE_STATE.NOT_STARTED]: { title: '첫 저축 시작하기', description: '페이스메이커가 도와드릴게요' },
+  [PACE_STATE.ON_TRACK]: { title: '지금 페이스 유지하기', description: '이번 달 목표 금액을 자동으로 모아요' },
+  [PACE_STATE.AHEAD]: { title: '더 빨리 달성하는 방법 보기', description: '페이스메이커가 알아서 모아줄게요' },
+  [PACE_STATE.BEHIND]: { title: '목표 페이스 따라잡기', description: '페이스메이커가 도와줄게요' },
+}
+
+const paceMetrics = computed(() => deriveGoalPaceMetrics(goalLike.value))
+const paceState = computed(() => derivePaceState(goalLike.value))
+const primaryCtaTitle = computed(() => PACE_CTA_CONTENT[paceState.value].title)
+const primaryCtaDescription = computed(() => PACE_CTA_CONTENT[paceState.value].description)
+
+// 페이스 차이: 월 페이스끼리 비교(currentMonthlyPace - targetMonthlyPace).
+// 아직 저축을 시작하지 않았다면 비교 대상 자체가 없으므로 숫자 대신 "—"로 표시한다.
+// 시작 후에는 현재<목표 -X만원, 현재>목표 +X만원, 동일(반올림 시 0만원) 시 부호 없이 표시
+const paceDifferenceLabel = computed(() => {
+  if (paceState.value === PACE_STATE.NOT_STARTED) return '—'
+  const magnitude = formatManwon(Math.abs(paceMetrics.value.paceDifference))
+  if (paceState.value === PACE_STATE.BEHIND) return `-${magnitude}만원`
+  if (paceState.value === PACE_STATE.AHEAD) return `+${magnitude}만원`
+  return `${magnitude}만원`
 })
-const primaryCtaDescription = computed(() => {
-  if (isAssistMode.value) return theme.value.ctaAction
-  return isPacemakerRegistered.value ? '이번 달 목표 금액을 자동으로 모아요' : '다음달 자금마련 →'
+const paceDifferenceColor = computed(() => {
+  if (paceState.value === PACE_STATE.NOT_STARTED) return '#94a3b8'
+  return paceState.value === PACE_STATE.BEHIND ? '#be185d' : '#0066FF'
 })
+
 const formattedEndDate = computed(() => props.endDate?.replace('-', '.') ?? '')
 
 // 메인 금액 부드러운 카운트업 (1초 감속 롤링)

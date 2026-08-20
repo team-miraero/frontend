@@ -37,7 +37,7 @@
 
   /* 정보 표시/컨테이너형 카드 (고정 위치 + 은은한 테두리 반응) */
   .card-container {
-    @apply transition-all duration-200 ease-out shadow-xs hover:border-slate-300;
+    @apply transition-all duration-200 ease-out shadow-sm hover:border-slate-300;
   }
 
   .font-tossface {

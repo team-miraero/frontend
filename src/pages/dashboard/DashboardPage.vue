@@ -30,13 +30,15 @@
         <!-- 1. 상단 통합 현황 카드 (PaceBanner: 진행 중/일시정지 상태 및 재개 토글 내장) -->
         <div>
           <PaceBanner
-            :pace="displayedPace"
+            :pace="displayedGoal.pace"
             :progress-rate="goalStore.currentGoal.progressRate"
-            :goal-name="displayedGoal.goalName"
             :disabled="isGoalPaused"
-            :current-amount="goalStore.currentGoal.currentAmount"
+            :current-amount="displayedGoal.currentAmount"
+            :start-amount="displayedGoal.startAmount"
             :goal-amount="goalStore.currentGoal.goalAmount"
             :end-date="goalStore.currentGoal.period.endDate"
+            :goal-months="goalStore.currentGoal.period.goalMonths"
+            :remain-months="goalStore.currentGoal.period.remainMonths"
             :daily-available-money="goalStore.dailyAvailableMoney"
             :monthly-available-money="goalStore.monthlyAvailableMoney"
             :pacemaker="displayedPacemaker"
@@ -47,12 +49,16 @@
             @resume="openResumeConfirm"
             @open-today="handleOpenTodayAvailableMoneyModal"
             @open-month="handleOpenMonthlyAvailableMoneyModal"
+            @view-roadmap="scrollToRoadmapSection"
           />
         </div>
 
         <!-- 2. 목표 진행 로드맵 카드 (통합 카드 컨테이너) -->
+        <!-- 페이스 비교 클릭 시 이 카드의 제목이 화면 위로 잘리지 않도록 여유를 두고(scroll-mt),
+             모바일 하단 네비게이션에 카드 끝부분이 가려지지 않도록 여유를 둔다(scroll-mb). -->
         <section
-          class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-6 md:p-7"
+          ref="roadmapSectionRef"
+          class="scroll-mt-4 scroll-mb-24 overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)] sm:p-6 md:p-7"
           :class="isGoalPaused ? 'opacity-65' : ''"
         >
           <div class="mb-3.5 sm:mb-4 flex items-center justify-between">
@@ -78,14 +84,8 @@
           <RaceRecordSummary
             :goal="displayedGoal"
             :assets="goalStore.assets ?? []"
-            :pacemaker="displayedPacemaker"
-            :is-toggling="pacemakerStore.isToggling"
-            :toggle-error-message="pacemakerStore.toggleError?.message ?? ''"
-            :dashboard-error-message="dashboardErrorMessage"
             @open-detail="handleOpenLinkedAssets"
-            @toggle="handlePacemakerToggle"
             @open="handleOpenShareGoal"
-            @retry-dashboard="retryPacemakerDashboard"
           />
         </div>
       </div>
@@ -159,7 +159,7 @@
         </p>
         <RouterLink
           :to="{ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } }"
-          class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-xs transition hover:opacity-90"
+          class="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
         >
           새 목표 만들기
         </RouterLink>
@@ -194,6 +194,7 @@ import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pace
 import PacemakerAssistFlow from '@/pages/dashboard/components/PacemakerAssistFlow.vue'
 import { useModal } from '@/shared/composables/useModal'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
+import { PACE_STATE, derivePaceState } from '@/features/roadmap/constants/pace-state.constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -224,6 +225,7 @@ const statusConfirmMode = ref('pause')
 const selectedMilestone = ref(null)
 const achievementErrorMessage = ref('')
 const previousProgressRate = ref(null)
+const roadmapSectionRef = ref(null)
 
 const EMPTY_DAILY_AVAILABLE_MONEY = Object.freeze({
   todayAvailableMoney: 0,
@@ -258,28 +260,33 @@ const displayedPacemaker = computed(() => {
     status: null,
   }
 })
-const displayedPace = computed(() => {
-  const pace = goalStore.currentGoal?.pace
-  if (!pace || !isShortagePreview.value) return pace
+// 개발 중 BEHIND 화면 미리보기(?scenario=shortage): 화면 전체가 바라보는 단일 파생 상태
+// (derivePaceState/deriveGoalPaceMetrics)는 pace.paceStatus/differenceAmount가 아니라
+// currentAmount·startAmount·period·pace.expectedAmount로 월평균 페이스를 직접 계산하므로,
+// 그 계산에 실제로 영향을 주는 currentAmount를 "시작 금액 + 목표 페이스 절반만큼만 추가 저축"한
+// 것으로 낮춰 BEHIND가 실제로 재현되게 한다.
+const displayedGoal = computed(() => {
+  const goal = goalStore.currentGoal
+  if (!goal || !isShortagePreview.value) return goal
 
-  return {
-    ...pace,
-    paceStatus: 'BEHIND',
-    differenceAmount: Math.max(500000, Math.abs(Number(pace.differenceAmount ?? 0))),
-  }
+  const { goalMonths = 0, remainMonths = 0 } = goal.period ?? {}
+  const startAmount = Number(goal.startAmount ?? 0)
+  const elapsedMonths = Math.max(1, goalMonths - remainMonths)
+  const remainingToSave = Math.max(0, Number(goal.goalAmount ?? 0) - startAmount)
+  const targetMonthlyPace = goalMonths > 0 ? remainingToSave / goalMonths : 0
+  const shortageSavedSinceStart = Math.max(0, Math.round(targetMonthlyPace * elapsedMonths * 0.5))
+
+  return { ...goal, currentAmount: startAmount + shortageSavedSinceStart }
 })
-const displayedGoal = computed(() => ({
-  ...goalStore.currentGoal,
-  pace: displayedPace.value,
-}))
 const assistFlowGoal = displayedGoal
 const hasSupplementaryError = computed(
   () =>
     Object.keys(goalStore.dashboardSupplementaryErrors).length > 0 || Boolean(roadmapStore.error)
 )
-const dashboardErrorMessage = computed(() =>
-  pacemakerStore.dashboardError ? '정보를 불러오지 못했어요' : ''
-)
+
+// 화면 표시(배지/문구/CTA)와 클릭 동작이 서로 다른 상태값을 보고 어긋나지 않도록,
+// PaceBanner가 쓰는 것과 동일한 파생 상태를 여기서도 단일하게 계산해 재사용한다.
+const paceState = computed(() => derivePaceState(displayedGoal.value))
 
 function handleOpenTodayAvailableMoneyModal() {
   isTodayAvailableMoneyModalOpen.value = true
@@ -291,6 +298,13 @@ function handleOpenMonthlyAvailableMoneyModal() {
 
 function handleOpenLinkedAssets() {
   openLinkedAssetsModal()
+}
+
+// 페이스 비교 영역 클릭: '나의 로드맵 여정' 카드로 스크롤 이동.
+// 헤더가 가리는 여백/하단 네비게이션에 가려지지 않는 여백은 CSS scroll-margin(section의
+// scroll-mt/scroll-mb)이 담당하므로, 여기서는 브라우저 기본 동작만 호출하면 된다.
+function scrollToRoadmapSection() {
+  roadmapSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 function handleSelectMilestone(milestone) {
@@ -311,14 +325,11 @@ function handlePacemakerToggle() {
   }
 }
 
-// 페이스메이커 카드의 "다시 시도": 대시보드 조회만 다시 시도
-async function retryPacemakerDashboard() {
-  await pacemakerStore.fetchPacemakerDashboard().catch(() => undefined)
-}
-
 // 뒤처진 목표는 대응전략으로 안내한다. 정상 페이스는 개설 여부에 따라 개설 안내 또는 메인 대시보드로 분기한다.
+// (화면에 "첫 저축 시작하기"라고 표시해놓고 클릭 시 BEHIND 대응 모달이 열리는 일이 없도록,
+//  버튼 문구를 정한 것과 동일한 paceState를 그대로 사용한다.)
 function handlePacemakerCtaClick() {
-  if (displayedPace.value?.paceStatus === 'BEHIND') {
+  if (paceState.value === PACE_STATE.BEHIND) {
     openPacemakerAssistFlow()
     return
   }
@@ -422,7 +433,7 @@ async function loadGoalDashboard(goalId) {
 
   if (!goal || String(goalStore.selectedGoalId) !== String(goalId)) return false
 
-  roadmapStore.fetchMilestones(goalId).catch(() => undefined)
+  await roadmapStore.fetchMilestones(goalId).catch(() => undefined)
   previousProgressRate.value = Number(goal?.progressRate) || 0
   showAchievementOnce(goal)
   return true
@@ -447,6 +458,9 @@ async function retrySupplementaryData() {
   ])
 }
 
+// 목표/로드맵/페이스메이커 상태를 모두 확인한 뒤에야 메인 로딩을 끝낸다 — 페이스메이커 상태
+// 확인이 끝나기 전에 화면부터 보이면, 이미 등록된 사용자에게도 잠깐 "미등록"처럼 보이거나
+// 그 순간 버튼을 누르면 잘못된 설정 모달이 열릴 수 있다.
 onMounted(async () => {
   try {
     await goalStore.fetchGoals()
@@ -456,7 +470,6 @@ onMounted(async () => {
 
     const hasGoal = await loadGoalDashboard(goalId)
     if (!hasGoal) return
-    isPageLoading.value = false
 
     await pacemakerStore.fetchPacemakerStatus().catch(() => undefined)
 
