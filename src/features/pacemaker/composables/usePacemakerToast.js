@@ -1,5 +1,6 @@
 // src/features/pacemaker/composables/usePacemakerToast.js
 import { usePacemakerStore } from '@/features/pacemaker/store/pacemaker.store'
+import { useGoalStore } from '@/features/goal/store/goal.store'
 import { PACEMAKER_HISTORY_PAGE_SIZE } from '@/features/pacemaker/constants/pacemaker.constants'
 // 전역 싱글톤 상태는 로그아웃 시 초기화할 수 있도록 별도 모듈에서 관리한다.
 import {
@@ -93,6 +94,7 @@ export function usePacemakerToast() {
    */
   const showDualNotifications = async () => {
     const pacemakerStore = usePacemakerStore()
+    const goalStore = useGoalStore()
     const sessionVersion = getToastSessionVersion()
 
     // 미개설 사용자에게는 알릴 자동 저축 내역 자체가 없다.
@@ -127,16 +129,18 @@ export function usePacemakerToast() {
       }
     }
 
-    const { todaySavingAmount, currentStreak, moneyBoxBalance } = pacemakerStore.pacemakerView
+    const { currentStreak, moneyBoxBalance } = pacemakerStore.pacemakerView
+    const todayAvailableMoney = Number(goalStore.dailyAvailableMoney?.todayAvailableMoney ?? 0)
 
-    // 값이 0인 알림은 "0원 저축했어요"가 되므로 아예 띄우지 않는다.
+    // 목표 대시보드에 표시되는 오늘 여유자금을 동일한 출처로 알린다.
+    // 값이 0인 경우에는 "0원" 알림을 만들지 않는다.
     const toasts = []
-    if (todaySavingAmount > 0) {
+    if (todayAvailableMoney > 0) {
       toasts.push({
         type: 'SAVING',
         badgeIcon: '💰',
-        title: `오늘의 여유자금 자동 저축: ${formatWon(todaySavingAmount)}`,
-        body: '오늘 쓰고 남은 여유자금을 저금통에 옮겨뒀어요!',
+        title: `오늘의 여유자금: ${formatWon(todayAvailableMoney)}`,
+        body: '오늘 사용 가능한 금액을 계산했어요!',
       })
     }
     if (currentStreak > 0) {

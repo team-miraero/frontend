@@ -68,6 +68,7 @@ import {
   usePacemakerToast,
 } from '@/features/pacemaker'
 import { useAuthStore } from '@/stores/auth.store'
+import { useGoalStore } from '@/features/goal'
 import { useModal } from '@/shared/composables/useModal'
 import { getLocalDateKey } from '@/shared/lib/date'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
@@ -109,6 +110,10 @@ const { isOpen: isHistoryModalOpen, open: openHistoryModal, close: closeHistoryM
 const pacemakerStore = computed(() => {
   void authStore.accessToken
   return usePacemakerStore()
+})
+const goalStore = computed(() => {
+  void authStore.accessToken
+  return useGoalStore()
 })
 
 // 퍼널 화면 제외 (루트 '/', 로그인, 회원가입, 온보딩, 목표설정 단계 등)
@@ -186,8 +191,14 @@ async function runDailyNotice() {
     isDailyNoticeChecked = false
     return
   }
+  if (!hasNotified) {
+    // 대시보드의 여유자금 데이터가 아직 도착하지 않았을 수 있다.
+    // 데이터가 채워지는 시점의 watch에서 다시 확인할 수 있도록 잠금을 푼다.
+    isDailyNoticeChecked = false
+    return
+  }
   // 데이터가 없어 알림을 건너뛴 날에는 "오늘 봤음"으로 기록하지 않는다.
-  if (hasNotified && !import.meta.env.DEV) {
+  if (!import.meta.env.DEV) {
     localStorage.setItem(noticeStorageKey(), TODAY_DATE)
   }
 }
@@ -200,7 +211,11 @@ onMounted(async () => {
 // 랜딩·로그인 화면에서 시작한 경우 App.vue는 이미 마운트된 뒤라
 // 로그인하고 대시보드에 들어오는 시점에 다시 확인한다.
 watch(
-  () => [authStore.accessToken, isDashboardRoute.value],
+  () => [
+    authStore.accessToken,
+    isDashboardRoute.value,
+    goalStore.value.dailyAvailableMoney?.todayAvailableMoney,
+  ],
   ([token]) => {
     if (!token) {
       isDailyNoticeChecked = false
