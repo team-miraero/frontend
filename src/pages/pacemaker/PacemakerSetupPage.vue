@@ -10,31 +10,24 @@
         @click="goBack"
       >
         <span aria-hidden="true">←</span>
-        {{
-          isEditMode
-            ? '대시보드로 돌아가기'
-            : currentStep === 'money-box'
-              ? '소개로 돌아가기'
-              : '이전으로'
-        }}
+        {{ isEditMode ? '대시보드로 돌아가기' : '소개로 돌아가기' }}
       </button>
 
-      <PacemakerMoneyBoxStep
-        v-if="currentStep === 'money-box'"
-        @next="currentStep = 'limit'"
-        @back="goToIntro"
-      />
       <PacemakerLimitStep
-        v-else-if="currentStep === 'limit'"
+        v-if="currentStep === 'limit'"
         v-model="maxAmount"
         v-model:selected-account-id="selectedAccountId"
         :is-submitting="isSubmitting"
         :error-message="submitError"
         :is-edit-mode="isEditMode"
         @complete="completeSetup"
-        @back="goBack"
       />
-      <PacemakerSetupCompleteStep v-else :max-amount="maxAmount" @open-dashboard="goToDashboard" />
+      <PacemakerSetupCompleteStep
+        v-else
+        :max-amount="maxAmount"
+        :account="selectedAccount"
+        @open-dashboard="goToDashboard"
+      />
     </div>
   </div>
 </template>
@@ -42,22 +35,28 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import {
   PacemakerLimitStep,
-  PacemakerMoneyBoxStep,
   PacemakerSetupCompleteStep,
   usePacemakerStore,
 } from '@/features/pacemaker'
+import { useGoalStore } from '@/features/goal'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const route = useRoute()
 const router = useRouter()
 const pacemakerStore = usePacemakerStore()
+const goalStore = useGoalStore()
+const { accounts } = storeToRefs(goalStore)
 const isEditMode = computed(() => route.query.mode === 'max-amount')
-const currentStep = ref(isEditMode.value ? 'limit' : 'money-box')
+const currentStep = ref('limit')
 const maxAmount = ref(10000)
 // 페이스메이커용 저금통과 연동할 주 입출금계좌 id
 const selectedAccountId = ref(null)
+const selectedAccount = computed(() =>
+  accounts.value.find((account) => account.accountId === selectedAccountId.value)
+)
 const isSubmitting = ref(false)
 const submitError = ref('')
 
@@ -95,11 +94,6 @@ function goToIntro() {
 function goBack() {
   if (isEditMode.value) {
     goToDashboard()
-    return
-  }
-
-  if (currentStep.value === 'limit') {
-    currentStep.value = 'money-box'
     return
   }
 
