@@ -181,13 +181,21 @@ export function useSpendingSimulator(summary) {
 
   async function saveCategoryTargets() {
     const targets = categories.value
-      .filter((category) => Number.isInteger(category.categoryId) && category.categoryId > 0)
+      // 사용자가 실제로 조절한 목표만 저장한다. 조절 전 카테고리는 target이 null이므로
+      // 최초 접근 시 기준 지출(슬라이더 오른쪽 끝)에서 시작하고, 저장된 목표만 재접속 때 복원된다.
+      .filter(
+        (category) =>
+          category.target !== null &&
+          Number.isInteger(category.categoryId) &&
+          category.categoryId > 0
+      )
       .map((category) => ({
         categoryId: category.categoryId,
-        targetAmount: Math.round((category.target ?? category.recentThreeMonthAverage) * 10000),
+        targetAmount: Math.round(category.target * 10000),
       }))
 
-    if (targets.length > 0) await saveExpenseCategoryTargets(targets)
+    // 모두 기준 지출로 되돌린 경우에도 빈 목록을 보내 기존 저장 목표를 제거한다.
+    await saveExpenseCategoryTargets(targets)
   }
 
   async function refreshSimulation() {
