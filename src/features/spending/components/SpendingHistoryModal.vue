@@ -21,7 +21,7 @@
               이번 달 지출 내역
             </h3>
             <p class="mt-1.5 text-xs leading-5 text-[#64748B]">
-              마이데이터를 통해 자동으로 분류된 최근 내역이에요.
+              마이데이터를 통해 자동으로 분류된 최근 내역이에요
             </p>
           </div>
 
@@ -84,8 +84,8 @@
             v-else-if="error"
             class="flex min-h-[280px] flex-col items-center justify-center text-center"
           >
-            <p class="text-sm font-semibold text-[#0A192F]">내역을 불러오지 못했어요.</p>
-            <p class="mt-1 text-xs text-[#64748B]">잠시 후 다시 시도해 주세요.</p>
+            <p class="text-sm font-semibold text-[#0A192F]">내역을 불러오지 못했어요</p>
+            <p class="mt-1 text-xs text-[#64748B]">잠시 후 다시 시도해 주세요</p>
             <button
               type="button"
               class="mt-4 rounded-xl bg-[#EAF2FF] px-4 py-2 text-xs font-semibold text-[#0066FF]"
@@ -99,7 +99,7 @@
             v-else-if="groupedTransactions.length === 0"
             class="flex min-h-[280px] items-center justify-center text-sm text-[#94A3B8]"
           >
-            해당 카테고리의 지출 내역이 없어요.
+            해당 카테고리의 지출 내역이 없어요
           </div>
 
           <div v-else>
@@ -238,10 +238,10 @@ const selectedCategoryName = computed(
 
 const footerText = computed(() => {
   if (selectedCategory.value !== 'ALL') {
-    return `${selectedCategoryName.value} ${filteredTransactions.value.length}건을 보여드려요.`
+    return `${selectedCategoryName.value} ${filteredTransactions.value.length}건을 보여드려요`
   }
 
-  return `전체 ${props.totalCount}건 중 최근 ${props.transactions.length}건을 보여드려요.`
+  return `전체 ${props.totalCount}건 중 최근 ${props.transactions.length}건을 보여드려요`
 })
 
 const groupedTransactions = computed(() => {

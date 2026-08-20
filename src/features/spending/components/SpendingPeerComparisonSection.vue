@@ -4,7 +4,7 @@
       <h2 id="spending-peer-title" class="sr-only">또래 지출과 비교</h2>
 
       <div
-        class="grid grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)_auto] items-center gap-1.5 sm:gap-2"
+        class="grid grid-cols-[minmax(0,3fr)_minmax(112px,2fr)] items-center gap-1.5 sm:grid-cols-[minmax(0,1fr)_140px] sm:gap-2"
         aria-label="또래 지출 비교 조건"
       >
         <div
@@ -29,46 +29,20 @@
           </button>
         </div>
 
-        <div
-          class="grid grid-cols-2 rounded-xl bg-[#F1F5F9] p-1"
-          role="group"
-          aria-label="지출 유형"
-        >
-          <button
-            v-for="type in categoryTypes"
-            :key="type.id"
-            type="button"
-            class="whitespace-nowrap rounded-lg px-1 py-2 text-[9px] font-semibold transition-all duration-150 sm:px-2 sm:text-xs"
-            :class="
-              selectedCategoryType === type.id
-                ? 'bg-white text-[#0066FF] shadow-sm font-bold'
-                : 'text-[#64748B]'
-            "
-            :aria-pressed="selectedCategoryType === type.id"
-            @click="selectedCategoryType = type.id"
-          >
-            {{ type.label }}
-          </button>
-        </div>
-
-        <span
-          v-if="usesConnectedPeerAverage"
-          class="flex h-[34px] items-center justify-center rounded-xl border border-[#D6E4FF] bg-[#F8FBFF] px-2 text-[10px] font-bold text-[#0A192F] sm:px-3 sm:text-xs"
-        >
-          내 또래
-        </span>
-        <div v-else class="relative min-w-0">
+        <div class="relative min-w-0">
           <label for="spending-peer-group-select" class="sr-only">비교 그룹</label>
           <select
             id="spending-peer-group-select"
             v-model="selectedPeerGroupId"
-            class="w-[88px] appearance-none cursor-pointer rounded-xl border border-[#D6E4FF] bg-[#F8FBFF] py-2 pl-2 pr-6 text-[10px] font-bold text-[#0A192F] shadow-2xs outline-none transition-all duration-150 hover:border-[#0066FF]/60 hover:bg-[#F0F6FF] focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/20 sm:w-[124px] sm:py-2 sm:pl-3 sm:pr-7 sm:text-xs"
+            class="w-full appearance-none cursor-pointer rounded-xl border border-[#D6E4FF] bg-[#F8FBFF] py-2 pl-2.5 pr-7 text-[10px] font-bold text-[#0A192F] shadow-2xs outline-none transition-all duration-150 hover:border-[#0066FF]/60 hover:bg-[#F0F6FF] focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/20 sm:py-2 sm:pl-3 sm:pr-8 sm:text-xs"
           >
             <option v-for="group in peerGroupOptions" :key="group.id" :value="group.id">
               {{ group.label }}
             </option>
           </select>
-          <div class="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-[#0066FF] sm:right-2">
+          <div
+            class="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-[#0066FF] sm:right-2"
+          >
             <svg
               class="h-3 w-3 sm:h-3.5 sm:w-3.5"
               viewBox="0 0 20 20"
@@ -85,99 +59,93 @@
         </div>
       </div>
 
-      <p
-        v-if="summary.peerAverageError"
-        class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
-      >
-        또래 평균을 불러오지 못했어요. 잠시 후 다시 확인해 주세요.
-      </p>
-
-      <template v-else-if="comparisonItems.length > 0">
+      <template v-if="comparisonItems.length > 0">
         <div
-        class="mt-4 flex min-h-[64px] flex-col justify-center rounded-xl border border-primary/10 bg-[#F4F8FF] px-3.5 py-2.5 sm:px-4 sm:py-3"
-      >
-        <p class="text-xs font-bold tracking-tight text-[#0A192F] break-keep sm:text-sm">
-          {{ selectedPeerGroupLabel }} {{ peerComparisonLabel }}보다
+          class="mt-4 flex min-h-[64px] flex-col justify-center rounded-xl border border-primary/10 bg-[#F4F8FF] px-3.5 py-2.5 sm:px-4 sm:py-3"
+        >
+          <p
+            class="flex flex-wrap items-baseline gap-x-1 text-xs font-bold tracking-tight text-[#0A192F] sm:text-sm"
+          >
+            <span class="whitespace-nowrap">
+              {{ selectedPeerGroupLabel }} {{ peerComparisonLabel }}보다
+            </span>
 
-          <strong :class="totalDifferenceClass">
-            월 {{ formatAmount(absoluteTotalDifference) }}만원
-            {{ totalDifferenceLabel }}
-          </strong>
-        </p>
+            <strong class="whitespace-nowrap" :class="totalDifferenceClass">
+              월 {{ formatAmount(absoluteTotalDifference) }}만원
+              {{ totalDifferenceLabel }}
+            </strong>
+          </p>
 
-        <p class="mt-1 text-[11px] text-[#64748B] break-keep sm:text-xs">
-          가장 차이가 큰 항목은 {{ largestDifferenceCategoryNames }}{{ categoryNamesEnding }}.
-        </p>
+          <p class="mt-1 text-[11px] text-[#64748B] break-keep sm:text-xs">
+            가장 차이가 큰 항목은 {{ largestDifferenceCategoryNames }}{{ categoryNamesEnding }}
+          </p>
         </div>
 
         <ul class="mt-2 divide-y divide-slate-100">
-        <li
-          v-for="category in comparisonItems"
-          :key="category.id"
-          class="grid min-w-0 grid-cols-[28px_36px_minmax(100px,1fr)_52px] items-center gap-1.5 py-3.5 first:pt-2 last:pb-0 sm:grid-cols-[32px_56px_minmax(140px,1fr)_64px] sm:gap-3"
-        >
-          <SpendingCategoryIcon
-            :icon="category.icon"
-            :category-id="category.id"
-            :accent="category.accent"
-            size="sm"
-          />
-
-          <span class="truncate text-xs font-bold text-[#0A192F]">
-            {{ category.name }}
-          </span>
-
-          <div
-            class="grid min-w-0 gap-1.5"
-            role="img"
-            :aria-label="`${category.name}: 나 ${formatAmount(category.current)}만원, ${peerAverageLabel} ${formatAmount(category.peerAmount)}만원`"
+          <li
+            v-for="category in comparisonItems"
+            :key="category.id"
+            class="grid min-w-0 grid-cols-[28px_36px_minmax(100px,1fr)_52px] items-center gap-1.5 py-3.5 first:pt-2 last:pb-0 sm:grid-cols-[32px_56px_minmax(140px,1fr)_64px] sm:gap-3"
           >
-            <div
-              class="grid grid-cols-[28px_minmax(0,1fr)_42px] items-center gap-1 text-[9px] text-[#64748B] sm:grid-cols-[32px_minmax(0,1fr)_48px] sm:text-[10px]"
-            >
-              <span class="font-medium text-[#64748B]">나</span>
-              <div class="h-1.5 overflow-hidden rounded-full bg-[#EEF2F7]">
-                <div
-                  class="h-full rounded-full bg-[#0066FF] transition-all duration-300 ease-out"
-                  :style="{ width: `${category.currentWidth}%` }"
-                />
-              </div>
-              <strong class="whitespace-nowrap text-right font-bold tabular-nums text-[#0A192F]"
-                >{{ formatAmount(category.current) }}만원</strong
-              >
-            </div>
+            <SpendingCategoryIcon
+              :icon="category.icon"
+              :category-id="category.id"
+              :accent="category.accent"
+              size="sm"
+            />
+
+            <span class="truncate text-xs font-bold text-[#0A192F]">
+              {{ category.name }}
+            </span>
 
             <div
-              class="grid grid-cols-[28px_minmax(0,1fr)_42px] items-center gap-1 text-[9px] text-[#64748B] sm:grid-cols-[32px_minmax(0,1fr)_48px] sm:text-[10px]"
+              class="grid min-w-0 gap-1.5"
+              role="img"
+              :aria-label="`${category.name}: 나 ${formatAmount(category.current)}만원, ${peerAverageLabel} ${formatAmount(category.peerAmount)}만원`"
             >
-              <span class="font-normal text-[#94A3B8]">평균</span>
-              <div class="h-1.5 overflow-hidden rounded-full bg-[#EEF2F7]">
-                <div
-                  class="h-full rounded-full bg-[#94A3B8] transition-all duration-300 ease-out"
-                  :style="{ width: `${category.peerWidth}%` }"
-                />
-              </div>
-              <span class="whitespace-nowrap text-right font-medium tabular-nums text-[#64748B]"
-                >{{ formatAmount(category.peerAmount) }}만원</span
+              <div
+                class="grid grid-cols-[28px_minmax(0,1fr)_42px] items-center gap-1 text-[9px] text-[#64748B] sm:grid-cols-[32px_minmax(0,1fr)_48px] sm:text-[10px]"
               >
-            </div>
-          </div>
+                <span class="font-medium text-[#64748B]">나</span>
+                <div class="h-1.5 overflow-hidden rounded-full bg-[#EEF2F7]">
+                  <div
+                    class="h-full rounded-full bg-[#0066FF] transition-all duration-300 ease-out"
+                    :style="{ width: `${category.currentWidth}%` }"
+                  />
+                </div>
+                <strong class="whitespace-nowrap text-right font-bold tabular-nums text-[#0A192F]"
+                  >{{ formatAmount(category.current) }}만원</strong
+                >
+              </div>
 
-          <span
-            class="whitespace-nowrap text-right text-xs font-bold tabular-nums"
-            :class="getDifferenceClass(category.difference)"
-          >
-            {{ formatDifference(category.difference) }}
-          </span>
-        </li>
+              <div
+                class="grid grid-cols-[28px_minmax(0,1fr)_42px] items-center gap-1 text-[9px] text-[#64748B] sm:grid-cols-[32px_minmax(0,1fr)_48px] sm:text-[10px]"
+              >
+                <span class="font-normal text-[#94A3B8]">평균</span>
+                <div class="h-1.5 overflow-hidden rounded-full bg-[#EEF2F7]">
+                  <div
+                    class="h-full rounded-full bg-[#94A3B8] transition-all duration-300 ease-out"
+                    :style="{ width: `${category.peerWidth}%` }"
+                  />
+                </div>
+                <span class="whitespace-nowrap text-right font-medium tabular-nums text-[#64748B]"
+                  >{{ formatAmount(category.peerAmount) }}만원</span
+                >
+              </div>
+            </div>
+
+            <span
+              class="whitespace-nowrap text-right text-xs font-bold tabular-nums"
+              :class="getDifferenceClass(category.difference)"
+            >
+              {{ formatDifference(category.difference) }}
+            </span>
+          </li>
         </ul>
       </template>
 
-      <p
-        v-else
-        class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
-      >
-        비교할 또래 지출 데이터가 없어요.
+      <p v-else class="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]">
+        비교할 또래 지출 데이터가 없어요
       </p>
     </article>
   </section>
@@ -187,10 +155,7 @@
 import { computed, toRef } from 'vue'
 import SpendingCategoryIcon from '@/features/spending/components/SpendingCategoryIcon.vue'
 import { usePeerSpendingComparison } from '@/features/spending/composables/useSpendingComparisons'
-import {
-  SPENDING_CATEGORY_TYPES,
-  SPENDING_COMPARISON_BASES,
-} from '@/features/spending/constants/spending.constants'
+import { SPENDING_COMPARISON_BASES } from '@/features/spending/constants/spending.constants'
 import { formatKoreanNumber } from '@/shared/lib/money'
 
 const props = defineProps({
@@ -201,18 +166,12 @@ const props = defineProps({
 })
 
 const formatAmount = formatKoreanNumber
-const categoryTypes = [
-  { id: SPENDING_CATEGORY_TYPES.FIXED, label: '고정지출' },
-  { id: SPENDING_CATEGORY_TYPES.VARIABLE, label: '변동지출' },
-]
 
 const {
   selectedComparisonBasis,
-  selectedCategoryType,
   selectedPeerGroupId,
   selectedPeerGroupLabel,
   peerGroupOptions,
-  usesConnectedPeerAverage,
   comparisonItems,
   totalDifference,
   absoluteTotalDifference,
@@ -221,11 +180,7 @@ const {
 } = usePeerSpendingComparison(toRef(props, 'summary'))
 
 const peerComparisonLabel = computed(() =>
-  usesConnectedPeerAverage.value
-    ? ''
-    : selectedComparisonBasis.value === 'AGE'
-      ? '또래'
-      : '소득평균'
+  selectedComparisonBasis.value === 'AGE' ? '또래' : '소득평균'
 )
 
 const peerAverageLabel = computed(() =>

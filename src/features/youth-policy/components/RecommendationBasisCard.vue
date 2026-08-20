@@ -1,11 +1,22 @@
 <!-- 조건 일치 정책을 찾는 데 사용한 프로필 정보를 깔끔하게 보여주는 인라인 바 -->
 <template>
   <aside
-    class="mt-2.5 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blue-100/90 bg-gradient-to-r from-[#f2f7ff] via-[#f8fbff] to-white px-3.5 py-2 text-xs shadow-2xs"
+    class="mt-2.5 flex flex-col gap-1.5 rounded-xl border border-blue-100/90 bg-gradient-to-r from-[#f2f7ff] via-[#f8fbff] to-white px-3.5 py-2 text-xs shadow-2xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2"
   >
-    <div class="flex flex-wrap items-center gap-2 min-w-0">
-      <span class="font-bold text-slate-700 shrink-0">적용된 조건:</span>
-      <div v-if="basisItems.length > 0" class="flex flex-wrap items-center gap-1.5">
+    <div class="flex items-center justify-between sm:contents">
+      <span class="shrink-0 font-bold text-slate-700">적용된 조건:</span>
+      <RouterLink
+        :to="{ name: ROUTE_NAMES.MYPAGE }"
+        class="inline-flex shrink-0 items-center gap-0.5 text-[11px] font-bold text-primary transition-colors hover:text-blue-700 sm:order-3 sm:ml-auto"
+      >
+        {{ hasProfileBasis ? '내 조건 수정' : '내 조건 등록' }}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="size-3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6" />
+        </svg>
+      </RouterLink>
+    </div>
+    <div class="min-w-0 sm:order-2 sm:flex-1">
+      <div v-if="basisItems.length > 0" class="flex items-center gap-1.5 overflow-x-auto sm:flex-wrap sm:overflow-visible">
         <span
           v-for="item in basisItems"
           :key="item"
@@ -17,16 +28,6 @@
       </div>
       <span v-else class="text-slate-400 text-[11px]">등록된 조건 정보 없음</span>
     </div>
-
-    <RouterLink
-      :to="{ name: ROUTE_NAMES.MYPAGE }"
-      class="inline-flex shrink-0 items-center gap-0.5 text-[11px] font-bold text-primary hover:text-blue-700 transition-colors ml-auto sm:ml-0"
-    >
-      {{ hasProfileBasis ? '내 조건 수정' : '내 조건 등록' }}
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="size-3">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6" />
-      </svg>
-    </RouterLink>
   </aside>
 </template>
 

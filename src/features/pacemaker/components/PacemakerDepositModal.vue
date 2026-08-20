@@ -29,8 +29,8 @@
 
       <button
         type="button"
-        class="flex w-full items-center justify-between rounded-2xl border border-[#c5dcff] bg-[#f8fbff] px-4 py-3.5 text-left"
-        :disabled="isSubmitting"
+        class="flex w-full items-center justify-between rounded-2xl border border-[#c5dcff] bg-[#f8fbff] px-4 py-3.5 text-left disabled:cursor-default"
+        :disabled="isSubmitting || (target?.depositOptions?.length ?? 0) < 2"
         @click="isAccountListOpen = !isAccountListOpen"
       >
         <div>

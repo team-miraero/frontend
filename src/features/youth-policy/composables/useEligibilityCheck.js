@@ -1,21 +1,6 @@
-/**
- * @param {string | null | undefined} birthDate yyyy-MM-dd
- * @returns {number | null}
- */
-export function calculateAge(birthDate) {
-  if (!birthDate) return null
-  const birth = new Date(birthDate)
-  if (Number.isNaN(birth.getTime())) return null
+import { calculateAge } from '@/shared/lib/date'
 
-  const today = new Date()
-  let age = today.getFullYear() - birth.getFullYear()
-  const hasHadBirthdayThisYear =
-    today.getMonth() > birth.getMonth() ||
-    (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate())
-  if (!hasHadBirthdayThisYear) age -= 1
-
-  return age
-}
+export { calculateAge }
 
 /**
  * @typedef {Object} EligibilityCheckItem

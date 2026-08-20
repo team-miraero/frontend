@@ -13,7 +13,7 @@
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-2">
             <span
-              class="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-extrabold text-white shadow-2xs"
+              class="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-extrabold text-white shadow-[0_1px_0_rgba(0,0,0,0.05)]"
             >
               SPLIT {{ milestone.order || Math.round(milestone.percentage / 20) || 1 }}
             </span>
@@ -26,7 +26,7 @@
           </div>
           <button
             type="button"
-            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-2xs transition hover:bg-white hover:text-slate-700 active:scale-95 cursor-pointer"
+            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition hover:bg-white hover:text-slate-700 active:scale-95 cursor-pointer"
             aria-label="닫기"
             @click="$emit('update:modelValue', false)"
           >
@@ -65,7 +65,7 @@
         <section v-if="reportContent" class="mt-5" aria-label="AI 분석 내용">
           <div class="mb-2.5 flex items-center gap-1.5">
             <span
-              class="flex size-4.5 items-center justify-center rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-600"
+              class="flex size-[18px] items-center justify-center rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-600"
             >
               ✓
             </span>
@@ -83,10 +83,8 @@
           class="mt-5 rounded-2xl border border-dashed border-blue-200 bg-[#f8fbff] px-5 py-8 text-center"
           aria-live="polite"
         >
-          <div
-            class="mx-auto flex size-11 items-center justify-center rounded-2xl bg-blue-100 text-xl"
-          >
-            {{ emptyState.icon }}
+          <div class="mx-auto flex size-11 items-center justify-center rounded-2xl bg-slate-100">
+            <DashboardIcon :name="emptyState.icon" class="size-6 text-primary" />
           </div>
           <p class="mt-3 text-sm font-bold text-[#0a192f]">{{ emptyState.title }}</p>
           <p class="mt-1.5 text-xs leading-5 text-slate-500">{{ emptyState.description }}</p>
@@ -111,6 +109,7 @@
 <script setup>
 import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
+import DashboardIcon from '@/pages/dashboard/components/DashboardIcon.vue'
 import { formatKRWCompact } from '@/shared/lib/money'
 
 const props = defineProps({
@@ -160,7 +159,7 @@ const formattedReportContent = computed(() => {
   let text = escapeHtml(reportContent.value)
   text = text.replace(
     /(?:\*\*)?(\[[^\]]+\])(?:\*\*)?/g,
-    '<span class="inline-flex items-center rounded-md bg-blue-50 border border-blue-200/70 px-2 py-0.5 font-bold text-primary text-[12px] sm:text-[13px] my-1 shadow-2xs">$1</span>'
+    '<span class="inline-flex items-center rounded-md bg-blue-50 border border-blue-200/70 px-2 py-0.5 font-bold text-primary text-[12px] sm:text-[13px] my-1 shadow-[0_1px_0_rgba(0,0,0,0.05)]">$1</span>'
   )
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-[#0a192f]">$1</strong>')
   return text
@@ -169,7 +168,7 @@ const formattedReportContent = computed(() => {
 const emptyState = computed(() => {
   if (['FAILED', 'ERROR'].includes(reportStatus.value)) {
     return {
-      icon: '↻',
+      icon: 'refresh',
       title: '리포트를 불러오지 못했어요',
       description: 'AI 분석이 다시 완료되면 이곳에서 내용을 확인할 수 있어요.',
     }
@@ -177,14 +176,14 @@ const emptyState = computed(() => {
 
   if (props.milestone?.status === 'COMPLETED') {
     return {
-      icon: '✨',
+      icon: 'report-ready',
       title: 'AI 리포트를 준비하고 있어요',
       description: '달성 데이터를 분석 중이에요. 잠시 후 다시 확인해 주세요.',
     }
   }
 
   return {
-    icon: '🔒',
+    icon: 'lock',
     title: '달성 후 리포트가 열려요',
     description: '이 마일스톤에 도달하면 AI가 진행 과정을 분석해 드려요.',
   }

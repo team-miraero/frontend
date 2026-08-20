@@ -11,7 +11,7 @@
           카테고리별 지난달 대비 변화
         </h2>
 
-        <p class="text-xs text-[#64748B]">각 항목의 지난달과 이번 달 지출을 비교해보세요.</p>
+        <p class="text-xs text-[#64748B]">각 항목의 지난달과 이번 달 지출을 비교해보세요</p>
       </div>
 
       <ul class="category-list">
@@ -66,7 +66,7 @@
         v-if="monthlyComparisonItems.length === 0"
         class="rounded-xl bg-[#F8FAFC] px-4 py-8 text-center text-sm text-[#64748B]"
       >
-        비교할 지출 데이터가 없어요.
+        비교할 지출 데이터가 없어요
       </p>
     </article>
   </section>

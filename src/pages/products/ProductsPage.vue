@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full bg-[#f8fafc] pb-16">
+  <div class="min-h-full bg-[#f8fafc] pb-28 sm:pb-16">
     <RoadmapSelector
       :goals="goals"
       :selected-goal-id="selectedGoalId"
@@ -8,111 +8,94 @@
     />
 
     <div class="page-container pb-10 pt-4 sm:pb-14 sm:pt-6">
-      <!-- 1. 상단 맞춤 추천 브리핑 카드 (메인 대시보드 스타일) -->
+      <!-- 1. 상단 맞춤 추천 비교 카드 -->
       <section
-        class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.04)] sm:p-6 md:p-7"
+        class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.04)] sm:p-6"
         aria-labelledby="recommendation-summary-title"
       >
-        <div class="flex flex-col gap-4">
-          <!-- 로딩 상태 -->
+        <!-- 로딩 상태 -->
+        <div v-if="isRecommendationLoading" class="space-y-3 py-2">
+          <div class="h-4 w-40 animate-pulse rounded-lg bg-slate-100" />
+          <div class="h-14 animate-pulse rounded-xl bg-slate-100" />
+        </div>
 
-          <!-- 로딩 상태 -->
-          <div v-if="isRecommendationLoading" class="space-y-2 py-2">
-            <div class="h-5 w-64 animate-pulse rounded-lg bg-slate-100" />
-            <div class="h-4 w-96 max-w-full animate-pulse rounded-lg bg-slate-100" />
-          </div>
+        <template v-else>
+          <p class="flex items-baseline gap-1.5 font-bold">
+            <span class="text-base tracking-tight text-primary sm:text-lg">
+              {{ selectedGoalName }}
+            </span>
+            <span class="text-xs text-slate-400">기준</span>
+          </p>
+          <h2
+            id="recommendation-summary-title"
+            class="mt-1 text-lg font-bold tracking-tight text-[#0a192f] sm:text-xl"
+          >
+            <template v-if="hasNoMaturityEligibleProducts">
+              목표 기간 내 만기 상품이 없어요
+            </template>
+            <template v-else-if="hasOnlyMoneyBox"> 저금통 이자 혜택을 더해보세요 </template>
+            <template v-else-if="linkedAssets.length > 0"> 추천 상품을 비교했어요 </template>
+            <template v-else> 현재 로드맵 연결 자산을 확인하지 못했어요 </template>
+          </h2>
+          <p
+            v-if="hasNoMaturityEligibleProducts"
+            class="mt-1 text-xs leading-relaxed text-slate-500"
+          >
+            기간을 조정하면 이용할 수 있는 상품도 함께 보여드려요.
+          </p>
 
-          <!-- 브리핑 메인 헤드라인 & 설명 -->
-          <template v-else>
-            <div>
-              <h2
-                id="recommendation-summary-title"
-                class="text-lg font-bold tracking-tight text-[#0a192f] sm:text-xl md:text-2xl"
-              >
-                <template v-if="hasNoMaturityEligibleProducts">
-                  목표 기간 내 만기 가능한 상품이 없어요
-                </template>
-                <template v-else-if="hasOnlyMoneyBox">
-                  <span class="text-primary">‘{{ selectedGoalName }}’</span> 저금통에 모인 돈, 이자 혜택까지 더해볼까요?
-                </template>
-                <template v-else-if="linkedAssets.length > 0">
-                  <span class="text-primary">‘{{ selectedGoalName }}’</span> 연결 자산을 기준으로 추천 상품을 비교했어요
-                </template>
-                <template v-else> 현재 로드맵 연결 자산을 확인하지 못했어요 </template>
-              </h2>
-              <p
-                v-if="hasNoMaturityEligibleProducts"
-                class="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500"
-              >
-                기간을 조정했을 때 이용할 수 있는 상품도 함께 보여드려요.
-              </p>
-              <p
-                v-else-if="hasOnlyMoneyBox && bestProduct"
-                class="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500"
-              >
-                {{ bestProduct.productName }}에 연결하면 최고
-                <strong class="font-bold text-primary tabular-nums">
-                  연 {{ formatRateCompact(bestRate) }}%
-                </strong>
-                이자를 받으며 목표를 더 빠르게 달성할 수 있어요.
-              </p>
-              <p
-                v-else-if="linkedAssets.length > 0 && bestProduct"
-                class="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500"
-              >
-                현재 연결 자산의 잔액 가중평균 금리는
-                <strong class="font-bold text-[#0a192f] tabular-nums">
-                  연 {{ formatRate(currentInterestRate) }}%
-                </strong>
-                이고, 추천 상품 중 최고 금리는
-                <strong class="font-bold text-primary tabular-nums">연 {{ formatRate(bestRate) }}%</strong>
-                입니다.
-                <template v-if="rateDifference > 0">
-                  현재 금리보다
-                  <strong class="font-bold text-primary tabular-nums">{{ formatRate(rateDifference) }}%p</strong>
-                  더 높아요.
-                </template>
-                <template v-else-if="rateDifference === 0"> 현재 상품과 같은 수준이에요. </template>
-                <template v-else>
-                  현재 상품이
-                  <strong class="font-bold text-primary tabular-nums">{{ formatRate(-rateDifference) }}%p</strong>
-                  더 높아요.
-                </template>
-              </p>
-            </div>
-
-            <!-- 하단 인셋 비교 카드 (대시보드 인셋 스타일) -->
-            <div
-              v-if="linkedAssets.length > 0 || bestProduct"
-              class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 sm:p-4 shadow-xs"
-            >
-              <div class="px-2">
-                <span class="text-[11px] font-bold text-slate-400">현재 상태</span>
-                <p class="mt-0.5 text-sm sm:text-base font-bold text-[#0a192f] tabular-nums">
-                  {{ linkedAssets.length > 0 ? `연 ${formatRate(currentInterestRate)}%` : '일반 저금통 (0%)' }}
+          <!-- 핵심 비교: 현재 금리 → 추천 최고 금리 -->
+          <div
+            v-if="linkedAssets.length > 0 || bestProduct"
+            class="mt-4 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 sm:p-5"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <span class="text-[11px] font-bold text-slate-400">
+                  {{ linkedAssets.length > 0 ? '현재 자산 금리' : '일반 저금통' }}
+                </span>
+                <p class="mt-1 text-lg font-bold tabular-nums text-[#0a192f] sm:text-xl">
+                  {{ linkedAssets.length > 0 ? `연 ${formatRate(currentInterestRate)}%` : '0%' }}
                 </p>
               </div>
-              <div class="px-2 border-l border-slate-200/70">
+              <span
+                class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm text-primary"
+                aria-hidden="true"
+              >
+                →
+              </span>
+              <div class="min-w-0 text-right">
                 <span class="text-[11px] font-bold text-slate-400">추천 상품 금리</span>
-                <p class="mt-0.5 text-sm sm:text-base font-bold text-primary tabular-nums">
+                <p class="mt-1 text-lg font-bold tabular-nums text-primary sm:text-xl">
                   최고 연 {{ formatRate(bestRate) }}%
                 </p>
               </div>
-              <div class="col-span-2 sm:col-span-1 px-2 border-t sm:border-t-0 sm:border-l border-slate-200/70 pt-2 sm:pt-0">
-                <span class="text-[11px] font-bold text-slate-400">금리 혜택</span>
-                <p class="mt-0.5 text-sm sm:text-base font-bold text-primary tabular-nums">
-                  {{ rateDifference > 0 ? `+${formatRate(rateDifference)}%p UP` : (hasOnlyMoneyBox ? `+${formatRate(bestRate)}%p 이자 혜택` : '동일 수준') }}
-                </p>
-              </div>
             </div>
-          </template>
-        </div>
+            <div
+              class="mt-3 rounded-xl bg-primary/[0.07] px-3 py-2 text-center text-[13px] font-bold text-primary"
+            >
+              {{
+                rateDifference > 0
+                  ? `+${formatRate(rateDifference)}%p 더 높은 금리 혜택`
+                  : hasOnlyMoneyBox
+                    ? `+${formatRate(bestRate)}%p 이자 혜택`
+                    : '현재 자산과 같은 수준이에요'
+              }}
+            </div>
+          </div>
+        </template>
       </section>
 
-      <section class="mt-5" aria-labelledby="product-list-title">
-        <div class="flex items-end justify-between gap-4">
+      <section class="mt-3 sm:mt-6" aria-labelledby="product-list-title">
+        <div class="flex items-center justify-between gap-3">
+          <h2
+            id="product-list-title"
+            class="shrink-0 text-sm font-bold text-[#0a192f] sm:text-base"
+          >
+            추천 상품 {{ sortedProducts.length }}개
+          </h2>
           <div
-            class="no-scrollbar -my-1.5 flex min-w-0 items-center gap-2 overflow-x-auto py-1.5 px-0.5"
+            class="no-scrollbar -my-1 flex min-w-0 items-center justify-end gap-1.5 overflow-x-auto px-0.5 py-1"
             role="tablist"
             aria-label="상품 종류"
           >
@@ -122,7 +105,7 @@
               :key="tab.value"
               type="button"
               role="tab"
-              class="shrink-0 cursor-pointer rounded-full border px-4 py-2 text-xs font-bold transition-all duration-200 ease-out hover:-translate-y-0.5 select-none"
+              class="shrink-0 cursor-pointer rounded-full border px-3 py-1.5 text-[11px] font-bold transition-all duration-200 ease-out hover:-translate-y-0.5 select-none sm:px-4 sm:py-2 sm:text-xs"
               :class="
                 activeFilter === tab.value
                   ? 'border-primary bg-primary text-white shadow-[0_4px_14px_rgba(0,102,255,0.22)]'
@@ -137,12 +120,7 @@
               {{ tab.label }}
             </button>
           </div>
-          <p class="mb-2 shrink-0 text-xs font-medium tabular-nums text-slate-400">
-            {{ sortedProducts.length }}개 상품
-          </p>
         </div>
-
-        <h2 id="product-list-title" class="sr-only">추천 상품 목록</h2>
 
         <div
           :id="`${activeFilter}-panel`"
@@ -153,13 +131,13 @@
         >
           <div
             v-if="isRecommendationLoading"
-            class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+            class="grid gap-3 pb-4 sm:gap-4 md:grid-cols-2 xl:grid-cols-3"
             aria-label="상품 목록을 불러오는 중"
           >
             <div
               v-for="index in 6"
               :key="index"
-              class="h-[310px] animate-pulse rounded-[18px] border border-[#e1e8f1] bg-white p-5"
+              class="h-[178px] animate-pulse rounded-[18px] border border-[#e1e8f1] bg-white p-5"
             >
               <div class="h-3 w-20 rounded bg-slate-100" />
               <div class="mt-3 h-5 w-2/3 rounded bg-slate-100" />
@@ -207,13 +185,14 @@
             </button>
           </div>
 
-          <div v-else class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div v-else class="grid gap-3 pb-4 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ProductCard
-              v-for="product in sortedProducts"
+              v-for="(product, productIndex) in sortedProducts"
               :key="`${product.productType}-${getProductId(product)}`"
               :product="product"
               :product-type="product.productType"
-              :is-highest-rate="Number(product.maximumInterestRate) === bestRate"
+              :is-highest-rate="Number(product.maximumInterestRate) === actualBestRate"
+              :is-top-recommended="productIndex === 0"
               :goal-name="selectedGoalName"
               :eligible-maturity-terms="product.eligibleMaturityTerms"
               :recommendation-impact="product.recommendationImpact"
@@ -227,7 +206,7 @@
       </section>
 
       <div
-        class="mt-6 flex items-start gap-2.5 rounded-2xl border border-slate-200/60 bg-slate-50/80 p-4 text-[11px] leading-relaxed text-slate-400 shadow-xs"
+        class="mt-3 flex items-start gap-2.5 rounded-2xl border border-slate-200/60 bg-slate-50/80 p-4 text-[11px] leading-relaxed text-slate-400 shadow-xs sm:mt-6"
       >
         <span
           class="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-slate-200/80 text-[10px] font-bold text-slate-600"
@@ -261,13 +240,13 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { goalApi, useGoalStore } from '@/features/goal'
 import {
+  CALCULATION_STATUS,
   ProductCard,
   ProductDetailModal,
   calculateRecommendationImpact,
   getMaturityEligibleTerms,
   calculateWeightedInterestRate,
   formatRate,
-  formatRateCompact,
   isLinkedProduct,
   useProductsStore,
 } from '@/features/products'
@@ -351,23 +330,45 @@ const filteredProducts = computed(() => {
   )
 })
 
-const sortedProducts = computed(() =>
-  [...filteredProducts.value].sort(
-    (a, b) => Number(b.maximumInterestRate) - Number(a.maximumInterestRate)
+function needsLongerPeriod(product) {
+  const termCount = new Set([
+    ...(product.saveTerms ?? []),
+    ...(product.options ?? []).map((option) => option.saveTerm),
+  ]).size
+
+  return (
+    product.recommendationImpact?.calculationStatus === CALCULATION_STATUS.NOT_APPLICABLE &&
+    (product.eligibleMaturityTerms?.length ?? 0) === 0 &&
+    termCount > 0
   )
-)
+}
 
-const bestProduct = computed(() =>
-  recommendationProducts.value.reduce((currentBest, product) => {
-    if (!currentBest) return product
+function sortRecommendedProducts(products) {
+  return [...products].sort((a, b) => {
+    const aNeedsLongerPeriod = needsLongerPeriod(a)
+    const bNeedsLongerPeriod = needsLongerPeriod(b)
+    if (aNeedsLongerPeriod !== bNeedsLongerPeriod) {
+      return aNeedsLongerPeriod ? 1 : -1
+    }
+    return Number(b.maximumInterestRate) - Number(a.maximumInterestRate)
+  })
+}
 
-    return Number(product.maximumInterestRate ?? 0) > Number(currentBest.maximumInterestRate ?? 0)
-      ? product
-      : currentBest
-  }, null)
-)
+const sortedProducts = computed(() => sortRecommendedProducts(filteredProducts.value))
+
+// 상단 요약 카드의 "추천 상품 금리"는 실제 목록에서 '추천' 태그가 붙는 1순위 상품과 일치해야 하므로,
+// 탭 필터와 무관하게 전체 추천 상품을 동일한 정렬 기준으로 계산한다.
+const bestProduct = computed(() => sortRecommendedProducts(recommendationProducts.value)[0] ?? null)
 
 const bestRate = computed(() => Number(bestProduct.value?.maximumInterestRate ?? 0))
+
+// '최고금리' 뱃지는 정렬 순서와 무관하게 실제 금리가 가장 높은 상품에 표시되어야 한다.
+const actualBestRate = computed(() =>
+  recommendationProducts.value.reduce(
+    (max, product) => Math.max(max, Number(product.maximumInterestRate ?? 0)),
+    0
+  )
+)
 
 const hasOnlyMoneyBox = computed(
   () =>

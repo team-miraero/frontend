@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-full bg-[#f8fafc] text-[#0a192f]">
     <main class="page-container-narrow pb-10 pt-4 sm:pb-14 sm:pt-6">
-      <div class="flex flex-col gap-5">
+      <div class="flex flex-col gap-3 sm:gap-5">
         <ProfileSection
           :profile="profile"
           :profile-image-url="displayProfileImageUrl"
@@ -241,7 +241,7 @@ function toggleNotification(id) {
 
 function openGoalResetModal() {
   if (!currentGoal.value) {
-    router.push({ name: ROUTE_NAMES.GOAL_SELECT })
+    router.push({ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } })
     return
   }
 

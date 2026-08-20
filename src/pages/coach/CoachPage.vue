@@ -56,7 +56,10 @@
           />
 
           <!-- AI 답변 생성 중 (생각 중 / 단정한 별 아이콘 + 텍스트 시머 그라데이션 말풍선) -->
-          <div v-if="coachStore.isSending" class="flex w-full items-end gap-2.5 justify-start">
+          <div
+            v-if="coachStore.isSending && coachStore.messages.at(-1)?.content.length === 0"
+            class="flex w-full items-end gap-2.5 justify-start"
+          >
             <div class="mb-1 flex size-7 sm:size-8 shrink-0 items-center justify-center">
               <!-- 단정하게 고정된 반짝 별 심볼 -->
               <svg

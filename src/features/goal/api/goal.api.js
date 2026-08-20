@@ -7,6 +7,26 @@ import { unwrapApiData } from '@/shared/api/unwrapApiData'
  */
 
 /**
+ * 백엔드 LocalDate가 "YYYY-MM-DD" 문자열 또는 [year, month, day] 배열로 내려오는
+ * 두 형태를 모두 "YYYY-MM-DD" 문자열로 정규화한다.
+ * @param {string | number[] | null | undefined} value
+ * @returns {string | null}
+ */
+function normalizeLocalDate(value) {
+  if (!value) return null
+
+  if (Array.isArray(value)) {
+    const [year, month, day] = value
+    if (!year || !month || !day) return null
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  }
+
+  if (typeof value === 'string') return value
+
+  return null
+}
+
+/**
  * 목표 프리셋 데이터를 조회하는 Mock API 함수
  * @returns {Promise<GoalPreset[]>}
  */
@@ -292,7 +312,7 @@ export async function getGoalAssets(goalId) {
         ? {
             ...asset.assetDetail,
             interestRate: Number(asset.assetDetail.interestRate ?? 0),
-            maturityDate: asset.assetDetail.maturityDate ?? null,
+            maturityDate: normalizeLocalDate(asset.assetDetail.maturityDate),
           }
         : null,
       autoTransfer: {

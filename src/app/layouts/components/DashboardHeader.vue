@@ -58,7 +58,7 @@
           :to="{ name: ROUTE_NAMES.DASHBOARD }"
           class="flex shrink-0 items-center gap-2"
         >
-          <div class="flex size-7 items-center justify-center rounded-[10px] bg-primary shadow-xs">
+          <div class="flex size-7 items-center justify-center rounded-[10px] bg-primary shadow-sm">
             <img src="@/assets/icons/logo.svg" alt="미래로" class="size-4" />
           </div>
           <strong class="text-base font-bold tracking-tight text-[#0a192f] hidden sm:block">미래로</strong>
@@ -67,7 +67,7 @@
         <!-- 토스 스타일: 현재 목표 선택 드롭다운 버튼 -->
         <button
           type="button"
-          class="group flex max-w-[190px] items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1.5 shadow-2xs transition hover:border-primary/40 hover:bg-[#f8fbff] active:scale-95 cursor-pointer select-none"
+          class="group flex max-w-[190px] items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1.5 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition hover:border-primary/40 hover:bg-[#f8fbff] active:scale-95 cursor-pointer select-none"
           aria-label="로드맵 선택"
           @click.stop="isMobileRoadmapSheetOpen = !isMobileRoadmapSheetOpen"
         >
@@ -117,7 +117,7 @@
         <button
           v-if="currentRouteName === ROUTE_NAMES.COACH"
           type="button"
-          class="flex size-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-600 shadow-xs transition hover:bg-white focus:outline-none active:scale-95 cursor-pointer"
+          class="flex size-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-600 shadow-sm transition hover:bg-white focus:outline-none active:scale-95 cursor-pointer"
           aria-label="대화 목록 열기"
           @click="coachStore.toggleSidebar()"
         >
@@ -138,7 +138,7 @@
         <div ref="mobileDropdownRef" class="relative">
           <button
             type="button"
-            class="relative flex size-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-600 shadow-xs transition hover:bg-white focus:outline-none"
+            class="relative flex size-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 focus:outline-none active:scale-95"
             aria-label="알림 센터 열기"
             @click="toggleDropdown"
           >
@@ -212,7 +212,7 @@
                 >
                   <!-- 테마별 컬러 틴트 아이콘 -->
                   <div
-                    class="flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-xl shadow-[0_1px_0_rgba(0,0,0,0.05)]"
                     :class="getNotificationIconStyle(item.type, item.badgeIcon).container"
                   >
                     <AppIcon
@@ -257,26 +257,6 @@
           </Transition>
         </div>
 
-        <!-- 마이페이지 바로가기 아이콘 버튼 (알림 종과 통일된 단정한 라인 룩) -->
-        <RouterLink
-          :to="{ name: ROUTE_NAMES.MYPAGE }"
-          class="flex size-9 shrink-0 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-600 shadow-xs transition hover:bg-white active:scale-95"
-          :class="currentRouteName === ROUTE_NAMES.MYPAGE ? 'border-primary/40 bg-blue-50 text-primary ring-1 ring-blue-200/60' : ''"
-          aria-label="마이페이지로 이동"
-        >
-          <svg
-            class="size-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </RouterLink>
       </div>
     </div>
 
@@ -286,7 +266,7 @@
         :to="{ name: ROUTE_NAMES.DASHBOARD }"
         class="mr-4 flex shrink-0 items-center gap-2.5"
       >
-        <div class="flex size-8 items-center justify-center rounded-[12px] bg-primary shadow-xs">
+        <div class="flex size-8 items-center justify-center rounded-[12px] bg-primary shadow-sm">
           <img src="@/assets/icons/logo.svg" alt="미래로" class="size-[18px]" />
         </div>
         <strong class="text-xl font-bold tracking-tight text-[#0a192f]">미래로</strong>
@@ -302,7 +282,7 @@
             :aria-expanded="isRoadmapDropdownOpen"
             @click="handleRoadmapHeaderClick"
           >
-            <span>로드맵</span>
+            <span>홈</span>
             <span
               class="flex items-center justify-center rounded-full p-0.5 transition hover:bg-slate-100"
               aria-label="로드맵 목록 열기"
@@ -381,7 +361,7 @@
               </div>
 
               <RouterLink
-                :to="{ name: ROUTE_NAMES.GOAL_SELECT }"
+                :to="{ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } }"
                 class="mt-2 flex items-center gap-2 rounded-xl border border-dashed border-[#b9d3ff] px-3 py-3 text-sm font-bold text-primary transition hover:bg-[#f4f8ff]"
                 role="menuitem"
                 @click="isRoadmapDropdownOpen = false"
@@ -413,7 +393,7 @@
         <div ref="dropdownRef" class="relative">
           <button
             type="button"
-            class="relative flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 focus:outline-none"
+            class="relative flex size-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 focus:outline-none active:scale-95"
             aria-label="알림 센터 열기"
             @click="toggleDropdown"
           >
@@ -487,7 +467,7 @@
                 >
                   <!-- 테마별 컬러 틴트 아이콘 -->
                   <div
-                    class="flex size-8 shrink-0 items-center justify-center rounded-xl shadow-2xs"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-xl shadow-[0_1px_0_rgba(0,0,0,0.05)]"
                     :class="getNotificationIconStyle(item.type, item.badgeIcon).container"
                   >
                     <AppIcon
@@ -544,26 +524,6 @@
           </Transition>
         </div>
 
-        <!-- 마이페이지 바로가기 아이콘 버튼 (데스크톱 알림 종과 통일) -->
-        <RouterLink
-          :to="{ name: ROUTE_NAMES.MYPAGE }"
-          class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-xs transition hover:bg-slate-50"
-          :class="isActive(ROUTE_NAMES.MYPAGE) ? 'border-primary/40 bg-blue-50 text-primary' : ''"
-          aria-label="마이페이지로 이동"
-        >
-          <svg
-            class="size-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </RouterLink>
       </div>
     </div>
 
@@ -628,7 +588,7 @@
               class="flex w-full flex-col rounded-2xl border p-3.5 text-left transition active:scale-[0.99] cursor-pointer"
               :class="
                 isSelectedGoal(goal)
-                  ? 'border-primary/40 bg-[#eaf2ff] shadow-xs'
+                  ? 'border-primary/40 bg-[#eaf2ff] shadow-sm'
                   : 'border-slate-200/80 bg-[#f8fbff] hover:bg-white'
               "
               @click="selectGoalAndNavigate(goal.goalId)"
@@ -675,7 +635,7 @@
 
           <!-- 새 로드맵 추가 버튼 -->
           <RouterLink
-            :to="{ name: ROUTE_NAMES.GOAL_SELECT }"
+            :to="{ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } }"
             class="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#b9d3ff] bg-[#f4f8ff] py-3.5 text-sm font-bold text-primary transition active:scale-[0.99] hover:bg-blue-50"
             @click="isMobileRoadmapSheetOpen = false"
           >
@@ -694,7 +654,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui.store'
 import { useGoalStore } from '@/features/goal'
 import { useCoachStore } from '@/features/coach'
-import { usePacemakerToast, usePacemakerDeposit } from '@/features/pacemaker'
+import { usePacemakerToast } from '@/features/pacemaker'
 import { NAV_ITEMS } from '@/shared/constants/navigation'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import AppIcon from '@/shared/ui/AppIcon.vue'
@@ -739,9 +699,7 @@ const {
   markAllAsRead,
   removeHistoryItem,
   clearHistory,
-  openBalanceModal,
 } = usePacemakerToast()
-const { retryDepositTargets } = usePacemakerDeposit()
 
 const isDropdownOpen = ref(false)
 const dropdownRef = ref(null)
@@ -836,14 +794,13 @@ function toggleDropdown() {
 function handleNotificationClick(item) {
   isDropdownOpen.value = false
 
-  if (item.type === 'SAVING') {
-    // 모달을 열자마자 대상 목록이 비어 보이지 않도록, 조회를 먼저 시작해두고
-    // 모달은 즉시 연다 (로딩 중에는 모달 자체가 "불러오는 중" 상태를 보여준다).
-    retryDepositTargets()
-    openBalanceModal()
-    if (route.name !== ROUTE_NAMES.PACEMAKER) {
-      router.push({ name: ROUTE_NAMES.PACEMAKER })
-    }
+  if (item.type === 'AVAILABLE_MONEY') {
+    const goalId = goalStore.selectedGoalId
+    router.push({
+      name: goalId ? ROUTE_NAMES.DASHBOARD_GOAL : ROUTE_NAMES.DASHBOARD,
+      ...(goalId ? { params: { goalId } } : {}),
+      query: { modal: 'today-available-money' },
+    })
   } else if (item.type === 'STREAK') {
     if (route.name !== ROUTE_NAMES.PACEMAKER) {
       router.push({ name: ROUTE_NAMES.PACEMAKER })

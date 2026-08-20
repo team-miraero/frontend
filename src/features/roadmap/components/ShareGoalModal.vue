@@ -54,6 +54,7 @@ import BaseModal from '@/shared/ui/BaseModal.vue'
 import { useShare, shouldCaptureNode } from '@/features/roadmap/composables/useShare'
 import ShareCardPreview from '@/features/roadmap/components/ShareCardPreview.vue'
 import ShareActionButtons from '@/features/roadmap/components/ShareActionButtons.vue'
+import { derivePaceState } from '@/features/roadmap/constants/pace-state.constants'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -94,12 +95,14 @@ async function generateCardImage() {
 }
 
 // 공유 카드(cardRef)에 지금 표시되고 있는 값 그대로를 반환
+// paceState는 메인 카드와 같은 단일 기준(derivePaceState)을 쓴다 — 백엔드 원본
+// pace.paceStatus(누적 기준)를 쓰면 저축 시작 전인데도 "뒤처지는 중"으로 공유되는 등
+// 화면에 보이는 상태와 다른 문구가 나갈 수 있다.
 function getShareData() {
   return {
     cardEl: cardRef.value,
     progress: props.goal.progressRate,
-    aheadAmount: props.goal.pace.differenceAmount,
-    isBehind: props.goal.pace.paceStatus === 'BEHIND',
+    paceState: derivePaceState(props.goal),
     goalName: props.goal.goalName,
   }
 }

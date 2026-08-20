@@ -1,6 +1,6 @@
 <!-- 회원가입 약관 동의 카드: 전체 동의 + 개별 약관 체크 + 약관 보기 모달 -->
 <template>
-  <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs sm:p-6">
     <div class="flex items-start gap-2.5">
       <div class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-50 text-primary">
         <svg
@@ -23,7 +23,7 @@
     </div>
 
     <label
-      class="mt-4 flex cursor-pointer items-center gap-2.5 rounded-xl border p-3 transition-all"
+      class="mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border p-2.5 transition-all sm:mt-4 sm:p-3"
       :class="
         allAgreed
           ? 'border-blue-200 bg-[#f0f6ff]'

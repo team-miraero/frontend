@@ -1,4 +1,4 @@
-<!-- 페이스메이커 자동 저축 전체 내역 모달 -->
+<!-- 페이스메이커 자동 저축 전체 내역 바텀시트 -->
 <template>
   <BaseModal
     :model-value="modelValue"
@@ -6,7 +6,7 @@
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <div class="flex items-center justify-between border-b border-slate-100 px-7 pb-[17px] pt-6">
-      <h3 class="text-base font-bold text-[#0a192f]">최근 자동 저축 내역</h3>
+      <h3 class="text-base font-bold text-[#0a192f]">자동저축 내역</h3>
       <button
         type="button"
         class="flex size-8 items-center justify-center rounded-full bg-[#f8fbff]"
@@ -17,7 +17,7 @@
       </button>
     </div>
 
-    <div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto px-7 py-5">
+    <div class="flex max-h-[420px] flex-col gap-2 overflow-y-auto px-7 py-5">
       <div
         v-if="error"
         class="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-center"
@@ -34,13 +34,16 @@
         </button>
       </div>
       <div
-        v-for="item in error || isLoading ? [] : histories"
+        v-for="item in error || isLoading ? [] : itemsWithBalance"
         :key="item.date"
         class="flex items-center justify-between border-b border-slate-100 py-3 last:border-b-0"
       >
         <div>
           <p class="text-xs font-bold text-[#0a192f]">{{ formatDate(item.date) }}</p>
           <p class="pt-0.5 text-xs text-slate-400">{{ describeHistory(item) }}</p>
+          <p v-if="item.status === 'SAVED'" class="pt-0.5 text-[11px] text-slate-400">
+            잔액 {{ formatWon(item.balanceAfter) }}
+          </p>
         </div>
         <p
           class="text-sm font-bold"
@@ -60,13 +63,18 @@
         아직 저축 내역이 없어요
       </p>
     </div>
+
+    <p class="border-t border-slate-100 px-7 py-4 text-center text-[11px] leading-5 text-slate-400">
+      최근 자동저축 내역을 최신순으로 보여드려요.
+    </p>
   </BaseModal>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
 
-defineProps({
+const props = defineProps({
   modelValue: {
     type: Boolean,
     default: false,
@@ -74,6 +82,11 @@ defineProps({
   histories: {
     type: Array,
     default: () => [],
+  },
+  // 목록 맨 위(가장 최근) 항목 적용 후의 현재 저금통 잔액. 각 행의 잔액을 거슬러 계산하는 기준값.
+  currentBalance: {
+    type: Number,
+    default: 0,
   },
   isLoading: {
     type: Boolean,
@@ -86,9 +99,19 @@ defineProps({
 })
 defineEmits(['update:modelValue', 'retry'])
 
+// histories는 최신 날짜가 먼저 오므로, 현재 잔액에서 역순으로 각 저축 이후 시점의 잔액을 복원한다.
+const itemsWithBalance = computed(() => {
+  let runningBalance = props.currentBalance
+  return props.histories.map((item) => {
+    const balanceAfter = runningBalance
+    if (item.status === 'SAVED') runningBalance -= item.amount ?? 0
+    return { ...item, balanceAfter }
+  })
+})
+
 function describeHistory(item) {
   if (item.description) return item.description
-  return item.status === 'SAVED' ? '여유자금 자동 저축' : '저축 건너뜀'
+  return item.status === 'SAVED' ? '하루 여유자금 자동 저축' : '저축 건너뜀'
 }
 
 function formatDate(isoDate) {

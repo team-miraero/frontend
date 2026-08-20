@@ -44,7 +44,7 @@
       </div>
 
       <!-- 상태 2: 달성 목표 존재 (Filled State) -->
-      <div v-else class="flex flex-col gap-5">
+      <div v-else class="flex flex-col gap-3 sm:gap-5">
         <!-- 상단 명예의 전당 요약 히어로 배너 -->
         <CollectionHeroBanner
           :total-count="collectionStore.totalAchievedCount"
@@ -52,7 +52,7 @@
         />
 
         <!-- 컬렉션 카드 그리드 목록 -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           <CollectionCard
             v-for="goal in collectionStore.achievedGoals"
             :key="goal.id"
@@ -113,7 +113,7 @@ onMounted(async () => {
 })
 
 function handleGoToGoalSelect() {
-  router.push({ name: ROUTE_NAMES.GOAL_SELECT })
+  router.push({ name: ROUTE_NAMES.GOAL_SELECT, query: { from: 'dashboard' } })
 }
 
 function handleViewRoadmap(goal) {

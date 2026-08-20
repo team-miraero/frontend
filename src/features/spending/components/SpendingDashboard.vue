@@ -1,49 +1,55 @@
 <template>
   <div>
-    <RoadmapSelector
-      :goals="goals"
-      :selected-goal-id="selectedGoalId"
-      :disabled="areGoalsLoading"
-      :trailing-text="myDataStatusText"
-      @update:selected-goal-id="$emit('select-goal', $event)"
+    <LoadingSpinner
+      v-if="isInitialLoading"
+      message="지출 정보를 불러오는 중이에요"
+      container-class="min-h-[calc(100dvh-122px)] md:min-h-[calc(100dvh-80px)]"
     />
 
-    <div class="page-container pb-10 pt-4 sm:pb-14 sm:pt-6">
-      <LoadingSpinner v-if="isLoading" message="지출 정보를 불러오고 있어요" />
+    <template v-else>
+      <RoadmapSelector
+        :goals="goals"
+        :selected-goal-id="selectedGoalId"
+        :disabled="areGoalsLoading"
+        :trailing-text="myDataStatusText"
+        @update:selected-goal-id="$emit('select-goal', $event)"
+      />
 
-      <p
-        v-else-if="error"
-        class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700"
-        role="alert"
-      >
-        지출 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
-      </p>
+      <div class="page-container pb-10 pt-4 sm:pb-14 sm:pt-6">
+        <p
+          v-if="error"
+          class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700"
+          role="alert"
+        >
+          지출 정보를 불러오지 못했어요 잠시 후 다시 시도해 주세요
+        </p>
 
-      <p
-        v-else-if="!hasNumericGoalId && !areGoalsLoading"
-        class="rounded-2xl border border-[#E2E8F0] bg-white px-5 py-8 text-center text-sm text-[#64748B]"
-      >
-        지출관리에 사용할 목표를 먼저 만들어 주세요.
-      </p>
+        <p
+          v-else-if="!hasNumericGoalId && !areGoalsLoading"
+          class="rounded-2xl border border-[#E2E8F0] bg-white px-5 py-8 text-center text-sm text-[#64748B]"
+        >
+          지출관리에 사용할 목표를 먼저 만들어 주세요
+        </p>
 
-      <template v-else-if="spendingSummary">
-        <SpendingSummarySection
-          :total-spending="spendingSummary.totalSpending"
-          :previous-month-spending="spendingSummary.previousMonthSpending"
-          :saving-capacity="spendingSummary.savingCapacity"
-          :remaining-months="spendingSummary.remainingMonths"
-          :monthly-difference="spendingSummary.monthlyDifference"
-          :goal-progress="spendingSummary.goalProgress"
-          @open-transactions="openTransactionHistory"
-        />
+        <template v-else-if="spendingSummary">
+          <SpendingSummarySection
+            :total-spending="spendingSummary.totalSpending"
+            :previous-month-spending="spendingSummary.previousMonthSpending"
+            :saving-capacity="spendingSummary.savingCapacity"
+            :remaining-months="spendingSummary.remainingMonths"
+            :monthly-difference="spendingSummary.monthlyDifference"
+            :goal-progress="spendingSummary.goalProgress"
+            @open-transactions="openTransactionHistory"
+          />
 
-        <SpendingContentTabs
-          class="mt-5 md:mt-7"
-          :summary="spendingSummary"
-          :selected-goal="selectedGoal"
-        />
-      </template>
-    </div>
+          <SpendingContentTabs
+            class="mt-3 sm:mt-5 md:mt-7"
+            :summary="spendingSummary"
+            :selected-goal="selectedGoal"
+          />
+        </template>
+      </div>
+    </template>
 
     <SpendingHistoryModal
       v-model="isTransactionHistoryOpen"
@@ -103,6 +109,9 @@ const hasNumericGoalId = computed(() => {
   const goalId = Number(props.selectedGoalId)
   return Number.isInteger(goalId) && goalId > 0
 })
+const isInitialLoading = computed(
+  () => props.areGoalsLoading || (isLoading.value && !spendingSummary.value)
+)
 
 const myDataStatusText = computed(() => {
   const month = Number(spendingSummary.value?.referenceMonth?.split('-')[1])

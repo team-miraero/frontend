@@ -92,6 +92,7 @@
         :value="sliderValue"
         :style="rangeStyle"
         @input="handleRangeInput"
+        @change="$emit('adjustment-complete')"
       />
 
       <div
@@ -114,24 +115,22 @@
         i
       </span>
 
-      슬라이더를 움직여 목표 지출을 정해보세요.
+      슬라이더를 움직여 목표 지출을 정해보세요
     </div>
 
     <!-- 조절 후 결과 -->
     <div
       v-else
-      class="mt-4 flex items-center justify-between gap-3 rounded-xl bg-[#F4F8FF] border border-primary/15 px-3 py-2.5 text-xs transition-all"
+      class="mt-4 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-[#F4F8FF] px-3 py-2.5 text-xs transition-all"
     >
-      <span class="font-bold text-primary">
-        {{ selectedGoal }} {{ formattedShortenedMonths }} 단축
-      </span>
+      <span class="shrink-0 font-bold text-primary"> {{ formattedShortenedMonths }} 단축 </span>
 
-      <span class="shrink-0 font-medium text-[#64748B]">
+      <span class="min-w-0 text-right font-medium text-[#64748B]">
         월
         <strong class="font-bold text-[#0A192F] tabular-nums"
           >{{ formatAmount(savingAmount) }}만원</strong
         >
-        절감
+        절감 가능
       </span>
     </div>
   </article>
@@ -166,7 +165,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update-target'])
+const emit = defineEmits(['update-target', 'adjustment-complete'])
 
 const formatAmount = formatKoreanNumber
 

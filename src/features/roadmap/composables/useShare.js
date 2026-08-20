@@ -8,6 +8,7 @@
 // 모달에 보이는 그대로가 항상 이미지에도 반영된다.
 import { ref } from 'vue'
 import { toPng } from 'html-to-image'
+import { PACE_STATE } from '@/features/roadmap/constants/pace-state.constants'
 
 // 컨페티/후광/반짝임 같은 순수 장식용 애니메이션 노드는 `data-html2canvas-ignore="true"`로
 // 표시해두고 캡처에서 제외한다. html-to-image는 이 속성을 자동으로 해석하지 않으므로
@@ -20,9 +21,8 @@ export function shouldCaptureNode(node) {
  * @typedef {Object} ShareCardData
  * @property {HTMLElement|null} cardEl - 캡처 대상 DOM(공유 카드) 엘리먼트
  * @property {number} progress - 달성률(%) — 공유 카드에 표시되는 값과 동일해야 함
- * @property {number} aheadAmount - 목표 대비 앞선(또는 뒤처진) 금액
- * @property {boolean} isBehind - 페이스가 뒤처진 상태인지 여부
- * @property {string} [goalName] - 저장 파일명에 쓰일 목표 이름
+ * @property {'NOT_STARTED'|'ON_TRACK'|'AHEAD'|'BEHIND'} paceState - derivePaceState로 계산한 단일 기준 상태
+ * @property {string} [goalName] - 목표 이름(공유 문구·저장 파일명에 사용)
  */
 
 /**
@@ -41,16 +41,13 @@ export function useShare(getShareData, { onNotify } = {}) {
     onNotify?.(message)
   }
 
-  function formatManwon(amount) {
-    return `${Math.round(amount / 10000).toLocaleString()}만원`
-  }
-
-  // 공유 카드에 표시된 값 그대로 문구를 생성한다 (하드코딩 금지)
-  function buildShareText({ progress, aheadAmount, isBehind }) {
-    const paceLine = isBehind
-      ? `목표보다 ${formatManwon(Math.abs(aheadAmount))} 뒤처지는 중 💪`
-      : `목표보다 ${formatManwon(Math.abs(aheadAmount))} 앞서가는 중 🚀`
-    return `🏆 목표 ${progress}% 달성!\n\n${paceLine}\n\n너도 같이 목표를 향해 달려볼래?`
+  // 저축 시작 전(NOT_STARTED)에는 아직 비교할 달성률/페이스가 없으므로 별도 문구를 쓰고,
+  // 그 외에는 달성률 그대로를 보여준다.
+  function buildShareText({ progress, paceState, goalName }) {
+    if (paceState === PACE_STATE.NOT_STARTED) {
+      return '목표를 향해 첫 저축을 시작했어요 🚩\n함께 모아보아요🚀'
+    }
+    return `내 ${goalName} 달성률 ${progress}%!\n함께 모아보아요🚀`
   }
 
   /**

@@ -2,7 +2,7 @@
 <template>
   <button
     type="button"
-    class="group flex flex-col justify-between rounded-xl border border-slate-100 bg-[#f8fbff] p-4 text-left transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary/40 hover:bg-white hover:shadow-xs active:scale-[0.98] cursor-pointer break-keep select-none"
+    class="group flex flex-col justify-between rounded-xl border border-slate-100 bg-[#f8fbff] p-4 text-left transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary/40 hover:bg-white hover:shadow-sm active:scale-[0.98] cursor-pointer break-keep select-none"
     @click="$emit('open-detail')"
   >
     <div>
@@ -19,8 +19,14 @@
           :key="asset.assetId"
           class="flex items-center gap-2.5"
         >
-          <div class="flex size-7 items-center justify-center rounded-lg bg-white shadow-2xs">
-            <img :src="assetIcon(asset.assetType)" alt="" class="size-3.5" />
+          <div
+            class="flex size-7 items-center justify-center rounded-[10px] bg-slate-100 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.08)]"
+          >
+            <DashboardIcon
+              :name="asset.assetType === 'MONEY_BOX' ? 'piggy-bank' : 'bank'"
+              class="size-[18px] drop-shadow-[0_2px_3px_rgba(49,130,246,0.18)]"
+              :class="asset.assetType === 'MONEY_BOX' ? 'text-[#3182f6]' : 'text-[#7c5ce7]'"
+            />
           </div>
           <div class="min-w-0 flex-1">
             <p class="truncate text-xs font-semibold text-[#0a192f]">{{ asset.assetName }}</p>
@@ -44,8 +50,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import moneyBoxIcon from '@/assets/icons/money-box.svg'
-import bankAccountIcon from '@/assets/icons/bank-account.svg'
+import DashboardIcon from '@/pages/dashboard/components/DashboardIcon.vue'
 import { formatKRWCompact } from '@/shared/lib/money'
 
 const props = defineProps({
@@ -64,7 +69,4 @@ const totalBalance = computed(() =>
   savingsAssets.value.reduce((sum, asset) => sum + (asset.balance ?? 0), 0)
 )
 
-function assetIcon(assetType) {
-  return assetType === 'MONEY_BOX' ? moneyBoxIcon : bankAccountIcon
-}
 </script>

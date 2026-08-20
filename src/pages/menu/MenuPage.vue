@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <div class="mx-auto max-w-2xl px-4 py-5 sm:px-6 space-y-4">
+    <div class="mx-auto max-w-2xl space-y-3 px-4 py-5 sm:space-y-4 sm:px-6">
       <!-- 1. 최상단 사용자 프로필 & 자산 요약 카드 (클릭 시 마이페이지 이동) -->
       <RouterLink
         :to="{ name: ROUTE_NAMES.MYPAGE }"
@@ -49,16 +49,14 @@
       <!-- 2. 맞춤 혜택 & 추천 금융 (하이라이트 섹션) -->
       <section class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs space-y-3">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">맞춤 혜택 & 금융</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div class="grid grid-cols-1 gap-0 sm:grid-cols-2 sm:gap-2.5">
           <!-- 청년 정책 -->
           <RouterLink
             :to="{ name: ROUTE_NAMES.YOUTH_POLICY }"
-            class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
+            class="flex items-center justify-between rounded-xl border border-transparent bg-white py-3 transition-all hover:bg-slate-50 active:scale-[0.98] sm:py-3.5"
           >
             <div class="flex items-center gap-3">
-              <div class="flex size-9.5 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
-                <img :src="iconMap.policy" alt="" class="size-5 object-contain" />
-              </div>
+              <NavIcon name="policy" />
               <strong class="text-sm font-bold text-[#0a192f]">청년 정책 지원금</strong>
             </div>
             <svg
@@ -77,12 +75,10 @@
           <!-- KB 금융 상품 추천 -->
           <RouterLink
             :to="{ name: ROUTE_NAMES.PRODUCTS }"
-            class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
+            class="flex items-center justify-between rounded-xl border border-transparent bg-white py-3 transition-all hover:bg-slate-50 active:scale-[0.98] sm:py-3.5"
           >
             <div class="flex items-center gap-3">
-              <div class="flex size-9.5 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                <img :src="iconMap.products" alt="" class="size-5 object-contain" />
-              </div>
+              <NavIcon name="products" />
               <strong class="text-sm font-bold text-[#0a192f]">KB 금융 상품</strong>
             </div>
             <svg
@@ -105,12 +101,10 @@
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">성취 & 도감</h2>
         <RouterLink
           :to="{ name: ROUTE_NAMES.COLLECTION }"
-          class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all hover:bg-blue-50/40 hover:border-primary/30 active:scale-[0.98]"
+          class="flex items-center justify-between rounded-xl border border-transparent bg-white py-3.5 transition-all hover:bg-slate-50 active:scale-[0.98]"
         >
           <div class="flex items-center gap-3">
-            <div class="flex size-9.5 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-              <img :src="iconMap.collection" alt="" class="size-5 object-contain" />
-            </div>
+            <NavIcon name="collection" />
             <strong class="text-sm font-bold text-[#0a192f]">나의 컬렉션</strong>
           </div>
           <svg
@@ -130,36 +124,36 @@
       <!-- 4. 핵심 서비스 바로가기 (주요 기능) -->
       <section class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs space-y-3">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">핵심 기능 바로가기</h2>
-        <div class="grid grid-cols-2 gap-2.5">
+        <div class="flex flex-col">
           <RouterLink
             :to="{ name: ROUTE_NAMES.DASHBOARD }"
-            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
+            class="flex items-center gap-3 rounded-xl px-1 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100"
           >
-            <img :src="iconMap.roadmap" alt="" class="size-5 object-contain" />
-            <span>목표 로드맵</span>
+            <NavIcon name="roadmap" />
+            <span>홈</span>
           </RouterLink>
 
           <RouterLink
             :to="{ name: ROUTE_NAMES.SPENDING }"
-            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
+            class="flex items-center gap-3 rounded-xl px-1 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100"
           >
-            <img :src="iconMap.spending" alt="" class="size-5 object-contain" />
+            <NavIcon name="spending" />
             <span>지출 관리</span>
           </RouterLink>
 
           <RouterLink
             :to="{ name: ROUTE_NAMES.PACEMAKER }"
-            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
+            class="flex items-center gap-3 rounded-xl px-1 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100"
           >
-            <img :src="iconMap.pacemaker" alt="" class="size-5 object-contain" />
+            <NavIcon name="pacemaker" />
             <span>페이스메이커</span>
           </RouterLink>
 
           <RouterLink
             :to="{ name: ROUTE_NAMES.COACH }"
-            class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs font-bold text-slate-700 hover:bg-blue-50/50 hover:text-primary transition"
+            class="flex items-center gap-3 rounded-xl px-1 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100"
           >
-            <img :src="iconMap.coach" alt="" class="size-5 object-contain" />
+            <NavIcon name="coach" />
             <span>AI 목표 코치</span>
           </RouterLink>
         </div>
@@ -223,7 +217,7 @@ import { useAuthFeatureStore } from '@/features/auth'
 import { useGoalStore } from '@/features/goal'
 import { LogoutConfirmModal } from '@/features/mypage'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
-import { NAV_ITEMS } from '@/shared/constants/navigation'
+import NavIcon from '@/shared/ui/NavIcon.vue'
 import '@/features/mypage/styles/mypage.css'
 
 const router = useRouter()
@@ -236,16 +230,6 @@ const logoutModalOpen = ref(false)
 
 const userName = computed(() => authStore.user?.name ?? '')
 const userInitial = computed(() => (userName.value ? userName.value.charAt(0) : 'M'))
-
-const iconMap = {
-  roadmap: NAV_ITEMS.find((i) => i.routeName === ROUTE_NAMES.DASHBOARD)?.icon,
-  spending: NAV_ITEMS.find((i) => i.routeName === ROUTE_NAMES.SPENDING)?.icon,
-  pacemaker: NAV_ITEMS.find((i) => i.routeName === ROUTE_NAMES.PACEMAKER)?.icon,
-  coach: NAV_ITEMS.find((i) => i.routeName === ROUTE_NAMES.COACH)?.icon,
-  collection: NAV_ITEMS.find((i) => i.routeName === ROUTE_NAMES.COLLECTION)?.icon,
-  products: NAV_ITEMS.find((i) => i.routeName === ROUTE_NAMES.PRODUCTS)?.icon,
-  policy: NAV_ITEMS.find((i) => i.routeName === ROUTE_NAMES.YOUTH_POLICY)?.icon,
-}
 
 async function logout() {
   await authFeatureStore.submitLogout()
