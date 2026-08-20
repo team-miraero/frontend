@@ -187,21 +187,13 @@
             @click="$emit('cta-click')"
           >
             <span
-              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
+              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-[#EAF3FF] text-[#3182f6] shadow-[inset_0_0_0_1px_rgba(49,130,246,0.08)] transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 1. 알아서 모으기 선명한 번개 SVG -->
-              <svg
-                class="size-4 sm:size-[18px]"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-              </svg>
+              <DashboardIcon
+                name="spark"
+                class="size-[18px] drop-shadow-[0_2px_3px_rgba(49,130,246,0.22)] sm:size-5"
+              />
             </span>
             <span class="min-w-0 flex-1">
               <strong
@@ -231,25 +223,13 @@
             @click="$emit('toggle')"
           >
             <span
-              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105"
+              class="flex size-8 sm:size-[34px] shrink-0 items-center justify-center rounded-xl bg-[#EAF9F3] text-[#00a878] shadow-[inset_0_0_0_1px_rgba(0,168,120,0.08)] transition-transform duration-200 group-hover:scale-105"
             >
               <!-- 2. 다음 달 자금마련 선명한 캘린더 SVG -->
-              <svg
-                class="size-4 sm:size-[18px]"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-                <path d="m9 16 2 2 4-4" />
-              </svg>
+              <DashboardIcon
+                name="calendar-check"
+                class="size-[18px] drop-shadow-[0_2px_3px_rgba(0,168,120,0.2)] sm:size-5"
+              />
             </span>
             <span class="min-w-0 flex-1">
               <span class="flex items-center justify-between gap-3">
@@ -291,6 +271,7 @@
 </template>
 
 <script setup>
+import DashboardIcon from '@/pages/dashboard/components/DashboardIcon.vue'
 import { computed } from 'vue'
 import {
   PACE_STATE,
