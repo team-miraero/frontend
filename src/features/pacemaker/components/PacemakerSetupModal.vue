@@ -41,7 +41,7 @@
       <button
         type="button"
         class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-sm font-bold text-white shadow-[0_6px_10px_rgba(0,102,255,0.28)] transition hover:bg-[#005ce6] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-[0.99]"
-        @click="goToPacemakerSetup"
+        @click="goToPacemakerIntro"
       >
         <img src="@/assets/icons/pacemaker-setup-cta.svg" alt="" class="size-[15px]" />
         여유자금 저금통 개설하기
@@ -73,8 +73,8 @@ const emit = defineEmits(['update:modelValue'])
 
 const router = useRouter()
 
-function goToPacemakerSetup() {
+function goToPacemakerIntro() {
   emit('update:modelValue', false)
-  router.push({ name: ROUTE_NAMES.PACEMAKER_SETUP })
+  router.push({ name: ROUTE_NAMES.PACEMAKER })
 }
 </script>

@@ -67,14 +67,14 @@
               </span>
               <span class="min-w-0 flex-1">
                 <span class="flex min-w-0 items-center gap-2 text-[11px] leading-4 text-slate-400">
-                  <span class="shrink-0 font-semibold">{{ account.institutionName }}</span>
+                  <span class="shrink-0 font-medium">{{ account.institutionName }}</span>
                   <span class="truncate text-slate-300">{{ account.maskedAccountNumber }}</span>
                 </span>
-                <span class="block truncate text-[15px] font-bold leading-5 text-[#0a192f]">{{
+                <span class="block truncate text-[15px] font-semibold leading-5 text-[#0a192f]">{{
                   account.accountName
                 }}</span>
                 <span
-                  class="mt-1 block text-lg font-extrabold leading-6 tracking-[-0.015em] text-[#0a192f]"
+                  class="mt-1 block text-lg font-bold leading-6 tracking-[-0.015em] text-[#0a192f]"
                   >{{ formatNumber(account.balance) }}원</span
                 >
               </span>
