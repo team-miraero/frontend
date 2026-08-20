@@ -2,27 +2,34 @@
   <section class="w-full" aria-labelledby="spending-simulator-title">
     <!-- 섹션 헤더 -->
     <div>
-      <div class="flex items-baseline justify-between gap-2">
-        <h2
-          id="spending-simulator-title"
-          class="shrink-0 text-lg font-bold text-[#0A192F] md:text-xl"
-        >
-          절감 시뮬레이터
-        </h2>
+      <div class="flex items-baseline">
+        <div class="flex shrink-0 items-center gap-1.5">
+          <h2 id="spending-simulator-title" class="text-lg font-bold text-[#0A192F] md:text-xl">
+            절감 시뮬레이터
+          </h2>
 
-        <p class="min-w-0 text-right text-xs text-[#64748B] md:text-sm">
-          기준 지출은 최근 3개월 평균 소비예요.
-        </p>
+          <button
+            type="button"
+            class="inline-flex size-[19px] shrink-0 items-center justify-center rounded-full border border-[#CBD5E1] text-[#94A3B8] transition-colors hover:border-[#94A3B8] hover:text-[#64748B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0066FF]/25"
+            aria-label="절감 시뮬레이터 설명 보기"
+            aria-haspopup="dialog"
+            @click="isInfoSheetOpen = true"
+          >
+            <svg viewBox="0 0 18 18" fill="none" class="size-3.5" aria-hidden="true">
+              <path d="M9 8v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              <circle cx="9" cy="5.5" r="0.9" fill="currentColor" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <p class="mt-1 text-center text-xs text-[#64748B]">
-        카테고리를 선택하고 지출을 조절해보세요.
+      <p ref="simulatorInstructionRef" class="mt-2 scroll-mt-2 text-center text-xs text-[#64748B]">
+        카테고리를 선택하고 지출을 조절해보세요
       </p>
     </div>
 
     <!-- 모바일 카테고리 선택 -->
     <div class="mt-4 min-[1400px]:hidden">
-
       <div class="grid grid-cols-3 gap-2">
         <button
           v-for="category in categories"
@@ -35,7 +42,7 @@
               : 'border-slate-200/80 bg-white hover:bg-[#F8FAFC]'
           "
           :aria-pressed="selectedCategoryId === category.id"
-          @click="selectCategory(category.id)"
+          @click="handleSelectCategory(category.id)"
         >
           <SpendingCategoryIcon
             :icon="category.icon"
@@ -66,9 +73,9 @@
           id-prefix="mobile-"
           selected
           @update-target="handleUpdateCategoryTarget"
+          @adjustment-complete="scrollToSimulatorInstruction"
         />
       </div>
-
     </div>
 
     <!-- 넓은 데스크톱 -->
@@ -79,6 +86,7 @@
         :category="category"
         :selected-goal="selectedGoal"
         @update-target="handleUpdateCategoryTarget"
+        @adjustment-complete="scrollToSimulatorInstruction"
       />
     </div>
 
@@ -88,7 +96,7 @@
         class="fixed inset-x-4 bottom-[calc(74px+env(safe-area-inset-bottom))] z-20 mx-auto max-w-[1376px] rounded-xl border px-3 py-2.5 text-center text-sm shadow-[0_4px_18px_rgba(15,35,70,0.08)] transition-all sm:inset-x-6 md:inset-x-8 md:bottom-4 min-[1400px]:static min-[1400px]:max-w-none min-[1400px]:shadow-none"
         :class="
           hasAdjustedInCurrentView
-            ? 'border-primary/15 bg-[#F4F8FF] font-bold text-primary'
+            ? 'border-primary/25 bg-[#EAF2FF] font-bold text-primary'
             : 'border-slate-100 bg-[#F8FBFF] text-xs text-[#94A3B8]'
         "
         role="status"
@@ -97,16 +105,19 @@
         <template v-if="hasAdjustedInCurrentView">
           {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }} 단축
         </template>
-        <template v-else> 슬라이더를 조절하면 전체 단축 기간이 표시돼요. </template>
+        <template v-else> 슬라이더를 조절하면 전체 단축 기간이 표시돼요 </template>
       </div>
     </div>
+
+    <SpendingSimulatorInfoSheet v-model="isInfoSheetOpen" />
   </section>
 </template>
 
 <script setup>
-import { onMounted, ref, toRef, watch } from 'vue'
+import { nextTick, onMounted, ref, toRef, watch } from 'vue'
 import SpendingCategoryCard from '@/features/spending/components/SpendingCategoryCard.vue'
 import SpendingCategoryIcon from '@/features/spending/components/SpendingCategoryIcon.vue'
+import SpendingSimulatorInfoSheet from '@/features/spending/components/SpendingSimulatorInfoSheet.vue'
 import { useSpendingSimulator } from '@/features/spending/composables/useSpendingSimulator'
 import { DEFAULT_SELECTED_GOAL } from '@/features/spending/constants/spending.constants'
 
@@ -133,6 +144,24 @@ const {
 } = useSpendingSimulator(toRef(props, 'summary'))
 
 const hasAdjustedInCurrentView = ref(false)
+const isInfoSheetOpen = ref(false)
+const simulatorInstructionRef = ref(null)
+
+async function scrollToSimulatorInstruction() {
+  await nextTick()
+
+  if (window.matchMedia('(min-width: 1400px)').matches) return
+
+  simulatorInstructionRef.value?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  })
+}
+
+function handleSelectCategory(categoryId) {
+  selectCategory(categoryId)
+  scrollToSimulatorInstruction()
+}
 
 function handleUpdateCategoryTarget(payload) {
   hasAdjustedInCurrentView.value = true
@@ -147,5 +176,4 @@ watch(
   () => props.summary?.referenceMonth,
   () => refreshSimulation()
 )
-
 </script>
