@@ -169,6 +169,10 @@
         </div>
       </div>
     </BaseModal>
+
+    <Transition name="onboarding-arrival">
+      <div v-if="isOnboardingArrival" class="onboarding-arrival" aria-hidden="true" />
+    </Transition>
   </HeroBackground>
 </template>
 
@@ -192,6 +196,9 @@ const authFeatureStore = useAuthFeatureStore()
 const currentStep = ref(1)
 const isSuccessModalOpen = ref(false)
 const emailInputRef = ref(null)
+const isOnboardingArrival = ref(
+  typeof window !== 'undefined' && window.sessionStorage.getItem('miraero-onboarding-transition') === '1'
+)
 
 const form = ref({ email: '', password: '', passwordConfirm: '' })
 const errors = ref({ email: '', password: '', passwordConfirm: '' })
@@ -199,6 +206,10 @@ const agreedTerms = ref(SIGNUP_TERMS.reduce((acc, term) => ({ ...acc, [term.id]:
 
 onMounted(() => {
   authFeatureStore.resetSignupError()
+  if (isOnboardingArrival.value) {
+    window.sessionStorage.removeItem('miraero-onboarding-transition')
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => { isOnboardingArrival.value = false }))
+  }
 })
 
 function handleBack() {
@@ -325,3 +336,7 @@ function goToLogin() {
   })
 }
 </script>
+
+<style scoped>
+.onboarding-arrival{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 50% 48%,#66b2ff 0%,#1677ff 34%,#0066ff 62%,#0054d6 100%);pointer-events:none}.onboarding-arrival-leave-active{transition:opacity .46s ease,filter .46s ease}.onboarding-arrival-leave-to{opacity:0;filter:blur(8px)}
+</style>
