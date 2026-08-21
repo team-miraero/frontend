@@ -2,7 +2,7 @@
 name: "\U0001F41E Bug"
 about: 버그 리포트
 title: "[BUG] "
-labels: bug
+labels: ''
 assignees: ''
 
 ---
