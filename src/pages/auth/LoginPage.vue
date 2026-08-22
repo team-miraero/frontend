@@ -3,7 +3,7 @@
   <HeroBackground>
     <StepHeader :show-back="true" @back="router.push({ name: ROUTE_NAMES.ONBOARDING })" />
 
-    <main class="flex min-h-[calc(100dvh-64px)] items-center justify-center px-4 py-6 sm:py-10">
+    <main class="flex min-h-[calc(100dvh-72px)] items-center justify-center px-4 py-6 sm:py-10">
       <div class="w-full max-w-[420px]">
         <div class="flex flex-col items-center text-center">
           <h1 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-[26px] [word-break:keep-all] break-keep">

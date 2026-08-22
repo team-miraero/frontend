@@ -16,7 +16,7 @@
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
       </div>
-      <p class="text-xs leading-relaxed text-slate-500 sm:text-sm">
+      <p class="text-[13px] leading-relaxed text-slate-500 sm:text-sm">
         미래로는 회원님이 연결한 금융기관의 자산·거래 정보를 바탕으로 맞춤 로드맵과 지출 분석을
         제공해요.
       </p>
@@ -95,20 +95,20 @@
           <span class="flex min-w-0 flex-1 flex-col">
             <span class="flex min-w-0 flex-nowrap items-center gap-1 sm:gap-1.5">
               <span
-                class="shrink-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-bold sm:text-[11px]"
+                class="shrink-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] font-bold sm:text-xs"
                 :class="term.required ? 'bg-blue-50 text-primary' : 'bg-slate-100 text-slate-400'"
               >
                 {{ term.required ? '필수' : '선택' }}
               </span>
               <span
-                class="min-w-0 whitespace-nowrap text-[11px] font-medium tracking-[-0.02em] text-[#0a192f] sm:text-sm sm:tracking-normal"
+                class="min-w-0 truncate whitespace-nowrap text-[13px] font-medium tracking-[-0.02em] text-[#0a192f] sm:text-sm sm:tracking-normal"
               >
                 {{ term.label }}
               </span>
             </span>
             <span
               v-if="term.description"
-              class="mt-0.5 text-xs text-slate-400 [word-break:keep-all]"
+              class="mt-0.5 text-[13px] text-slate-400 [word-break:keep-all]"
             >
               {{ term.description }}
             </span>
@@ -116,7 +116,7 @@
         </label>
         <button
           type="button"
-          class="shrink-0 self-start whitespace-nowrap pt-0.5 text-[11px] font-semibold text-slate-400 transition-colors hover:text-slate-700 sm:text-xs"
+          class="shrink-0 self-start whitespace-nowrap pt-0.5 text-xs font-semibold text-slate-400 transition-colors hover:text-slate-700 sm:text-[13px]"
           @click="openTerm(term)"
         >
           보기

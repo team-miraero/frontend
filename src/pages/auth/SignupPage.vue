@@ -3,10 +3,10 @@
   <HeroBackground>
     <StepHeader :show-back="true" @back="handleBack" />
 
-    <main class="flex min-h-[calc(100dvh-64px)] items-center justify-center px-4 py-2 sm:py-8">
+    <main class="flex min-h-[calc(100dvh-72px)] items-center justify-center px-4 py-2 sm:py-8">
       <div class="w-full max-w-[420px]">
         <!-- 단계 인디케이터 -->
-        <div class="mb-2 flex items-center justify-center gap-1.5 text-xs font-semibold text-primary sm:mb-4">
+        <div class="mb-2 flex items-center justify-center gap-1.5 text-[13px] font-semibold text-primary sm:mb-4">
           <span
             class="flex size-5 items-center justify-center rounded-full text-[11px] font-bold transition-colors"
             :class="currentStep === 1 ? 'bg-primary text-white' : 'bg-blue-100 text-primary'"
@@ -24,10 +24,10 @@
 
         <!-- 헤더 영역 -->
         <div class="flex flex-col items-center text-center">
-          <h1 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl [word-break:keep-all] break-keep">
+          <h1 class="text-[22px] font-bold tracking-tight text-gray-900 sm:text-2xl [word-break:keep-all] break-keep">
             {{ currentStep === 1 ? '미래로 시작하기' : '계정 정보를 입력해 주세요' }}
           </h1>
-          <p class="mt-1 text-xs leading-relaxed text-gray-500 sm:mt-1.5 sm:text-sm [word-break:keep-all] break-keep">
+          <p class="mt-1 text-[13px] leading-relaxed text-gray-500 sm:mt-1.5 sm:text-sm [word-break:keep-all] break-keep">
             {{
               currentStep === 1
                 ? '인증된 정보로 미래로 이용을 등록해요.'
@@ -52,7 +52,7 @@
                 다음
               </BaseButton>
 
-              <p class="mt-3 text-center text-xs text-gray-500 sm:mt-4 sm:text-sm">
+              <p class="mt-3 text-center text-[13px] text-gray-500 sm:mt-4 sm:text-sm">
                 이미 계정이 있으신가요?
                 <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }" class="font-semibold text-primary">
                   로그인
@@ -64,7 +64,7 @@
           <!-- Step 2: 계정 정보 입력 -->
           <div v-else class="space-y-4 sm:space-y-6">
             <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-7 shadow-xs">
-              <h2 class="text-xs font-bold text-gray-900 sm:text-sm">계정 정보</h2>
+              <h2 class="text-sm font-bold text-gray-900">계정 정보</h2>
 
               <div class="mt-2.5 space-y-3 sm:mt-4 sm:space-y-4">
                 <BaseInput
@@ -101,7 +101,7 @@
 
                 <p
                   v-if="isPasswordMatched"
-                  class="flex items-center gap-1 text-[11px] font-medium text-emerald-600 animate-fade-in sm:text-xs"
+                  class="flex items-center gap-1 text-xs font-medium text-emerald-600 animate-fade-in sm:text-[13px]"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="size-3.5">
                     <path d="M20 6 9 17l-5-5" />
@@ -114,7 +114,7 @@
             <div class="space-y-2.5 sm:space-y-3">
               <p
                 v-if="authFeatureStore.signupError"
-                class="text-center text-xs font-medium text-red-500 sm:text-sm [word-break:keep-all] break-keep"
+                class="text-center text-[13px] font-medium text-red-500 sm:text-sm [word-break:keep-all] break-keep"
               >
                 {{ authFeatureStore.signupError }}
               </p>
@@ -129,7 +129,7 @@
                 }}
               </BaseButton>
 
-              <p class="mt-3 text-center text-xs text-gray-500 sm:mt-4 sm:text-sm">
+              <p class="mt-3 text-center text-[13px] text-gray-500 sm:mt-4 sm:text-sm">
                 이미 계정이 있으신가요?
                 <RouterLink
                   :to="{ name: ROUTE_NAMES.LOGIN }"
@@ -150,7 +150,7 @@
         <h2 class="text-xl font-bold tracking-tight text-gray-900 break-keep">
           회원가입이 완료되었어요!
         </h2>
-        <p class="mt-2 text-xs sm:text-sm leading-relaxed text-gray-500 break-keep">
+        <p class="mt-2 text-[13px] sm:text-sm leading-relaxed text-gray-500 break-keep">
           미래로와 함께 나만의 맞춤 로드맵을<br />세우러 가볼까요?
         </p>
 
