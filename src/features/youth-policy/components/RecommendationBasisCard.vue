@@ -1,7 +1,7 @@
 <!-- 조건 일치 정책을 찾는 데 사용한 프로필 정보를 깔끔하게 보여주는 인라인 바 -->
 <template>
   <aside
-    class="mt-2.5 flex flex-col gap-2 rounded-xl border border-blue-100/90 bg-gradient-to-r from-[#f2f7ff] via-[#f8fbff] to-white px-3.5 py-2.5 text-xs shadow-2xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2"
+    class="mt-2.5 flex flex-col gap-2 rounded-xl border border-blue-100/90 bg-[#f5f8ff] px-3.5 py-2.5 text-xs shadow-2xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2"
   >
     <div class="flex items-center justify-between sm:contents">
       <span class="shrink-0 font-bold text-slate-700">적용된 조건:</span>
