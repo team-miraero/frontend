@@ -5,17 +5,17 @@
   >
     <!-- 상단: 키워드 태그 배지 + 마감일 배지 -->
     <div class="flex items-center justify-between gap-2">
-      <div class="flex min-w-0 flex-wrap items-center gap-1.5">
+      <div class="flex min-w-0 max-w-[calc(100%-76px)] flex-wrap items-center gap-1.5">
         <span
           v-if="regionTag"
-          class="shrink-0 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] font-bold text-slate-600"
+          class="max-w-[88px] truncate rounded-md border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] font-bold text-slate-600"
         >
           {{ regionTag }}
         </span>
         <span
           v-for="keyword in keywordTags"
           :key="keyword"
-          class="truncate rounded-md bg-[#eef5ff] px-2.5 py-0.5 text-[11px] font-bold text-primary"
+          class="max-w-[112px] truncate rounded-md bg-[#eef5ff] px-2.5 py-0.5 text-[11px] font-bold text-primary"
         >
           {{ keyword }}
         </span>

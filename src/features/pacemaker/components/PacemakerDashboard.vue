@@ -9,7 +9,7 @@
       <p id="pacemaker-balance-title" class="text-xs font-bold text-white/80">
         페이스메이커 전용 저금통
       </p>
-      <p v-if="pacemaker.maskedAccountNumber" class="mt-0.5 text-xs font-medium text-white/60">
+      <p v-if="pacemaker.maskedAccountNumber" class="mt-0.5 text-xs font-medium text-white/70">
         {{ pacemaker.maskedAccountNumber }}
       </p>
 
@@ -21,7 +21,7 @@
 
       <div class="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-3">
         <div>
-          <p class="text-[11px] font-medium text-white/60">오늘 자동저축</p>
+          <p class="text-[11px] font-medium text-white/70">오늘 자동저축</p>
           <p class="text-sm font-bold">+{{ formatNumber(pacemaker.todaySavingAmount) }}원</p>
         </div>
         <!-- 하루 한도: 영역 자체가 상한선 변경 진입점 -->
@@ -32,7 +32,7 @@
           @click="$emit('edit-max-amount')"
         >
           <span class="min-w-0">
-            <span class="block text-[11px] font-medium text-white/60">하루 한도</span>
+            <span class="block text-[11px] font-medium text-white/70">하루 한도</span>
             <span class="block text-sm font-bold"> {{ formatNumber(pacemaker.maxAmount) }}원 </span>
           </span>
           <svg

@@ -98,7 +98,7 @@
                 />
               </div>
               <div
-                class="flex items-center justify-between text-[10px] font-medium whitespace-nowrap gap-1"
+              class="flex items-center justify-between text-[11px] font-medium whitespace-nowrap gap-1"
               >
                 <span class="text-primary font-bold tabular-nums shrink-0"
                   >{{ segmentProgress(milestone, index) }}% 달성</span
@@ -112,7 +112,7 @@
             <!-- 완료/예정 상태 텍스트 (한 줄 유지) -->
             <div
               v-else
-              class="flex items-center justify-between text-[10px] font-medium text-slate-400 whitespace-nowrap gap-1"
+              class="flex items-center justify-between text-[11px] font-medium text-slate-400 whitespace-nowrap gap-1"
             >
               <span
                 v-if="milestone.status === 'COMPLETED'"

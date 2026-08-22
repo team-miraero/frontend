@@ -57,7 +57,7 @@
           >
             <div class="flex items-center gap-3">
               <NavIcon name="policy" />
-              <strong class="text-sm font-bold text-[#0a192f]">청년 정책 지원금</strong>
+              <strong class="text-sm font-bold text-[#0a192f]">청년 정책</strong>
             </div>
             <svg
               class="size-4 shrink-0 text-slate-300"
