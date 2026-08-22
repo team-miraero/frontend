@@ -27,46 +27,130 @@
         <p class="text-base font-bold text-primary">{{ formatWon(availableBalance) }}</p>
       </div>
 
-      <button
-        type="button"
-        class="flex w-full items-center justify-between rounded-2xl border border-[#c5dcff] bg-[#f8fbff] px-4 py-3.5 text-left disabled:cursor-default"
-        :disabled="isSubmitting || (target?.depositOptions?.length ?? 0) < 2"
-        @click="isAccountListOpen = !isAccountListOpen"
+      <div
+        class="overflow-hidden rounded-2xl border border-[#c5dcff] bg-white transition-colors duration-200"
       >
-        <div>
-          <p class="text-xs text-slate-400">입금할 자산</p>
-          <p class="pt-0.5 text-sm font-bold text-[#0a192f]">
-            {{ selectedOption?.icon }} {{ selectedOption?.accountNickname }}
-          </p>
-          <p class="text-xs text-slate-500">
-            {{ selectedOption?.accountNumberMasked }}
-          </p>
-        </div>
-        <p v-if="selectedOption?.accountBalance != null" class="text-sm font-bold text-[#0a192f]">
-          {{ formatWon(selectedOption.accountBalance) }}
-        </p>
-      </button>
-
-      <div v-if="isAccountListOpen" class="flex flex-col gap-2">
         <button
-          v-for="option in target?.depositOptions ?? []"
-          :key="`${option.assetType}-${option.assetId}`"
+          id="deposit-asset-trigger"
           type="button"
-          class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left"
-          :class="isSameOption(option, selectedOption) ? 'border-[#c5dcff]' : ''"
-          :disabled="isSubmitting"
-          @click="selectOption(option)"
+          class="flex w-full items-center justify-between gap-3 bg-[#f8fbff] px-4 py-3.5 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="isSubmitting || !(target?.depositOptions?.length > 0)"
+          :aria-expanded="isAccountListOpen"
+          aria-controls="deposit-asset-listbox"
+          aria-haspopup="listbox"
+          @click="toggleAccountList"
+          @keydown.enter.prevent="toggleAccountList"
+          @keydown.space.prevent="toggleAccountList"
+          @keydown.down.prevent="handleAccountTriggerArrow(1)"
+          @keydown.up.prevent="handleAccountTriggerArrow(-1)"
+          @keydown.esc.stop.prevent="closeAccountList"
         >
-          <span>
-            <span class="block text-sm font-bold text-[#0a192f]"
-              >{{ option.icon }} {{ option.accountNickname }}</span
-            >
-            <span class="block text-xs text-slate-400">{{ option.accountNumberMasked }}</span>
+          <span class="min-w-0">
+            <span class="block text-xs text-slate-400">입금할 자산</span>
+            <span class="block truncate pt-0.5 text-sm font-bold text-[#0a192f]">
+              {{ selectedOption?.icon }} {{ selectedOption?.accountNickname }}
+            </span>
+            <span class="block truncate text-xs text-slate-500">
+              {{ selectedOption?.accountNumberMasked }}
+            </span>
           </span>
-          <span class="text-sm font-bold text-primary">{{
-            formatWon(option.accountBalance)
-          }}</span>
+          <span class="flex shrink-0 items-center gap-2.5">
+            <span
+              v-if="selectedOption?.accountBalance != null"
+              class="text-sm font-bold text-[#0a192f]"
+            >
+              {{ formatWon(selectedOption.accountBalance) }}
+            </span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-4 text-slate-400 transition-transform duration-200"
+              :class="isAccountListOpen ? 'rotate-180' : ''"
+              aria-hidden="true"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </span>
         </button>
+
+        <Transition name="deposit-asset-accordion">
+          <div
+            v-if="isAccountListOpen"
+            id="deposit-asset-listbox"
+            class="deposit-asset-accordion-panel"
+            role="listbox"
+            aria-label="입금할 연결 자산 선택"
+          >
+            <div class="min-h-0">
+              <div class="border-t border-slate-200/80">
+                <button
+                  v-for="(option, optionIndex) in target?.depositOptions ?? []"
+                  :id="accountOptionId(optionIndex)"
+                  :key="`${option.assetType}-${option.assetId}`"
+                  type="button"
+                  role="option"
+                  class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left outline-none transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60"
+                  :class="[
+                    optionIndex > 0 ? 'border-t border-slate-200/70' : '',
+                    isSameOption(option, selectedOption)
+                      ? 'bg-primary/[0.06] focus-visible:bg-primary/[0.08]'
+                      : 'bg-white hover:bg-slate-50 active:bg-slate-100 focus-visible:bg-slate-50',
+                    'focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/15',
+                  ]"
+                  :aria-selected="isSameOption(option, selectedOption)"
+                  :tabindex="focusedOptionIndex === optionIndex ? 0 : -1"
+                  :disabled="isSubmitting"
+                  @click="selectOption(option)"
+                  @focus="focusedOptionIndex = optionIndex"
+                  @keydown.down.prevent="moveAccountFocus(optionIndex, 1)"
+                  @keydown.up.prevent="moveAccountFocus(optionIndex, -1)"
+                  @keydown.home.prevent="focusAccountOption(0)"
+                  @keydown.end.prevent="
+                    focusAccountOption((target?.depositOptions?.length ?? 1) - 1)
+                  "
+                  @keydown.enter.prevent="selectOption(option)"
+                  @keydown.space.prevent="selectOption(option)"
+                  @keydown.esc.stop.prevent="closeAccountList(true)"
+                >
+                  <span class="flex min-w-0 items-center gap-2">
+                    <span
+                      class="flex size-4 shrink-0 items-center justify-center text-primary"
+                      aria-hidden="true"
+                    >
+                      <svg
+                        v-if="isSameOption(option, selectedOption)"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="size-3.5"
+                      >
+                        <path d="m5 12 4 4L19 6" />
+                      </svg>
+                    </span>
+                    <span class="min-w-0">
+                      <span class="block truncate text-sm font-bold text-[#0a192f]">
+                        {{ option.icon }} {{ option.accountNickname }}
+                      </span>
+                      <span class="block truncate text-xs text-slate-400">
+                        {{ option.accountNumberMasked }}
+                      </span>
+                    </span>
+                  </span>
+                  <span class="shrink-0 text-sm font-bold tabular-nums text-[#0a192f]">
+                    {{ formatWon(option.accountBalance) }}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </Transition>
       </div>
 
       <div>
@@ -137,7 +221,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
 import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
@@ -175,6 +259,7 @@ const QUICK_ADD_CHIPS = [
 const amountInput = ref('0')
 const isAccountListOpen = ref(false)
 const selectedOption = ref(null)
+const focusedOptionIndex = ref(-1)
 
 const amount = computed(() => Number(amountInput.value) || 0)
 const isOverLimit = computed(() => amount.value > props.availableBalance)
@@ -198,6 +283,7 @@ watch(
         props.target?.depositOptions?.[0] ??
         null
       isAccountListOpen.value = false
+      focusedOptionIndex.value = -1
     }
   }
 )
@@ -206,9 +292,69 @@ function isSameOption(a, b) {
   return a != null && b != null && a.assetId === b.assetId && a.assetType === b.assetType
 }
 
+function accountOptionId(optionIndex) {
+  return `deposit-asset-option-${optionIndex}`
+}
+
+function selectedOptionIndex() {
+  const selectedIndex = props.target?.depositOptions?.findIndex((option) =>
+    isSameOption(option, selectedOption.value)
+  )
+  return Math.max(0, selectedIndex ?? 0)
+}
+
+async function focusAccountOption(optionIndex) {
+  const optionCount = props.target?.depositOptions?.length ?? 0
+  if (optionCount === 0) return
+
+  const nextIndex = Math.min(Math.max(optionIndex, 0), optionCount - 1)
+  focusedOptionIndex.value = nextIndex
+  await nextTick()
+  document.getElementById(accountOptionId(nextIndex))?.focus()
+}
+
+async function openAccountList() {
+  if (!(props.target?.depositOptions?.length > 0) || props.isSubmitting) return
+  isAccountListOpen.value = true
+  await focusAccountOption(selectedOptionIndex())
+}
+
+function toggleAccountList() {
+  if (isAccountListOpen.value) {
+    closeAccountList()
+    return
+  }
+  openAccountList()
+}
+
+function handleAccountTriggerArrow(direction) {
+  if (!isAccountListOpen.value) {
+    openAccountList()
+    return
+  }
+  moveAccountFocus(focusedOptionIndex.value, direction)
+}
+
+function moveAccountFocus(currentIndex, direction) {
+  const optionCount = props.target?.depositOptions?.length ?? 0
+  if (optionCount === 0) return
+  const nextIndex = (currentIndex + direction + optionCount) % optionCount
+  focusAccountOption(nextIndex)
+}
+
+async function closeAccountList(returnFocus = false) {
+  if (!isAccountListOpen.value) return
+  isAccountListOpen.value = false
+  focusedOptionIndex.value = -1
+  if (!returnFocus) return
+
+  await nextTick()
+  document.getElementById('deposit-asset-trigger')?.focus()
+}
+
 function selectOption(option) {
   selectedOption.value = option
-  isAccountListOpen.value = false
+  closeAccountList(true)
 }
 
 function handleAmountInput(event) {
@@ -239,3 +385,31 @@ function formatWon(value) {
   return `${value.toLocaleString()}원`
 }
 </script>
+
+<style scoped>
+.deposit-asset-accordion-panel {
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+}
+
+.deposit-asset-accordion-enter-active,
+.deposit-asset-accordion-leave-active {
+  transition:
+    grid-template-rows 180ms ease,
+    opacity 160ms ease;
+}
+
+.deposit-asset-accordion-enter-from,
+.deposit-asset-accordion-leave-to {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deposit-asset-accordion-enter-active,
+  .deposit-asset-accordion-leave-active {
+    transition: none;
+  }
+}
+</style>

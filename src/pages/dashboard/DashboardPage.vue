@@ -28,6 +28,28 @@
           </button>
         </div>
 
+        <div
+          v-if="hasPacemakerDataError"
+          class="flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"
+          role="status"
+        >
+          <p class="text-xs font-bold text-amber-700">
+            {{
+              pacemakerStore.statusError
+                ? '페이스메이커 상태를 불러오지 못했어요.'
+                : '페이스메이커 일부 정보를 불러오지 못했어요.'
+            }}
+          </p>
+          <button
+            type="button"
+            class="shrink-0 text-xs font-bold text-amber-800 disabled:opacity-50"
+            :disabled="isPacemakerDataLoading"
+            @click="loadPacemakerData"
+          >
+            {{ isPacemakerDataLoading ? '불러오는 중…' : '다시 시도' }}
+          </button>
+        </div>
+
         <!-- 1. 상단 통합 현황 카드 (PaceBanner: 진행 중/일시정지 상태 및 재개 토글 내장) -->
         <div>
           <PaceBanner
@@ -44,6 +66,8 @@
             :monthly-available-money="goalStore.monthlyAvailableMoney"
             :pacemaker="displayedPacemaker"
             :is-toggling="pacemakerStore.isToggling"
+            :pacemaker-error="hasPacemakerDataError"
+            :pacemaker-status-unavailable="isPacemakerStatusUnavailable"
             @cta-click="handlePacemakerCtaClick"
             @toggle="handlePacemakerToggle"
             @pause="openPauseConfirm"
@@ -229,6 +253,7 @@ const selectedMilestone = ref(null)
 const achievementErrorMessage = ref('')
 const previousProgressRate = ref(null)
 const roadmapSectionRef = ref(null)
+const isPacemakerDataLoading = ref(false)
 
 const EMPTY_DAILY_AVAILABLE_MONEY = Object.freeze({
   todayAvailableMoney: 0,
@@ -286,6 +311,19 @@ const hasSupplementaryError = computed(
   () =>
     Object.keys(goalStore.dashboardSupplementaryErrors).length > 0 || Boolean(roadmapStore.error)
 )
+const hasPacemakerDataError = computed(
+  () =>
+    Boolean(pacemakerStore.statusError) ||
+    (pacemakerStore.pacemakerStatus?.registered === true &&
+      (Boolean(pacemakerStore.dashboardError) || Boolean(pacemakerStore.historiesError)))
+)
+const isPacemakerStatusUnavailable = computed(
+  () =>
+    isPacemakerDataLoading.value ||
+    pacemakerStore.isStatusLoading ||
+    Boolean(pacemakerStore.statusError) ||
+    typeof pacemakerStore.pacemakerStatus?.registered !== 'boolean'
+)
 
 // 화면 표시(배지/문구/CTA)와 클릭 동작이 서로 다른 상태값을 보고 어긋나지 않도록,
 // PaceBanner가 쓰는 것과 동일한 파생 상태를 여기서도 단일하게 계산해 재사용한다.
@@ -336,6 +374,8 @@ function handleOpenShareGoal() {
 
 // 대시보드 카드의 작은 토글 스위치: 개설됐으면 그냥 ON/OFF, 안 됐으면 개설 안내 모달
 function handlePacemakerToggle() {
+  if (isPacemakerStatusUnavailable.value) return
+
   if (displayedPacemaker.value?.registered) {
     pacemakerStore.togglePacemaker()
   } else {
@@ -351,6 +391,8 @@ function handlePacemakerCtaClick() {
     openPacemakerAssistFlow()
     return
   }
+
+  if (isPacemakerStatusUnavailable.value) return
 
   if (!displayedPacemaker.value?.registered) {
     openPacemakerModal()
@@ -476,6 +518,25 @@ async function retrySupplementaryData() {
   ])
 }
 
+async function loadPacemakerData() {
+  if (isPacemakerDataLoading.value) return
+
+  isPacemakerDataLoading.value = true
+  try {
+    const status = await pacemakerStore.fetchPacemakerStatus()
+    if (!status.registered) return
+
+    await Promise.allSettled([
+      pacemakerStore.fetchPacemakerDashboard(),
+      pacemakerStore.fetchHistories({ page: 0, size: PACEMAKER_HISTORY_PAGE_SIZE }),
+    ])
+  } catch {
+    // Store 오류 상태를 통해 대시보드에서 재시도 UI를 유지한다.
+  } finally {
+    isPacemakerDataLoading.value = false
+  }
+}
+
 // 목표/로드맵/페이스메이커 상태를 모두 확인한 뒤에야 메인 로딩을 끝낸다 — 페이스메이커 상태
 // 확인이 끝나기 전에 화면부터 보이면, 이미 등록된 사용자에게도 잠깐 "미등록"처럼 보이거나
 // 그 순간 버튼을 누르면 잘못된 설정 모달이 열릴 수 있다.
@@ -489,17 +550,7 @@ onMounted(async () => {
     const hasGoal = await loadGoalDashboard(goalId)
     if (!hasGoal) return
 
-    await pacemakerStore.fetchPacemakerStatus().catch(() => undefined)
-
-    const pacemakerRequests = []
-    if (pacemakerStore.pacemakerStatus?.registered) {
-      pacemakerRequests.push(
-        pacemakerStore.fetchPacemakerDashboard(),
-        pacemakerStore.fetchHistories({ page: 0, size: PACEMAKER_HISTORY_PAGE_SIZE })
-      )
-    }
-
-    await Promise.all(pacemakerRequests.map((request) => request.catch(() => undefined)))
+    await loadPacemakerData()
   } finally {
     isPageLoading.value = false
   }

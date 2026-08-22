@@ -34,16 +34,13 @@
         </button>
       </div>
       <div
-        v-for="item in error || isLoading ? [] : itemsWithBalance"
+        v-for="item in error || isLoading ? [] : histories"
         :key="item.date"
         class="flex items-center justify-between border-b border-slate-100 py-3 last:border-b-0"
       >
         <div>
           <p class="text-xs font-bold text-[#0a192f]">{{ formatDate(item.date) }}</p>
           <p class="pt-0.5 text-xs text-slate-400">{{ describeHistory(item) }}</p>
-          <p v-if="item.status === 'SAVED'" class="pt-0.5 text-[11px] text-slate-400">
-            잔액 {{ formatWon(item.balanceAfter) }}
-          </p>
         </div>
         <p
           class="text-sm font-bold"
@@ -71,10 +68,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import BaseModal from '@/shared/ui/BaseModal.vue'
 
-const props = defineProps({
+defineProps({
   modelValue: {
     type: Boolean,
     default: false,
@@ -82,11 +78,6 @@ const props = defineProps({
   histories: {
     type: Array,
     default: () => [],
-  },
-  // 목록 맨 위(가장 최근) 항목 적용 후의 현재 저금통 잔액. 각 행의 잔액을 거슬러 계산하는 기준값.
-  currentBalance: {
-    type: Number,
-    default: 0,
   },
   isLoading: {
     type: Boolean,
@@ -98,16 +89,6 @@ const props = defineProps({
   },
 })
 defineEmits(['update:modelValue', 'retry'])
-
-// histories는 최신 날짜가 먼저 오므로, 현재 잔액에서 역순으로 각 저축 이후 시점의 잔액을 복원한다.
-const itemsWithBalance = computed(() => {
-  let runningBalance = props.currentBalance
-  return props.histories.map((item) => {
-    const balanceAfter = runningBalance
-    if (item.status === 'SAVED') runningBalance -= item.amount ?? 0
-    return { ...item, balanceAfter }
-  })
-})
 
 function describeHistory(item) {
   if (item.description) return item.description

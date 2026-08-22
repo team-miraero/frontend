@@ -182,8 +182,12 @@
           <button
             type="button"
             class="group flex w-full items-center gap-3.5 rounded-xl py-1 text-left transition active:scale-[0.98] cursor-pointer select-none sm:py-1.5"
-            :class="disabled ? 'pointer-events-none opacity-45' : ''"
-            :disabled="disabled"
+            :class="
+              disabled || (pacemakerStatusUnavailable && paceState !== PACE_STATE.BEHIND)
+                ? 'pointer-events-none opacity-45'
+                : ''
+            "
+            :disabled="disabled || (pacemakerStatusUnavailable && paceState !== PACE_STATE.BEHIND)"
             @click="$emit('cta-click')"
           >
             <span
@@ -219,7 +223,7 @@
             type="button"
             class="group flex w-full items-center gap-3 rounded-xl py-1 text-left disabled:cursor-not-allowed disabled:opacity-60 transition active:scale-[0.98] select-none cursor-pointer"
             :class="disabled ? 'pointer-events-none opacity-45' : ''"
-            :disabled="isToggling || disabled"
+            :disabled="isToggling || disabled || pacemakerStatusUnavailable"
             @click="$emit('toggle')"
           >
             <span
@@ -244,7 +248,9 @@
                     "
                   >
                     {{
-                      pacemaker?.enabled
+                      pacemakerError
+                        ? '페이스메이커 정보를 불러오지 못했어요'
+                        : pacemaker?.enabled
                         ? `이번달 +${formatWon(pacemaker.monthlySecuredAmount)} 자동 확보`
                         : '하루 여유자금으로 자동 저축'
                     }}
@@ -294,6 +300,8 @@ const props = defineProps({
   monthlyAvailableMoney: { type: Object, default: null },
   pacemaker: { type: Object, default: null },
   isToggling: { type: Boolean, default: false },
+  pacemakerError: { type: Boolean, default: false },
+  pacemakerStatusUnavailable: { type: Boolean, default: false },
 })
 
 // 월 페이스/누적 진행률 계산에 필요한 원본 데이터를 하나로 묶은 goal-like 객체

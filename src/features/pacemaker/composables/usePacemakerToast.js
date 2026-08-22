@@ -86,13 +86,35 @@ export function usePacemakerToast() {
   }
 
   /**
+   * 여유자금은 대시보드 화면이 채우는 값이라 알림이 먼저 실행되면 아직 비어 있다.
+   * 그 상태로 0으로 판단하면 💰 알림만 타이밍 때문에 빠지므로 여기서 직접 확보한다.
+   * @returns {Promise<boolean | null>} true=확보함, false=조회할 목표가 없음,
+   *   null=일시적인 오류로 확인하지 못함
+   */
+  const ensureDailyAvailableMoney = async (goalStore, forceRefresh) => {
+    if (goalStore.selectedGoalId === null) {
+      await goalStore.fetchGoals(forceRefresh)
+      if (goalStore.goalsError) return null
+    }
+
+    const goalId = goalStore.selectedGoalId
+    if (goalId === null) return false
+
+    await goalStore.fetchSupplementaryDashboardData(goalId)
+    if (goalStore.dashboardSupplementaryErrors.dailyAvailableMoney) return null
+
+    return true
+  }
+
+  /**
    * 💰, 🔥 큼직한 이모지 뱃지 알림 2종 발송.
    * 문구에 실제 저축 금액이 들어가므로, 데이터를 확보한 뒤에만 발송한다.
    * (예전에는 데이터가 없으면 예시 숫자를 그대로 노출했다)
+   * @param {{ forceRefresh?: boolean }} [options] 날짜 변경 후 전날 대시보드 캐시를 무시할지 여부
    * @returns {Promise<boolean | null>} true=발송함, false=정상적으로 알릴 내용이 없음,
    *   null=일시적인 오류로 확인하지 못함 (호출부가 나중에 다시 시도할 수 있도록 구분해서 알려준다)
    */
-  const showDualNotifications = async () => {
+  const showDualNotifications = async ({ forceRefresh = false } = {}) => {
     const pacemakerStore = usePacemakerStore()
     const goalStore = useGoalStore()
     const sessionVersion = getToastSessionVersion()
@@ -108,7 +130,8 @@ export function usePacemakerToast() {
     }
     if (!status?.registered) return false
 
-    if (!pacemakerStore.pacemakerDashboard) {
+    // 날짜가 바뀐 뒤에는 전날의 todaySaving 캐시를 사용하면 안 되므로 대시보드를 강제로 갱신한다.
+    if (forceRefresh || !pacemakerStore.pacemakerDashboard) {
       try {
         await pacemakerStore.fetchPacemakerDashboard()
       } catch {
@@ -121,7 +144,10 @@ export function usePacemakerToast() {
     // null일 때만 저축 내역을 받아 계산하는데, 이때 조회가 실패하면 폴백이 조용히 0으로 깔려
     // 실제로는 스트릭이 있는데도 🔥 알림이 빠질 수 있다 — 그 상태로 "오늘 확인함"을 기록하지
     // 않도록 실패를 null로 알려 호출부가 나중에 다시 시도하게 한다.
-    if (pacemakerStore.pacemakerDashboard.currentStreak == null && !pacemakerStore.histories.length) {
+    if (
+      pacemakerStore.pacemakerDashboard.currentStreak == null &&
+      (forceRefresh || !pacemakerStore.histories.length)
+    ) {
       try {
         await pacemakerStore.fetchHistories({ page: 0, size: PACEMAKER_HISTORY_PAGE_SIZE })
       } catch {
@@ -129,7 +155,15 @@ export function usePacemakerToast() {
       }
     }
 
-    const { currentStreak, moneyBoxBalance } = pacemakerStore.pacemakerView
+    // 두 알림의 데이터 출처가 달라 한쪽만 준비된 채로 판단하면 나머지 하나가 조용히 빠진다.
+    // 여유자금까지 확보한 뒤에 두 조건을 함께 평가한다.
+    if (forceRefresh || !goalStore.dailyAvailableMoney) {
+      if ((await ensureDailyAvailableMoney(goalStore, forceRefresh)) === null) return null
+    }
+
+    const { currentStreak, todaySavingAmount: rawTodaySavingAmount } = pacemakerStore.pacemakerView
+    const todaySavingAmount = Number(rawTodaySavingAmount ?? 0)
+    const savedToday = pacemakerStore.pacemakerDashboard.todaySaving?.saved === true
     const todayAvailableMoney = Number(goalStore.dailyAvailableMoney?.todayAvailableMoney ?? 0)
 
     // 목표 대시보드에 표시되는 오늘 여유자금을 동일한 출처로 알린다.
@@ -143,12 +177,14 @@ export function usePacemakerToast() {
         body: '오늘 사용 가능한 금액을 계산했어요!',
       })
     }
-    if (currentStreak > 0) {
+    // 어제까지의 기록만으로도 스트릭은 유지될 수 있으므로, 오늘 자동저축이 실제로 성공했고
+    // 유효한 저축액이 있을 때만 "오늘 확보 완료" 알림을 만든다.
+    if (currentStreak > 0 && savedToday && todaySavingAmount > 0) {
       toasts.push({
         type: 'STREAK',
         badgeIcon: '🔥',
         title: `연속 ${currentStreak}일째 페이스 달성 중!`,
-        body: `오늘도 저금통에 여유자금 ${formatWon(moneyBoxBalance)} 확보 완료!`,
+        body: `오늘도 저금통에 여유자금 ${formatWon(todaySavingAmount)} 확보 완료!`,
       })
     }
     if (!toasts.length) return false
