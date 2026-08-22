@@ -137,7 +137,11 @@
           aria-label="대화 목록 열기"
           @click="coachStore.toggleSidebar()"
         >
-          <AppIcon name="message" size="md" :stroke-width="1.8" />
+          <img
+            src="@/assets/icons/goal-paused-clock.svg"
+            alt=""
+            class="size-5"
+          />
         </button>
 
         <!-- 🔔 모바일 알림 종 아이콘 & 알림 드롭다운 -->

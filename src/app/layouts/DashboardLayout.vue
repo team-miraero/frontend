@@ -19,6 +19,7 @@
       <DashboardFooter v-if="!route.meta.hideHeader && !route.meta.hideFooter && !route.meta.fixedHeight" />
     </main>
     <DashboardBottomNav v-if="!route.meta.hideHeader && !route.meta.hideBottomNav" />
+    <AICoachFloatingButton />
   </div>
 </template>
 
@@ -27,6 +28,7 @@ import { useRoute, RouterView } from 'vue-router'
 import DashboardHeader from '@/app/layouts/components/DashboardHeader.vue'
 import DashboardSidebar from '@/app/layouts/components/DashboardSidebar.vue'
 import DashboardBottomNav from '@/app/layouts/components/DashboardBottomNav.vue'
+import AICoachFloatingButton from '@/app/layouts/components/AICoachFloatingButton.vue'
 import DashboardFooter from '@/app/layouts/components/DashboardFooter.vue'
 
 const route = useRoute()
