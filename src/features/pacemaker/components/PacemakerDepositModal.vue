@@ -28,12 +28,12 @@
       </div>
 
       <div
-        class="overflow-hidden rounded-2xl border border-[#c5dcff] bg-white transition-colors duration-200"
+        class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition-colors duration-200"
       >
         <button
           id="deposit-asset-trigger"
           type="button"
-          class="flex w-full items-center justify-between gap-3 bg-[#f8fbff] px-4 py-3.5 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-60"
+          class="flex w-full items-center justify-between gap-3 bg-slate-50 px-4 py-3.5 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="isSubmitting || !(target?.depositOptions?.length > 0)"
           :aria-expanded="isAccountListOpen"
           aria-controls="deposit-asset-listbox"
@@ -159,8 +159,8 @@
           v-model="amountInput"
           type="text"
           inputmode="numeric"
-          class="w-full rounded-2xl border bg-[#f7faff] px-5 py-4 text-right text-xl font-bold text-[#0a192f] outline-none"
-          :class="isOverLimit ? 'border-[#fbcfe8]' : 'border-[#9dc0f5]'"
+          class="w-full rounded-2xl border bg-white px-5 py-4 text-right text-xl font-bold text-[#0a192f] outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"
+          :class="isOverLimit ? 'border-[#fbcfe8]' : 'border-slate-300'"
           :disabled="isSubmitting"
           @input="handleAmountInput"
         />
@@ -253,7 +253,7 @@ const QUICK_ADD_CHIPS = [
   { label: '+5만', amount: 50000 },
   { label: '+10만', amount: 100000 },
   { label: '+20만', amount: 200000 },
-  { label: '전체입금', full: true },
+  { label: '전액', full: true },
 ]
 
 const amountInput = ref('0')
