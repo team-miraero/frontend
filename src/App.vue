@@ -70,12 +70,13 @@ import {
 import { useAuthStore } from '@/stores/auth.store'
 import { useGoalStore } from '@/features/goal'
 import { useModal } from '@/shared/composables/useModal'
-import { getLocalDateKey } from '@/shared/lib/date'
+import { useLocalDateClock } from '@/shared/composables/useLocalDateClock'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { localDateKey: currentLocalDateKey } = useLocalDateClock()
 const { requestPermission } = usePacemakerNotification()
 const {
   selectedDepositTarget,
@@ -171,19 +172,19 @@ function noticeStorageKey() {
 
 // [초기 접속 / 로그인 직후 1회 발송]
 // 알림 문구에 실제 저축 금액이 들어가므로 로그인 후 대시보드 영역에서만 발송한다.
-async function runDailyNotice() {
+async function runDailyNotice({ forceRefresh = false } = {}) {
   if (isDailyNoticeChecked) return
   if (!authStore.accessToken || !isDashboardRoute.value) return
   isDailyNoticeChecked = true
 
-  const TODAY_DATE = getLocalDateKey(new Date())
+  const TODAY_DATE = currentLocalDateKey.value
   const lastNoticeDate = localStorage.getItem(noticeStorageKey())
 
   // 💡 개발 환경(npm run dev)에서는 새로고침마다 팀원들이 언제든 테스트 가능하도록 발송하고,
   // 💡 실서비스 배포 환경에서는 오늘 하루 아직 보지 않은 경우 1회만 발송!
   if (!import.meta.env.DEV && lastNoticeDate === TODAY_DATE) return
 
-  const hasNotified = await showDualNotifications()
+  const hasNotified = await showDualNotifications({ forceRefresh })
   if (hasNotified === null) {
     // 일시적인 오류로 확인하지 못했다 — 다음 라우트 전환 때 다시 시도할 수 있게 둔다.
     isDailyNoticeChecked = false
@@ -213,6 +214,7 @@ watch(
     authStore.accessToken,
     isDashboardRoute.value,
     goalStore.value.dailyAvailableMoney?.todayAvailableMoney,
+    route.path,
   ],
   ([token]) => {
     if (!token) {
@@ -230,6 +232,13 @@ watch(
     runDailyNotice()
   }
 )
+
+// 앱을 종료하지 않고 자정을 넘겨도 다음 날 알림을 다시 확인한다.
+// 이때 전날의 todaySaving 캐시가 남아 있을 수 있으므로 서버 데이터를 강제로 갱신한다.
+watch(currentLocalDateKey, () => {
+  isDailyNoticeChecked = false
+  runDailyNotice({ forceRefresh: true })
+})
 
 // [페이지 이동 시] 퍼널/로그인 화면일 때만 알림을 지우고, 대시보드 간 이동 시엔 떠 있던 알림이 유지됨
 watch(

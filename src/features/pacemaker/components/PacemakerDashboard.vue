@@ -14,16 +14,15 @@
       </p>
 
       <p class="mt-4 text-[32px] font-bold leading-none tracking-tight sm:text-[34px]">
-        {{ formatNumber(pacemaker.moneyBoxBalance) }}<span class="ml-1 text-lg font-semibold">원</span>
+        {{ formatNumber(pacemaker.moneyBoxBalance)
+        }}<span class="ml-1 text-lg font-semibold">원</span>
       </p>
       <p class="mt-1.5 text-xs text-white/70">현재 모인 금액</p>
 
       <div class="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-3">
         <div>
           <p class="text-[11px] font-medium text-white/60">오늘 자동저축</p>
-          <p class="text-sm font-bold">
-            +{{ formatNumber(pacemaker.todaySavingAmount) }}원
-          </p>
+          <p class="text-sm font-bold">+{{ formatNumber(pacemaker.todaySavingAmount) }}원</p>
         </div>
         <!-- 하루 한도: 영역 자체가 상한선 변경 진입점 -->
         <button
@@ -34,9 +33,7 @@
         >
           <span class="min-w-0">
             <span class="block text-[11px] font-medium text-white/60">하루 한도</span>
-            <span class="block text-sm font-bold">
-              {{ formatNumber(pacemaker.maxAmount) }}원
-            </span>
+            <span class="block text-sm font-bold"> {{ formatNumber(pacemaker.maxAmount) }}원 </span>
           </span>
           <svg
             class="size-3.5 shrink-0 text-white/50 transition group-hover:text-white/80"
@@ -142,7 +139,10 @@
           </span>
         </div>
         <p class="text-[11px] font-medium text-slate-400">
-          {{ isMonthlyStreak ? '클릭하여 이번 주 기록으로 접기' : '클릭하여 이번 달 기록으로 펼치기' }} · {{ formatTodayLabel }} 기준
+          {{
+            isMonthlyStreak ? '클릭하여 이번 주 기록으로 접기' : '클릭하여 이번 달 기록으로 펼치기'
+          }}
+          · {{ formatTodayLabel }} 기준
         </p>
       </div>
 
@@ -266,40 +266,113 @@
             </button>
           </div>
 
-          <!-- 연결된 자산 (여러 개면 선택 가능) -->
-          <button
-            type="button"
-            class="rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-2.5 text-left disabled:cursor-default"
-            :disabled="(group.depositAssets?.length ?? 0) < 2"
-            :aria-expanded="expandedGoalId === group.goalId"
-            @click="toggleAssetList(group.goalId)"
+          <!-- 페이스메이커 입금에 사용할 연결 자산 선택 -->
+          <div
+            class="overflow-hidden rounded-xl border border-slate-200/80 bg-white transition-colors duration-200"
           >
-            <span class="block text-[11px] font-medium text-slate-400">연결된 자산</span>
-            <span class="mt-0.5 flex items-center justify-between gap-2">
-              <span class="truncate text-sm font-bold text-[#0a192f]">
-                {{ depositAssetName(selectedDepositAsset(group)) }}
-              </span>
-              <span v-if="(group.depositAssets?.length ?? 0) > 1" class="text-xs text-slate-400">
-                {{ expandedGoalId === group.goalId ? '⌃' : '⌄' }}
-              </span>
-            </span>
-          </button>
-
-          <div v-if="expandedGoalId === group.goalId" class="grid gap-2">
             <button
-              v-for="asset in selectableAssets(group)"
-              :key="`${asset.assetType}-${asset.assetId}`"
+              :id="assetTriggerId(group.goalId)"
               type="button"
-              class="w-full rounded-xl border border-[#edf2ff] bg-white px-3 py-2.5 text-left"
-              @click="selectDepositAsset(group.goalId, asset)"
+              class="flex w-full items-center justify-between gap-3 bg-slate-50/80 px-3 py-2.5 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/15"
+              :aria-expanded="expandedGoalId === group.goalId"
+              :aria-controls="assetListId(group.goalId)"
+              aria-haspopup="listbox"
+              @click="toggleAssetList(group)"
+              @keydown.enter.prevent="toggleAssetList(group)"
+              @keydown.space.prevent="toggleAssetList(group)"
+              @keydown.down.prevent="handleAssetTriggerArrow(group, 1)"
+              @keydown.up.prevent="handleAssetTriggerArrow(group, -1)"
+              @keydown.esc.stop.prevent="closeAssetList(group.goalId)"
             >
-              <span class="block truncate text-xs text-slate-400">
-                {{ depositAssetName(asset) }}
+              <span class="min-w-0">
+                <span class="block text-[11px] font-medium text-slate-400">연결 자산 선택</span>
+                <span class="mt-0.5 block truncate text-sm font-bold text-[#0a192f]">
+                  {{ depositAssetName(selectedDepositAsset(group)) }}
+                </span>
               </span>
-              <span class="mt-0.5 block text-sm font-bold text-primary">
-                {{ formatCompactWon(asset.balance) }}
-              </span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="size-4 shrink-0 text-slate-400 transition-transform duration-200"
+                :class="expandedGoalId === group.goalId ? 'rotate-180' : ''"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </button>
+
+            <Transition name="asset-accordion">
+              <div
+                v-if="expandedGoalId === group.goalId"
+                :id="assetListId(group.goalId)"
+                class="asset-accordion-panel"
+                role="listbox"
+                :aria-label="`${group.goalName} 연결 자산 선택`"
+              >
+                <div class="min-h-0">
+                  <div class="border-t border-slate-200/80">
+                    <button
+                      v-for="(asset, assetIndex) in group.depositAssets ?? []"
+                      :id="assetOptionId(group.goalId, assetIndex)"
+                      :key="`${asset.assetType}-${asset.assetId}`"
+                      type="button"
+                      role="option"
+                      class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left outline-none transition-colors duration-150"
+                      :class="[
+                        assetIndex > 0 ? 'border-t border-slate-200/70' : '',
+                        isSelectedAsset(group, asset)
+                          ? 'bg-primary/[0.06] focus-visible:bg-primary/[0.08]'
+                          : 'bg-white hover:bg-slate-50 active:bg-slate-100 focus-visible:bg-slate-50',
+                        'focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/15',
+                      ]"
+                      :aria-selected="isSelectedAsset(group, asset)"
+                      :tabindex="focusedAssetIndex === assetIndex ? 0 : -1"
+                      @click="selectDepositAsset(group, asset)"
+                      @focus="focusedAssetIndex = assetIndex"
+                      @keydown.down.prevent="moveAssetFocus(group, assetIndex, 1)"
+                      @keydown.up.prevent="moveAssetFocus(group, assetIndex, -1)"
+                      @keydown.home.prevent="focusAssetOption(group, 0)"
+                      @keydown.end.prevent="
+                        focusAssetOption(group, (group.depositAssets?.length ?? 1) - 1)
+                      "
+                      @keydown.enter.prevent="selectDepositAsset(group, asset)"
+                      @keydown.space.prevent="selectDepositAsset(group, asset)"
+                      @keydown.esc.stop.prevent="closeAssetList(group.goalId, true)"
+                    >
+                      <span class="flex min-w-0 items-center gap-2">
+                        <span
+                          class="flex size-4 shrink-0 items-center justify-center text-primary"
+                          aria-hidden="true"
+                        >
+                          <svg
+                            v-if="isSelectedAsset(group, asset)"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="size-3.5"
+                          >
+                            <path d="m5 12 4 4L19 6" />
+                          </svg>
+                        </span>
+                        <span class="truncate text-sm font-medium text-[#0a192f]">
+                          {{ depositAssetName(asset) }}
+                        </span>
+                      </span>
+                      <span class="shrink-0 text-sm font-bold tabular-nums text-[#0a192f]">
+                        {{ formatNumber(asset.balance) }}원
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Transition>
           </div>
 
           <!-- 현재 금액 / 목표 금액 / 진행률 -->
@@ -343,7 +416,6 @@
     <PacemakerHistoryModal
       v-model="isHistoryModalOpen"
       :histories="pacemakerStore.histories"
-      :current-balance="pacemaker.moneyBoxBalance"
       :is-loading="pacemakerStore.isHistoriesLoading"
       :error="pacemakerStore.historiesError"
       @retry="retryHistories"
@@ -365,14 +437,14 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { usePacemakerStore } from '@/features/pacemaker/store/pacemaker.store'
 import { usePacemakerDeposit } from '@/features/pacemaker/composables/usePacemakerDeposit'
 import PacemakerDepositModal from '@/features/pacemaker/components/PacemakerDepositModal.vue'
 import PacemakerDepositSuccessModal from '@/features/pacemaker/components/PacemakerDepositSuccessModal.vue'
 import PacemakerHistoryModal from '@/features/pacemaker/components/PacemakerHistoryModal.vue'
 import { useModal } from '@/shared/composables/useModal'
-import { getLocalDateKey } from '@/shared/lib/date'
+import { useLocalDateClock } from '@/shared/composables/useLocalDateClock'
 import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
 defineEmits(['edit-max-amount'])
@@ -412,17 +484,18 @@ const {
 } = usePacemakerDeposit()
 const selectedAssetIds = ref({})
 const expandedGoalId = ref(null)
+const focusedAssetIndex = ref(-1)
 const isMonthlyStreak = ref(false)
 const { isOpen: isDepositModalOpen, open: openDepositModal } = useModal()
 const { isOpen: isDepositSuccessModalOpen, open: openDepositSuccessModal } = useModal()
 const { isOpen: isHistoryModalOpen, open: openHistoryModal } = useModal()
+const { currentDate, localDateKey: referenceDate } = useLocalDateClock()
 
 const pacemaker = computed(() => pacemakerStore.pacemakerView)
 const isActive = computed(() => pacemaker.value.status === 'ACTIVE')
 const weeklyStreak = computed(() => pacemaker.value.weeklyStreak ?? [])
-// 서버는 오늘 날짜를 별도로 내려주지 않으므로 로컬 오늘 날짜를 기준일로 쓴다.
-const referenceDate = computed(() => getLocalDateKey(new Date()))
-const todayDayOfWeek = computed(() => DAY_OF_WEEK_BY_INDEX[new Date().getDay()])
+// 서버는 오늘 날짜를 별도로 내려주지 않으므로 자정에 갱신되는 로컬 날짜를 기준일로 쓴다.
+const todayDayOfWeek = computed(() => DAY_OF_WEEK_BY_INDEX[currentDate.value.getDay()])
 
 const weekDays = computed(() => {
   const byDay = new Map(weeklyStreak.value.map((day) => [day.dayOfWeek, day]))
@@ -497,9 +570,8 @@ function selectedDepositAsset(group) {
   )
 }
 
-function selectableAssets(group) {
-  const selectedKey = assetKey(selectedDepositAsset(group))
-  return group.depositAssets?.filter((asset) => assetKey(asset) !== selectedKey) ?? []
+function isSelectedAsset(group, asset) {
+  return assetKey(selectedDepositAsset(group)) === assetKey(asset)
 }
 
 // 카드에 표시할 계좌명을 계좌 상세 API(/accounts/{accountId})에서 조회해 캐시해둠
@@ -527,13 +599,76 @@ function depositAssetName(asset) {
   return accountName ?? asset.financialInstitutionName ?? '입금 계좌'
 }
 
-function toggleAssetList(goalId) {
-  expandedGoalId.value = expandedGoalId.value === goalId ? null : goalId
+function assetTriggerId(goalId) {
+  return `linked-assets-trigger-${goalId}`
 }
 
-function selectDepositAsset(goalId, asset) {
-  selectedAssetIds.value = { ...selectedAssetIds.value, [goalId]: assetKey(asset) }
+function assetListId(goalId) {
+  return `linked-assets-${goalId}`
+}
+
+function assetOptionId(goalId, assetIndex) {
+  return `linked-assets-${goalId}-option-${assetIndex}`
+}
+
+function selectedAssetIndex(group) {
+  const selectedKey = assetKey(selectedDepositAsset(group))
+  const selectedIndex = group.depositAssets?.findIndex((asset) => assetKey(asset) === selectedKey)
+  return Math.max(0, selectedIndex ?? 0)
+}
+
+async function focusAssetOption(group, assetIndex) {
+  const assetCount = group.depositAssets?.length ?? 0
+  if (assetCount === 0) return
+
+  const nextIndex = Math.min(Math.max(assetIndex, 0), assetCount - 1)
+  focusedAssetIndex.value = nextIndex
+  await nextTick()
+  document.getElementById(assetOptionId(group.goalId, nextIndex))?.focus()
+}
+
+async function openAssetList(group) {
+  if (!(group.depositAssets?.length > 0)) return
+  expandedGoalId.value = group.goalId
+  await focusAssetOption(group, selectedAssetIndex(group))
+}
+
+function toggleAssetList(group) {
+  if (expandedGoalId.value === group.goalId) {
+    closeAssetList(group.goalId)
+    return
+  }
+  openAssetList(group)
+}
+
+function handleAssetTriggerArrow(group, direction) {
+  if (expandedGoalId.value !== group.goalId) {
+    openAssetList(group)
+    return
+  }
+  moveAssetFocus(group, focusedAssetIndex.value, direction)
+}
+
+function moveAssetFocus(group, currentIndex, direction) {
+  const assetCount = group.depositAssets?.length ?? 0
+  if (assetCount === 0) return
+  const nextIndex = (currentIndex + direction + assetCount) % assetCount
+  focusAssetOption(group, nextIndex)
+}
+
+async function closeAssetList(goalId, returnFocus = false) {
+  if (expandedGoalId.value !== goalId) return
   expandedGoalId.value = null
+  focusedAssetIndex.value = -1
+  if (!returnFocus) return
+
+  await nextTick()
+  document.getElementById(assetTriggerId(goalId))?.focus()
+}
+
+function selectDepositAsset(group, asset) {
+  selectedAssetIds.value = { ...selectedAssetIds.value, [group.goalId]: assetKey(asset) }
+  closeAssetList(group.goalId, true)
 }
 
 function openDeposit(group) {
@@ -554,13 +689,6 @@ async function handleToggle() {
 
 function formatNumber(amount) {
   return Number(amount ?? 0).toLocaleString('ko-KR')
-}
-
-function formatCompactWon(amount) {
-  const value = Number(amount ?? 0)
-  if (value >= 100000000) return `${Math.round(value / 10000000) / 10}억원`
-  if (value >= 10000) return `${Math.round(value / 1000) / 10}만원`
-  return `${formatNumber(value)}원`
 }
 
 // 오늘 날짜는 저축 여부와 무관하게 테두리로 구분해 "오늘이 어디인지" 바로 보이게 한다.
@@ -584,3 +712,31 @@ function monthDayClass(day) {
   return 'text-slate-300'
 }
 </script>
+
+<style scoped>
+.asset-accordion-panel {
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+}
+
+.asset-accordion-enter-active,
+.asset-accordion-leave-active {
+  transition:
+    grid-template-rows 180ms ease,
+    opacity 160ms ease;
+}
+
+.asset-accordion-enter-from,
+.asset-accordion-leave-to {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .asset-accordion-enter-active,
+  .asset-accordion-leave-active {
+    transition: none;
+  }
+}
+</style>

@@ -3,7 +3,7 @@
     class="flex justify-center bg-[#f8fafc]"
     :class="
       pacemakerStore.pacemakerStatus?.registered === false
-        ? 'h-[calc(100dvh_-_122px_-_env(safe-area-inset-bottom))] sm:h-[calc(100dvh_-_130px_-_env(safe-area-inset-bottom))] md:h-auto md:min-h-[calc(100vh-80px)] md:pb-6'
+        ? 'md:min-h-[calc(100vh-80px)] md:pb-6'
         : 'min-h-[calc(100vh-80px)] pb-6'
     "
   >
@@ -74,11 +74,11 @@
 
     <div
       v-else-if="pacemakerStore.pacemakerStatus?.registered === false"
-      class="page-container-narrow grid h-full grid-rows-[auto_minmax(0,1fr)_auto] gap-3 py-3 md:flex md:h-auto md:flex-col md:gap-5 md:pb-0 md:pt-5"
+      class="page-container-narrow flex flex-col pb-5 pt-10 md:pb-0 md:pt-12"
     >
       <!-- 페이스메이커 핵심 설명 -->
       <section
-        class="px-1 py-3 motion-safe:animate-fade-in-up sm:px-2 sm:py-4"
+        class="px-1 motion-safe:animate-fade-in-up sm:px-2"
         aria-labelledby="pacemaker-intro-title"
       >
         <div>
@@ -88,7 +88,7 @@
           >
             목표까지<br />차곡차곡 모아요
           </h2>
-          <p class="mt-3 text-xs leading-[18px] text-slate-500 sm:text-sm sm:leading-5">
+          <p class="mt-4 text-xs leading-[18px] text-slate-500 sm:text-sm sm:leading-5">
             매일 남은 돈을 계산해 자동으로 저축해요
           </p>
         </div>
@@ -96,36 +96,36 @@
 
       <!-- 페이스메이커 서비스 흐름 -->
       <section
-        class="flex min-h-0 flex-col rounded-[20px] border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
+        class="mt-8 flex h-auto flex-col rounded-[20px] border border-slate-200 bg-white px-5 pb-5 pt-6"
         aria-labelledby="pacemaker-how-title"
       >
-        <h2 id="pacemaker-how-title" class="mb-2 text-base font-bold text-[#0a192f]">
-          어떻게 모으나요?
+        <h2 id="pacemaker-how-title" class="text-base font-bold text-[#0a192f]">
+          이렇게 도와드려요
         </h2>
-        <ul class="flex min-h-0 flex-1 flex-col divide-y divide-slate-100">
+        <ul class="mt-2 flex flex-col divide-y divide-slate-100">
           <li
             v-for="step in savingFlow"
             :key="step.title"
-            class="flex min-h-0 flex-1 items-center gap-3 py-3"
+            class="flex items-center gap-4 py-5"
           >
             <span
-              class="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-blue-50 text-primary"
+              class="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-blue-50 text-primary"
               aria-hidden="true"
             >
               <AppIcon :name="step.icon" size="sm" />
             </span>
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <h3 class="text-sm font-semibold text-[#0a192f]">{{ step.title }}</h3>
-              <p class="mt-0.5 text-[11px] leading-[15px] text-slate-500">
+              <p class="mt-1 text-[11px] leading-[17px] text-slate-500">
                 {{ step.description }}
               </p>
             </div>
           </li>
         </ul>
 
-        <div class="mt-2 flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2.5">
+        <div class="mt-2 flex items-center gap-2.5 rounded-xl bg-slate-50 px-4 py-3.5">
           <svg
-            class="size-3.5 shrink-0 text-slate-400"
+            class="size-3 shrink-0 text-slate-400"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -144,10 +144,77 @@
         </div>
       </section>
 
+      <!-- 페이스메이커 기능 요약 -->
+      <div
+        class="mt-5 flex h-[52px] items-center rounded-[14px] border border-blue-100/70 bg-blue-50/60 px-4"
+        aria-label="페이스메이커 주요 기능"
+      >
+        <div class="flex min-w-0 flex-1 items-center justify-center gap-1.5">
+          <svg
+            class="size-3.5 shrink-0 text-primary"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M20 7h-5V2" />
+            <path d="M4 17h5v5" />
+            <path d="M5.1 9A8 8 0 0 1 18.4 5.4L20 7" />
+            <path d="M18.9 15A8 8 0 0 1 5.6 18.6L4 17" />
+          </svg>
+          <span class="whitespace-nowrap text-[11px] font-semibold text-[#0a192f]">자동저축</span>
+        </div>
+
+        <span class="h-5 w-px shrink-0 bg-blue-100" aria-hidden="true" />
+
+        <div class="flex min-w-0 flex-1 items-center justify-center gap-1.5">
+          <svg
+            class="size-3.5 shrink-0 text-primary"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+            <path d="M9 12h6" />
+          </svg>
+          <span class="whitespace-nowrap text-[11px] font-semibold text-[#0a192f]">
+            하루 한도 설정
+          </span>
+        </div>
+
+        <span class="h-5 w-px shrink-0 bg-blue-100" aria-hidden="true" />
+
+        <div class="flex min-w-0 flex-1 items-center justify-center gap-1.5">
+          <svg
+            class="size-3.5 shrink-0 text-primary"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="6" y="4" width="4" height="16" rx="1" />
+            <rect x="14" y="4" width="4" height="16" rx="1" />
+          </svg>
+          <span class="whitespace-nowrap text-[11px] font-semibold text-[#0a192f]">
+            언제든 일시정지
+          </span>
+        </div>
+      </div>
+
       <!-- 저금통 개설 CTA -->
       <button
         type="button"
-        class="inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-primary px-5 text-[15px] font-bold tracking-tight text-white shadow-[0_7px_20px_rgba(0,102,255,0.24)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:animate-fade-in-up motion-safe:transition motion-safe:hover:bg-[#0055dd] motion-safe:active:scale-[0.98]"
+        class="mt-4 inline-flex min-h-[58px] w-full items-center justify-center gap-2 rounded-[16px] bg-primary px-5 text-[15px] font-bold tracking-tight text-white shadow-[0_7px_20px_rgba(0,102,255,0.24)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:animate-fade-in-up motion-safe:transition motion-safe:hover:bg-[#0055dd] motion-safe:active:scale-[0.98]"
         style="animation-delay: 300ms"
         @click="goToSetup"
       >
@@ -200,6 +267,11 @@ const savingFlow = [
     icon: 'target',
     title: '목표 자산으로 이동',
     description: '원하는 목표 자산에 쌓아서 관리해요',
+  },
+  {
+    icon: 'bell',
+    title: '저축 현황 알림',
+    description: '저축 결과와 연속 기록을 매일 아침 알려드려요',
   },
 ]
 
