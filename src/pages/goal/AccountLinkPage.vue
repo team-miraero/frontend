@@ -4,16 +4,16 @@
     <StepHeader @back="handleBack" />
 
     <div
-      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pb-40 pt-1 md:pb-6"
+      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pt-3 sm:pt-6 pb-40 md:pb-8"
     >
       <ProgressBar :current-step="4" :total-steps="4" />
 
       <h1
-        class="mt-3 text-2xl font-black tracking-tight leading-snug text-gray-900 sm:text-[28px] break-keep"
+        class="mt-4 sm:mt-6 text-2xl font-black tracking-tight leading-snug text-gray-900 sm:text-[28px] break-keep"
       >
         이 목표, 어디에<br class="sm:hidden" /> 모을까요?
       </h1>
-      <p class="mt-2 sm:mt-2.5 break-keep text-xs sm:text-sm font-medium text-slate-500">
+      <p class="mt-2 sm:mt-2.5 break-keep text-[13px] sm:text-sm font-medium text-slate-500">
         목표 전용 공간을 정해야 진행률을 정확하게 추적할 수 있어요.
       </p>
 
@@ -21,7 +21,7 @@
 
       <div
         v-else-if="accountsError"
-        class="mt-6 flex min-h-[300px] flex-col items-center justify-center rounded-[18px] border border-gray-200 bg-white px-6 text-center"
+        class="mt-6 sm:mt-8 flex min-h-[300px] flex-col items-center justify-center rounded-[18px] border border-gray-200 bg-white px-6 text-center"
       >
         <div class="flex size-11 items-center justify-center rounded-full bg-red-50 text-red-500">
           !
@@ -38,7 +38,7 @@
       </div>
 
       <template v-else>
-        <div class="mt-6 space-y-3">
+        <div class="mt-6 sm:mt-8 space-y-3 sm:space-y-4">
           <AccountOptionCard
             title="저금통 만들기"
             description="매달 자동으로 모으는 목표 전용 저금통이에요."
@@ -81,7 +81,7 @@
             <div>
               <div class="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label for="transfer-amount" class="text-xs font-medium text-gray-500">
+                  <label for="transfer-amount" class="text-[13px] font-medium text-gray-500">
                     월 이체 금액
                   </label>
                   <div
@@ -97,17 +97,17 @@
                     />
                     <span class="shrink-0 text-sm text-gray-400">원</span>
                   </div>
-                  <p class="mt-1 text-[11px] text-primary">실현 가능성 분석값을 반영했어요.</p>
+                  <p class="mt-1 text-[13px] text-primary">실현 가능성 분석값을 반영했어요.</p>
                 </div>
 
                 <div>
-                  <span class="text-xs font-medium text-gray-500">이체 날짜</span>
+                  <span class="text-[13px] font-medium text-gray-500">이체 날짜</span>
                   <div class="mt-1.5 grid grid-cols-5 gap-1.5">
                     <button
                       v-for="day in TRANSFER_DAYS"
                       :key="day"
                       type="button"
-                      class="min-h-10 rounded-xl border px-1 text-xs font-medium transition-colors"
+                      class="min-h-10 rounded-xl border px-1 text-[13px] font-medium transition-colors"
                       :class="
                         transferDay === day
                           ? 'border-primary bg-primary text-white'
@@ -118,14 +118,14 @@
                       {{ day }}일
                     </button>
                   </div>
-                  <p class="mt-1 text-[11px] text-gray-400">급여일 다음 날을 추천해요.</p>
+                  <p class="mt-1 text-[13px] text-gray-400">급여일 다음 날을 추천해요.</p>
                 </div>
               </div>
 
               <div class="mt-4 border-t border-gray-100 pt-4">
                 <div class="flex items-center justify-between gap-3">
-                  <span class="text-xs font-medium text-gray-500">출금 계좌</span>
-                  <span class="text-[11px] text-gray-400">급여 계좌를 선택해 주세요.</span>
+                  <span class="text-[13px] font-medium text-gray-500">출금 계좌</span>
+                  <span class="text-[13px] text-gray-400">급여 계좌를 선택해 주세요.</span>
                 </div>
                 <div class="mt-1.5 space-y-2">
                   <AccountListItem
@@ -165,7 +165,7 @@
             </template>
 
             <div>
-              <span class="text-xs font-medium text-gray-500">마이데이터 계좌 목록</span>
+              <span class="text-[13px] font-medium text-gray-500">마이데이터 계좌 목록</span>
               <div class="mt-1.5 space-y-2">
                 <AccountListItem
                   v-for="account in savingAccounts"
@@ -181,7 +181,7 @@
           </AccountOptionCard>
         </div>
 
-        <p class="mt-4 flex items-start gap-1.5 text-xs leading-relaxed text-gray-400">
+        <p class="mt-4 flex items-start gap-1.5 text-[13px] leading-relaxed text-gray-400">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -202,7 +202,7 @@
 
     <p
       v-if="submitError"
-      class="mx-auto w-full max-w-[650px] px-4 text-center text-xs text-red-500"
+      class="mx-auto w-full max-w-[650px] px-4 text-center text-[13px] text-red-500"
     >
       {{ submitError }}
     </p>

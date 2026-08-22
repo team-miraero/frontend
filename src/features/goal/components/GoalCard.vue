@@ -3,56 +3,56 @@
     role="radio"
     tabindex="0"
     :aria-checked="isSelected"
-    class="group relative flex w-full flex-col justify-between p-3.5 sm:p-5 rounded-2xl transition-all duration-200 ease-out text-left select-none border-2 cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[#0066FF] focus-visible:ring-offset-2 active:scale-[0.98]"
+    class="group relative flex w-full items-center justify-between rounded-2xl border-2 p-5 text-left transition-all duration-200 ease-out select-none cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[#0066FF] focus-visible:ring-offset-2 active:scale-[0.99] sm:p-6"
     style="-webkit-tap-highlight-color: transparent"
     :class="[
       isSelected
-        ? 'border-[#0066FF] bg-[#EBF3FF] shadow-md -translate-y-1'
-        : 'border-slate-200/90 bg-white hover:-translate-y-1 hover:border-primary/40 hover:shadow-md',
+        ? 'border-[#0066FF] bg-[#EBF3FF] shadow-md -translate-y-0.5'
+        : 'border-slate-200/90 bg-white hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md',
     ]"
     @click="$emit('select')"
     @keydown.space.prevent="$emit('select')"
     @keydown.enter.prevent="$emit('select')"
   >
-    <!-- 상단 영역: 목표 유형 아이콘 -->
-    <div class="mb-2 flex items-center sm:mb-3">
-      <!-- 아이콘 둥근 박스 -->
+    <!-- 좌측 영역: 원본 아이콘 + 텍스트 -->
+    <div class="flex items-center gap-3.5 sm:gap-4 min-w-0 flex-1">
+      <!-- 아이콘 둥근 박스 (원본 크기) -->
       <div
         class="flex size-10 shrink-0 items-center justify-center rounded-[14px] transition-colors"
         :class="iconBackgroundClass"
       >
         <GoalTypeIcon :goal-type="id" size="lg" :class="iconToneClass" />
       </div>
-    </div>
 
-    <!-- 텍스트 영역: 타이틀 + 1줄 설명 -->
-    <div class="mt-1 min-w-0">
-      <div class="mb-0.5 flex min-w-0 items-center gap-1 sm:mb-1">
+      <!-- 텍스트 영역: 타이틀 + 1줄 설명 -->
+      <div class="min-w-0 flex-1">
         <h3
-          class="min-w-0 truncate whitespace-nowrap text-sm font-bold transition-colors sm:text-base md:text-lg"
+          class="truncate whitespace-nowrap text-[15px] font-bold transition-colors sm:text-base md:text-lg"
           :class="isSelected ? 'text-[#0066FF]' : 'text-gray-900'"
         >
           {{ title }}
         </h3>
-        <button
-          v-if="guideInfo"
-          type="button"
-          class="inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-500 transition-colors hover:text-[#0066FF] focus:outline-none"
-          title="목표 가이드 보기"
-          aria-label="목표 가이드 보기"
-          @click.stop="$emit('guide')"
-        >
-          <svg class="size-[15px]" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" />
-            <path d="M12 11v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
-            <circle cx="12" cy="7.5" r="1.25" fill="currentColor" />
-          </svg>
-        </button>
+        <p class="truncate whitespace-nowrap text-[13px] font-medium leading-tight text-gray-500 sm:leading-snug sm:text-sm md:text-base">
+          {{ description }}
+        </p>
       </div>
+    </div>
 
-      <p class="text-[11px] sm:text-xs md:text-sm text-gray-500 font-medium leading-tight sm:leading-snug truncate whitespace-nowrap">
-        {{ description }}
-      </p>
+    <!-- 우측 영역: 원본 가이드 ? 버튼 -->
+    <div v-if="guideInfo" class="shrink-0 ml-2">
+      <button
+        type="button"
+        class="inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-500 transition-colors hover:text-[#0066FF] focus:outline-none"
+        title="목표 가이드 보기"
+        aria-label="목표 가이드 보기"
+        @click.stop="$emit('guide')"
+      >
+        <svg class="size-[15px]" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" />
+          <path d="M12 11v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          <circle cx="12" cy="7.5" r="1.25" fill="currentColor" />
+        </svg>
+      </button>
     </div>
   </div>
 </template>

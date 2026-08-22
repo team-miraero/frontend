@@ -16,17 +16,17 @@
 
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-1.5 sm:gap-2">
-          <p class="whitespace-nowrap text-[13px] font-bold text-gray-900 sm:text-sm">
+          <p class="whitespace-nowrap text-[15px] font-bold text-gray-900 sm:text-base">
             {{ title }}
           </p>
           <span
             v-if="recommended"
-            class="rounded-full bg-accent-light px-2 py-0.5 text-[11px] font-semibold text-primary"
+            class="rounded-full bg-accent-light px-2 py-0.5 text-xs font-semibold text-primary"
           >
             추천
           </span>
         </div>
-        <p class="mt-1 break-keep text-[11px] leading-relaxed text-gray-500 sm:text-xs">
+        <p class="mt-1 break-keep text-[13px] leading-relaxed text-gray-500 sm:text-sm">
           {{ description }}
         </p>
 
@@ -34,7 +34,7 @@
           <span
             v-for="tag in tags"
             :key="tag"
-            class="flex items-center gap-1 text-[11px] text-gray-400"
+            class="flex items-center gap-1 text-xs text-gray-400"
           >
             <span class="h-1 w-1 shrink-0 rounded-full bg-gray-300" />
             {{ tag }}

@@ -4,21 +4,21 @@
     <StepHeader @back="handleBack" />
 
     <div
-      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pb-36 pt-1 md:pb-8"
+      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pt-3 sm:pt-6 pb-36 md:pb-8"
     >
       <ProgressBar :current-step="2" :total-steps="4" />
 
       <!-- 메인 헤드라인 & 서브 설명 -->
       <h1
-        class="mt-3 whitespace-pre-line sm:whitespace-normal text-2xl sm:text-[28px] font-black tracking-tight leading-snug text-gray-900 break-keep"
+        class="mt-4 sm:mt-6 whitespace-pre-line sm:whitespace-normal text-2xl sm:text-[28px] font-black tracking-tight leading-snug text-gray-900 break-keep"
       >
         {{ config.title }}
       </h1>
-      <p class="mt-2 sm:mt-2.5 text-xs sm:text-sm font-medium text-slate-500">금액과 기간을 설정해 주세요.</p>
+      <p class="mt-2 sm:mt-2.5 text-[13px] sm:text-sm font-medium text-slate-500">금액과 기간을 설정해 주세요.</p>
 
       <!-- 1. 학자금 대출 상환 전용 UI -->
       <template v-if="isStudentLoan">
-        <div class="mt-4 space-y-3">
+        <div class="mt-6 sm:mt-8 space-y-3 sm:space-y-4">
           <!-- 카드 1: 남은 대출 잔액 (원금) -->
           <div
             class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
@@ -26,7 +26,7 @@
             <div class="flex items-center justify-between">
               <label class="text-sm font-bold text-gray-900">남은 대출 잔액 (원금)</label>
               <span
-                class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-600"
+                class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[13px] font-bold text-emerald-600"
               >
                 <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 마이데이터 자동 연동
@@ -44,7 +44,7 @@
               />
               <span class="shrink-0 text-sm font-bold text-slate-400">원</span>
             </div>
-            <div class="mt-2 flex items-center justify-between text-xs font-semibold">
+            <div class="mt-2 flex items-center justify-between text-[13px] font-semibold">
               <span class="text-primary">{{ amountCaption }}</span>
               <span class="text-slate-400">연 1.7% 고정금리 (정부 학자금)</span>
             </div>
@@ -69,7 +69,7 @@
           >
             <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
               <h3 class="text-base font-bold text-gray-900">이자 포함 상환 계획</h3>
-              <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-primary">
+              <span class="rounded-full bg-blue-50 px-3 py-1 text-[13px] font-bold text-primary">
                 연 1.7% 고정
               </span>
             </div>
@@ -77,7 +77,7 @@
             <!-- 비율 프로그레스 바 -->
             <div class="mt-4">
               <div
-                class="flex items-center justify-between text-xs font-bold text-slate-500 mb-1.5"
+                class="mb-1.5 flex items-center justify-between text-[13px] font-bold text-slate-500"
               >
                 <span>원금 {{ loanResult.principalRatio }}%</span>
                 <span>이자 {{ loanResult.interestRatio }}%</span>
@@ -99,14 +99,14 @@
               class="mt-4 rounded-2xl bg-blue-50/70 border border-blue-100 p-4 flex items-center justify-between"
             >
               <div>
-                <p class="text-xs font-bold text-gray-900">총 갚아야 할 금액</p>
-                <p class="text-[11px] text-slate-400 mt-0.5">원금 + 이자 합계</p>
+                <p class="text-[13px] font-bold text-gray-900">총 갚아야 할 금액</p>
+                <p class="mt-0.5 text-[13px] text-slate-400">원금 + 이자 합계</p>
               </div>
               <div class="text-right">
                 <p class="text-lg sm:text-xl font-bold text-primary">
                   약 {{ formatKRWCompact(loanResult.totalPayment) }}
                 </p>
-                <p class="text-[11px] text-slate-400 mt-0.5">
+                <p class="mt-0.5 text-[13px] text-slate-400">
                   월 {{ loanResult.monthlyPayment.toLocaleString() }}원 × {{ months }}개월
                 </p>
               </div>
@@ -117,7 +117,7 @@
 
       <!-- 2. 일반 목표 UI (비상금 / 독립자금 / 결혼자금) -->
       <template v-else>
-        <div class="mt-4 space-y-3">
+        <div class="mt-6 sm:mt-8 space-y-3 sm:space-y-4">
           <!-- 카드 1: [목표 금액 & 기간 설정 스마트 카드] -->
           <div
             class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_24px_rgba(15,35,70,0.03)]"
@@ -160,7 +160,7 @@
                     @click="amount = preset.value"
                   >
                     <span
-                      class="text-[11px] font-medium"
+                      class="text-[13px] font-medium"
                       :class="amount === preset.value ? 'text-[#0066FF]/80' : 'text-slate-500'"
                     >
                       {{ preset.title }}
@@ -200,7 +200,7 @@
                     v-for="preset in config.amountPresets"
                     :key="preset.label"
                     type="button"
-                    class="flex min-h-11 items-center justify-center rounded-2xl border py-2.5 text-xs font-bold transition-all sm:text-sm"
+                    class="flex min-h-11 items-center justify-center rounded-2xl border py-2.5 text-[13px] font-bold transition-all sm:text-sm"
                     :class="
                       amount === preset.value
                         ? 'border-[#0066FF] bg-[#EBF3FF] text-[#0066FF] ring-1 ring-[#0066FF]/20'
@@ -241,7 +241,7 @@
                     background: `linear-gradient(to right, #0066FF 0%, #0066FF ${((months - config.periodMin) / (config.periodMax - config.periodMin)) * 100}%, #E2E8F0 ${((months - config.periodMin) / (config.periodMax - config.periodMin)) * 100}%, #E2E8F0 100%)`
                   }"
                 />
-                <div class="flex justify-between text-[11px] text-slate-500 font-bold mt-1.5">
+                <div class="mt-1.5 flex justify-between text-[13px] font-bold text-slate-500">
                   <span>{{ config.periodMin }}개월</span>
                   <span>{{ config.periodMax }}개월</span>
                 </div>
@@ -257,7 +257,7 @@
                   v-for="preset in config.periodPresets"
                   :key="preset.label"
                   type="button"
-                  class="flex min-h-10 items-center justify-center rounded-2xl border py-2 text-xs font-bold transition-all sm:text-sm"
+                  class="flex min-h-10 items-center justify-center rounded-2xl border py-2 text-[13px] font-bold transition-all sm:text-sm"
                   :class="
                     months === preset.value
                       ? 'border-[#0066FF] bg-[#EBF3FF] text-[#0066FF] ring-1 ring-[#0066FF]/20'
@@ -274,7 +274,7 @@
             <div class="mt-4 border-t border-slate-100 pt-4">
               <div
                 v-if="!isSeedMoneyOpen && startAmount === 0"
-                class="flex cursor-pointer items-center justify-between text-xs font-bold text-gray-500 transition-colors hover:text-primary"
+                class="flex cursor-pointer items-center justify-between text-[13px] font-bold text-gray-500 transition-colors hover:text-primary"
                 @click="openSeedMoney"
               >
                 <span>이미 모아둔 돈이 있나요? (선택)</span>
@@ -282,7 +282,7 @@
               </div>
 
               <div v-else class="space-y-2 animate-fade-in">
-                <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center justify-between text-[13px]">
                   <div class="flex items-center gap-1.5">
                     <span class="font-bold text-gray-900">이미 모아둔 돈</span>
                     <span v-if="startAmount > 0" class="font-bold text-primary">
@@ -291,7 +291,7 @@
                   </div>
                   <button
                     type="button"
-                    class="shrink-0 text-xs font-semibold text-gray-400 hover:text-primary transition-colors"
+                    class="shrink-0 text-[13px] font-semibold text-gray-400 hover:text-primary transition-colors"
                     @click="closeSeedMoney"
                   >
                     닫기
@@ -308,7 +308,7 @@
                     class="w-full bg-transparent text-sm font-bold text-gray-900 outline-none sm:text-base"
                     @input="handleStartAmountInput"
                   />
-                  <span class="shrink-0 text-xs font-bold text-slate-400">원</span>
+                  <span class="shrink-0 text-[13px] font-bold text-slate-400">원</span>
                 </div>
               </div>
             </div>
@@ -319,11 +319,11 @@
             class="rounded-3xl border border-primary/25 bg-gradient-to-br from-blue-50/90 via-white to-indigo-50/40 p-5 shadow-[0_4px_24px_rgba(15,35,70,0.04)]"
           >
             <div>
-              <p class="text-xs font-semibold text-slate-500">월 예상 저축액</p>
+              <p class="text-[13px] font-semibold text-slate-500">월 예상 저축액</p>
               <p class="mt-1 text-2xl font-bold text-primary sm:text-[26px]">
                 매달 약 {{ monthlyAmountLabel }}
               </p>
-              <p class="mt-1 text-xs font-medium text-slate-400">
+              <p class="mt-1 text-[13px] font-medium text-slate-400">
                 {{ formatPeriodHuman(months) }} 동안 모을 때의 예상 금액이에요.
               </p>
             </div>
@@ -332,7 +332,7 @@
       </template>
 
       <!-- 하단 안내 문구 -->
-      <p class="mt-4 flex items-start gap-1.5 text-xs leading-relaxed text-slate-400 font-medium">
+      <p class="mt-4 flex items-start gap-1.5 text-[13px] leading-relaxed text-slate-400 font-medium">
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -346,7 +346,7 @@
           <path d="M12 11v5" />
           <path d="M12 8h.01" />
         </svg>
-        <span>마이데이터를 반영해 예상 금액을 계산해요.</span>
+        <span>연결된 정보를 반영해 예상 금액을 계산해요.</span>
       </p>
     </div>
 

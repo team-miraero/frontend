@@ -5,35 +5,35 @@
 
     <!-- 본문 콘텐츠 -->
     <div
-      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pb-28 md:pb-4 pt-1"
+      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pt-3 sm:pt-6 pb-28 md:pb-6"
     >
       <ProgressBar :current-step="1" :total-steps="4" />
 
       <!-- 메인 헤드라인 & 서브 텍스트 -->
       <h1
-        class="mt-3 text-2xl sm:text-[28px] font-black tracking-tight leading-snug text-gray-900 break-keep"
+        class="mt-4 sm:mt-6 text-2xl sm:text-[28px] font-black tracking-tight leading-snug text-gray-900 break-keep"
       >
         어떤 목표를 향해 <br class="sm:hidden" />달려볼까요?
       </h1>
-      <p class="mt-2 sm:mt-2.5 text-xs sm:text-sm font-medium text-slate-500 break-keep">
+      <p class="mt-2 sm:mt-2.5 text-[13px] sm:text-sm font-medium text-slate-500 break-keep">
         지금 가장 집중하고 싶은 목표를 선택해 주세요.
       </p>
 
       <!-- 1) 로딩 스켈레톤 UI -->
-      <div v-if="isLoading" class="mt-4 sm:mt-5 grid grid-cols-2 gap-2.5 sm:gap-3">
+      <div v-if="isLoading" class="mt-6 sm:mt-8 space-y-3.5 sm:space-y-4">
         <div
           v-for="i in 4"
           :key="i"
-          class="h-[120px] sm:h-[130px] rounded-2xl bg-[#F4F7FA] p-3.5 sm:p-5 animate-pulse flex flex-col justify-between"
+          class="rounded-2xl border-2 border-transparent bg-[#F4F7FA] p-5 sm:p-6 animate-pulse flex items-center justify-between"
         >
-          <div class="flex items-center justify-between">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-200/70" />
-            <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-200/70" />
+          <div class="flex items-center gap-3.5 sm:gap-4 flex-1 min-w-0">
+            <div class="size-10 rounded-[14px] bg-slate-200/70 shrink-0" />
+            <div class="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+              <div class="h-4 sm:h-4.5 w-24 sm:w-32 rounded bg-slate-200/70" />
+              <div class="h-3 sm:h-3.5 w-36 sm:w-48 rounded bg-slate-200/50" />
+            </div>
           </div>
-          <div class="space-y-1.5 sm:space-y-2">
-            <div class="h-3.5 sm:h-4 w-16 sm:w-24 rounded bg-slate-200/70" />
-            <div class="h-2.5 sm:h-3 w-28 sm:w-40 rounded bg-slate-200/50" />
-          </div>
+          <div class="size-5 rounded-full bg-slate-200/70 shrink-0 ml-2" />
         </div>
       </div>
 
@@ -55,18 +55,18 @@
           </svg>
         </div>
         <h3 class="text-base font-bold text-gray-900 mb-1">목표 목록을 불러오지 못했어요</h3>
-        <p class="text-xs text-gray-500 mb-4">네트워크 연결 상태를 확인하고 다시 시도해 주세요.</p>
+        <p class="mb-4 text-[13px] text-gray-500">네트워크 연결 상태를 확인하고 다시 시도해 주세요.</p>
         <button
           type="button"
-          class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold transition-transform active:scale-95"
+          class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary text-[13px] font-bold text-white transition-transform active:scale-95 cursor-pointer"
           @click="fetchPresets"
         >
           다시 시도
         </button>
       </div>
 
-      <!-- 3) 목표 카드 그리드 (모바일 2열 2x2, 태블릿/PC 2열) -->
-      <div v-else class="mt-4 sm:mt-5 grid grid-cols-2 gap-2.5 sm:gap-3">
+      <!-- 3) 목표 카드 리스트 (1열 세로 리스트) -->
+      <div v-else class="mt-6 sm:mt-8 space-y-3.5 sm:space-y-4">
         <GoalCard
           v-for="preset in presets"
           :key="preset.id"
@@ -79,7 +79,13 @@
     </div>
 
     <!-- 하단 반응형 CTA (모바일: 화면 고정 / 데스크톱: 카드 아래 인라인) -->
-    <BottomCTA :label="buttonText" :disabled="!selectedGoal" desktop-static @click="handleNext" />
+    <BottomCTA
+      :label="buttonText"
+      :disabled="!selectedGoal"
+      caption="목표는 나중에 변경할 수 있어요"
+      desktop-static
+      @click="handleNext"
+    />
 
     <!-- 목표 상세 안내 바텀시트 / 모달 -->
     <BaseModal v-model="isGuideModalOpen" hide-default-close>
@@ -96,7 +102,7 @@
               <h2 class="text-base sm:text-lg font-bold text-[#0a192f]">
                 {{ selectedGuidePreset.title }}
               </h2>
-              <p class="text-xs text-slate-500 font-medium mt-0.5">
+              <p class="mt-0.5 text-[13px] font-medium text-slate-500">
                 {{ selectedGuidePreset.description }}
               </p>
             </div>
@@ -122,11 +128,11 @@
 
         <!-- 본문: 누구에게 맞을까요? 안내 박스 -->
         <div class="mt-4 sm:mt-5 rounded-2xl border border-blue-100 bg-[#F8FAFC] p-4">
-          <div class="flex items-center gap-1.5 font-bold text-[#0066FF] text-xs mb-2">
+          <div class="mb-2 flex items-center gap-1.5 text-[13px] font-bold text-[#0066FF]">
             <AppIcon name="lightbulb" size="sm" />
             <span>누구에게 맞을까요?</span>
           </div>
-          <p class="text-xs sm:text-sm font-medium leading-relaxed text-slate-700 break-keep">
+          <p class="text-[13px] sm:text-sm font-medium leading-relaxed text-slate-700 break-keep">
             {{ selectedGuidePreset.guideInfo }}
           </p>
         </div>
@@ -136,7 +142,7 @@
           <span
             v-for="tag in selectedGuidePreset.tags"
             :key="tag"
-            class="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-slate-600"
+            class="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1 text-xs sm:text-[13px] font-semibold text-slate-600"
           >
             #{{ tag }}
           </span>
