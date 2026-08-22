@@ -30,18 +30,10 @@
           <p class="mt-1 text-xs leading-relaxed text-gray-500 sm:mt-1.5 sm:text-sm [word-break:keep-all] break-keep">
             {{
               currentStep === 1
-                ? 'KB스타뱅킹에서 확인된 정보로 미래로 이용을 등록해요.'
+                ? '인증된 정보로 미래로 이용을 등록해요.'
                 : '로그인에 사용할 이메일과 비밀번호를 입력해 주세요.'
             }}
           </p>
-          <div
-            class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-primary sm:mt-3 sm:px-3 sm:py-1.5 sm:text-xs"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="size-3.5" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />
-            </svg>
-            KB스타뱅킹 인증 완료
-          </div>
         </div>
 
         <form class="mt-3.5 sm:mt-6" @submit.prevent="handleSubmit">

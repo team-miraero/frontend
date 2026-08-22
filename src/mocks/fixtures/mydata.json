@@ -2,7 +2,7 @@
   "accounts": [
     {
       "id": "acc-1",
-      "bankName": "KB국민은행",
+      "bankName": "연결 은행",
       "accountNumber": "123-456-789012",
       "balance": 3200000,
       "type": "수시입출금"
@@ -44,7 +44,7 @@
   "investments": [
     {
       "id": "inv-1",
-      "productName": "KB국민 ETF",
+      "productName": "국내 ETF",
       "amount": 1200000,
       "returnRate": 4.2
     }
@@ -52,7 +52,7 @@
   "loans": [
     {
       "id": "loan-1",
-      "productName": "KB 청년전세대출",
+      "productName": "청년전세대출",
       "principal": 50000000,
       "interestRate": 3.1,
       "monthlyPayment": 130000

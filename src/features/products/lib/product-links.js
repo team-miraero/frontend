@@ -30,12 +30,12 @@ export function getOfficialProductLink(product) {
   return directUrl
     ? {
         href: directUrl,
-        label: officialUrlLabel || 'KB에서 가입하기',
-        description: 'KB국민은행 공식 상품 페이지로 이동해요',
+        label: officialUrlLabel || '상품 페이지로 이동',
+        description: '금융기관의 공식 상품 페이지로 이동해요',
       }
     : {
         href: KB_PRODUCT_CATALOG_URL,
-        label: 'KB 상품몰에서 찾아보기',
-        description: 'KB국민은행 공식 상품몰에서 판매 여부와 가입 조건을 확인해 주세요',
+        label: '상품몰에서 찾아보기',
+        description: '공식 상품몰에서 판매 여부와 가입 조건을 확인해 주세요',
       }
 }

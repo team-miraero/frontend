@@ -1,4 +1,4 @@
-// products 도메인 라우트 (KB-01~02)
+// products 도메인 라우트
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 
 export const productsRoutes = [

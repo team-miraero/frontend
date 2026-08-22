@@ -61,7 +61,7 @@ export async function signup(payload) {
 }
 
 /**
- * 로그인 사용자의 KB Pay 마이데이터 연결을 생성하거나 갱신한다.
+ * 로그인 사용자의 마이데이터 연결을 생성하거나 갱신한다.
  */
 export async function connectMydata() {
   const { data } = await client.post('/mydata/connect')
@@ -69,7 +69,7 @@ export async function connectMydata() {
 }
 
 /**
- * 연결된 KB Pay 마이데이터의 자산 정보를 동기화한다.
+ * 연결된 마이데이터의 자산 정보를 동기화한다.
  */
 export async function syncMydata() {
   const { data } = await client.post('/mydata/sync')
