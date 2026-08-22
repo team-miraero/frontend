@@ -189,6 +189,27 @@
   }
 }
 
+@media (min-width: 400px) and (max-width: 480px) {
+  .mypage-subtle-button,
+  .mypage-primary-small-button {
+    font-size: 14px;
+  }
+
+  .mypage-account-row,
+  .mypage-image-select-button,
+  .mypage-password-input,
+  .mypage-goal-input,
+  .mypage-modal-secondary,
+  .mypage-modal-primary,
+  .mypage-modal-danger {
+    font-size: 16px;
+  }
+
+  .mypage-account-row span:last-child {
+    font-size: 28px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mypage-spinner {
     animation-duration: 0.01ms;

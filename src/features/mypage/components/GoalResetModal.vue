@@ -617,4 +617,11 @@ watch(
   padding: 12px 10px;
   font-size: 13px;
 }
+
+@media (min-width: 400px) and (max-width: 480px) {
+  .mypage-modal-actions .mypage-modal-primary,
+  .mypage-modal-actions .mypage-modal-secondary {
+    font-size: 15px;
+  }
+}
 </style>
