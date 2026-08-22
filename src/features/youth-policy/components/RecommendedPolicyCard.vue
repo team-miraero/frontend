@@ -7,6 +7,12 @@
     <div class="flex items-center justify-between gap-2">
       <div class="flex min-w-0 flex-wrap items-center gap-1.5">
         <span
+          v-if="regionTag"
+          class="shrink-0 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] font-bold text-slate-600"
+        >
+          {{ regionTag }}
+        </span>
+        <span
           v-for="keyword in keywordTags"
           :key="keyword"
           class="truncate rounded-md bg-[#eef5ff] px-2.5 py-0.5 text-[11px] font-bold text-primary"
@@ -23,44 +29,50 @@
     </div>
 
     <h3
-      class="mt-3.5 line-clamp-2 min-h-12 text-base font-bold leading-6 text-gray-900 group-hover:text-primary transition-colors"
+      class="mt-3.5 line-clamp-2 min-h-12 text-base font-bold leading-6 text-gray-900 transition-colors group-hover:text-primary"
     >
-      {{ policy.policyName }}
+      {{ displayPolicyName }}
     </h3>
 
     <p
       v-if="policy.supportContent"
-      class="mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-gray-500 font-medium"
+      class="mt-2 line-clamp-2 min-h-[42px] text-[13px] font-medium leading-[21px] text-gray-500"
     >
       {{ policy.supportContent }}
     </p>
 
-    <dl class="mt-4 space-y-2 border-t border-slate-100 pt-3.5 text-xs">
-      <div v-if="policy.providerInstitutionName" class="flex items-center justify-between">
+    <dl class="mt-4 space-y-2.5 border-t border-slate-100 pt-3.5 text-xs">
+      <div
+        v-if="policy.providerInstitutionName"
+        class="grid grid-cols-[64px_minmax(0,1fr)] items-start gap-2"
+      >
         <dt class="font-semibold text-slate-400">제공기관</dt>
-        <dd class="font-bold text-slate-700 truncate max-w-[180px]">
+        <dd class="line-clamp-2 text-right font-bold leading-[18px] text-slate-700">
           {{ policy.providerInstitutionName }}
         </dd>
       </div>
-      <div class="flex items-center justify-between">
+      <div class="grid grid-cols-[64px_minmax(0,1fr)] items-start gap-2">
         <dt class="font-semibold text-slate-400">신청기간</dt>
-        <dd class="font-bold text-slate-700 truncate max-w-[180px]">
+        <dd class="text-right font-bold leading-[18px] text-slate-700">
           {{ policy.applicationPeriod || '별도 공지' }}
         </dd>
       </div>
-      <div v-if="ageLabel" class="flex items-center justify-between">
+      <div v-if="ageLabel" class="grid grid-cols-[64px_minmax(0,1fr)] items-start gap-2">
         <dt class="font-semibold text-slate-400">지원연령</dt>
-        <dd class="font-bold text-slate-700">{{ ageLabel }}</dd>
+        <dd class="text-right font-bold leading-[18px] text-slate-700">{{ ageLabel }}</dd>
       </div>
     </dl>
 
     <div class="mt-auto pt-5">
       <button
         type="button"
-        class="flex w-full items-center justify-center rounded-xl bg-[#eaf2ff] py-2.5 text-xs sm:text-sm font-bold text-primary transition-all duration-150 hover:bg-primary hover:text-white active:scale-98 cursor-pointer select-none"
+        class="flex min-h-10 w-full cursor-pointer select-none items-center justify-center gap-1 rounded-xl border border-primary/20 bg-primary/10 py-2.5 text-xs font-bold text-primary transition-all duration-150 hover:border-primary hover:bg-primary hover:text-white active:scale-98 sm:text-sm"
         @click="emit('view-detail', policy.youthPolicyId)"
       >
         자세히 보기
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="size-3.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6" />
+        </svg>
       </button>
     </div>
   </article>
@@ -74,6 +86,18 @@ const props = defineProps({
   policy: { type: Object, required: true },
 })
 const emit = defineEmits(['view-detail'])
+
+const parenthesizedRegion = computed(() => props.policy.policyName?.match(/^\(([^)]+)\)\s*/))
+const regionTag = computed(() => {
+  const region = props.policy.region
+  if (region && region !== '전체') return region
+  return parenthesizedRegion.value?.[1] ?? ''
+})
+const displayPolicyName = computed(() =>
+  parenthesizedRegion.value
+    ? props.policy.policyName.slice(parenthesizedRegion.value[0].length)
+    : props.policy.policyName
+)
 
 const keywordTags = computed(() => {
   const tags = (props.policy.policyKeyword || '')

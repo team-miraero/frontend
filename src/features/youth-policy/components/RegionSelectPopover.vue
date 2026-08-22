@@ -76,7 +76,7 @@
           role="dialog"
           aria-modal="true"
           aria-labelledby="region-select-title"
-          class="fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-[28px] bg-white px-5 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] shadow-[0_-16px_48px_rgba(15,23,42,0.2)]"
+          class="fixed inset-x-0 bottom-0 z-50 flex max-h-[80dvh] flex-col rounded-t-[28px] bg-white px-5 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] shadow-[0_-16px_48px_rgba(15,23,42,0.2)]"
         >
           <!-- 모바일 상단 손잡이 바 -->
           <div class="mx-auto mb-3 h-1 w-10 shrink-0 rounded-full bg-slate-200" />

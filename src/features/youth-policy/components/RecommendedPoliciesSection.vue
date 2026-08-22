@@ -9,13 +9,7 @@
   >
     <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
       <div class="flex flex-wrap items-center gap-2">
-        <h2 class="text-lg sm:text-xl font-bold text-gray-900">내 조건에 맞는 정책</h2>
-        <span
-          v-if="youthPolicyStore.region !== '전체'"
-          class="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary shrink-0 whitespace-nowrap"
-        >
-          {{ youthPolicyStore.region }}
-        </span>
+        <h2 class="text-[17px] font-bold leading-6 text-gray-900 sm:text-xl">내 조건에 맞는 정책</h2>
       </div>
       <button
         v-if="youthPolicyStore.recommendedPolicies.length > RECOMMENDED_PREVIEW_SIZE"
