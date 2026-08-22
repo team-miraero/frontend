@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as pacemakerApi from '@/features/pacemaker/api/pacemaker.api'
 import { getLocalDateKey } from '@/shared/lib/date'
+import { useLocalDateClock } from '@/shared/composables/useLocalDateClock'
 
 export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   /** @type {import('vue').Ref<import('@/features/pacemaker/api/pacemaker.api').PacemakerStatus | null>} */
@@ -17,12 +18,15 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
   const historiesError = ref(null)
   const isToggling = ref(false)
   const toggleError = ref(null)
+  const isStatusLoading = ref(false)
+  const statusError = ref(null)
   const dashboardError = ref(null)
   /** @type {import('vue').Ref<Record<number, import('@/features/pacemaker/api/pacemaker.api').AccountDetail>>} */
   const accountDetails = ref({})
   const accountDetailRequests = new Map()
   let depositTargetsRequestId = 0
   let historiesRequestId = 0
+  const { currentDate, localDateKey } = useLocalDateClock()
 
   function $reset() {
     pacemakerStatus.value = null
@@ -35,6 +39,8 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     historiesError.value = null
     isToggling.value = false
     toggleError.value = null
+    isStatusLoading.value = false
+    statusError.value = null
     dashboardError.value = null
     accountDetails.value = {}
     accountDetailRequests.clear()
@@ -58,7 +64,7 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     const dashboard = pacemakerDashboard.value
     const currentStatus = dashboard?.status ?? status?.status ?? null
     // 서버가 "오늘" 날짜를 내려주지 않으므로(saved 불리언만 옴) 로컬 오늘 날짜의 월을 기준으로 집계한다.
-    const referenceMonth = getLocalDateKey(new Date()).slice(0, 7)
+    const referenceMonth = localDateKey.value.slice(0, 7)
     let monthlySecuredAmount = 0
     let monthlySuccessCountFromHistories = 0
     histories.value.forEach((item) => {
@@ -69,7 +75,8 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     })
 
     return {
-      registered: status?.registered ?? false,
+      // 상태 조회 전/실패를 실제 미개설(false)과 구분한다.
+      registered: status?.registered ?? null,
       status: currentStatus,
       enabled: currentStatus === 'ACTIVE',
       moneyBoxBalance: dashboard?.moneyBox?.balance ?? 0,
@@ -79,28 +86,46 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
       // 서버가 아직 집계를 못 채워 null을 주는 계정이 있어(정상적으로 내려주는 0은 그대로 존중),
       // null일 때만 이미 받아온 저축 내역(histories)으로 같은 값을 대신 계산한다. TODO: 서버가
       // currentStreak/monthlySuccessCount/weeklyStreak를 항상 채워주게 되면 이 폴백은 제거한다.
-      currentStreak: dashboard?.currentStreak ?? computeStreakFromHistories(histories.value),
+      currentStreak:
+        dashboard?.currentStreak ?? computeStreakFromHistories(histories.value, currentDate.value),
       maxAmount: dashboard?.maxAmount ?? 0,
       monthlySecuredAmount,
       monthlySuccessCount: dashboard?.monthlySuccessCount ?? monthlySuccessCountFromHistories,
-      weeklyStreak: dashboard?.weeklyStreak ?? computeWeeklyStreakFromHistories(histories.value),
+      weeklyStreak:
+        dashboard?.weeklyStreak ??
+        computeWeeklyStreakFromHistories(histories.value, currentDate.value),
     }
   })
 
   async function fetchPacemakerStatus() {
-    pacemakerStatus.value = await pacemakerApi.getPacemakerStatus()
-    return pacemakerStatus.value
+    isStatusLoading.value = true
+
+    try {
+      const status = await pacemakerApi.getPacemakerStatus()
+      if (typeof status?.registered !== 'boolean') {
+        throw new Error('페이스메이커 상태를 확인할 수 없습니다.')
+      }
+
+      pacemakerStatus.value = status
+      statusError.value = null
+      return status
+    } catch (error) {
+      statusError.value = error
+      throw error
+    } finally {
+      isStatusLoading.value = false
+    }
   }
 
   // 오늘 또는 어제부터 거꾸로 연속 여부를 센다. 오늘 배치는 아직 안 돌았을 수 있어 하루만 봐주지만,
   // 어제도 기록이 없으면 이미 끊긴 것이므로 봐주지 않는다(과거의 마지막 저축일을 기준으로 삼지 않는다).
-  function computeStreakFromHistories(historyItems) {
+  function computeStreakFromHistories(historyItems, referenceDate = new Date()) {
     const savedDates = new Set(
       historyItems.filter((item) => item.status === 'SAVED').map((item) => item.date)
     )
     if (savedDates.size === 0) return 0
 
-    const today = new Date()
+    const today = new Date(referenceDate)
     const yesterday = new Date(today)
     yesterday.setDate(today.getDate() - 1)
 
@@ -121,9 +146,9 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     return streak
   }
 
-  function computeWeeklyStreakFromHistories(historyItems) {
+  function computeWeeklyStreakFromHistories(historyItems, referenceDate = new Date()) {
     const byDate = new Map(historyItems.map((item) => [item.date, item]))
-    const today = new Date()
+    const today = new Date(referenceDate)
     const mondayOffset = today.getDay() === 0 ? -6 : 1 - today.getDay()
     const monday = new Date(today)
     monday.setDate(today.getDate() + mondayOffset)
@@ -299,6 +324,8 @@ export const usePacemakerStore = defineStore('feature-pacemaker', () => {
     historiesError,
     isToggling,
     toggleError,
+    isStatusLoading,
+    statusError,
     dashboardError,
     accountDetails,
     fetchPacemakerStatus,

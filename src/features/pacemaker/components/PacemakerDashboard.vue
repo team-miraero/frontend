@@ -343,7 +343,6 @@
     <PacemakerHistoryModal
       v-model="isHistoryModalOpen"
       :histories="pacemakerStore.histories"
-      :current-balance="pacemaker.moneyBoxBalance"
       :is-loading="pacemakerStore.isHistoriesLoading"
       :error="pacemakerStore.historiesError"
       @retry="retryHistories"
@@ -372,7 +371,7 @@ import PacemakerDepositModal from '@/features/pacemaker/components/PacemakerDepo
 import PacemakerDepositSuccessModal from '@/features/pacemaker/components/PacemakerDepositSuccessModal.vue'
 import PacemakerHistoryModal from '@/features/pacemaker/components/PacemakerHistoryModal.vue'
 import { useModal } from '@/shared/composables/useModal'
-import { getLocalDateKey } from '@/shared/lib/date'
+import { useLocalDateClock } from '@/shared/composables/useLocalDateClock'
 import GoalTypeIcon from '@/shared/ui/GoalTypeIcon.vue'
 
 defineEmits(['edit-max-amount'])
@@ -416,13 +415,13 @@ const isMonthlyStreak = ref(false)
 const { isOpen: isDepositModalOpen, open: openDepositModal } = useModal()
 const { isOpen: isDepositSuccessModalOpen, open: openDepositSuccessModal } = useModal()
 const { isOpen: isHistoryModalOpen, open: openHistoryModal } = useModal()
+const { currentDate, localDateKey: referenceDate } = useLocalDateClock()
 
 const pacemaker = computed(() => pacemakerStore.pacemakerView)
 const isActive = computed(() => pacemaker.value.status === 'ACTIVE')
 const weeklyStreak = computed(() => pacemaker.value.weeklyStreak ?? [])
-// 서버는 오늘 날짜를 별도로 내려주지 않으므로 로컬 오늘 날짜를 기준일로 쓴다.
-const referenceDate = computed(() => getLocalDateKey(new Date()))
-const todayDayOfWeek = computed(() => DAY_OF_WEEK_BY_INDEX[new Date().getDay()])
+// 서버는 오늘 날짜를 별도로 내려주지 않으므로 자정에 갱신되는 로컬 날짜를 기준일로 쓴다.
+const todayDayOfWeek = computed(() => DAY_OF_WEEK_BY_INDEX[currentDate.value.getDay()])
 
 const weekDays = computed(() => {
   const byDay = new Map(weeklyStreak.value.map((day) => [day.dayOfWeek, day]))
