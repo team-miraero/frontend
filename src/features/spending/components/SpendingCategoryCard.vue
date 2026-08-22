@@ -1,6 +1,6 @@
 <template>
   <article
-    class="flex flex-col rounded-2xl border bg-white p-4 transition-all duration-200 md:p-5 shadow-xs hover:border-slate-300"
+    class="flex flex-col rounded-2xl border bg-white p-5 transition-all duration-200 shadow-xs hover:border-slate-300"
     :class="cardBorderClass"
   >
     <!-- 카드 헤더 -->
@@ -18,14 +18,6 @@
           <h3 class="text-sm font-bold text-[#0A192F]">
             {{ category.name }}
           </h3>
-
-          <span
-            v-if="category.target !== null"
-            class="flex items-center gap-1 text-[11px] font-bold text-primary animate-pulse"
-          >
-            <span class="h-1.5 w-1.5 rounded-full bg-primary" />
-            목표 설정 중
-          </span>
         </div>
       </div>
 
@@ -39,8 +31,8 @@
       </span>
     </div>
 
-    <div class="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-      <div class="rounded-xl bg-[#F8FBFF] border border-slate-100 px-3 py-3 text-center">
+    <div class="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+      <div class="rounded-xl bg-[#F8FBFF] border border-slate-100 px-3 py-4 text-center">
         <p class="text-xs font-medium text-[#64748B]">기준 지출</p>
 
         <p class="mt-1 text-base font-bold tabular-nums text-[#0A192F]">
@@ -62,7 +54,7 @@
       </svg>
 
       <div
-        class="rounded-xl border px-3 py-3 text-center transition-colors"
+        class="rounded-xl border px-3 py-4 text-center transition-colors"
         :class="hasTarget ? 'border-[#B9D4FF] bg-[#F4F8FF]' : 'border-transparent bg-[#F2F4F6]'"
       >
         <p class="text-xs font-medium text-[#64748B]">목표 지출</p>
@@ -79,7 +71,7 @@
     </div>
 
     <!-- 슬라이더 -->
-    <div class="relative mt-5">
+    <div class="relative mt-6">
       <label :for="rangeInputId" class="sr-only"> {{ category.name }} 목표 지출 조절 </label>
 
       <input
@@ -96,7 +88,7 @@
       />
 
       <div
-        class="mt-2 flex items-center justify-between text-xs font-medium tabular-nums text-[#94A3B8]"
+        class="mt-3 flex items-center justify-between text-xs font-medium tabular-nums text-[#94A3B8]"
       >
         <span>{{ formatAmount(category.min) }}</span>
         <span>{{ formatAmount(category.recentThreeMonthAverage) }}만원</span>
@@ -106,7 +98,7 @@
     <!-- 조절 전 안내 -->
     <div
       v-if="category.target === null"
-      class="mt-4 flex items-center gap-2 rounded-xl bg-[#F8FBFF] border border-slate-100 px-3 py-2.5 text-xs text-[#64748B]"
+      class="mt-6 flex items-center gap-2 rounded-xl bg-[#F8FBFF] border border-slate-100 px-3 py-3 text-xs text-[#64748B]"
     >
       <span
         class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-600"
@@ -121,9 +113,11 @@
     <!-- 조절 후 결과 -->
     <div
       v-else
-      class="mt-4 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-[#F4F8FF] px-3 py-2.5 text-xs transition-all"
+      class="mt-6 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-[#F4F8FF] px-3 py-3 text-xs transition-all"
     >
-      <span class="shrink-0 font-bold text-primary"> {{ formattedShortenedMonths }} 단축 </span>
+      <span class="shrink-0 font-bold text-primary">
+        {{ formattedShortenedMonths }} 단축 예상
+      </span>
 
       <span class="min-w-0 text-right font-medium text-[#64748B]">
         월
@@ -183,7 +177,7 @@ const savingBadge = computed(() => {
     return '-'
   }
 
-  return `-${formatAmount(savingAmount.value)}만원`
+  return `월 ${formatAmount(savingAmount.value)}만원 절감`
 })
 
 const rangeProgress = computed(() => {
