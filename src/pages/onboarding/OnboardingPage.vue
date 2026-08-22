@@ -3,7 +3,7 @@
     <StepHeader show-brand :show-back="false" class="onboarding-header" :class="{ 'onboarding-header--hidden': scrollProgress > .008 }">
       <nav class="flex items-center gap-3">
         <RouterLink :to="{ name: ROUTE_NAMES.LOGIN }" class="text-sm font-medium text-gray-600">로그인</RouterLink>
-        <RouterLink v-slot="{ navigate }" :to="{ name: ROUTE_NAMES.SIGNUP }" custom><BaseButton size="sm" @click="navigate">시작하기</BaseButton></RouterLink>
+        <RouterLink v-slot="{ navigate }" :to="{ name: ROUTE_NAMES.SIGNUP }" custom><BaseButton size="sm" class="!px-5 !py-2.5" @click="navigate">시작하기</BaseButton></RouterLink>
       </nav>
     </StepHeader>
 
