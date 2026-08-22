@@ -49,15 +49,16 @@
           container-class="py-20"
         />
         <template v-else>
-          <ChatMessageBubble
-            v-for="message in coachStore.messages"
-            :key="message.id"
-            :message="message"
-          />
+          <template v-for="message in coachStore.messages" :key="message.id">
+            <ChatMessageBubble
+              v-if="message.content.trim().length > 0"
+              :message="message"
+            />
+          </template>
 
           <!-- AI 답변 생성 중 (생각 중 / 단정한 별 아이콘 + 텍스트 시머 그라데이션 말풍선) -->
           <div
-            v-if="coachStore.isSending && coachStore.messages.at(-1)?.content.length === 0"
+            v-if="coachStore.isSending && coachStore.messages.at(-1)?.content.trim().length === 0"
             class="flex w-full items-end gap-2.5 justify-start"
           >
             <div class="mb-1 flex size-7 sm:size-8 shrink-0 items-center justify-center">
