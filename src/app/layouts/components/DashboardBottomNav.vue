@@ -20,7 +20,11 @@
           <svg
             viewBox="0 0 24 24"
             class="size-5 transition-transform duration-200"
-            :class="isRoadmapActiveTab ? 'scale-105 fill-primary stroke-primary' : 'fill-none stroke-current'"
+            :class="
+              isRoadmapActiveTab
+                ? 'scale-105 fill-primary stroke-primary'
+                : 'fill-none stroke-current'
+            "
             stroke-width="1.8"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -41,20 +45,35 @@
       <RouterLink
         :to="{ name: ROUTE_NAMES.SPENDING }"
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95"
-        :class="isActive(ROUTE_NAMES.SPENDING) ? 'text-primary font-bold' : 'text-slate-400 font-medium hover:text-slate-600'"
+        :class="
+          isActive(ROUTE_NAMES.SPENDING)
+            ? 'text-primary font-bold'
+            : 'text-slate-400 font-medium hover:text-slate-600'
+        "
       >
         <span class="flex size-8 items-center justify-center transition-all duration-200">
           <!-- 활성: Solid Primary Blue Fill 카드 / 비활성: Outline 카드 -->
           <svg
             viewBox="0 0 24 24"
             class="size-5 transition-transform duration-200"
-            :class="isActive(ROUTE_NAMES.SPENDING) ? 'scale-105 fill-primary stroke-primary' : 'fill-none stroke-current'"
+            :class="
+              isActive(ROUTE_NAMES.SPENDING)
+                ? 'scale-105 fill-primary stroke-primary'
+                : 'fill-none stroke-current'
+            "
             stroke-width="1.8"
             stroke-linecap="round"
             stroke-linejoin="round"
           >
             <rect width="20" height="14" x="2" y="5" rx="2" />
-            <line x1="2" x2="22" y1="10" y2="10" :stroke="isActive(ROUTE_NAMES.SPENDING) ? '#ffffff' : 'currentColor'" stroke-width="1.8" />
+            <line
+              x1="2"
+              x2="22"
+              y1="10"
+              y2="10"
+              :stroke="isActive(ROUTE_NAMES.SPENDING) ? '#ffffff' : 'currentColor'"
+              stroke-width="1.8"
+            />
           </svg>
         </span>
         <span class="max-w-full truncate tracking-tight">지출</span>
@@ -64,21 +83,33 @@
       <RouterLink
         :to="{ name: ROUTE_NAMES.PACEMAKER }"
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95"
-        :class="isActive(ROUTE_NAMES.PACEMAKER) ? 'text-primary font-bold' : 'text-slate-400 font-medium hover:text-slate-600'"
+        :class="
+          isActive(ROUTE_NAMES.PACEMAKER)
+            ? 'text-primary font-bold'
+            : 'text-slate-400 font-medium hover:text-slate-600'
+        "
       >
         <span class="flex size-8 items-center justify-center transition-all duration-200">
           <!-- 활성: Solid Primary Blue Fill 시계 / 비활성: Outline 시계 -->
           <svg
             viewBox="0 0 24 24"
             class="size-5 transition-transform duration-200"
-            :class="isActive(ROUTE_NAMES.PACEMAKER) ? 'scale-105 fill-primary stroke-primary' : 'fill-none stroke-current'"
+            :class="
+              isActive(ROUTE_NAMES.PACEMAKER)
+                ? 'scale-105 fill-primary stroke-primary'
+                : 'fill-none stroke-current'
+            "
             stroke-width="1.8"
             stroke-linecap="round"
             stroke-linejoin="round"
           >
             <path d="M10 2h4" stroke-width="1.8" />
             <circle cx="12" cy="13" r="8" />
-            <path d="M12 9v4l2.5 2.5" :stroke="isActive(ROUTE_NAMES.PACEMAKER) ? '#ffffff' : 'currentColor'" stroke-width="1.8" />
+            <path
+              d="M12 9v4l2.5 2.5"
+              :stroke="isActive(ROUTE_NAMES.PACEMAKER) ? '#ffffff' : 'currentColor'"
+              stroke-width="1.8"
+            />
           </svg>
         </span>
         <span class="max-w-full truncate tracking-tight">페이스</span>
@@ -88,14 +119,22 @@
       <RouterLink
         :to="{ name: ROUTE_NAMES.COACH }"
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95"
-        :class="isActive(ROUTE_NAMES.COACH) ? 'text-primary font-bold' : 'text-slate-400 font-medium hover:text-slate-600'"
+        :class="
+          isActive(ROUTE_NAMES.COACH)
+            ? 'text-primary font-bold'
+            : 'text-slate-400 font-medium hover:text-slate-600'
+        "
       >
         <span class="flex size-8 items-center justify-center transition-all duration-200">
           <!-- 활성: Solid Primary Blue Fill Sparkle / 비활성: Outline Sparkle -->
           <svg
             viewBox="0 0 24 24"
             class="size-5 transition-transform duration-200"
-            :class="isActive(ROUTE_NAMES.COACH) ? 'scale-105 fill-primary stroke-primary' : 'fill-none stroke-current'"
+            :class="
+              isActive(ROUTE_NAMES.COACH)
+                ? 'scale-105 fill-primary stroke-primary'
+                : 'fill-none stroke-current'
+            "
             stroke-width="1.8"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -111,7 +150,11 @@
       <RouterLink
         :to="{ name: ROUTE_NAMES.MENU }"
         class="relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[11px] transition duration-200 active:scale-95"
-        :class="isActive(ROUTE_NAMES.MENU) ? 'text-primary font-bold' : 'text-slate-400 font-medium hover:text-slate-600'"
+        :class="
+          isActive(ROUTE_NAMES.MENU)
+            ? 'text-primary font-bold'
+            : 'text-slate-400 font-medium hover:text-slate-600'
+        "
       >
         <span class="flex size-8 items-center justify-center transition-all duration-200">
           <svg

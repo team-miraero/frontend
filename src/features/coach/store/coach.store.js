@@ -22,20 +22,28 @@ export const useCoachStore = defineStore('feature-coach', () => {
   const messages = ref([])
   const draftInput = ref('')
   const isSending = ref(false)
+  const sendError = ref(null)
   const isLoadingConversations = ref(false)
   const isLoadingMessages = ref(false)
   const isSidebarOpen = ref(false)
+  let activeRequestController = null
+  let stopActiveTyping = null
 
   function toggleSidebar(val) {
     isSidebarOpen.value = typeof val === 'boolean' ? val : !isSidebarOpen.value
   }
 
   function $reset() {
+    activeRequestController?.abort()
+    stopActiveTyping?.()
+    activeRequestController = null
+    stopActiveTyping = null
     conversations.value = []
     currentConversationId.value = null
     messages.value = []
     draftInput.value = ''
     isSending.value = false
+    sendError.value = null
     isLoadingConversations.value = false
     isLoadingMessages.value = false
     isSidebarOpen.value = false
@@ -91,6 +99,7 @@ export const useCoachStore = defineStore('feature-coach', () => {
     if (currentConversationId.value === conversationId) return
     currentConversationId.value = conversationId
     draftInput.value = ''
+    sendError.value = null
     isLoadingMessages.value = true
     try {
       const result = await coachApi.getConversationMessages(conversationId)
@@ -125,6 +134,7 @@ export const useCoachStore = defineStore('feature-coach', () => {
     conversations.value = [conversation, ...conversations.value]
     currentConversationId.value = newConvId
     draftInput.value = ''
+    sendError.value = null
     messages.value = welcomeContent
       ? [createLocalMessage(CHAT_ROLES.ASSISTANT, welcomeContent)]
       : []
@@ -152,18 +162,87 @@ export const useCoachStore = defineStore('feature-coach', () => {
     draftInput.value = value
   }
 
+  function clearSendError() {
+    sendError.value = null
+  }
+
   /**
    * @param {string} [content] 생략 시 draftInput을 사용
+   * @param {{ appendUser?: boolean }} [options]
    */
-  async function sendMessage(content) {
+  async function sendMessage(content, options = {}) {
     const text = (content ?? draftInput.value).trim()
     if (!text || isSending.value || !currentConversationId.value) return
 
-    messages.value.push(createLocalMessage(CHAT_ROLES.USER, text))
+    if (options.appendUser !== false) {
+      messages.value.push(createLocalMessage(CHAT_ROLES.USER, text))
+    }
     messages.value.push(createLocalMessage(CHAT_ROLES.ASSISTANT, ''))
     const assistantMessage = messages.value[messages.value.length - 1]
     draftInput.value = ''
+    sendError.value = null
     isSending.value = true
+
+    const pendingCharacters = []
+    const prefersReducedMotion =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let typingTimer = null
+    let streamFinished = false
+    let wasStopped = false
+    let receivedText = ''
+    let resolveTyping
+    const typingFinished = new Promise((resolve) => {
+      resolveTyping = resolve
+    })
+
+    function finishTypingIfReady() {
+      if (streamFinished && pendingCharacters.length === 0 && typingTimer === null) {
+        resolveTyping()
+      }
+    }
+
+    function scheduleTyping() {
+      if (typingTimer !== null) return
+
+      if (prefersReducedMotion) {
+        assistantMessage.content += pendingCharacters.splice(0).join('')
+        finishTypingIfReady()
+        return
+      }
+
+      const backlog = pendingCharacters.length
+      const batchSize = backlog > 120 ? 4 : backlog > 50 ? 3 : backlog > 20 ? 2 : 1
+      const nextChunk = pendingCharacters.splice(0, batchSize).join('')
+      const delay = /[.!?。！？\n]$/.test(nextChunk) ? 55 : 24
+
+      typingTimer = window.setTimeout(() => {
+        typingTimer = null
+        assistantMessage.content += nextChunk
+        if (pendingCharacters.length > 0) scheduleTyping()
+        else finishTypingIfReady()
+      }, delay)
+    }
+
+    function enqueueText(value) {
+      if (!value) return
+      pendingCharacters.push(...Array.from(value))
+      scheduleTyping()
+    }
+
+    function stopTyping() {
+      wasStopped = true
+      if (typingTimer !== null) {
+        window.clearTimeout(typingTimer)
+        typingTimer = null
+      }
+      assistantMessage.content += pendingCharacters.splice(0).join('')
+      streamFinished = true
+      resolveTyping()
+    }
+
+    const requestController = new AbortController()
+    activeRequestController = requestController
+    stopActiveTyping = stopTyping
 
     try {
       const completedMessage = await coachApi.sendMessageStream(
@@ -174,19 +253,55 @@ export const useCoachStore = defineStore('feature-coach', () => {
         useAuthStore().accessToken,
         {
           onDelta: (delta) => {
-            assistantMessage.content += delta
+            receivedText += delta
+            enqueueText(delta)
           },
+          signal: requestController.signal,
         }
       )
+
+      const completedContent = completedMessage.content ?? ''
+      if (!wasStopped && completedContent.startsWith(receivedText)) {
+        enqueueText(completedContent.slice(receivedText.length))
+      }
+      streamFinished = true
+      finishTypingIfReady()
+      await typingFinished
+
       assistantMessage.id = completedMessage.aiCoachMessageId ?? assistantMessage.id
-      assistantMessage.content = completedMessage.content ?? assistantMessage.content
+      assistantMessage.content = completedContent || assistantMessage.content
       assistantMessage.createdAt = completedMessage.createdAt ?? assistantMessage.createdAt
     } catch (err) {
-      messages.value = messages.value.filter((message) => message.id !== assistantMessage.id)
-      throw err
+      if (typingTimer !== null) window.clearTimeout(typingTimer)
+      if (err?.name === 'AbortError') {
+        assistantMessage.content += pendingCharacters.splice(0).join('')
+        if (!assistantMessage.content.trim()) {
+          messages.value = messages.value.filter((message) => message.id !== assistantMessage.id)
+        }
+      } else {
+        messages.value = messages.value.filter((message) => message.id !== assistantMessage.id)
+        sendError.value = {
+          content: text,
+          message: err instanceof Error ? err.message : 'AI 답변을 불러오지 못했어요.',
+        }
+      }
     } finally {
+      if (activeRequestController === requestController) activeRequestController = null
+      if (stopActiveTyping === stopTyping) stopActiveTyping = null
       isSending.value = false
     }
+  }
+
+  function stopGenerating() {
+    if (!isSending.value) return
+    stopActiveTyping?.()
+    activeRequestController?.abort()
+  }
+
+  async function retryLastMessage() {
+    const failedContent = sendError.value?.content
+    if (!failedContent) return
+    await sendMessage(failedContent, { appendUser: false })
   }
 
   return {
@@ -195,6 +310,7 @@ export const useCoachStore = defineStore('feature-coach', () => {
     messages,
     draftInput,
     isSending,
+    sendError,
     isLoadingConversations,
     isLoadingMessages,
     isSidebarOpen,
@@ -204,7 +320,10 @@ export const useCoachStore = defineStore('feature-coach', () => {
     createNewConversation,
     removeConversation,
     setDraftInput,
+    clearSendError,
     sendMessage,
+    stopGenerating,
+    retryLastMessage,
     $reset,
   }
 })

@@ -4,7 +4,7 @@
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    stroke-width="2"
+    :stroke-width="strokeWidth"
     stroke-linecap="round"
     stroke-linejoin="round"
     :class="sizeClass"
@@ -72,6 +72,9 @@
       <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </template>
+    <template v-else-if="iconName === 'message'">
+      <path d="M6 5h12a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-1v2l-3-2H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Z" />
+    </template>
     <template v-else>
       <circle cx="12" cy="12" r="9" />
       <path d="m9 12 2 2 4-4" />
@@ -105,6 +108,7 @@ const ALIASES = {
 const props = defineProps({
   name: { type: String, default: '' },
   size: { type: String, default: 'md' },
+  strokeWidth: { type: [Number, String], default: 2 },
 })
 const iconName = computed(() => ALIASES[props.name] || props.name || 'check')
 const sizeClass = computed(
