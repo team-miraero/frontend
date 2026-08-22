@@ -8,7 +8,7 @@
     >
       <section
         ref="dialogRef"
-        class="flex max-h-[calc(100dvh-16px)] w-full max-w-[430px] flex-col overflow-hidden rounded-t-[24px] bg-white shadow-[0_24px_70px_rgba(10,25,47,0.22)] outline-none sm:max-h-[min(760px,calc(100dvh-32px))] sm:rounded-[20px]"
+        class="flex max-h-[calc(100dvh-144px)] w-full max-w-[430px] flex-col overflow-hidden rounded-t-[24px] bg-white shadow-[0_24px_70px_rgba(10,25,47,0.22)] outline-none sm:max-h-[min(632px,calc(100dvh-160px))] sm:rounded-[20px]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="spending-history-title"
