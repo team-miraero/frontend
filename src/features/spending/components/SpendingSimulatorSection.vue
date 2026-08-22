@@ -23,19 +23,19 @@
         </div>
       </div>
 
-      <p ref="simulatorInstructionRef" class="mt-2 scroll-mt-2 text-center text-xs text-[#64748B]">
+      <p ref="simulatorInstructionRef" class="mt-3 scroll-mt-2 text-center text-xs text-[#64748B]">
         카테고리를 선택하고 지출을 조절해보세요
       </p>
     </div>
 
     <!-- 모바일 카테고리 선택 -->
-    <div class="mt-4 min-[1400px]:hidden">
-      <div class="grid grid-cols-3 gap-2">
+    <div class="mt-6 min-[1400px]:hidden">
+      <div class="grid grid-cols-3 gap-3">
         <button
           v-for="category in categories"
           :key="category.id"
           type="button"
-          class="relative flex min-h-[82px] flex-col items-center justify-center rounded-2xl border p-2 transition-all active:scale-[0.98] cursor-pointer select-none"
+          class="relative flex min-h-[92px] flex-col items-center justify-center rounded-2xl border p-3 transition-all active:scale-[0.98] cursor-pointer select-none"
           :class="
             selectedCategoryId === category.id
               ? 'border-primary/40 bg-[#EAF2FF] shadow-xs'
@@ -65,7 +65,7 @@
       </div>
 
       <!-- 모바일에서 선택된 카드 하나만 표시 -->
-      <div class="mt-4">
+      <div class="mt-8">
         <SpendingCategoryCard
           v-if="selectedCategory"
           :category="selectedCategory"
@@ -91,21 +91,27 @@
     </div>
 
     <!-- 절감 조정 탭에 머무는 동안 화면 하단에 유지되는 전체 절감 결과 -->
-    <div class="mt-3 h-10 min-[1400px]:h-auto">
+    <div class="mt-8 h-16 min-[1400px]:h-auto">
       <div
-        class="fixed inset-x-4 bottom-[calc(74px+env(safe-area-inset-bottom))] z-20 mx-auto max-w-[1376px] rounded-xl border px-3 py-2.5 text-center text-sm shadow-[0_4px_18px_rgba(15,35,70,0.08)] transition-all sm:inset-x-6 md:inset-x-8 md:bottom-4 min-[1400px]:static min-[1400px]:max-w-none min-[1400px]:shadow-none"
+        class="fixed inset-x-4 bottom-[calc(74px+env(safe-area-inset-bottom))] z-20 mx-auto max-w-[1376px] rounded-xl border px-4 py-3 text-center shadow-[0_4px_18px_rgba(15,35,70,0.08)] transition-all sm:inset-x-6 md:inset-x-8 md:bottom-4 min-[1400px]:static min-[1400px]:max-w-none min-[1400px]:shadow-none"
         :class="
           hasAdjustedInCurrentView
-            ? 'border-primary/25 bg-[#EAF2FF] font-bold text-primary'
-            : 'border-slate-100 bg-[#F8FBFF] text-xs text-[#94A3B8]'
+            ? 'border-primary/25 bg-[#EAF2FF]'
+            : 'border-slate-100 bg-[#F8FBFF]'
         "
         role="status"
         aria-live="polite"
       >
         <template v-if="hasAdjustedInCurrentView">
-          {{ selectedGoal }} 총 {{ formattedTotalShortenedMonths }} 단축
+          <p class="text-[11px] font-medium text-[#94A3B8]">전체 절감 효과</p>
+          <p class="mt-1 text-sm">
+            <span class="font-bold text-[#0A192F]">{{ selectedGoal }} 총</span>
+            <span class="ml-1 font-bold text-primary">{{ formattedTotalShortenedMonths }} 단축</span>
+          </p>
         </template>
-        <template v-else> 슬라이더를 조절하면 전체 단축 기간이 표시돼요 </template>
+        <template v-else>
+          <p class="text-xs text-[#94A3B8]">슬라이더를 조절하면 전체 단축 기간이 표시돼요</p>
+        </template>
       </div>
     </div>
 

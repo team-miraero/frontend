@@ -3,7 +3,7 @@
     <h2 id="spending-summary-title" class="sr-only">이번 달 지출 요약</h2>
 
     <!-- 모바일 통합 요약 카드 -->
-    <article class="rounded-2xl border border-[#D6E4FF] bg-white p-5 md:hidden">
+    <article class="rounded-2xl border border-[#D6E4FF] bg-white p-4 md:hidden">
       <div class="flex items-start justify-between gap-4">
         <p class="text-sm font-medium text-[#64748B]">이번 달 총지출</p>
 
@@ -39,7 +39,7 @@
       </div>
 
       <div
-        class="mt-5 grid grid-cols-2 divide-x divide-[#E2E8F0] rounded-xl bg-[#F4F8FF] px-3 py-4"
+        class="mt-4 grid grid-cols-2 divide-x divide-[#E2E8F0] rounded-xl bg-[#F4F8FF] px-3 py-3"
       >
         <div class="px-2">
           <p class="text-xs text-[#64748B]">이번 달 저축 여력</p>
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <div class="mt-4">
+      <div class="mt-3">
         <div class="flex items-center justify-between gap-4 text-xs text-[#64748B]">
           <span>목표 달성 진행률</span>
           <span class="font-medium">{{ normalizedGoalProgress }}%</span>

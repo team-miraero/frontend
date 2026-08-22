@@ -4,7 +4,7 @@
       <h2 id="spending-peer-title" class="sr-only">또래 지출과 비교</h2>
 
       <div
-        class="grid grid-cols-[minmax(0,3fr)_minmax(112px,2fr)] items-center gap-1.5 sm:grid-cols-[minmax(0,1fr)_140px] sm:gap-2"
+        class="grid grid-cols-[minmax(0,2fr)_minmax(100px,1fr)] items-center gap-1.5 sm:grid-cols-[minmax(0,1fr)_140px] sm:gap-2"
         aria-label="또래 지출 비교 조건"
       >
         <div
@@ -16,7 +16,7 @@
             v-for="basis in SPENDING_COMPARISON_BASES"
             :key="basis.id"
             type="button"
-            class="whitespace-nowrap rounded-lg px-1 py-2 text-[9px] font-semibold transition-all duration-150 sm:px-2 sm:text-xs"
+            class="whitespace-nowrap rounded-lg px-1 py-2.5 text-[10px] font-semibold transition-all duration-150 sm:px-2 sm:text-xs"
             :class="
               selectedComparisonBasis === basis.id
                 ? 'bg-white text-[#0066FF] shadow-sm font-bold'
@@ -29,22 +29,21 @@
           </button>
         </div>
 
-        <div class="relative min-w-0">
-          <label for="spending-peer-group-select" class="sr-only">비교 그룹</label>
-          <select
+        <div ref="peerGroupContainerRef" class="relative min-w-0">
+          <button
             id="spending-peer-group-select"
-            v-model="selectedPeerGroupId"
-            class="w-full appearance-none cursor-pointer rounded-xl border border-[#D6E4FF] bg-[#F8FBFF] py-2 pl-2.5 pr-7 text-[10px] font-bold text-[#0A192F] shadow-2xs outline-none transition-all duration-150 hover:border-[#0066FF]/60 hover:bg-[#F0F6FF] focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/20 sm:py-2 sm:pl-3 sm:pr-8 sm:text-xs"
+            type="button"
+            class="flex w-full items-center justify-between gap-1 rounded-xl border border-[#D6E4FF] bg-[#F8FBFF] py-2 pl-2.5 pr-2 text-[10px] font-bold text-[#0A192F] shadow-2xs outline-none transition-all duration-150 hover:border-[#0066FF]/60 hover:bg-[#F0F6FF] focus-visible:border-[#0066FF] focus-visible:ring-2 focus-visible:ring-[#0066FF]/20 cursor-pointer sm:py-2 sm:pl-3 sm:pr-2.5 sm:text-xs"
+            aria-haspopup="listbox"
+            :aria-expanded="isPeerGroupOpen"
+            aria-label="비교 그룹 선택"
+            @click="isPeerGroupOpen = !isPeerGroupOpen"
           >
-            <option v-for="group in peerGroupOptions" :key="group.id" :value="group.id">
-              {{ group.label }}
-            </option>
-          </select>
-          <div
-            class="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-[#0066FF] sm:right-2"
-          >
+            <span class="truncate">{{ selectedPeerGroupLabel }}</span>
+
             <svg
-              class="h-3 w-3 sm:h-3.5 sm:w-3.5"
+              class="h-3 w-3 shrink-0 text-[#0066FF] transition-transform duration-150 sm:h-3.5 sm:w-3.5"
+              :class="isPeerGroupOpen ? 'rotate-180' : ''"
               viewBox="0 0 20 20"
               fill="currentColor"
               aria-hidden="true"
@@ -55,7 +54,29 @@
                 clip-rule="evenodd"
               />
             </svg>
-          </div>
+          </button>
+
+          <ul
+            v-if="isPeerGroupOpen"
+            role="listbox"
+            aria-label="비교 그룹 목록"
+            class="absolute right-0 top-full z-20 mt-1.5 min-w-full overflow-hidden rounded-xl border border-[#D6E4FF] bg-white py-1 shadow-[0_12px_28px_rgba(15,35,70,0.12)]"
+          >
+            <li v-for="group in peerGroupOptions" :key="group.id" role="option" :aria-selected="group.id === selectedPeerGroupId">
+              <button
+                type="button"
+                class="block w-full whitespace-nowrap px-3 py-2 text-left text-[10px] font-semibold transition-colors sm:text-xs"
+                :class="
+                  group.id === selectedPeerGroupId
+                    ? 'bg-[#EAF2FF] text-[#0066FF]'
+                    : 'text-[#0A192F] hover:bg-[#F8FBFF]'
+                "
+                @click="selectPeerGroup(group.id)"
+              >
+                {{ group.label }}
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -152,7 +173,7 @@
 </template>
 
 <script setup>
-import { computed, toRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 import SpendingCategoryIcon from '@/features/spending/components/SpendingCategoryIcon.vue'
 import { usePeerSpendingComparison } from '@/features/spending/composables/useSpendingComparisons'
 import { SPENDING_COMPARISON_BASES } from '@/features/spending/constants/spending.constants'
@@ -182,6 +203,42 @@ const {
 const peerComparisonLabel = computed(() =>
   selectedComparisonBasis.value === 'AGE' ? '또래' : '소득평균'
 )
+
+const isPeerGroupOpen = ref(false)
+const peerGroupContainerRef = ref(null)
+
+function selectPeerGroup(groupId) {
+  selectedPeerGroupId.value = groupId
+  isPeerGroupOpen.value = false
+}
+
+function handlePeerGroupClickOutside(event) {
+  if (!isPeerGroupOpen.value) return
+  if (peerGroupContainerRef.value && !peerGroupContainerRef.value.contains(event.target)) {
+    isPeerGroupOpen.value = false
+  }
+}
+
+function handlePeerGroupKeydown(event) {
+  if (isPeerGroupOpen.value && event.key === 'Escape') {
+    isPeerGroupOpen.value = false
+  }
+}
+
+// 비교 기준(연령대/월소득)을 바꾸면 그룹 목록 자체가 달라지므로 열려 있던 목록은 닫는다.
+watch(selectedComparisonBasis, () => {
+  isPeerGroupOpen.value = false
+})
+
+onMounted(() => {
+  document.addEventListener('click', handlePeerGroupClickOutside)
+  window.addEventListener('keydown', handlePeerGroupKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handlePeerGroupClickOutside)
+  window.removeEventListener('keydown', handlePeerGroupKeydown)
+})
 
 const peerAverageLabel = computed(() =>
   selectedComparisonBasis.value === 'AGE' ? '또래 평균' : '소득평균'
