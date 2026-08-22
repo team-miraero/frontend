@@ -13,7 +13,7 @@ export const useGoalStore = defineStore('feature-goal', () => {
   const selectedGoalType = ref(null)
   // 온보딩 중 고른 목표 프리셋('INDEPENDENCE' 등 문자열). 실제 생성된 로드맵의 goalId와는 별개.
   const selectedGoalPresetId = ref(null)
-  // 대시보드/지출관리/금융상품 등에서 쓰는 "적용 대상" 로드맵의 실제 숫자 goalId.
+  // 대시보드/지출관리/KB상품 등에서 쓰는 "적용 대상" 로드맵의 실제 숫자 goalId.
   const selectedGoalId = ref(null)
   const goalParams = ref(null)
   const feasibilityResult = ref(null)

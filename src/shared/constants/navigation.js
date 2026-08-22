@@ -36,8 +36,8 @@ export const NAV_ITEMS = [
   },
   {
     routeName: ROUTE_NAMES.PRODUCTS,
-    label: '금융 상품',
-    pageTitle: '금융 상품 추천',
+    label: 'KB 상품',
+    pageTitle: 'KB 상품 추천',
     icon: productsIcon,
   },
   {

@@ -72,14 +72,14 @@
             </svg>
           </RouterLink>
 
-          <!-- 금융 상품 추천 -->
+          <!-- KB 금융 상품 추천 -->
           <RouterLink
             :to="{ name: ROUTE_NAMES.PRODUCTS }"
             class="flex items-center justify-between rounded-xl border border-transparent bg-white py-3 transition-all hover:bg-slate-50 active:scale-[0.98] sm:py-3.5"
           >
             <div class="flex items-center gap-3">
               <NavIcon name="products" />
-              <strong class="text-sm font-bold text-[#0a192f]">금융 상품</strong>
+              <strong class="text-sm font-bold text-[#0a192f]">KB 금융 상품</strong>
             </div>
             <svg
               class="size-4 shrink-0 text-slate-300"
