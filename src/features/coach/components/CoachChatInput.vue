@@ -1,5 +1,7 @@
 <template>
-  <div class="border-t border-slate-200/80 bg-white px-3.5 pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom))] sm:px-6 sm:pt-3 sm:pb-3.5 lg:px-10">
+  <div
+    class="border-t border-slate-200/80 bg-white px-3.5 pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom))] sm:px-6 sm:pt-3 sm:pb-3.5 lg:px-10"
+  >
     <!-- 추천 질문 칩 (하단 입력창 위 고정 가로 스크롤 탭) -->
     <div
       v-if="!coachStore.isSending"
@@ -22,26 +24,31 @@
       class="flex items-center gap-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 px-3.5 py-1.5 sm:py-2 shadow-xs transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/15 sm:px-4"
     >
       <textarea
+        ref="textareaRef"
         v-model="draftInput"
         rows="1"
-        placeholder="저축·목표 관련 질문을 자유롭게 입력하세요..."
-        class="min-h-[22px] max-h-[110px] flex-1 resize-none bg-transparent py-1 text-xs leading-[20px] text-[#0a192f] placeholder:text-slate-400 focus:outline-none sm:min-h-[24px] sm:py-1 sm:text-sm sm:leading-[22px]"
+        placeholder="목표 달성에 대해 물어보세요"
+        class="min-h-[22px] max-h-[110px] flex-1 resize-none bg-transparent py-1 text-xs leading-[20px] text-[#0a192f] placeholder:text-slate-400 focus:outline-none disabled:cursor-wait disabled:text-slate-400 sm:min-h-[24px] sm:py-1 sm:text-sm sm:leading-[22px]"
+        :disabled="coachStore.isSending"
         @input="autoGrow"
-        @keydown.enter.exact.prevent="handleSend"
+        @keydown.enter.exact.prevent="handleAction"
       />
       <button
         type="button"
-        class="flex size-8 shrink-0 items-center justify-center rounded-xl transition-all active:scale-90 sm:size-9 cursor-pointer"
+        class="flex size-8 shrink-0 items-center justify-center rounded-full transition-all active:scale-90 sm:size-9 cursor-pointer"
         :class="
-          canSend
-            ? 'bg-primary text-white shadow-md shadow-primary/25 hover:bg-primary/90'
-            : 'bg-slate-200 text-slate-400'
+          coachStore.isSending
+            ? 'bg-primary text-white hover:bg-primary/90'
+            : canSend
+              ? 'bg-primary text-white shadow-md shadow-primary/25 hover:bg-primary/90'
+              : 'bg-slate-200 text-slate-400'
         "
-        :disabled="!canSend"
-        aria-label="메시지 전송"
-        @click="handleSend"
+        :disabled="!coachStore.isSending && !canSend"
+        :aria-label="coachStore.isSending ? '답변 생성 중지' : '메시지 전송'"
+        @click="handleAction"
       >
         <svg
+          v-if="!coachStore.isSending"
           class="size-4 transition-transform duration-150"
           :class="canSend ? '-translate-y-0.5' : ''"
           viewBox="0 0 24 24"
@@ -54,17 +61,21 @@
           <path d="M12 19V5" />
           <path d="m5 12 7-7 7 7" />
         </svg>
+        <svg v-else viewBox="0 0 24 24" fill="currentColor" class="size-3.5" aria-hidden="true">
+          <rect x="5" y="5" width="14" height="14" rx="2" />
+        </svg>
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useCoachStore } from '@/features/coach/store/coach.store'
 import { SUGGESTED_PROMPTS } from '@/features/coach/constants/coach.constants'
 
 const coachStore = useCoachStore()
+const textareaRef = ref(null)
 
 const draftInput = computed({
   get: () => coachStore.draftInput,
@@ -73,13 +84,24 @@ const draftInput = computed({
 
 const canSend = computed(() => draftInput.value.trim().length > 0 && !coachStore.isSending)
 
+watch(draftInput, (value) => {
+  if (value) return
+  nextTick(() => {
+    if (textareaRef.value) textareaRef.value.style.height = 'auto'
+  })
+})
+
 function autoGrow(event) {
   const el = event.target
   el.style.height = 'auto'
   el.style.height = `${Math.min(el.scrollHeight, 120)}px`
 }
 
-function handleSend() {
+function handleAction() {
+  if (coachStore.isSending) {
+    coachStore.stopGenerating()
+    return
+  }
   if (!canSend.value) return
   coachStore.sendMessage()
 }

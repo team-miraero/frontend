@@ -102,7 +102,7 @@ export async function sendMessage(payload) {
  * AI 코치 답변을 SSE로 수신한다.
  * @param {SendChatMessagePayload} payload
  * @param {string} accessToken
- * @param {{ onDelta?: (content: string) => void }} [handlers]
+ * @param {{ onDelta?: (content: string) => void, signal?: AbortSignal }} [handlers]
  * @returns {Promise<ChatMessageDto>}
  */
 export async function sendMessageStream(payload, accessToken, handlers = {}) {
@@ -118,6 +118,7 @@ export async function sendMessageStream(payload, accessToken, handlers = {}) {
         Accept: 'text/event-stream',
       },
       body: JSON.stringify({ content: payload.message }),
+      signal: handlers.signal,
     }
   )
 
@@ -132,7 +133,10 @@ export async function sendMessageStream(payload, accessToken, handlers = {}) {
 
   function processEvent(block) {
     const lines = block.split('\n')
-    const eventName = lines.find((line) => line.startsWith('event:'))?.slice(6).trim()
+    const eventName = lines
+      .find((line) => line.startsWith('event:'))
+      ?.slice(6)
+      .trim()
     const data = lines
       .filter((line) => line.startsWith('data:'))
       .map((line) => line.slice(5).trim())
@@ -142,7 +146,8 @@ export async function sendMessageStream(payload, accessToken, handlers = {}) {
     const payloadData = JSON.parse(data)
     if (eventName === 'delta') handlers.onDelta?.(payloadData.content ?? '')
     if (eventName === 'completed') completedMessage = payloadData.message ?? null
-    if (eventName === 'error') throw new Error(payloadData.message ?? 'AI 응답을 생성하지 못했습니다.')
+    if (eventName === 'error')
+      throw new Error(payloadData.message ?? 'AI 응답을 생성하지 못했습니다.')
   }
 
   let isStreamDone = false

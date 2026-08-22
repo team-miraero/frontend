@@ -5,7 +5,10 @@
     <!-- 모바일/태블릿 헤더 (lg:hidden) -->
     <div class="page-container flex h-14 sm:h-16 items-center justify-between gap-3 lg:hidden">
       <!-- 1. 뒤로가기 / 닫기 서브 헤더 (상세/서브 페이지 및 챗봇 세션) -->
-      <div v-if="route.meta.showBack || route.meta.showBackButton || route.meta.showClose" class="flex items-center gap-1.5 min-w-0">
+      <div
+        v-if="route.meta.showBack || route.meta.showBackButton || route.meta.showClose"
+        class="flex items-center gap-1.5 min-w-0"
+      >
         <button
           type="button"
           class="-ml-1.5 flex size-9 shrink-0 items-center justify-center rounded-xl text-slate-700 transition hover:bg-slate-100 active:scale-95 cursor-pointer"
@@ -49,19 +52,25 @@
           :aria-expanded="uiStore.sidebarOpen"
           @click="uiStore.toggleSidebar()"
         >
-          <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            class="size-5"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          >
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
-        <RouterLink
-          :to="{ name: ROUTE_NAMES.DASHBOARD }"
-          class="flex shrink-0 items-center gap-2"
-        >
+        <RouterLink :to="{ name: ROUTE_NAMES.DASHBOARD }" class="flex shrink-0 items-center gap-2">
           <div class="flex size-7 items-center justify-center rounded-[10px] bg-primary shadow-sm">
             <img src="@/assets/icons/logo.svg" alt="미래로" class="size-4" />
           </div>
-          <strong class="text-base font-bold tracking-tight text-[#0a192f] hidden sm:block">미래로</strong>
+          <strong class="text-base font-bold tracking-tight text-[#0a192f] hidden sm:block"
+            >미래로</strong
+          >
         </RouterLink>
 
         <!-- 토스 스타일: 현재 목표 선택 드롭다운 버튼 -->
@@ -101,7 +110,14 @@
           :aria-expanded="uiStore.sidebarOpen"
           @click="uiStore.toggleSidebar()"
         >
-          <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            class="size-5"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          >
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -112,26 +128,16 @@
       </div>
 
       <!-- 우측: 알림 센터 종 아이콘 & 마이페이지 아바타 (+ AI 코치 전용 대화목록 버튼) -->
-      <div class="flex shrink-0 items-center gap-2">
+      <div class="flex shrink-0 items-center gap-0">
         <!-- AI 코치 전용: 모바일 대화 목록 열기 버튼 -->
         <button
           v-if="currentRouteName === ROUTE_NAMES.COACH"
           type="button"
-          class="flex size-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/90 text-slate-600 shadow-sm transition hover:bg-white focus:outline-none active:scale-95 cursor-pointer"
+          class="flex size-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 active:scale-95 cursor-pointer"
           aria-label="대화 목록 열기"
           @click="coachStore.toggleSidebar()"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="size-4 text-slate-600"
-          >
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-          </svg>
+          <AppIcon name="message" size="md" :stroke-width="1.8" />
         </button>
 
         <!-- 🔔 모바일 알림 종 아이콘 & 알림 드롭다운 -->
@@ -256,7 +262,6 @@
             </div>
           </Transition>
         </div>
-
       </div>
     </div>
 
@@ -523,7 +528,6 @@
             </div>
           </Transition>
         </div>
-
       </div>
     </div>
 
@@ -597,7 +601,9 @@
                 <div class="flex min-w-0 items-center gap-2">
                   <span
                     class="size-2 shrink-0 rounded-full"
-                    :class="isSelectedGoal(goal) ? 'bg-primary ring-2 ring-primary/30' : 'bg-slate-300'"
+                    :class="
+                      isSelectedGoal(goal) ? 'bg-primary ring-2 ring-primary/30' : 'bg-slate-300'
+                    "
                   />
                   <strong
                     class="truncate text-sm font-bold"
@@ -676,7 +682,8 @@ function getNotificationIconStyle(type, badgeIcon) {
   }
   if (type === 'ACHIEVE' || badgeIcon === '🎯') {
     return {
-      container: 'bg-emerald-50 border border-emerald-200/80 text-emerald-600 shadow-emerald-500/10',
+      container:
+        'bg-emerald-50 border border-emerald-200/80 text-emerald-600 shadow-emerald-500/10',
       icon: 'target',
       iconColor: 'text-emerald-600',
     }
@@ -693,13 +700,8 @@ const router = useRouter()
 const uiStore = useUiStore()
 const goalStore = useGoalStore()
 const coachStore = useCoachStore()
-const {
-  notificationHistory,
-  hasUnread,
-  markAllAsRead,
-  removeHistoryItem,
-  clearHistory,
-} = usePacemakerToast()
+const { notificationHistory, hasUnread, markAllAsRead, removeHistoryItem, clearHistory } =
+  usePacemakerToast()
 
 const isDropdownOpen = ref(false)
 const dropdownRef = ref(null)
