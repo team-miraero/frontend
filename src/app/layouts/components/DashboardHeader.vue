@@ -3,7 +3,7 @@
     class="z-30 shrink-0 border-b border-slate-200/80 bg-white/95 shadow-[0_2px_12px_rgba(15,35,70,0.04)] backdrop-blur-xl max-lg:border-b-0 max-lg:bg-[#f8fafc] max-lg:shadow-none"
   >
     <!-- 모바일/태블릿 헤더 (lg:hidden) -->
-    <div class="page-container flex h-14 sm:h-16 items-center justify-between gap-3 lg:hidden">
+    <div class="page-container flex h-[72px] items-center justify-between gap-3 lg:hidden">
       <!-- 1. 뒤로가기 / 닫기 서브 헤더 (상세/서브 페이지 및 챗봇 세션) -->
       <div
         v-if="route.meta.showBack || route.meta.showBackButton || route.meta.showClose"
@@ -65,10 +65,10 @@
         </button>
 
         <RouterLink :to="{ name: ROUTE_NAMES.DASHBOARD }" class="flex shrink-0 items-center gap-2">
-          <div class="flex size-7 items-center justify-center rounded-[10px] bg-primary shadow-sm">
-            <img src="@/assets/icons/logo.svg" alt="미래로" class="size-4" />
+          <div class="flex size-8 items-center justify-center rounded-[12px] bg-primary shadow-sm">
+            <img src="@/assets/icons/logo.svg" alt="미래로" class="size-[18px]" />
           </div>
-          <strong class="text-base font-bold tracking-tight text-[#0a192f] hidden sm:block"
+          <strong class="text-lg font-bold tracking-tight text-[#0a192f] hidden sm:block"
             >미래로</strong
           >
         </RouterLink>

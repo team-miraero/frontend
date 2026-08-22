@@ -1,7 +1,7 @@
 <!-- 공용 브랜드 + 단계형 네비게이션 헤더 -->
 <template>
   <header
-    class="sticky top-0 z-20 w-full py-3.5 transition-all duration-300"
+    class="sticky top-0 z-20 w-full py-5 transition-all duration-300"
     :class="[
       isScrolled
         ? 'border-b border-blue-100/60 bg-[#f8fbff]/85 backdrop-blur-md shadow-xs'

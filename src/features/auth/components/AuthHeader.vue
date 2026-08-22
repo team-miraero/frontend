@@ -1,7 +1,7 @@
 <!-- 로그인·회원가입 공통 상단바: 좌측 로고, 우측 뒤로가기 링크(대상/텍스트는 페이지별로 전달) -->
 <template>
   <div
-    class="sticky top-0 z-20 mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 py-6 backdrop-blur-md md:px-8 lg:px-[80px]"
+    class="sticky top-0 z-20 mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 py-5 backdrop-blur-md md:px-8 lg:px-[80px]"
   >
     <BrandHeader />
     <RouterLink
