@@ -167,7 +167,7 @@
             :to="{ name: ROUTE_NAMES.MYPAGE }"
             class="group flex w-full items-center justify-between py-3.5 text-left transition hover:text-primary"
           >
-            <span class="leading-none">계정 및 마이데이터 관리</span>
+            <span class="leading-none">계정 및 연결 관리</span>
             <svg
               class="size-4 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
               viewBox="0 0 24 24"

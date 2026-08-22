@@ -6,7 +6,7 @@ let profile = {
   email: 'miraero@gmail.com',
   birthDate: '2001-03-15',
   profileImageUrl: null,
-  company: 'KB금융그룹',
+  company: '미래로',
   monthlyIncome: 2850000,
   kbpayLinked: true,
 }
@@ -14,21 +14,21 @@ let profile = {
 let mydataConnections = [
   {
     connectionId: 1,
-    institutionName: 'KB국민은행',
+    institutionName: '연결 은행',
     agreedAt: '2026-07-15T10:30:00',
     expiresAt: '2027-07-15T10:30:00',
     lastSyncedAt: '2026-07-20T09:30:00',
   },
   {
     connectionId: 2,
-    institutionName: 'KB Pay',
+    institutionName: '간편결제',
     agreedAt: '2026-07-16T14:00:00',
     expiresAt: '2027-07-16T14:00:00',
     lastSyncedAt: '2026-07-20T09:35:00',
   },
   {
     connectionId: 3,
-    institutionName: 'KB증권',
+    institutionName: '연결 증권사',
     agreedAt: '2025-07-10T11:00:00',
     expiresAt: '2026-07-10T11:00:00',
     lastSyncedAt: '2026-07-09T18:20:00',

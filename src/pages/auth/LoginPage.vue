@@ -12,14 +12,6 @@
           <p class="mt-2 text-sm leading-relaxed text-gray-500 [word-break:keep-all] break-keep">
             미래로 계정으로 시작하세요
           </p>
-          <div
-            class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-primary"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="size-3.5" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />
-            </svg>
-            KB스타뱅킹 인증 완료
-          </div>
         </div>
 
         <form class="mt-7 space-y-6" @submit.prevent="handleLogin">

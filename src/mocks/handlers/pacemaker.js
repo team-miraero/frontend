@@ -62,7 +62,7 @@ const mockGoals = [
       {
         assetType: 'ACCOUNT',
         assetId: 3,
-        financialInstitutionName: 'KB국민은행',
+        financialInstitutionName: '연결 은행',
         maskedAccountNumber: '123-***-789',
         balance: 700000,
       },
@@ -77,7 +77,7 @@ const mockGoals = [
     withdrawalAccounts: [
       {
         accountId: 8,
-        financialInstitutionName: 'KB국민은행',
+        financialInstitutionName: '연결 은행',
         maskedAccountNumber: '987-***-123',
         balance: 1000000,
       },
