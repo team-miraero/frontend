@@ -22,13 +22,13 @@
     <BaseCard>
       <div class="flex items-center justify-between mb-4">
         <label class="block text-sm font-bold text-gray-700">남은 대출 잔액</label>
-        <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700"
+        <span class="rounded-full bg-green-100 px-2 py-0.5 text-[13px] font-bold text-green-700"
           >마이데이터 자동 연동</span
         >
       </div>
       <AmountInput v-model="loanBalance" />
 
-      <div class="mt-3 flex items-center space-x-3 text-xs font-medium text-blue-500">
+      <div class="mt-3 flex items-center space-x-3 text-[13px] font-medium text-blue-500">
         <span>= {{ Math.floor(loanBalance / 10000).toLocaleString() }}만원</span>
         <span>연 1.7% 고정금리 (정부 학자금)</span>
       </div>
@@ -41,7 +41,7 @@
         <label class="block text-sm font-bold text-gray-700">완납 기간</label>
         <span class="text-sm font-bold text-blue-600">{{ repaymentPeriod }}개월</span>
       </div>
-      <p class="text-xs text-gray-500 mb-6">
+      <p class="mb-6 text-[13px] text-gray-500">
         슬라이더를 조절하면 이자 포함 상환 계획이 자동으로 계산돼요
       </p>
 
@@ -55,7 +55,7 @@
       />
 
       <!-- 양 끝단 개월 수 표시 -->
-      <div class="flex justify-between text-xs text-gray-400 mt-2">
+      <div class="mt-2 flex justify-between text-[13px] text-gray-400">
         <span>6개월</span>
         <span>60개월</span>
       </div>
@@ -66,7 +66,7 @@
           <span class="text-sm font-medium text-gray-600">월 납입액(이자 포함)</span>
           <span class="text-xl font-bold text-blue-600">{{ formattedMonthlyPayment }}원</span>
         </div>
-        <p class="text-xs text-gray-400">원리금균등상환 기준 · 연 1.7% 적용</p>
+        <p class="text-[13px] text-gray-400">원리금균등상환 기준 · 연 1.7% 적용</p>
       </div>
     </BaseCard>
 
@@ -78,7 +78,7 @@
         <div class="h-full bg-yellow-400" :style="{ width: interestRatio + '%' }"></div>
       </div>
       <!-- 범례 (파란점, 노란점) 추가 -->
-      <div class="flex items-center space-x-4 mb-6 text-xs text-gray-500">
+      <div class="mb-6 flex items-center space-x-4 text-[13px] text-gray-500">
         <div class="flex items-center">
           <span class="w-2 h-2 rounded-full bg-blue-600 mr-1"></span>원금 {{ formattedPrincipal }}원
         </div>
@@ -106,12 +106,12 @@
     <!-- 4. 추가 상환 여력 -->
     <BaseCard>
       <label class="block text-sm font-bold text-gray-700">추가 상환 여력</label>
-      <p class="text-xs text-gray-500 mt-1 mb-4">선택 사항 — 매달 더 갚으면 이자도 줄어들어요</p>
+      <p class="mt-1 mb-4 text-[13px] text-gray-500">선택 사항 — 매달 더 갚으면 이자도 줄어들어요</p>
       <AmountInput v-model="extraPayment" />
     </BaseCard>
 
     <!-- 하단 영역 -->
-    <p class="text-xs text-gray-400 text-center">
+    <p class="text-center text-[13px] text-gray-400">
       이자는 원리금균등상환 방식으로 계산됩니다. 정확한 이자율은 금융기관별로 상이할 수 있습니다.
     </p>
 

@@ -6,21 +6,21 @@
     <!-- 본문 콘텐츠 -->
     <div
       v-if="goalParams && feasibility"
-      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pb-28 md:pb-4 pt-1"
+      class="relative z-10 mx-auto w-full max-w-[660px] animate-fade-in-up px-4 pt-3 sm:pt-6 pb-28 md:pb-6"
     >
       <ProgressBar :current-step="3" :total-steps="4" />
 
       <!-- 메인 헤드라인 & 서브 설명 -->
       <h1
-        class="mt-3 whitespace-pre-line sm:whitespace-normal text-2xl sm:text-[28px] font-black tracking-tight leading-snug text-gray-900 break-keep"
+        class="mt-4 sm:mt-6 whitespace-pre-line sm:whitespace-normal text-2xl sm:text-[28px] font-black tracking-tight leading-snug text-gray-900 break-keep"
       >
         {{ initialStatusContent.pageTitle }}
       </h1>
-      <p class="mt-2 sm:mt-2.5 text-xs sm:text-sm font-medium text-slate-500">
+      <p class="mt-2 sm:mt-2.5 text-[13px] sm:text-sm font-medium text-slate-500">
         현재 소득과 지출을 기준으로 분석했어요.
       </p>
 
-      <div class="mt-4 sm:mt-5">
+      <div class="mt-6 sm:mt-8">
         <FeasibilityResult
           v-model:selected-alternative="selectedAlternative"
           available-label="월 가능 저축액"
