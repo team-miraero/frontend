@@ -78,11 +78,11 @@
           </div>
         </div>
 
-        <!-- 하단: 페이스 정보 인셋 카드 (슬레이트 톤앤매너) — 클릭 시 '나의 로드맵 여정' 섹션으로 스크롤 이동 -->
-        <div class="mt-5 sm:mt-6">
+        <!-- 하단: 페이스 정보 — 클릭 시 '나의 로드맵 여정' 섹션으로 스크롤 이동 -->
+        <div class="mt-5 border-t border-slate-100 pt-4 sm:mt-6 sm:pt-5">
           <button
             type="button"
-            class="w-full rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] cursor-pointer select-none sm:p-3.5"
+            class="-mx-1 w-[calc(100%+0.5rem)] rounded-xl px-1 py-1 text-left transition-colors duration-200 hover:bg-slate-50 active:scale-[0.99] cursor-pointer select-none"
             aria-label="나의 로드맵 여정으로 이동"
             @click="$emit('view-roadmap')"
           >
@@ -96,7 +96,7 @@
                   >
                     {{ formatManwon(paceMetrics.currentMonthlyPace) }}만원
                   </strong>
-                  <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
+                  <span class="text-[11px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
               </div>
 
@@ -109,7 +109,7 @@
                   >
                     {{ formatManwon(paceMetrics.targetMonthlyPace) }}만원
                   </strong>
-                  <span class="text-[10px] font-normal text-slate-400 sm:text-xs">/월</span>
+                  <span class="text-[11px] font-normal text-slate-400 sm:text-xs">/월</span>
                 </div>
               </div>
 
@@ -125,7 +125,7 @@
                   </strong>
                   <span
                     v-if="paceState !== PACE_STATE.NOT_STARTED"
-                    class="text-[10px] font-normal text-slate-400 sm:text-xs"
+                    class="text-[11px] font-normal text-slate-400 sm:text-xs"
                     >/월</span
                   >
                 </div>
@@ -137,7 +137,7 @@
 
       <!-- 우측: 스마트 자동 저축 카드 (슬림형 슬레이트 인셋 패널) -->
       <div
-        class="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 sm:p-4 shadow-[0_1px_0_rgba(0,0,0,0.05)]"
+        class="flex flex-col justify-between overflow-hidden rounded-2xl border border-blue-100/80 bg-[#f8fbff] p-3.5 sm:p-4 shadow-[0_1px_0_rgba(0,0,0,0.05)]"
       >
         <div
           v-if="dailyAvailableMoney || monthlyAvailableMoney"
@@ -146,7 +146,7 @@
           <button
             v-if="dailyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-lg px-2 py-2 text-left transition-colors duration-200 hover:bg-white/70 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!monthlyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-today')"
@@ -162,7 +162,7 @@
           <button
             v-if="monthlyAvailableMoney"
             type="button"
-            class="group rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
+            class="group rounded-lg px-2 py-2 text-left transition-colors duration-200 hover:bg-white/70 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none"
             :class="!dailyAvailableMoney ? 'col-span-2' : ''"
             :disabled="disabled"
             @click="$emit('open-month')"
