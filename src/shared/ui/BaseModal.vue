@@ -24,7 +24,7 @@
           appear
         >
           <div
-            class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl pb-[env(safe-area-inset-bottom)] sm:pb-0"
+            class="relative w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-t-3xl sm:rounded-2xl bg-white shadow-2xl pb-[env(safe-area-inset-bottom)] sm:pb-0"
             :class="hideDefaultClose ? '' : 'p-6'"
           >
             <!-- 모바일 상단 손잡이 바 (상단 오버레이로 헤더 여백 침범 방지) -->

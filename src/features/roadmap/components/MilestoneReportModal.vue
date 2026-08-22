@@ -48,15 +48,15 @@
           class="grid grid-cols-3 divide-x divide-slate-100 rounded-2xl border border-slate-100 bg-slate-50/70 px-2 py-3.5 text-center"
         >
           <div class="px-2">
-            <dt class="text-[10px] font-bold text-slate-400">목표 금액</dt>
+            <dt class="text-[11px] font-bold text-slate-400">목표 금액</dt>
             <dd class="mt-1 text-xs font-bold text-[#0a192f]">{{ formattedAmount }}</dd>
           </div>
           <div class="px-2">
-            <dt class="text-[10px] font-bold text-slate-400">목표 지점</dt>
+            <dt class="text-[11px] font-bold text-slate-400">목표 지점</dt>
             <dd class="mt-1 text-xs font-bold text-primary">{{ milestone.percentage }}%</dd>
           </div>
           <div class="px-2">
-            <dt class="text-[10px] font-bold text-slate-400">달성일</dt>
+            <dt class="text-[11px] font-bold text-slate-400">달성일</dt>
             <dd class="mt-1 text-xs font-bold text-[#0a192f]">{{ achievedDate }}</dd>
           </div>
         </dl>
@@ -72,7 +72,7 @@
             <p class="text-xs font-bold text-emerald-600">AI 코치 분석</p>
           </div>
           <div
-            class="whitespace-pre-line text-xs sm:text-sm leading-6 sm:leading-7 text-slate-600"
+            class="whitespace-pre-line text-[13px] leading-6 text-slate-600 sm:text-sm sm:leading-7"
             v-html="formattedReportContent"
           />
         </section>
@@ -91,7 +91,7 @@
         </section>
 
         <p class="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-[11px] leading-5 text-slate-400">
-          AI 리포트는 목표 진행 데이터와 연결 자산 흐름을 바탕으로 작성된 참고 정보예요.
+          AI 리포트는 목표 진행·연결 자산 데이터를 바탕으로 한 참고 정보예요.
         </p>
 
         <button
