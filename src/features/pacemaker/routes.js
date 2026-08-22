@@ -14,6 +14,10 @@ export const pacemakerRoutes = [
     meta: {
       navRouteName: ROUTE_NAMES.PACEMAKER,
       pageTitle: '페이스메이커 설정',
+      hideHeader: true,
+      hideBottomNav: true,
+      hideFooter: true,
+      fixedHeight: true,
     },
   },
 ]
