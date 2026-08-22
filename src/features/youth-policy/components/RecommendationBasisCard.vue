@@ -1,13 +1,13 @@
 <!-- 조건 일치 정책을 찾는 데 사용한 프로필 정보를 깔끔하게 보여주는 인라인 바 -->
 <template>
   <aside
-    class="mt-2.5 flex flex-col gap-1.5 rounded-xl border border-blue-100/90 bg-gradient-to-r from-[#f2f7ff] via-[#f8fbff] to-white px-3.5 py-2 text-xs shadow-2xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2"
+    class="mt-2.5 flex flex-col gap-2 rounded-xl border border-blue-100/90 bg-gradient-to-r from-[#f2f7ff] via-[#f8fbff] to-white px-3.5 py-2.5 text-xs shadow-2xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2"
   >
     <div class="flex items-center justify-between sm:contents">
       <span class="shrink-0 font-bold text-slate-700">적용된 조건:</span>
       <RouterLink
         :to="{ name: ROUTE_NAMES.MYPAGE }"
-        class="inline-flex shrink-0 items-center gap-0.5 text-[11px] font-bold text-primary transition-colors hover:text-blue-700 sm:order-3 sm:ml-auto"
+        class="inline-flex min-h-7 shrink-0 items-center gap-0.5 rounded-md px-1 text-[11px] font-bold text-primary transition-colors hover:bg-primary/5 hover:text-blue-700 sm:order-3 sm:ml-auto"
       >
         {{ hasProfileBasis ? '내 조건 수정' : '내 조건 등록' }}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="size-3">
@@ -20,9 +20,8 @@
         <span
           v-for="item in basisItems"
           :key="item"
-          class="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-md border border-blue-200/70 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-700 shadow-2xs"
+          class="inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-blue-200/70 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-700 shadow-2xs"
         >
-          <span class="text-primary font-bold">✓</span>
           {{ item }}
         </span>
       </div>

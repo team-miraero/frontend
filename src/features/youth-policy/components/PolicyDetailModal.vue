@@ -59,17 +59,47 @@
               </span>
             </div>
             <h3 class="mt-2 text-xl font-bold text-[#0a192f]">{{ policy.policyName }}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ policy.policyDescription }}</p>
+            <p class="mt-2 text-sm leading-6 text-slate-500">{{ policy.policyDescription }}</p>
 
-            <div class="mt-5 rounded-2xl bg-accent-light px-5 py-4">
-              <p class="text-xs text-primary/70">지원 내용</p>
-              <p class="mt-1 text-sm font-bold text-primary">{{ policy.supportContent }}</p>
+            <div v-if="supportItems.length" class="mt-5 rounded-2xl bg-accent-light px-5 py-4">
+              <p class="text-xs font-bold text-primary/70">지원 내용</p>
+              <ul class="mt-2 space-y-2">
+                <li
+                  v-for="item in supportItems"
+                  :key="item"
+                  class="flex items-start gap-2 text-sm font-bold leading-6 text-primary"
+                >
+                  <span class="mt-[9px] size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+                  <span>{{ item }}</span>
+                </li>
+              </ul>
             </div>
 
             <dl class="mt-5 divide-y divide-gray-100 rounded-2xl border border-gray-100 px-4">
-              <div v-for="item in infoRows" :key="item.label" class="grid grid-cols-[96px_1fr] gap-3 py-3">
-                <dt class="text-xs text-gray-400">{{ item.label }}</dt>
-                <dd class="text-sm font-bold leading-relaxed text-gray-700">{{ item.value }}</dd>
+              <div
+                v-for="item in infoRows"
+                :key="item.label"
+                class="grid grid-cols-[64px_minmax(0,1fr)] gap-3 py-3.5 sm:grid-cols-[96px_minmax(0,1fr)]"
+              >
+                <dt class="whitespace-nowrap pt-0.5 text-xs text-gray-400">{{ item.label }}</dt>
+                <dd>
+                  <p
+                    v-if="item.items.length === 1"
+                    class="text-sm font-bold leading-6 text-gray-700 [text-wrap:pretty]"
+                  >
+                    {{ item.items[0] }}
+                  </p>
+                  <ul v-else class="space-y-1.5">
+                    <li
+                      v-for="value in item.items"
+                      :key="value"
+                      class="flex items-start gap-2 text-sm font-bold leading-6 text-gray-700"
+                    >
+                      <span class="mt-[10px] size-1 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+                      <span class="[text-wrap:pretty]">{{ value }}</span>
+                    </li>
+                  </ul>
+                </dd>
               </div>
             </dl>
 
@@ -111,6 +141,8 @@ const keywordTags = computed(() => {
   return tags.length > 0 ? tags : (props.policy.policyCategory ? [props.policy.policyCategory] : [])
 })
 
+const supportItems = computed(() => splitDetailItems(props.policy?.supportContent))
+
 const infoRows = computed(() => {
   if (!props.policy) return []
   return [
@@ -118,6 +150,23 @@ const infoRows = computed(() => {
     { label: '지원 대상', value: props.policy.qualification || '정보 없음' },
     { label: '소득 조건', value: props.policy.incomeConditionText || '별도 조건 없음' },
     { label: '신청 방법', value: props.policy.applicationMethod || '정보 없음' },
-  ].filter((row) => row.value)
+  ]
+    .filter((row) => row.value)
+    .map((row) => ({ ...row, items: splitDetailItems(row.value) }))
 })
+
+function splitDetailItems(value) {
+  if (!value) return []
+
+  return String(value)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .split(/\r?\n|;\s*|(?=[①-⑳])|(?=\s*[•●○▪■▶※]\s*)/)
+    .map((item) =>
+      item
+        .trim()
+        .replace(/^(?:[-*•●○▪■▶※]|[①-⑳]|\d+[.)])\s*/, '')
+        .trim()
+    )
+    .filter(Boolean)
+}
 </script>

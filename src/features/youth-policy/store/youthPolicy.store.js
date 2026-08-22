@@ -142,8 +142,13 @@ export const useYouthPolicyStore = defineStore('feature-youth-policy', () => {
    * @param {string} id POLICY_CATEGORY_IDS 값
    */
   async function setCategory(id) {
-    if (categoryId.value === id) return
+    const isChanged = categoryId.value !== id
     categoryId.value = id
+    page.value = 1
+
+    // 다른 카테고리의 목록이 남아 전환되지 않은 것처럼 보이지 않게 즉시 비운다.
+    // 같은 카테고리를 다시 누른 경우에도 재조회해 실패하거나 꼬인 목록을 복구한다.
+    if (isChanged) policies.value = []
     await fetchPolicies()
   }
 

@@ -5,6 +5,7 @@ import { client } from '@/shared/api/client'
  * @property {number} youthPolicyId
  * @property {string} policyName
  * @property {string | null} policyKeyword 콤마로 구분된 정책 키워드 (예: "보조금,주거지원")
+ * @property {string | null} region
  * @property {string | null} providerInstitutionName
  * @property {string | null} applicationPeriod
  */
@@ -61,6 +62,7 @@ export async function getRecommendedYouthPolicies(params) {
  * @property {number} youthPolicyId
  * @property {string} policyName
  * @property {string | null} policyKeyword
+ * @property {string | null} region
  * @property {string | null} policyDescription
  * @property {string | null} supportContent
  * @property {string | null} providerInstitutionName

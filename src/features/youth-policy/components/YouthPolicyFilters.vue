@@ -135,7 +135,6 @@ function applyRegion(region) {
 }
 
 async function applyCategory(categoryId) {
-  if (categoryId === youthPolicyStore.categoryId) return
   await youthPolicyStore.setCategory(categoryId)
   emit('category-applied')
 }
