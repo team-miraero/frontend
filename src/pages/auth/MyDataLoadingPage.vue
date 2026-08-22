@@ -3,7 +3,7 @@
   <HeroBackground>
     <StepHeader :show-back="false" />
 
-    <main class="flex min-h-[calc(100dvh-64px)] items-center justify-center px-4 py-3 sm:py-8">
+    <main class="flex min-h-[calc(100dvh-72px)] items-center justify-center px-4 py-3 sm:py-8">
       <div class="w-full max-w-[420px]">
         <div
           v-if="mydataSyncError"
@@ -28,12 +28,12 @@
             </svg>
           </div>
           <h1
-            class="mt-4 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl [word-break:keep-all] break-keep"
+            class="mt-4 text-[22px] font-bold tracking-tight text-gray-900 sm:text-2xl [word-break:keep-all] break-keep"
           >
             마이데이터를 연동하지 못했어요
           </h1>
           <p
-            class="mt-1.5 text-xs leading-relaxed text-gray-500 sm:text-sm [word-break:keep-all] break-keep"
+            class="mt-1.5 text-[13px] leading-relaxed text-gray-500 sm:text-sm [word-break:keep-all] break-keep"
           >
             {{ mydataSyncError }}
           </p>
@@ -95,7 +95,7 @@
 
             <!-- 로그인 페이지와 동일한 20~24px 굵직한 메인 타이틀 -->
             <h1
-              class="mt-4 text-xl font-bold tracking-tight text-gray-900 sm:text-[22px] [word-break:keep-all] break-keep transition-all duration-300"
+              class="mt-4 text-[22px] font-bold tracking-tight text-gray-900 sm:text-2xl [word-break:keep-all] break-keep transition-all duration-300"
             >
               {{
                 isComplete
@@ -104,7 +104,7 @@
               }}
             </h1>
             <p
-              class="mt-1.5 text-xs sm:text-sm leading-relaxed text-gray-500 [word-break:keep-all] break-keep"
+              class="mt-1.5 text-[13px] sm:text-sm leading-relaxed text-gray-500 [word-break:keep-all] break-keep"
             >
               {{
                 isComplete
@@ -119,8 +119,8 @@
             class="mt-5 rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 shadow-xs"
           >
             <div class="flex items-center justify-between">
-              <p class="text-xs font-semibold text-gray-400 sm:text-sm">데이터 분석 진행 상황</p>
-              <span class="text-xs font-bold text-primary font-mono sm:text-sm">{{ displayPercent }}%</span>
+              <p class="text-[13px] font-semibold text-gray-400 sm:text-sm">데이터 분석 진행 상황</p>
+              <span class="text-[13px] font-bold text-primary font-mono sm:text-sm">{{ displayPercent }}%</span>
             </div>
 
             <ul class="mt-2.5 divide-y divide-slate-100 sm:mt-3">
@@ -173,7 +173,7 @@
                   </Transition>
 
                   <span
-                    class="truncate text-xs sm:text-sm"
+                    class="truncate text-[13px] sm:text-sm"
                     :class="
                       statusOf(index) === 'pending' ? 'text-gray-400' : 'font-medium text-gray-900'
                     "
@@ -189,7 +189,7 @@
                 >
                   <span
                     v-if="statusOf(index) === 'done'"
-                    class="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-primary whitespace-nowrap"
+                    class="shrink-0 whitespace-nowrap rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-primary"
                   >
                     {{ itemDetails[item.id] || '분석 완료' }}
                   </span>
@@ -221,7 +221,7 @@
             >
               <div
                 :key="currentTipIndex"
-                class="flex items-center justify-center gap-2 text-xs text-slate-600"
+                class="flex items-center justify-center gap-2 text-[13px] text-slate-600"
               >
                 <span
                   class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[#F2F4F6] text-primary sm:size-7"
@@ -229,7 +229,7 @@
                   <AppIcon :name="TIPS[currentTipIndex].icon" size="sm" />
                 </span>
                 <span
-                  class="text-xs font-medium text-slate-700 [word-break:keep-all] break-keep leading-snug"
+                  class="text-[13px] font-medium text-slate-700 [word-break:keep-all] break-keep leading-snug"
                   >{{ TIPS[currentTipIndex].text }}</span
                 >
               </div>
